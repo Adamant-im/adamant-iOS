@@ -477,6 +477,10 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
+        viewModel.presentNodeListVC
+            .sink { [weak self] in self?.presentNodeListViewer() }
+            .store(in: &subscriptions)
     }
 }
 
@@ -660,6 +664,14 @@ private extension ChatViewController {
         UIView.animate(withDuration: 0.25) {
             self.chatDropView.alpha = value ? 1.0 : .zero
         }
+    }
+    
+    func presentNodeListViewer() {
+        let vc = screensFactory.makeNodesList()
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        
+        self.present(nav, animated: true, completion: nil)
     }
 }
 

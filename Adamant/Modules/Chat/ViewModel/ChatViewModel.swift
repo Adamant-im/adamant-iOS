@@ -97,6 +97,7 @@ final class ChatViewModel: NSObject {
     let presentDocumentPickerVC = ObservableSender<Void>()
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
+    let presentNodeListVC = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -294,9 +295,15 @@ final class ChatViewModel: NSObject {
         }
         
         guard apiServiceCompose.hasActiveNode(group: .adm) else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
+            dialog.send(
+                .noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send()
+                    }
+                )
+            )
             return
         }
         
@@ -709,12 +716,17 @@ final class ChatViewModel: NSObject {
         }
         
         guard apiServiceCompose.hasActiveNode(group: .adm) else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
+            dialog.send(
+                .noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send()
+                    }
+                )
+            )
             return false
         }
-        
         return true
     }
     
@@ -1063,9 +1075,15 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
         guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.ipfs.name
-            ).localizedDescription))
+            dialog.send(
+                .noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send()
+                    }
+                )
+            )
             return
         }
         

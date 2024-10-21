@@ -282,6 +282,34 @@ extension AdamantDialogService {
         present(alert, animated: animated, completion: completion)
     }
     
+    func showNoActiveNodesAlert(
+        nodeName: String,
+        completion: @escaping () -> Void
+    ) {
+        dismissProgress()
+        let alert = UIAlertController(
+            title: "",
+            message: ApiServiceError.noEndpointsAvailable(
+                nodeGroupName: nodeName).localizedDescription,
+            preferredStyle: .alert
+        )
+        
+        let action = UIAlertAction(
+            title: .adamant.sharedErrors.reviewNodeListButtonTitle(nodeName),
+            style: .default,
+            handler: { _ in completion() }
+        )
+        
+        alert.addAction(action)
+        alert.addAction(UIAlertAction(
+            title: String.adamant.alert.cancel,
+            style: .cancel,
+            handler: nil)
+        )
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     func presentShareAlertFor(
         string: String,
         types: [ShareType],

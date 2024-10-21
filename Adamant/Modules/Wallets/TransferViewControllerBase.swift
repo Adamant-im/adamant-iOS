@@ -802,20 +802,28 @@ class TransferViewControllerBase: FormViewController {
         guard
             apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
         else {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription
-            )
+            dialogService.showNoActiveNodesAlert(
+                nodeName: NodeGroup.adm.name
+            ) { [weak self] in
+                guard let self = self else { return }
+                let vc = self.screensFactory.makeNodesList()
+                vc.modalPresentationStyle = .pageSheet
+                
+                self.present(vc, animated: true, completion: nil)
+            }
             return
         }
         
         guard walletCore.hasActiveNode else {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: walletCore.tokenName
-                ).localizedDescription
-            )
+            dialogService.showNoActiveNodesAlert(
+                nodeName: walletCore.tokenName
+            ) { [weak self] in
+                guard let self = self else { return }
+                let vc = self.screensFactory.makeCoinsNodesList(context: .menu)
+                vc.modalPresentationStyle = .pageSheet
+                
+                self.present(vc, animated: true, completion: nil)
+            }
             return
         }
         

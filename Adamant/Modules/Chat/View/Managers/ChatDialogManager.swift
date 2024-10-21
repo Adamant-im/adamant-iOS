@@ -25,7 +25,8 @@ final class ChatDialogManager {
     
     typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
     typealias ContextMenuAction = ((_ messageId: String) -> Void)?
-    
+    typealias NoActiveNodesAction = (() -> Void)
+
     init(
         viewModel: ChatViewModel,
         dialogService: DialogService,
@@ -108,6 +109,8 @@ private extension ChatDialogManager {
             showRenameAlert()
         case .actionMenu:
             showActionMenu()
+        case .noActiveNodesAlert(let name, let action):
+            dialogService.showNoActiveNodesAlert(nodeName: name, completion: action)
         }
     }
     

@@ -88,6 +88,10 @@ public extension String.adamant {
             String.localizedStringWithFormat(.localized("ApiService.InternalError.NoAdmNodesAvailable", comment: "No active ADM nodes to fetch the partner's %@ address"), coin)
         }
         
+        public static func reviewNodeListButtonTitle(_ coin: String) -> String {
+            String.localizedStringWithFormat(.localized("AlertButton.ReviewNodeList", comment: "Button title for alert when all ADM nodes are inactive"), coin)
+        }
+        
         public static var notEnoughMoney: String {
             String.localized("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
         }
