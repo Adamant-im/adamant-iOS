@@ -60,9 +60,18 @@ public final class BlockchainHealthCheckWrapper<
                     group.addTask { @HealthCheckActor [weak self] in
                         guard
                             let self = self,
-                            let update = await updateNodeStatusInfo(node: node)
+                            !currentRequests.contains(node.id)
                         else { return }
                         
+                        currentRequests.insert(node.id)
+                        updateNode(id: node.id) { $0.isUpdating = true }
+                        
+                        defer {
+                            currentRequests.remove(node.id)
+                            updateNode(id: node.id) { $0.isUpdating = false }
+                        }
+                        
+                        let update = await updateNodeStatusInfo(node: node)
                         updateNodesAvailability(update: update)
                     }
                 }
@@ -87,11 +96,7 @@ private extension BlockchainHealthCheckWrapper {
             .store(in: &subscriptions)
     }
     
-    func updateNodeStatusInfo(node: Node) async -> NodeUpdate? {
-        guard !currentRequests.contains(node.id) else { return nil }
-        currentRequests.insert(node.id)
-        defer { currentRequests.remove(node.id) }
-        
+    func updateNodeStatusInfo(node: Node) async -> NodeUpdate {
         guard
             node.preferMainOrigin == nil,
             let altOrigin = node.altOrigin

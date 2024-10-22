@@ -688,6 +688,9 @@
 /* NodesList.NodeCell: Node is synchronizing */
 "NodesList.NodeCell.Synchronizing" = "Синхронизируется";
 
+/* NodesList.NodeCell: Node is updating */
+"NodesList.NodeCell.Updating" = "Обновляется";
+
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Офлайн";
 
