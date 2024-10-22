@@ -496,6 +496,7 @@ private extension ChatMessageFactory {
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = .asset(named: "status_pending")
+        attachment.image?.withTintColor(.adamant.secondary)
         attachment.bounds = CGRect(x: .zero, y: -1, width: 10, height: 10)
         return NSAttributedString(attachment: attachment)
     }
