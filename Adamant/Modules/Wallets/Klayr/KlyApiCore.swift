@@ -10,7 +10,7 @@ import CommonKit
 import Foundation
 @preconcurrency import LiskKit
 
-class KlyApiCore: BlockchainHealthCheckableService {
+class KlyApiCore: BlockchainHealthCheckableService, @unchecked Sendable {
     func makeClient(origin: NodeOrigin) -> APIClient {
         .init(options: .init(
             nodes: [.init(origin: origin.asString())],

@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class DogeApiCore: BlockchainHealthCheckableService {
+final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -49,11 +49,11 @@ final class DogeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
     
     var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
+        get async { await api.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
@@ -61,7 +61,7 @@ final class DogeApiService: ApiServiceProtocol {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func request<Output>(

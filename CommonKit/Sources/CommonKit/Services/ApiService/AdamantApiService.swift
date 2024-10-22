@@ -34,14 +34,14 @@ public final class AdamantApiService {
 
 extension AdamantApiService: AdamantApiServiceProtocol {
     public var chosenFastestNodeId: UUID? {
-        service.chosenFastestNodeId
+        get async { await service.chosenNodeId }
     }
     
     public func healthCheck() {
-        service.healthCheck()
+        Task { await service.healthCheck() }
     }
     
     public var hasActiveNode: Bool {
-        !service.sortedAllowedNodes.isEmpty
+        get async { await !service.sortedAllowedNodes.isEmpty }
     }
 }

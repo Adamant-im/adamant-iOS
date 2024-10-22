@@ -11,6 +11,7 @@ import CommonKit
 
 final class InfoServiceApiService: Sendable {
     let core: BlockchainHealthCheckWrapper<InfoServiceApiCore>
+    let mapper: InfoServiceMapperProtocol
     
     func request<Output>(
         _ request: @Sendable (
@@ -23,7 +24,8 @@ final class InfoServiceApiService: Sendable {
         }.mapError { .apiError($0) }
     }
     
-    init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>) {
+    init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>, mapper: InfoServiceMapperProtocol) {
         self.core = core
+        self.mapper = mapper
     }
 }

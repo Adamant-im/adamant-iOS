@@ -16,7 +16,8 @@ public protocol HealthCheckableError: Error {
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
-open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked Sendable {
+@HealthCheckActor
+open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
     @ObservableValue public private(set) var nodes: [Node] = .init()
     @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
     
@@ -27,20 +28,21 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
     private let normalUpdateInterval: TimeInterval
     private let crucialUpdateInterval: TimeInterval
     
-    @Atomic public var fastestNodeMode = true
-    @Atomic public var healthCheckTimerSubscription: AnyCancellable?
-    @Atomic public var subscriptions: Set<AnyCancellable> = .init()
-    
-    @Atomic private var previousAppState: UIApplication.State?
-    @Atomic private var lastUpdateTime: Date?
-    
-    public var chosenFastestNodeId: UUID? {
-        fastestNodeMode
-            ? sortedAllowedNodes.first?.id
-            : nil
+    public var fastestNodeMode = true {
+        didSet { updateSortedNodes() }
     }
     
-    public init(
+    public var healthCheckTimerSubscription: AnyCancellable?
+    public var subscriptions: Set<AnyCancellable> = .init()
+    
+    private var previousAppState: UIApplication.State?
+    private var lastUpdateTime: Date?
+    
+    public var chosenNodeId: UUID? {
+        sortedAllowedNodes.first?.id
+    }
+    
+    public nonisolated init(
         service: Service,
         isActive: Bool,
         name: String,
@@ -55,33 +57,9 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
         self.normalUpdateInterval = normalUpdateInterval
         self.crucialUpdateInterval = crucialUpdateInterval
         
-        let connection = connection
-            .removeDuplicates()
-            .filter { $0 }
-        
-        nodes
-            .removeDuplicates()
-            .handleEvents(receiveOutput: { [weak self] in self?.updateNodes($0) })
-            .removeDuplicates { !$0.doesNeedHealthCheck($1) }
-            .combineLatest(connection)
-            .sink { [weak self] _ in self?.healthCheck() }
-            .store(in: &subscriptions)
-        
-        $sortedAllowedNodes
-            .map { $0.isEmpty }
-            .removeDuplicates()
-            .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.didBecomeActiveAction() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.previousAppState = .background }
-            .store(in: &subscriptions)
+        Task.sync { @HealthCheckActor [self] in
+            configure(nodes: nodes, connection: connection)
+        }
     }
     
     public func request<Output>(
@@ -89,6 +67,7 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
         _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
+        updateSortedNodes()
         
         var lastConnectionError = nodesList.isEmpty
             ? Error.noEndpointsError(nodeGroupName: name)
@@ -121,10 +100,41 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
 }
 
 private extension HealthCheckWrapper {
+    func configure(nodes: AnyObservable<[Node]>, connection: AnyObservable<Bool>) {
+        let connection = connection
+            .removeDuplicates()
+            .filter { $0 }
+        
+        nodes
+            .removeDuplicates()
+            .handleEvents(receiveOutput: { [weak self] in self?.updateNodes($0) })
+            .removeDuplicates { !$0.doesNeedHealthCheck($1) }
+            .combineLatest(connection)
+            .sink { [weak self] _ in self?.healthCheck() }
+            .store(in: &subscriptions)
+        
+        $sortedAllowedNodes
+            .map { $0.isEmpty }
+            .removeDuplicates()
+            .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { @HealthCheckActor [weak self] _ in self?.didBecomeActiveAction() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { @HealthCheckActor [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
+    }
+    
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.compactMap { [fastestNodeMode = $fastestNodeMode] in
-            guard !waitsForConnectivity || !$0.isEmpty else { return nil }
-            return fastestNodeMode.value ? $0 : $0.shuffled()
+        await $sortedAllowedNodes.compactMap { sortedNodes in
+            !waitsForConnectivity || !sortedNodes.isEmpty
+                ? sortedNodes
+                : nil
         }.values.first { _ in true } ?? .init()
     }
     
@@ -154,9 +164,12 @@ private extension HealthCheckWrapper {
     
     func updateNodes(_ newNodes: [Node]) {
         nodes = newNodes
-        
-        sortedAllowedNodes = newNodes.getAllowedNodes(
-            sortedBySpeedDescending: true,
+        updateSortedNodes()
+    }
+    
+    func updateSortedNodes() {
+        sortedAllowedNodes = nodes.getAllowedNodes(
+            sortedBySpeedDescending: fastestNodeMode,
             needWS: false
         )
     }

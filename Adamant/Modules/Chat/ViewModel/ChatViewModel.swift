@@ -293,15 +293,15 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard apiServiceCompose.hasActiveNode(group: .adm) else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
-            return
-        }
-        
-        if !(filesPicked?.isEmpty ?? true) {
-            Task {
+        Task {
+            guard await apiServiceCompose.hasActiveNode(group: .adm) else {
+                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                    nodeGroupName: NodeGroup.adm.name
+                ).localizedDescription))
+                return
+            }
+            
+            if !(filesPicked?.isEmpty ?? true) {
                 do {
                     try await sendFiles(with: text)
                 } catch {
@@ -311,11 +311,9 @@ final class ChatViewModel: NSObject {
                         filesPicked: filesPicked
                     )
                 }
+                return
             }
-            return
-        }
-        
-        Task {
+    
             let message: AdamantMessage
             
             if let replyMessage = replyMessage {
@@ -702,13 +700,13 @@ final class ChatViewModel: NSObject {
         )
     }
     
-    func canSendMessage(withText text: String) -> Bool {
+    func canSendMessage(withText text: String) async -> Bool {
         guard text.count <= maxMessageLenght else {
             dialog.send(.alert(.adamant.chat.messageIsTooBig))
             return false
         }
         
-        guard apiServiceCompose.hasActiveNode(group: .adm) else {
+        guard await apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
@@ -1062,7 +1060,7 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
-        guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
+        guard await apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.ipfs.name
             ).localizedDescription))

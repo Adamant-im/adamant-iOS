@@ -9,8 +9,8 @@
 import Foundation
 
 public protocol ApiServiceProtocol: Sendable {
-    var chosenFastestNodeId: UUID? { get }
-    var hasActiveNode: Bool { get }
+    var chosenFastestNodeId: UUID? { get async }
+    var hasActiveNode: Bool { get async }
     
     func healthCheck()
 }

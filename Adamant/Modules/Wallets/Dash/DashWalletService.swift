@@ -115,7 +115,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
     
     // MARK: - Notifications

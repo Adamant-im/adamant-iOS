@@ -10,7 +10,7 @@
 import Foundation
 import CommonKit
 
-final class KlyServiceApiCore: KlyApiCore {
+final class KlyServiceApiCore: KlyApiCore, @unchecked Sendable {
     override func getStatusInfo(
         origin: NodeOrigin
     ) async -> WalletServiceResult<NodeStatusInfo> {
@@ -35,11 +35,11 @@ final class KlyServiceApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyServiceApiCore>
     
     var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
+        get async { await api.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<KlyServiceApiCore>) {
@@ -47,7 +47,7 @@ final class KlyServiceApiService: ApiServiceProtocol {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func requestServiceApi<Output>(
