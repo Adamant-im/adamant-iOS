@@ -12,11 +12,11 @@ import CommonKit
 protocol FileApiServiceProtocol: ApiServiceProtocol {
     func uploadFile(
         data: Data,
-        uploadProgress: @escaping ((Progress) -> Void)
+        uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<String>
     
     func downloadFile(
         id: String,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<Data>
 }

@@ -10,6 +10,7 @@ import Swinject
 import SwiftUI
 import FilesStorageKit
 
+@MainActor
 struct StorageUsageFactory {
     private let assembler: Assembler
     
@@ -26,8 +27,8 @@ struct StorageUsageFactory {
     }
 }
 
-private struct StorageUsageAssembly: Assembly {
-    func assemble(container: Container) {
+private struct StorageUsageAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(StorageUsageViewModel.self) {
             StorageUsageViewModel(
                 filesStorage: $0.resolve(FilesStorageProtocol.self)!,

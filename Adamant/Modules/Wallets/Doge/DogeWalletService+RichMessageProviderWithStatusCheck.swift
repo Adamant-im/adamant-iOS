@@ -26,7 +26,7 @@ extension DogeWalletService {
         let dogeTransaction: BTCRawTransaction
         
         do {
-            dogeTransaction = try await getTransaction(by: hash)
+            dogeTransaction = try await getTransaction(by: hash, waitsForConnectivity: true)
         } catch {
             return .init(error: error)
         }

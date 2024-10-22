@@ -28,7 +28,7 @@ final class InfoService: InfoServiceProtocol {
         set { updateCurrency(newValue) }
     }
     
-    nonisolated init(
+    init(
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         api: InfoServiceApiServiceProtocol
@@ -36,7 +36,7 @@ final class InfoService: InfoServiceProtocol {
         self.securedStore = securedStore
         self.api = api
         rateCoins = walletServiceCompose.getWallets().map { $0.core.tokenSymbol }
-        Task { @MainActor in configure() }
+        configure()
     }
     
     func update() {
@@ -72,8 +72,8 @@ private extension InfoService {
         setupCurrency()
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { _ in Task { [weak self] in self?.update() } }
+            .notifications(named: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in await self?.update() }
             .store(in: &subscriptions)
     }
     

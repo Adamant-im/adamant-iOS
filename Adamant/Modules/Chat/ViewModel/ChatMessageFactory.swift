@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import MarkdownKit
+@preconcurrency import MarkdownKit
 import MessageKit
 import CommonKit
 import FilesStorageKit
 
-struct ChatMessageFactory {
+struct ChatMessageFactory: Sendable {
     private let walletServiceCompose: WalletServiceCompose
     
     static let markdownParser = MarkdownParser(

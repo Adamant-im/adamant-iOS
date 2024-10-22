@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ApiServiceProtocol {
+public protocol ApiServiceProtocol: Sendable {
     var chosenFastestNodeId: UUID? { get }
     var hasActiveNode: Bool { get }
     

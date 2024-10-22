@@ -11,6 +11,7 @@ import SnapKit
 import CommonKit
 import MarkdownKit
 import SafariServices
+import Combine
 
 // MARK: - Localization
 extension String.adamant {
@@ -119,9 +120,9 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     private lazy var bottomPanel = DelegatesBottomPanel()
     
-    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
+    private(set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
     private var filteredDelegates: [Int]?
-    private var forcedUpdateTimer: Timer?
+    private var timerSubscription: AnyCancellable?
     private var loadingView: LoadingView?
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
@@ -159,11 +160,6 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        
-        if let timer = forcedUpdateTimer {
-            timer.invalidate()
-            forcedUpdateTimer = nil
-        }
     }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
@@ -313,7 +309,7 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 // MARK: - Voting
 private extension DelegatesListViewController {
     func vote() {
-        if forcedUpdateTimer != nil {
+        if timerSubscription != nil {
             self.dialogService.showWarning(withMessage: String.adamant.delegates.timeOutBeforeNewVote)
             return
         }
@@ -411,18 +407,15 @@ private extension DelegatesListViewController {
     }
     
     func scheduleUpdate() {
-        if let timer = forcedUpdateTimer {
-            timer.invalidate()
-            forcedUpdateTimer = nil
-        }
-        
-        let timer = Timer.scheduledTimer(timeInterval: 20.0, target: self, selector: #selector(updateTimerCallback), userInfo: nil, repeats: false)
-        forcedUpdateTimer = timer
+        timerSubscription = Timer.publish(every: 20, on: .main, in: .default)
+            .autoconnect()
+            .first()
+            .sink { [weak self] _ in self?.updateTimerCallback() }
     }
     
-    @objc func updateTimerCallback(_ timer: Timer) {
+    func updateTimerCallback() {
         handleRefresh(refreshControl)
-        forcedUpdateTimer = nil
+        timerSubscription = nil
     }
     
     func updateVotePanel() {

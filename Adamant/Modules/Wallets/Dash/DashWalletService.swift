@@ -19,7 +19,7 @@ struct DashApiComand {
     static let rawTransactionMethod: String = "getrawtransaction"
 }
 
-final class DashWalletService: WalletCoreProtocol {
+final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -77,7 +77,7 @@ final class DashWalletService: WalletCoreProtocol {
         return DashWalletService.fixedFee
     }
     
-    @Atomic private (set) var isWarningGasPrice = false
+    @Atomic private(set) var isWarningGasPrice = false
     
     static let kvsAddress = "dash:address"
     
@@ -128,8 +128,8 @@ final class DashWalletService: WalletCoreProtocol {
     @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    @Atomic private (set) var dashWallet: DashWallet?
-    @Atomic private (set) var enabled = true
+    @Atomic private(set) var dashWallet: DashWallet?
+    @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
@@ -156,7 +156,7 @@ final class DashWalletService: WalletCoreProtocol {
     )
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -185,25 +185,22 @@ final class DashWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.dashWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -261,7 +258,7 @@ final class DashWalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -401,7 +398,7 @@ extension DashWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dashApiService.request { core, origin in
+        let data: Data = try await dashApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
                 origin: origin,
                 path: .empty,
@@ -508,7 +505,7 @@ extension DashWalletService {
     ///   - dashAddress: DASH address to save into KVS
     ///   - adamantAddress: Owner of Dash address
     ///   - completion: success
-    private func save(dashAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(dashAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -519,7 +516,7 @@ extension DashWalletService {
             return
         }
 
-        Task {
+        Task { @Sendable in
             let result = await apiService.store(
                 key: DashWalletService.kvsAddress,
                 value: dashAddress,
@@ -558,7 +555,7 @@ extension DashWalletService {
                         return
                     }
 
-                    self?.save(dashAddress: dashAddress) { result in
+                    self?.save(dashAddress: dashAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
                     }
                 }

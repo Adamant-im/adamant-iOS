@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 
 /// A standard protocol representing a Transaction details.
-protocol TransactionDetails {
+protocol TransactionDetails: Sendable {
     /// The identifier of the transaction.
     var txId: String { get }
     

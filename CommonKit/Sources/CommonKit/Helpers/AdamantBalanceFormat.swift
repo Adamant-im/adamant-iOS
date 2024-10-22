@@ -59,9 +59,9 @@ public enum AdamantBalanceFormat {
         return formatter
     }
     
-    public static var currencyFormatterFull = currencyFormatter(for: .full, currencySymbol: nil)
-    public static var currencyFormatterCompact = currencyFormatter(for: .compact, currencySymbol: nil)
-    public static var currencyFormatterShort = currencyFormatter(for: .short, currencySymbol: nil)
+    public static let currencyFormatterFull = currencyFormatter(for: .full, currencySymbol: nil)
+    public static let currencyFormatterCompact = currencyFormatter(for: .compact, currencySymbol: nil)
+    public static let currencyFormatterShort = currencyFormatter(for: .short, currencySymbol: nil)
     
     // MARK: Methods
     
@@ -92,7 +92,7 @@ public enum AdamantBalanceFormat {
     
     // MARK: Other formatters
     
-    public static var rawNumberDotFormatter: NumberFormatter = {
+    public static let rawNumberDotFormatter: NumberFormatter = {
         let f = NumberFormatter()
         f.numberStyle = .decimal
         f.roundingMode = .floor
@@ -103,7 +103,7 @@ public enum AdamantBalanceFormat {
         return f
     }()
     
-    public static var rawNumberCommaFormatter: NumberFormatter = {
+    public static let rawNumberCommaFormatter: NumberFormatter = {
         let f = NumberFormatter()
         f.numberStyle = .decimal
         f.roundingMode = .floor

@@ -11,7 +11,7 @@ import SocketIO
 import CommonKit
 import Combine
 
-final class AdamantSocketService: SocketService {
+final class AdamantSocketService: SocketService, @unchecked Sendable {
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
     
@@ -43,7 +43,7 @@ final class AdamantSocketService: SocketService {
     @Atomic private var manager: SocketManager?
     @Atomic private var socket: SocketIOClient?
     @Atomic private var currentAddress: String?
-    @Atomic private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
+    @Atomic private var currentHandler: (@Sendable (ApiServiceResult<Transaction>) -> Void)?
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
     let defaultResponseDispatchQueue = DispatchQueue(
@@ -67,7 +67,7 @@ final class AdamantSocketService: SocketService {
     
     // MARK: - Tools
     
-    func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void) {
+    func connect(address: String, handler: @escaping @Sendable (ApiServiceResult<Transaction>) -> Void) {
         disconnect()
         currentAddress = address
         currentHandler = handler

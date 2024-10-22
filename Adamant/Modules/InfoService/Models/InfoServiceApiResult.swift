@@ -6,4 +6,4 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-typealias InfoServiceApiResult<Success> = Result<Success, InfoServiceApiError>
+typealias InfoServiceApiResult<Success: Sendable> = Result<Success, InfoServiceApiError>

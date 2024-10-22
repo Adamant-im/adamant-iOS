@@ -7,7 +7,7 @@ import Combine
 
 public typealias FileStorageServiceResult<Success> = Result<Success, FileValidationError>
 
-public final class FilesStorageKit: FilesStorageProtocol {
+public final class FilesStorageKit: FilesStorageProtocol, @unchecked Sendable {
     public struct File {
         public let id: String
         public let isEncrypted: Bool
@@ -17,7 +17,7 @@ public final class FilesStorageKit: FilesStorageProtocol {
     }
     
     @Atomic private var cachedFiles: [String: File] = [:]
-    private var cachedImages: NSCache<NSString, UIImage> = NSCache()
+    private let cachedImages: NSCache<NSString, UIImage> = NSCache()
     private let maxCachedFilesToLoad = 100
     private let encryptedFileExtension = "encFhj"
     private let previewFileExtension = "prvAIFE"

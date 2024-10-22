@@ -7,7 +7,7 @@
 
 import Foundation
 
-public var isMacOS: Bool = {
+public let isMacOS: Bool = {
     #if targetEnvironment(macCatalyst)
     true
     #else

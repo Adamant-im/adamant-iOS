@@ -6,13 +6,13 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Combine
+@preconcurrency import Combine
 import CoreData
 import MarkdownKit
 import UIKit
 import CommonKit
 import AdvancedContextMenuKit
-import ElegantEmojiPicker
+@preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
 
@@ -28,7 +28,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
-    private let richTransactionStatusService: TransactionStatusService
+    private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     private let chatCacheService: ChatCacheService
     private let walletServiceCompose: WalletServiceCompose
     private let avatarService: AvatarService
@@ -157,7 +157,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
-        richTransactionStatusService: TransactionStatusService,
+        richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
         chatCacheService: ChatCacheService,
         walletServiceCompose: WalletServiceCompose,
         avatarService: AvatarService,
@@ -1055,8 +1055,8 @@ extension ChatViewModel {
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
+    nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in updateTransactions(performFetch: false) }
     }
 }
 
@@ -1116,9 +1116,8 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantVisibleWalletsService.visibleWallets)
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
+            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
+            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {
@@ -1199,7 +1198,7 @@ private extension ChatViewModel {
         updateMessages(
             resetLoadingProperty: performFetch,
             completion: isNewReaction
-                ? { [commitVibro] in commitVibro.send() }
+                ? { @Sendable [commitVibro] in commitVibro.send() }
                 : {}
         )
     }
@@ -1471,11 +1470,12 @@ private extension ChatViewModel {
     func waitForChatLoading(with address: String) async {
         await withUnsafeContinuation { continuation in
             Task {
-                await chatsProvider.chatLoadingStatusPublisher
-                    .filter { $0.contains(
-                        where: {
+                let publisher = await chatsProvider.chatLoadingStatusPublisher
+                publisher
+                    .filter { dict in
+                        dict.contains {
                             $0.key == address && $0.value == .loaded
-                        })
+                        }
                     }
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] _ in
@@ -1704,24 +1704,28 @@ private extension Sequence where Element == ChatTransaction {
 }
 
 extension ChatViewModel: ElegantEmojiPickerDelegate {
-    func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
-        dialog.send(.dismissMenu)
+    nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+        let sendableEmoji = Atomic(emoji)
         
-        guard let previousArg = previousArg else { return }
-        
-        let emoji = emoji?.emoji == previousArg.selectedEmoji
-        ? ""
-        : (emoji?.emoji ?? "")
-        
-        let type: EmojiUpdateType = emoji.isEmpty
-        ? .decrement
-        : .increment
-        
-        emojiService.updateFrequentlySelectedEmojis(
-            selectedEmoji: emoji,
-            type: type
-        )
-        
-        reactAction(previousArg.messageId, emoji: emoji)
+        MainActor.assumeIsolatedSafe {
+            dialog.send(.dismissMenu)
+            
+            guard let previousArg = previousArg else { return }
+            
+            let emoji = sendableEmoji.value?.emoji == previousArg.selectedEmoji
+            ? ""
+            : (sendableEmoji.value?.emoji ?? "")
+            
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
+            
+            reactAction(previousArg.messageId, emoji: emoji)
+        }
     }
 }

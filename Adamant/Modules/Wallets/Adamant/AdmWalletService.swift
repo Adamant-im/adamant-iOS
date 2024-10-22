@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 import Swinject
-import CoreData
+@preconcurrency import CoreData
 import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol {
+final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -114,25 +114,22 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.wallet = nil
             }
             .store(in: &subscriptions)
@@ -170,7 +167,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         }
         
         if isRaised {
-            vibroService.applyVibration(.success)
+            Task { @MainActor in vibroService.applyVibration(.success) }
         }
         if notify, let wallet = wallet {
             postUpdateNotification(with: wallet)

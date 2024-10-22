@@ -37,7 +37,7 @@ final class StorageUsageViewModel: ObservableObject {
         }
     }
     
-    nonisolated init(
+    init(
         filesStorage: FilesStorageProtocol,
         dialogService: DialogService,
         filesStorageProprieties: FilesStorageProprietiesProtocol
@@ -118,10 +118,12 @@ final class StorageUsageViewModel: ObservableObject {
 
 private extension StorageUsageViewModel {
     func updateCacheSize() {
-        DispatchQueue.global().async {
-            let size = (try? self.filesStorage.getCacheSize().get()) ?? .zero
-            DispatchQueue.main.async {
-                self.storageUsedDescription = self.formatSize(size)
+        Task.detached { [filesStorage] in
+            let size = (try? filesStorage.getCacheSize().get()) ?? .zero
+            
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                storageUsedDescription = formatSize(size)
             }
         }
     }

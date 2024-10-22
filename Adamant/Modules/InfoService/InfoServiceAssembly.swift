@@ -9,8 +9,8 @@
 import Swinject
 import CommonKit
 
-struct InfoServiceAssembly: Assembly {
-    func assemble(container: Container) {
+struct InfoServiceAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(InfoServiceProtocol.self) { r in
             InfoService(
                 securedStore: r.resolve(SecuredStore.self)!,

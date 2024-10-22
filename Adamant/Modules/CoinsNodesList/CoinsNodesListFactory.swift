@@ -15,6 +15,7 @@ enum CoinsNodesListContext {
     case menu
 }
 
+@MainActor
 struct CoinsNodesListFactory {
     private let parent: Assembler
     private let assemblies = [CoinsNodesListAssembly()]
@@ -38,8 +39,8 @@ struct CoinsNodesListFactory {
     }
 }
 
-private struct CoinsNodesListAssembly: Assembly {
-    func assemble(container: Container) {
+private struct CoinsNodesListAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(CoinsNodesListViewModel.self) {
             let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
             

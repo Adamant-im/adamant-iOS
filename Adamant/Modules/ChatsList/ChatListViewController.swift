@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import MarkdownKit
 import MessageKit
 import Combine
@@ -283,26 +283,23 @@ final class ChatListViewController: KeyboardObservingViewController {
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: nil)
                 self?.areMessagesLoaded = false
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
+            .notifications(named: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
+            .sink { @MainActor notification in
                 Task { [weak self] in
                     await self?.handleInitiallySyncedNotification(notification)
                 }
@@ -310,31 +307,27 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
+            .notifications(named: .AdamantTransfersProvider.stateChanged, object: nil)
+            .sink { @MainActor [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageProprietiesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageProprietiesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
@@ -728,99 +721,115 @@ extension ChatListViewController {
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        if controller == chatsController {
-            tableView.beginUpdates()
-            updatingIndicatorView.startAnimate()
+    nonisolated func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            if controller == chatsController {
+                tableView.beginUpdates()
+                updatingIndicatorView.startAnimate()
+            }
         }
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        switch controller {
-        case let c where c == chatsController:
-            tableView.endUpdates()
-            updatingIndicatorView.stopAnimate()
-            
-        case let c where c == unreadController:
-            setBadgeValue(controller.fetchedObjects?.count)
-            
-        default:
-            break
+    nonisolated func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            switch controller {
+            case let c where c == chatsController:
+                tableView.endUpdates()
+                updatingIndicatorView.stopAnimate()
+                
+            case let c where c == unreadController:
+                setBadgeValue(controller.fetchedObjects?.count)
+                
+            default:
+                break
+            }
         }
     }
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if isBusy { return }
-        switch controller {
-        // MARK: Chats controller
-        case let c where c == chatsController:
-            switch type {
-            case .insert:
-                if let newIndexPath = newIndexPath {
-                    tableView.insertRows(at: [newIndexPath], with: .automatic)
-                }
-                
-            case .delete:
-                if let indexPath = indexPath {
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
-                }
-                
-            case .update:
-                if let indexPath = indexPath,
-                   let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-                   let chatroom = anObject as? Chatroom {
-                    configureCell(cell, for: chatroom)
-                }
-                
-            case .move:
-                if let indexPath = indexPath, let newIndexPath = newIndexPath {
-                    if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+    nonisolated func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        let sendableObject = Atomic(anObject)
+        
+        Task { @MainActor in
+            if isBusy { return }
+            let anObject = sendableObject.value
+            
+            switch controller {
+            // MARK: Chats controller
+            case let c where c == chatsController:
+                switch type {
+                case .insert:
+                    if let newIndexPath = newIndexPath {
+                        tableView.insertRows(at: [newIndexPath], with: .automatic)
+                    }
+                    
+                case .delete:
+                    if let indexPath = indexPath {
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                    
+                case .update:
+                    if let indexPath = indexPath,
+                       let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+                       let chatroom = anObject as? Chatroom {
                         configureCell(cell, for: chatroom)
                     }
-                    tableView.moveRow(at: indexPath, to: newIndexPath)
+                    
+                case .move:
+                    if let indexPath = indexPath, let newIndexPath = newIndexPath {
+                        if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+                            configureCell(cell, for: chatroom)
+                        }
+                        tableView.moveRow(at: indexPath, to: newIndexPath)
+                    }
+                @unknown default:
+                    break
                 }
-            @unknown default:
+                
+            // MARK: Unread controller
+                
+            case let c where c == unreadController:
+                guard let transaction = anObject as? ChatTransaction else { break }
+                
+                if self.view.window == nil,
+                   type == .insert {
+                    showNotification(for: transaction)
+                }
+                
+                let shouldForceUpdate = anObject is TransferTransaction
+                || anObject is RichMessageTransaction
+                
+                if shouldForceUpdate, type == .insert {
+                    transactionsRequiringBalanceUpdate.append(transaction.txId)
+                }
+                
+                guard shouldForceUpdate,
+                      let blockId = transaction.blockId,
+                      !blockId.isEmpty,
+                      transactionsRequiringBalanceUpdate.contains(transaction.txId)
+                else {
+                    break
+                }
+                
+                if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
+                    transactionsRequiringBalanceUpdate.remove(at: index)
+                }
+                
+                NotificationCenter.default.post(
+                    name: .AdamantAccountService.forceUpdateBalance,
+                    object: nil
+                )
+                
+            default:
                 break
             }
-            
-        // MARK: Unread controller
-            
-        case let c where c == unreadController:
-            guard let transaction = anObject as? ChatTransaction else { break }
-            
-            if self.view.window == nil,
-               type == .insert {
-                showNotification(for: transaction)
-            }
-            
-            let shouldForceUpdate = anObject is TransferTransaction
-            || anObject is RichMessageTransaction
-            
-            if shouldForceUpdate, type == .insert {
-                transactionsRequiringBalanceUpdate.append(transaction.txId)
-            }
-            
-            guard shouldForceUpdate,
-                  let blockId = transaction.blockId,
-                  !blockId.isEmpty,
-                  transactionsRequiringBalanceUpdate.contains(transaction.txId)
-            else {
-                break
-            }
-            
-            if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
-                transactionsRequiringBalanceUpdate.remove(at: index)
-            }
-            
-            NotificationCenter.default.post(
-                name: .AdamantAccountService.forceUpdateBalance,
-                object: nil
-            )
-            
-        default:
-            break
         }
     }
 }

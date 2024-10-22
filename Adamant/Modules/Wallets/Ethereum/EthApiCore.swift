@@ -8,7 +8,7 @@
 
 import CommonKit
 import Foundation
-import web3swift
+@preconcurrency import web3swift
 import Web3Core
 
 actor EthApiCore {

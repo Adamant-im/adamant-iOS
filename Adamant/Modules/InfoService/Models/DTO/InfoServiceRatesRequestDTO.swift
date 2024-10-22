@@ -8,6 +8,6 @@
 
 import Foundation
 
-struct InfoServiceRatesRequestDTO: Codable {
+struct InfoServiceRatesRequestDTO: Codable, Sendable {
     let coin: String
 }

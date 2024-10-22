@@ -93,7 +93,10 @@ final class BtcTransferViewController: TransferViewControllerBase {
                 
                 var detailTransaction: BtcTransaction?
                 if let hash = transaction.txHash {
-                    detailTransaction = try? await service.getTransaction(by: hash)
+                    detailTransaction = try? await service.getTransaction(
+                        by: hash,
+                        waitsForConnectivity: false
+                    )
                 }
                 
                 processTransaction(

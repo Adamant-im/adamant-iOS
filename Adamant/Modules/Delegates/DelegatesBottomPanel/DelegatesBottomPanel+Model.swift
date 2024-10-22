@@ -21,16 +21,18 @@ extension DelegatesBottomPanel {
         let totalVotesColor: UIColor
         let sendAction: () -> Void
         
-        static let `default` = Self(
-            upvotes: .zero,
-            downvotes: .zero,
-            new: (.zero, .zero),
-            total: (.zero, .zero),
-            cost: "",
-            isSendingEnabled: false,
-            newVotesColor: .adamant.textColor,
-            totalVotesColor: .adamant.textColor,
-            sendAction: {}
-        )
+        static var `default`: Self {
+            Self(
+                upvotes: .zero,
+                downvotes: .zero,
+                new: (.zero, .zero),
+                total: (.zero, .zero),
+                cost: "",
+                isSendingEnabled: false,
+                newVotesColor: .adamant.textColor,
+                totalVotesColor: .adamant.textColor,
+                sendAction: {}
+            )
+        }
     }
 }

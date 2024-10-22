@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct NodeStatusInfo: Equatable {
+public struct NodeStatusInfo: Equatable, Sendable {
     public let ping: TimeInterval
     public let height: Int
     public let wsEnabled: Bool

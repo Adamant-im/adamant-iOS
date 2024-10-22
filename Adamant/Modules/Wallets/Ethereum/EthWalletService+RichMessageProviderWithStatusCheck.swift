@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import web3swift
-import Web3Core
+@preconcurrency import web3swift
+@preconcurrency import Web3Core
 import CommonKit
 
 extension EthWalletService {
@@ -28,7 +28,9 @@ extension EthWalletService {
         let transactionInfo: EthTransactionInfo
         
         do {
-            transactionInfo = try await ethApiService.requestWeb3 { [weak self] web3 in
+            transactionInfo = try await ethApiService.requestWeb3(
+                waitsForConnectivity: true
+            ) { [weak self] web3 in
                 guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
                 return try await getTransactionInfo(hash: hash, web3: web3)
             }.get()
@@ -45,7 +47,7 @@ extension EthWalletService {
         
         var sentDate: Date?
         if let blockHash = details.blockHash {
-            sentDate = try? await ethApiService.requestWeb3 { web3 in
+            sentDate = try? await ethApiService.requestWeb3(waitsForConnectivity: true) { web3 in
                 try await web3.eth.block(by: blockHash).timestamp
             }.get()
         }
@@ -58,12 +60,12 @@ extension EthWalletService {
 }
 
 private extension EthWalletService {
-    struct EthTransactionInfo {
+    struct EthTransactionInfo: Sendable {
         var details: Web3Core.TransactionDetails?
         var receipt: TransactionReceipt?
     }
 
-    enum EthTransactionInfoElement {
+    enum EthTransactionInfoElement: Sendable {
         case details(Web3Core.TransactionDetails)
         case receipt(TransactionReceipt)
     }
@@ -73,11 +75,11 @@ private extension EthWalletService {
             of: EthTransactionInfoElement.self,
             returning: Atomic<EthTransactionInfo>.self
         ) { group in
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .details(try await web3.eth.transactionDetails(hash))
             }
             
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .receipt(try await web3.eth.transactionReceipt(hash))
             }
             

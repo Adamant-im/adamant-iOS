@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum NodeConnectionStatus: Equatable, Codable {
+public enum NodeConnectionStatus: Equatable, Codable, Sendable {
     case offline
     case synchronizing
     case allowed
@@ -15,7 +15,7 @@ public enum NodeConnectionStatus: Equatable, Codable {
 }
 
 public extension NodeConnectionStatus {
-    enum RejectedReason: Codable, Equatable {
+    enum RejectedReason: Codable, Equatable, Sendable {
         case outdatedApiVersion
     }
 }

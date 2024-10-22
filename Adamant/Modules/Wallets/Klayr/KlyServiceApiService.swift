@@ -6,7 +6,7 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import LiskKit
+@preconcurrency import LiskKit
 import Foundation
 import CommonKit
 
@@ -51,20 +51,22 @@ final class KlyServiceApiService: ApiServiceProtocol {
     }
     
     func requestServiceApi<Output>(
+        waitsForConnectivity: Bool,
         body: @escaping @Sendable (
             _ api: LiskKit.Service,
             _ completion: @escaping @Sendable (LiskKit.Result<Output>) -> Void
         ) -> Void
     ) async -> WalletServiceResult<Output> {
-        await requestClient { client, completion in
+        await requestClient(waitsForConnectivity: waitsForConnectivity) { client, completion in
             body(.init(client: client, version: .v3), completion)
         }
     }
     
     func requestServiceApi<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (LiskKit.Service) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await requestClient { client in
+        await requestClient(waitsForConnectivity: waitsForConnectivity) { client in
             try await request(LiskKit.Service(client: client, version: .v3))
         }
     }
@@ -72,20 +74,22 @@ final class KlyServiceApiService: ApiServiceProtocol {
 
 private extension KlyServiceApiService {
     func requestClient<Output>(
+        waitsForConnectivity: Bool,
         body: @escaping @Sendable (
             _ client: APIClient,
             _ completion: @escaping @Sendable (LiskKit.Result<Output>) -> Void
         ) -> Void
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.request(origin: origin, body: body)
         }
     }
     
     func requestClient<Output>(
+        waitsForConnectivity: Bool,
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.request(origin: origin, body)
         }
     }

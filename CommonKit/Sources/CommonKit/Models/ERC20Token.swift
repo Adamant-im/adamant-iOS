@@ -8,7 +8,7 @@
 
 import UIKit
 
-public struct ERC20Token {
+public struct ERC20Token: Sendable {
     public let symbol: String
     public let name: String
     public let contractAddress: String

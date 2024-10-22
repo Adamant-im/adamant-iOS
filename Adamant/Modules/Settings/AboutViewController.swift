@@ -382,8 +382,10 @@ extension AboutViewController {
 
 // MARK: - MFMailComposeViewControllerDelegate
 extension AboutViewController: MFMailComposeViewControllerDelegate {
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        controller.dismiss(animated: true, completion: nil)
+    nonisolated func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        Task { @MainActor in
+            controller.dismiss(animated: true, completion: nil)
+        }
     }
 }
 
