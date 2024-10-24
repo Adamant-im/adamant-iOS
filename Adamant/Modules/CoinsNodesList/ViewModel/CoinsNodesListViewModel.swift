@@ -79,7 +79,7 @@ private extension CoinsNodesListViewModel {
             var restNodeIds: [UUID] = .init()
             
             for group in processedGroups {
-                await apiServiceCompose.chosenFastestNodeId(group: group).map { restNodeIds.append($0) }
+                await apiServiceCompose.get(group)?.chosenFastestNodeId.map { restNodeIds.append($0) }
             }
             
             state.sections = mapper.map(
@@ -98,7 +98,7 @@ private extension CoinsNodesListViewModel {
     
     func healthCheck() {
         processedGroups.forEach {
-            apiServiceCompose.healthCheck(group: $0)
+            apiServiceCompose.get($0)?.healthCheck()
         }
     }
 }

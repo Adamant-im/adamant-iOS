@@ -20,16 +20,8 @@ struct ApiServiceCompose: ApiServiceComposeProtocol {
     let ipfs: ApiServiceProtocol
     let infoService: ApiServiceProtocol
     
-    func chosenFastestNodeId(group: NodeGroup) async -> UUID? {
-        await getApiService(group: group).chosenFastestNodeId
-    }
-    
-    func hasActiveNode(group: NodeGroup) async -> Bool {
-        await getApiService(group: group).hasActiveNode
-    }
-    
-    func healthCheck(group: NodeGroup) {
-        getApiService(group: group).healthCheck()
+    func get(_ group: NodeGroup) -> ApiServiceProtocol? {
+        getApiService(group: group)
     }
 }
 

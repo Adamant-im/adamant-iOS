@@ -43,14 +43,13 @@ public final class BlockchainHealthCheckWrapper<
             nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
         
-        Task.sync { @HealthCheckActor [self] in
+        Task { @HealthCheckActor [self] in
             configure(nodesAdditionalParamsStorage: nodesAdditionalParamsStorage)
         }
     }
     
-    public override func healthCheck() {
-        super.healthCheck()
-        guard isActive else { return }
+    public override func healthCheckInternal() {
+        super.healthCheckInternal()
         
         Task { @HealthCheckActor in
             updateNodesAvailability(update: nil)
@@ -92,7 +91,8 @@ private extension BlockchainHealthCheckWrapper {
     func configure(nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol) {
         nodesAdditionalParamsStorage
             .fastestNodeMode(group: params.group)
-            .sink { [weak self] in self?.fastestNodeMode = $0 }
+            .values
+            .sink { [weak self] in await self?.setFastestMode($0) }
             .store(in: &subscriptions)
     }
     

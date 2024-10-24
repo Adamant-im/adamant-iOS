@@ -48,20 +48,12 @@ final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
 final class DogeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
     
-    var chosenFastestNodeId: UUID? {
-        get async { await api.chosenNodeId }
-    }
-    
-    var hasActiveNode: Bool {
-        get async { await !api.sortedAllowedNodes.isEmpty }
-    }
+    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { api.chosenFastestNodeId }
+    var hasActiveNode: AnyAsyncStreamable<Bool> { api.hasActiveNode }
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
         self.api = api
-    }
-    
-    func healthCheck() {
-        Task { await api.healthCheck() }
     }
     
     func request<Output>(

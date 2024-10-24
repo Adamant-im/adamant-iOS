@@ -33,15 +33,7 @@ public final class AdamantApiService {
 }
 
 extension AdamantApiService: AdamantApiServiceProtocol {
-    public var chosenFastestNodeId: UUID? {
-        get async { await service.chosenNodeId }
-    }
-    
-    public func healthCheck() {
-        Task { await service.healthCheck() }
-    }
-    
-    public var hasActiveNode: Bool {
-        get async { await !service.sortedAllowedNodes.isEmpty }
-    }
+    public var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { service.chosenFastestNodeId }
+    public var hasActiveNode: AnyAsyncStreamable<Bool> { service.hasActiveNode }
+    public func healthCheck() { service.healthCheck() }
 }

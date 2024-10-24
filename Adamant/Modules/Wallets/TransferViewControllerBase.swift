@@ -797,7 +797,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard
-            await apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+            await apiServiceCompose.get(.adm)?.hasActiveNode == true || admReportRecipient == nil
         else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(

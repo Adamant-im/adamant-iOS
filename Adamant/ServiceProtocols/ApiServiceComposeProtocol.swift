@@ -10,7 +10,5 @@ import Foundation
 import CommonKit
 
 protocol ApiServiceComposeProtocol {
-    func chosenFastestNodeId(group: NodeGroup) async -> UUID?
-    func hasActiveNode(group: NodeGroup) async -> Bool
-    func healthCheck(group: NodeGroup)
+    func get(_ group: NodeGroup) -> ApiServiceProtocol?
 }

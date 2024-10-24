@@ -20,6 +20,10 @@ enum IPFSApiCommands {
 final class IPFSApiService: FileApiServiceProtocol {
     let service: BlockchainHealthCheckWrapper<IPFSApiCore>
     
+    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { service.chosenFastestNodeId }
+    var hasActiveNode: AnyAsyncStreamable<Bool> { service.hasActiveNode }
+    func healthCheck() { service.healthCheck() }
+    
     init(
         healthCheckWrapper: BlockchainHealthCheckWrapper<IPFSApiCore>
     ) {

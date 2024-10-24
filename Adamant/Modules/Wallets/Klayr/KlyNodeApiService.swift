@@ -13,20 +13,12 @@ import CommonKit
 final class KlyNodeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
     
-    var chosenFastestNodeId: UUID? {
-        get async { await api.chosenNodeId }
-    }
-    
-    var hasActiveNode: Bool {
-        get async { await !api.sortedAllowedNodes.isEmpty }
-    }
+    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { api.chosenFastestNodeId }
+    var hasActiveNode: AnyAsyncStreamable<Bool> { api.hasActiveNode }
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<KlyApiCore>) {
         self.api = api
-    }
-    
-    func healthCheck() {
-        Task { await api.healthCheck() }
     }
     
     func requestNodeApi<Output>(

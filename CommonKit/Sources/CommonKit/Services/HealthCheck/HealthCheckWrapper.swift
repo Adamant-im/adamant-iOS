@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import UIKit
+import AsyncAlgorithms
 
 public protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
@@ -18,29 +19,20 @@ public protocol HealthCheckableError: Error {
 
 @HealthCheckActor
 open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
-    @ObservableValue public private(set) var nodes: [Node] = .init()
-    @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
+    @ObservableValue private(set) var nodes: [Node] = .init()
+    let sortedAllowedNodes: SendableObservableValue<[Node]> = .init(.init(.init()))
+    
+    let name: String
+    var subscriptions: Set<AnyCancellable> = .init()
     
     public let service: Service
-    public let isActive: Bool
-    public let name: String
-    
+    public private(set) var fastestNodeMode = true
     private let normalUpdateInterval: TimeInterval
     private let crucialUpdateInterval: TimeInterval
-    
-    public var fastestNodeMode = true {
-        didSet { updateSortedNodes() }
-    }
-    
-    public var healthCheckTimerSubscription: AnyCancellable?
-    public var subscriptions: Set<AnyCancellable> = .init()
-    
+    private let isActive: Bool
+    private var healthCheckTimerSubscription: AnyCancellable?
     private var previousAppState: UIApplication.State?
     private var lastUpdateTime: Date?
-    
-    public var chosenNodeId: UUID? {
-        sortedAllowedNodes.first?.id
-    }
     
     public nonisolated init(
         service: Service,
@@ -57,7 +49,7 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         self.normalUpdateInterval = normalUpdateInterval
         self.crucialUpdateInterval = crucialUpdateInterval
         
-        Task.sync { @HealthCheckActor [self] in
+        Task { @HealthCheckActor [self] in
             configure(nodes: nodes, connection: connection)
         }
     }
@@ -92,11 +84,22 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
             : .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
     }
     
-    open func healthCheck() {
-        guard isActive else { return }
-        lastUpdateTime = .now
-        updateHealthCheckTimerSubscription()
+    public func setFastestMode(_ isOn: Bool) async {
+        fastestNodeMode = isOn
+        updateSortedNodes()
     }
+    
+    nonisolated public func healthCheck() {
+        Task { @HealthCheckActor in
+            guard isActive else { return }
+            lastUpdateTime = .now
+            await updateHealthCheckTimerSubscription()
+            healthCheckInternal()
+        }
+        
+    }
+    
+    open func healthCheckInternal() {}
 }
 
 private extension HealthCheckWrapper {
@@ -113,10 +116,11 @@ private extension HealthCheckWrapper {
             .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
         
-        $sortedAllowedNodes
+        sortedAllowedNodes
+            .makeSequence()
             .map { $0.isEmpty }
             .removeDuplicates()
-            .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
+            .sink { [weak self] _ in await self?.updateHealthCheckTimerSubscription() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
@@ -131,16 +135,16 @@ private extension HealthCheckWrapper {
     }
     
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.compactMap { sortedNodes in
-            !waitsForConnectivity || !sortedNodes.isEmpty
-                ? sortedNodes
-                : nil
-        }.values.first { _ in true } ?? .init()
+        let nodes = try? await sortedAllowedNodes
+            .makeSequence()
+            .first { !waitsForConnectivity || !$0.isEmpty }
+        
+        return nodes ?? .init()
     }
     
-    func updateHealthCheckTimerSubscription() {
+    func updateHealthCheckTimerSubscription() async {
         healthCheckTimerSubscription = Timer.publish(
-            every: sortedAllowedNodes.isEmpty
+            every: await sortedAllowedNodes.value.isEmpty
                 ? crucialUpdateInterval
                 : normalUpdateInterval,
             on: .main,
@@ -168,10 +172,12 @@ private extension HealthCheckWrapper {
     }
     
     func updateSortedNodes() {
-        sortedAllowedNodes = nodes.getAllowedNodes(
+        let newNodes = nodes.getAllowedNodes(
             sortedBySpeedDescending: fastestNodeMode,
             needWS: false
         )
+        
+        sortedAllowedNodes.task { $0.send(newNodes) }
     }
 }
 

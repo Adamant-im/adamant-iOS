@@ -10,17 +10,9 @@ import Foundation
 import CommonKit
 
 extension InfoServiceApiService: ApiServiceProtocol {
-    var chosenFastestNodeId: UUID? {
-        get async { await core.chosenNodeId }
-    }
-    
-    func healthCheck() {
-        Task { await core.healthCheck() }
-    }
-    
-    var hasActiveNode: Bool {
-        get async { await !core.sortedAllowedNodes.isEmpty }
-    }
+    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { core.chosenFastestNodeId }
+    var hasActiveNode: AnyAsyncStreamable<Bool> { core.hasActiveNode }
+    func healthCheck() { core.healthCheck() }
 }
 
 extension InfoServiceApiService: InfoServiceApiServiceProtocol {
