@@ -10,8 +10,12 @@ import Foundation
 import CommonKit
 
 extension InfoServiceApiService: ApiServiceProtocol {
-    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { core.chosenFastestNodeId }
-    var hasActiveNode: AnyAsyncStreamable<Bool> { core.hasActiveNode }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { core.nodesInfoPublisher }
+    
+    @MainActor
+    var nodesInfo: NodesListInfo { core.nodesInfo }
+    
     func healthCheck() { core.healthCheck() }
 }
 

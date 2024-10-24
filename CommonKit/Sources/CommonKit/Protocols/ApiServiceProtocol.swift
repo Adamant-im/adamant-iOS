@@ -9,18 +9,26 @@
 import Foundation
 
 public protocol ApiServiceProtocol: Sendable {
-    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { get }
-    var hasActiveNode: AnyAsyncStreamable<Bool> { get }
+    @MainActor
+    var nodesInfo: NodesListInfo { get }
+    
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { get }
     
     func healthCheck()
 }
 
 public extension ApiServiceProtocol {
-    var chosenFastestNodeId: UUID? {
-        get async { try? await chosenFastestNodeId.makeSequence().first?.flatMap { $0 } }
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        nodesInfoPublisher
+            .map { $0.nodes.contains { $0.isEnabled } }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        get async { (try? await hasActiveNode.makeSequence().first) ?? false }
+    @MainActor
+    var hasEnabledNode: Bool {
+        nodesInfo.nodes.contains { $0.isEnabled }
     }
 }

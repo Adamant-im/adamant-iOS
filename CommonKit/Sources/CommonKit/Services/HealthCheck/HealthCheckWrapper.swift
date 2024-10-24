@@ -20,7 +20,20 @@ public protocol HealthCheckableError: Error {
 @HealthCheckActor
 open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
     @ObservableValue private(set) var nodes: [Node] = .init()
-    let sortedAllowedNodes: SendableObservableValue<[Node]> = .init(.init(.init()))
+    @ObservableValue private var sortedAllowedNodes: [Node] = .init()
+    
+    @MainActor
+    private var _nodesInfo: ObservableValue<NodesListInfo> = .init(.default)
+    
+    @MainActor
+    public var nodesInfoPublisher: AnyObservable<NodesListInfo> {
+        _nodesInfo.removeDuplicates().eraseToAnyPublisher()
+    }
+    
+    @MainActor
+    public var nodesInfo: NodesListInfo {
+        _nodesInfo.value
+    }
     
     let name: String
     var subscriptions: Set<AnyCancellable> = .init()
@@ -84,7 +97,7 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
             : .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
     }
     
-    public func setFastestMode(_ isOn: Bool) async {
+    public func setFastestMode(_ isOn: Bool) {
         fastestNodeMode = isOn
         updateSortedNodes()
     }
@@ -93,10 +106,9 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         Task { @HealthCheckActor in
             guard isActive else { return }
             lastUpdateTime = .now
-            await updateHealthCheckTimerSubscription()
+            updateHealthCheckTimerSubscription()
             healthCheckInternal()
         }
-        
     }
     
     open func healthCheckInternal() {}
@@ -116,11 +128,10 @@ private extension HealthCheckWrapper {
             .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
         
-        sortedAllowedNodes
-            .makeSequence()
+        $sortedAllowedNodes
             .map { $0.isEmpty }
             .removeDuplicates()
-            .sink { [weak self] _ in await self?.updateHealthCheckTimerSubscription() }
+            .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
@@ -135,16 +146,14 @@ private extension HealthCheckWrapper {
     }
     
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        let nodes = try? await sortedAllowedNodes
-            .makeSequence()
-            .first { !waitsForConnectivity || !$0.isEmpty }
-        
-        return nodes ?? .init()
+        await $sortedAllowedNodes.values.first {
+            !waitsForConnectivity || !$0.isEmpty
+        } ?? .init()
     }
     
-    func updateHealthCheckTimerSubscription() async {
+    func updateHealthCheckTimerSubscription() {
         healthCheckTimerSubscription = Timer.publish(
-            every: await sortedAllowedNodes.value.isEmpty
+            every: sortedAllowedNodes.isEmpty
                 ? crucialUpdateInterval
                 : normalUpdateInterval,
             on: .main,
@@ -172,12 +181,13 @@ private extension HealthCheckWrapper {
     }
     
     func updateSortedNodes() {
-        let newNodes = nodes.getAllowedNodes(
+        sortedAllowedNodes = nodes.getAllowedNodes(
             sortedBySpeedDescending: fastestNodeMode,
             needWS: false
         )
         
-        sortedAllowedNodes.task { $0.send(newNodes) }
+        let newInfo = NodesListInfo(nodes: nodes, chosenNodeId: sortedAllowedNodes.first?.id)
+        Task { @MainActor in _nodesInfo.send(newInfo) }
     }
 }
 

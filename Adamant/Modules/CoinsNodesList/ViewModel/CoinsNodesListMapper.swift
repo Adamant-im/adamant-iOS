@@ -10,34 +10,25 @@ import CommonKit
 import SwiftUI
 
 struct CoinsNodesListMapper {
-    let processedGroups: [NodeGroup]
-    
-    func map(items: [NodeGroup: [Node]], restNodeIds: [UUID]) -> [CoinsNodesListState.Section] {
-        processedGroups.map {
-            map(
-                group: $0,
-                nodes: items[$0] ?? .init(),
-                restNodeIds: restNodeIds
-            )
-        }.sorted { $0.title < $1.title }
-    }
-}
-
-private extension CoinsNodesListMapper {
     func map(
         group: NodeGroup,
-        nodes: [Node],
-        restNodeIds: [UUID]
+        nodesInfo: NodesListInfo
     ) -> CoinsNodesListState.Section {
         .init(
             id: group,
             title: group.name,
-            rows: nodes.map {
-                map(node: $0, group: group, isRest: restNodeIds.contains($0.id))
+            rows: nodesInfo.nodes.map { node in
+                map(
+                    node: node,
+                    group: group,
+                    isRest: nodesInfo.chosenNodeId.map { $0 == node.id } ?? false
+                )
             }
         )
     }
-    
+}
+
+private extension CoinsNodesListMapper {
     func map(
         node: Node,
         group: NodeGroup,
@@ -55,7 +46,7 @@ private extension CoinsNodesListMapper {
             connectionStatus: indicatorAttrString,
             description: node.statusString(
                 showVersion: true,
-                dateHeight: group.useDateHeight
+                heightType: group.heightType
             ) ?? .empty
         )
     }

@@ -18,8 +18,12 @@ class EthApiService: ApiServiceProtocol, @unchecked Sendable {
         get async { await api.service.keystoreManager }
     }
     
-    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { api.chosenFastestNodeId }
-    var hasActiveNode: AnyAsyncStreamable<Bool> { api.hasActiveNode }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
+    
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
+    
     func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {

@@ -34,8 +34,12 @@ final class KlyServiceApiCore: KlyApiCore, @unchecked Sendable {
 final class KlyServiceApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyServiceApiCore>
     
-    var chosenFastestNodeId: AnyAsyncStreamable<UUID?> { api.chosenFastestNodeId }
-    var hasActiveNode: AnyAsyncStreamable<Bool> { api.hasActiveNode }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
+    
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
+    
     func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<KlyServiceApiCore>) {

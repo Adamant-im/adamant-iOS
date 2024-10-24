@@ -22,7 +22,6 @@ public struct Node: Equatable, Identifiable, @unchecked Sendable {
     public var preferMainOrigin: Bool?
     public var isEnabled: Bool
     public var type: NodeType
-    public var isUpdating = false
     
     public init(
         id: UUID,

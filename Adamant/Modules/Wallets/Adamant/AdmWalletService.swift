@@ -90,8 +90,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        get async { await apiService.hasActiveNode }
+    @MainActor
+    var hasEnabledNode: Bool {
+        apiService.hasEnabledNode
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(

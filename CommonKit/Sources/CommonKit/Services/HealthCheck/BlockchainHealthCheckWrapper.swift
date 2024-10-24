@@ -57,18 +57,10 @@ public final class BlockchainHealthCheckWrapper<
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
                     group.addTask { @HealthCheckActor [weak self] in
-                        guard
-                            let self = self,
-                            !currentRequests.contains(node.id)
-                        else { return }
+                        guard let self, !currentRequests.contains(node.id) else { return }
                         
                         currentRequests.insert(node.id)
-                        updateNode(id: node.id) { $0.isUpdating = true }
-                        
-                        defer {
-                            currentRequests.remove(node.id)
-                            updateNode(id: node.id) { $0.isUpdating = false }
-                        }
+                        defer { currentRequests.remove(node.id) }
                         
                         let update = await updateNodeStatusInfo(node: node)
                         updateNodesAvailability(update: update)

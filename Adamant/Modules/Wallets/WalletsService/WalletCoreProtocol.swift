@@ -282,7 +282,9 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var enabled: Bool { get }
     
     // MARK: Logic
-    var hasActiveNode: Bool { get async }
+    @MainActor
+    var hasEnabledNode: Bool { get }
+    
     func update()
     
     // MARK: Tools
