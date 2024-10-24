@@ -83,6 +83,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = window
         
         let rootTabBarController = UITabBarController()
+        if #available(iOS 18.0, *) {
+            rootTabBarController.mode = .tabSidebar
+            rootTabBarController.traitOverrides.horizontalSizeClass = .unspecified
+        }
         window.rootViewController = rootTabBarController
         rootTabBarController.view.backgroundColor = .adamant.backgroundColor
         window.tintColor = UIColor.adamant.primary
