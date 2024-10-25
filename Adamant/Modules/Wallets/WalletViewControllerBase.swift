@@ -12,9 +12,8 @@ import CommonKit
 import Combine
 
 extension String.adamant {
-    struct wallets {
-        
-        private init() {}
+    enum wallets {
+        static let noEnabledNodes = String.localized("AccountTab.Row.NoEnabledNodes")
     }
 }
 
@@ -164,7 +163,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 let service = service
             else { return }
             
-            let vc = screensFactory.makeTransferListVC(service: service)
+            let vc = service.core.hasEnabledNode
+                ? screensFactory.makeTransferListVC(service: service)
+                : makeNodesList()
             
             if let split = splitViewController {
                 let details = UINavigationController(rootViewController:vc)
@@ -360,9 +361,15 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         alert: Int?,
         isBalanceInitialized: Bool
     ) -> BalanceRowValue {
-        let cryptoString = isBalanceInitialized
-        ? AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
-        : String.adamant.account.updatingBalance
+        guard service?.core.hasEnabledNode == true else {
+            return .init(crypto: .adamant.wallets.noEnabledNodes, fiat: nil, alert: nil)
+        }
+        
+        guard isBalanceInitialized else {
+            return .init(crypto: .adamant.account.updatingBalance, fiat: nil, alert: nil)
+        }
+        
+        let cryptoString = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
         
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
@@ -436,6 +443,10 @@ private extension WalletViewControllerBase {
                 self?.setTitle()
             }
             .store(in: &subscriptions)
+        
+        service.core.hasEnabledNodePublisher
+            .sink { [weak self] _ in self?.updateWalletUI() }
+            .store(in: &subscriptions)
     }
     
     func updateWalletUI() {
@@ -462,6 +473,12 @@ private extension WalletViewControllerBase {
             isBalanceInitialized: wallet.isBalanceInitialized
         )
         row.updateCell()
+    }
+    
+    func makeNodesList() -> UIViewController {
+        service?.core.nodeGroups.contains(.adm) == true
+            ? screensFactory.makeNodesList()
+            : screensFactory.makeCoinsNodesList(context: .menu)
     }
 }
 

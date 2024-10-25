@@ -136,12 +136,13 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private var cachedWalletAddress: [String: String] = [:]
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
     
     static let kvsAddress = "btc:address"
     private let walletPath = "m/44'/0'/21'/0/0"
     
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.brchWallet.walletUpdated")
+    let walletUpdatedNotification = Notification.Name("adamant.btcWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.btcWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
@@ -177,7 +178,12 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     @MainActor
     var hasEnabledNode: Bool {
-        apiService.hasEnabledNode
+        btcApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        btcApiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -237,7 +243,18 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.transactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -271,6 +288,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -363,6 +381,25 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
 
         return output
+    }
+    
+    private func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    private func resetBalance() {
+        btcWallet?.isBalanceInitialized = false
+        guard let wallet = btcWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
 
     public func isValid(bitcoinAddress address: String) -> Bool {

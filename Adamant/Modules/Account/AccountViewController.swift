@@ -154,6 +154,7 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let walletServiceCompose: WalletServiceCompose
+    private let apiServiceCompose: ApiServiceComposeProtocol
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -217,7 +218,8 @@ final class AccountViewController: FormViewController {
         avatarService: AvatarService,
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -230,6 +232,7 @@ final class AccountViewController: FormViewController {
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
         self.walletServiceCompose = walletServiceCompose
+        self.apiServiceCompose = apiServiceCompose
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -1108,6 +1111,18 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        let disabledGroup = NodeGroup.allCases.first {
+            apiServiceCompose.get($0)?.hasEnabledNode != true
+        }
+        
+        if let disabledGroup {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    nodeGroupName: disabledGroup.name
+                ).localizedDescription
+            )
+        }
+        
         refreshControl.endRefreshing()
         DispatchQueue.background.async { [accountService] in
             accountService.reloadWallets()

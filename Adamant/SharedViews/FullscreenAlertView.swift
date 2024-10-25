@@ -8,51 +8,64 @@
 
 import UIKit
 import CommonKit
+import SnapKit
 
 final class FullscreenAlertView: UIView {
-    
-    // MARK: IBOutlets
-    
-    @IBOutlet weak var alertBackgroundView: UIView!
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var messageLabel: UILabel!
-    
-    // MARK: Setters & Getters
-    
-    var title: String? {
-        get {
-            return titleLabel.text
-        }
-        set {
-            titleLabel.isHidden = newValue == nil
-            titleLabel.text = newValue
-        }
+    var message: String = .empty {
+        didSet { messageLabel.text = message }
     }
     
-    var message: String? {
-        get {
-            return messageLabel.text
-        }
-        set {
-            messageLabel.isHidden = newValue == nil
-            messageLabel.text = newValue
-        }
+    private let containerView: UIView = .init()
+    private let imageView = UIImageView(image: warningImage)
+    
+    private let messageLabel = UILabel(
+        font: .systemFont(ofSize: 15),
+        textColor: .adamant.textColor,
+        numberOfLines: .zero,
+        alignment: .center
+    )
+    
+    private lazy var verticalStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [imageView, messageLabel])
+        stack.axis = .vertical
+        stack.spacing = 15
+        return stack
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configure()
     }
     
-    // MARK: Lifecycle
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        configure()
+    }
+}
+
+private extension FullscreenAlertView {
+    func configure() {
+        backgroundColor = .black.withAlphaComponent(0.4)
+        containerView.backgroundColor = .adamant.cellColor
+        containerView.layer.cornerRadius = 15
+        imageView.tintColor = .adamant.primary
+        imageView.contentMode = .scaleAspectFit
         
-        Task { @MainActor in
-            alertBackgroundView.layer.cornerRadius = 14
-            titleLabel.isHidden = true
-            messageLabel.isHidden = true
-            alertBackgroundView.backgroundColor = .adamant.background
-            titleLabel.textColor = .adamant.primary
-            messageLabel.textColor = .adamant.primary
-            imageView.tintColor = .adamant.primary
+        addSubview(containerView)
+        containerView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.top.leading.greaterThanOrEqualToSuperview().inset(15)
+            $0.bottom.trailing.lessThanOrEqualToSuperview().inset(15)
+        }
+        
+        containerView.addSubview(verticalStack)
+        verticalStack.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview().inset(15)
         }
     }
 }
+
+private let warningImage = UIImage(
+    systemName: "exclamationmark.triangle.fill",
+    withConfiguration: UIImage.SymbolConfiguration(pointSize: 50, weight: .light)
+)!

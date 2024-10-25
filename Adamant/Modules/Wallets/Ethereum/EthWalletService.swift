@@ -123,6 +123,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var gasPrice: BigUInt = 0
     @Atomic private(set) var gasLimit: BigUInt = 0
     @Atomic private(set) var isWarningGasPrice = false
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
 	
 	static let transferGas: Decimal = 21000
 	static let kvsAddress = "eth:address"
@@ -168,7 +169,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     @MainActor
     var hasEnabledNode: Bool {
-        apiService.hasEnabledNode
+        ethApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        ethApiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -236,7 +242,18 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.historyTransactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -280,6 +297,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -308,6 +326,25 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 		
         await calculateFee()
 	}
+    
+    private func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    private func resetBalance() {
+        ethWallet?.isBalanceInitialized = false
+        guard let wallet = ethWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
+    }
     
     func calculateFee(for address: EthereumAddress? = nil) async {
         let priceRaw = try? await getGasPrices()

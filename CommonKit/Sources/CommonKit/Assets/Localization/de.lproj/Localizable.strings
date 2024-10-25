@@ -103,6 +103,9 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
+/* Account tab: No enabled nodes */
+"AccountTab.Row.NoEnabledNodes" = "No enabled nodes";
+
 /* Account tab: 'Language' row */
 "AccountTab.Row.Language" = "Sprache";
 

@@ -14,6 +14,7 @@ import AsyncAlgorithms
 public protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
     
+    static var noNetworkError: Self { get }
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
@@ -74,8 +75,10 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
         updateSortedNodes()
         
-        var lastConnectionError = nodesList.isEmpty
-            ? Error.noEndpointsError(nodeGroupName: name)
+        var lastConnectionError: Error? = nodesList.isEmpty
+            ? nodes.contains { $0.isEnabled }
+                ? .noNetworkError
+                : .noEndpointsError(nodeGroupName: name)
             : nil
         
         for node in nodesList {

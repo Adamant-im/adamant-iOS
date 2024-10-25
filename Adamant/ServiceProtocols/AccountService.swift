@@ -151,6 +151,7 @@ protocol AccountService: AnyObject, Sendable {
     // MARK: State
     
     var state: AccountServiceState { get }
+    var isBalanceExpired: Bool { get }
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
     
