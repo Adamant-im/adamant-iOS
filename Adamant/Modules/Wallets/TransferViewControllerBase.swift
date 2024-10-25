@@ -948,6 +948,13 @@ class TransferViewControllerBase: FormViewController {
                 let row: SafeDecimalRow? = form.rowBy(tag: BaseRows.amount.tag)
                 row?.value  = Double(amount)
                 row?.updateCell()
+            case .recipient:
+                break
+            case .klyrMessage(let message):
+                let commentRow = BaseRows.blockchainComments(coin: walletCore.tokenName)
+                let row: TextAreaRow? = form.rowBy(tag: commentRow.tag)
+                row?.value = message
+                row?.updateCell()
             }
         }
         
