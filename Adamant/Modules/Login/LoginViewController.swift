@@ -312,7 +312,7 @@ final class LoginViewController: FormViewController {
                     return
                 }
 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self?.tableView.scrollToBottom(animated: true)
                 }
             }
