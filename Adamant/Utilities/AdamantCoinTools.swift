@@ -15,6 +15,8 @@ struct QQAddressInformation {
 
 enum QQAddressParam {
     case amount(String)
+    case recipient(String)
+    case klyrMessage(String)
     
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
@@ -24,9 +26,13 @@ enum QQAddressParam {
         let key = keyValue[0]
         let value = String(keyValue[1])
         
-        switch keyValue[0] {
+        switch key {
         case "amount":
             self = .amount(value)
+        case "recipient":
+            self = .recipient(value)
+        case "reference":
+            self = .klyrMessage(value)
         default:
             return nil
         }
@@ -59,12 +65,22 @@ final class AdamantCoinTools {
     }
     
     private class func parseAdress(url: URLComponents) -> QQAddressInformation {
-        let addressRaw = url.path
         
         let params = url.queryItems?.compactMap {
             QQAddressParam(raw: String($0.description))
         }
         
+        var recipient: String?
+        
+        params?.forEach({ param in
+            guard case .recipient(let address) = param else {
+                return
+            }
+            recipient = address
+        })
+        
+        let addressRaw = recipient ?? url.path
+       
         return QQAddressInformation(address: addressRaw, params: params)
     }
 }

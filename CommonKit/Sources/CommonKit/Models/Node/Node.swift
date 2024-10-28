@@ -10,7 +10,7 @@
 
 import Foundation
 
-public struct Node: Equatable, Identifiable {
+public struct Node: Equatable, Identifiable, @unchecked Sendable {
     public let id: UUID
     public var mainOrigin: NodeOrigin
     public var altOrigin: NodeOrigin?

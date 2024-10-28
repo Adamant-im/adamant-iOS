@@ -93,7 +93,7 @@ final class NodesListViewController: FormViewController {
     
     @ObservableValue private var nodesList = [Node]()
     @ObservableValue private var currentSocketsNodeId: UUID?
-    @ObservableValue private var chosenFastestNodeId: UUID?
+    @ObservableValue private var chosenRestNodeId: UUID?
     
     private var nodesHaveBeenDisplayed = false
     private var timerSubsctiption: AnyCancellable?
@@ -202,26 +202,25 @@ final class NodesListViewController: FormViewController {
     }
     
     private func setupObservers() {
-        nodesStorage.getNodesPublisher(group: nodeGroup)
-            .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: nodeGroup))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.setNewNodesList($0.0) }
+        apiService.nodesInfoPublisher
+            .sink { [weak self] in self?.setNewNodesList($0) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .SocketService.currentNodeUpdate, object: nil)
-            .receive(on: DispatchQueue.main)
-            .map { [weak self] _ in self?.socketService.currentNode?.id }
-            .removeDuplicates()
-            .assign(to: _currentSocketsNodeId)
+            .notifications(named: .SocketService.currentNodeUpdate, object: nil)
+            .sink { @MainActor [weak self] _ in
+                let newId = self?.socketService.currentNode?.id
+                guard self?.currentSocketsNodeId != newId else { return }
+                self?.currentSocketsNodeId = newId
+            }
             .store(in: &subscriptions)
         
         currentSocketsNodeId = socketService.currentNode?.id
     }
     
-    private func setNewNodesList(_ newNodes: [Node]) {
-        nodesList = newNodes
-        chosenFastestNodeId = apiService.chosenFastestNodeId
+    private func setNewNodesList(_ newNodes: NodesListInfo) {
+        nodesList = newNodes.nodes
+        chosenRestNodeId = newNodes.chosenNodeId
         
         if !nodesHaveBeenDisplayed {
             UIView.performWithoutAnimation {
@@ -418,11 +417,14 @@ extension NodesListViewController {
             id: node.id,
             title: node.title,
             indicatorString: node.indicatorString(
-                isRest: chosenFastestNodeId == node.id,
+                isRest: chosenRestNodeId == node.id,
                 isWs: currentSocketsNodeId == node.id
             ),
             indicatorColor: node.indicatorColor,
-            statusString: node.statusString(showVersion: true, dateHeight: false) ?? .empty,
+            statusString: node.statusString(
+                showVersion: true,
+                heightType: nodeGroup.heightType
+            ) ?? .empty,
             isEnabled: node.isEnabled,
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
                 nodesStorage.updateNode(id: node.id, group: .adm) { $0.isEnabled = isEnabled }
@@ -433,7 +435,7 @@ extension NodesListViewController {
     private func makeNodeCellPublisher(nodeId: UUID) -> some Observable<NodeCell.Model> {
         $nodesList.combineLatest(
             $currentSocketsNodeId,
-            $chosenFastestNodeId
+            $chosenRestNodeId
         ).compactMap { [weak self] tuple in
             let nodes = tuple.0
             

@@ -13,7 +13,7 @@ import CommonKit
 ///
 /// - text: Simple text message
 /// - markdownText: attributed text, formatted with markdown
-enum AdamantMessage {
+enum AdamantMessage: Sendable {
     case text(String)
     case markdownText(String)
     case richMessage(payload: RichMessage)

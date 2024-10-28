@@ -43,14 +43,11 @@ final class NotificationsViewModel: ObservableObject {
         return AttributedString(attributedString)
     }
     
-    nonisolated init(dialogService: DialogService, notificationsService: NotificationsService) {
+    init(dialogService: DialogService, notificationsService: NotificationsService) {
         self.dialogService = dialogService
         self.notificationsService = notificationsService
-        
-        Task {
-            await configure()
-            await addObservers()
-        }
+        configure()
+        addObservers()
     }
     
     func presentNotificationSoundsPicker() {
@@ -151,8 +148,8 @@ final class NotificationsViewModel: ObservableObject {
 private extension NotificationsViewModel {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantNotificationService.notificationsSoundChanged)
-            .sink { [weak self] _ in self?.configure() }
+            .notifications(named: .AdamantNotificationService.notificationsSoundChanged)
+            .sink { [weak self] _ in await self?.configure() }
             .store(in: &subscriptions)
         
         $inAppSounds

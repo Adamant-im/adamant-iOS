@@ -11,6 +11,6 @@ import Foundation
 import CoreData
 
 @objc(TransferTransaction)
-public class TransferTransaction: ChatTransaction {
+public class TransferTransaction: ChatTransaction, @unchecked Sendable {
     static let entityName = "TransferTransaction"
 }

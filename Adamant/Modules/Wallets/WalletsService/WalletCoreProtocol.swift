@@ -20,11 +20,11 @@ enum WalletServiceSimpleResult {
     case failure(error: WalletServiceError)
 }
 
-typealias WalletServiceResult<T> = Result<T, WalletServiceError>
+typealias WalletServiceResult<T: Sendable> = Result<T, WalletServiceError>
 
 // MARK: - Errors
 
-enum WalletServiceError: Error {
+enum WalletServiceError: Error, Sendable {
     case notLogged
     case notEnoughMoney
     case networkError
@@ -124,6 +124,10 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
+    public static var noNetworkError: WalletServiceError {
+        .apiError(.noNetworkError)
+    }
+    
     static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
         .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
@@ -214,6 +218,7 @@ extension Notification.Name {
     }
 }
 
+@MainActor
 protocol WalletViewController {
     var viewController: UIViewController { get }
     var height: CGFloat { get }
@@ -221,7 +226,7 @@ protocol WalletViewController {
 }
 
 // MARK: - Wallet Service
-protocol WalletCoreProtocol: AnyObject {
+protocol WalletCoreProtocol: AnyObject, Sendable {
     // MARK: Currency
     static var currencySymbol: String { get }
     static var currencyLogo: UIImage { get }
@@ -243,6 +248,7 @@ protocol WalletCoreProtocol: AnyObject {
     var coinStorage: CoinStorageService { get }
     var nodeGroups: [NodeGroup] { get }
     var transferDecimals: Int { get }
+    var explorerAddress: String { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
@@ -281,7 +287,12 @@ protocol WalletCoreProtocol: AnyObject {
     var enabled: Bool { get }
     
     // MARK: Logic
-    var hasActiveNode: Bool { get }
+    @MainActor
+    var hasEnabledNode: Bool { get }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> { get }
+    
     func update()
     
     // MARK: Tools
@@ -383,4 +394,8 @@ protocol WalletServiceTwoStepSend: WalletCoreProtocol {
 
 protocol RawTransaction {
     var txHash: String? { get }
+}
+
+extension WalletCoreProtocol {
+    static var balanceLifetime: TimeInterval { 300 }
 }

@@ -12,7 +12,7 @@ import Network
 import CommonKit
 
 // MARK: - AdamantReachability wrapper
-final class AdamantReachability: ReachabilityMonitor {
+final class AdamantReachability: ReachabilityMonitor, @unchecked Sendable {
     @ObservableValue private(set) var connection = true
     
     private let monitor = NWPathMonitor()

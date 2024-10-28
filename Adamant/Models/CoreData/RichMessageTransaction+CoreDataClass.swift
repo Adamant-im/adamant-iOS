@@ -12,7 +12,7 @@ import CoreData
 import CommonKit
 
 @objc(RichMessageTransaction)
-public class RichMessageTransaction: ChatTransaction {
+public class RichMessageTransaction: ChatTransaction, @unchecked Sendable {
     static let entityName = "RichMessageTransaction"
     
     override func serializedMessage() -> String? {

@@ -111,7 +111,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         logoImageView.snp.makeConstraints {
             $0.size.equalTo(25)
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().inset(10)
+            $0.leading.equalToSuperview().inset(8)
         }
         
         addSubview(checkmarkView)
@@ -123,7 +123,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(checkmarkView)
-            $0.leading.equalTo(logoImageView.snp.trailing).offset(10)
+            $0.leading.equalTo(logoImageView.snp.trailing).offset(8)
         }
         
         addSubview(horizontalStack)
@@ -136,17 +136,20 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         balanceLabel.contentMode = .left
         balanceLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(checkmarkView.snp.leading).offset(-10)
+            $0.trailing.equalTo(checkmarkView.snp.leading).offset(-8)
+            $0.leading.greaterThanOrEqualTo(titleLabel.snp.trailing)
         }
     }
 }
 
+@MainActor
 private func makeTitleLabel() -> UILabel {
     let label = UILabel()
-    label.font = .systemFont(ofSize: 17, weight: .regular)
+    label.font = .systemFont(ofSize: 15, weight: .regular)
     return label
 }
 
+@MainActor
 private func makeSubtitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .preferredFont(forTextStyle: .caption1)
@@ -154,6 +157,7 @@ private func makeSubtitleLabel() -> UILabel {
     return label
 }
 
+@MainActor
 private func makeCaptionLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 12, weight: .regular)
@@ -162,8 +166,9 @@ private func makeCaptionLabel() -> UILabel {
     return label
 }
 
+@MainActor
 private func makeAdditionalLabel() -> UILabel {
     let label = UILabel()
-    label.font = .systemFont(ofSize: 17, weight: .regular)
+    label.font = .systemFont(ofSize: 15, weight: .regular)
     return label
 }

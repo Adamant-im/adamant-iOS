@@ -169,7 +169,7 @@ final class LoginViewController: FormViewController {
         self.screensFactory = screensFactory
         self.apiService = apiService
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -306,11 +306,26 @@ final class LoginViewController: FormViewController {
             }
             
             let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-            dialogService.presentShareAlertFor(string: passphrase,
-                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
-                                               excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-                                               animated: true, from: cell,
-                                               completion: nil)
+            
+            let didSelectAction: ((ShareType) -> Void)? = { [weak self] type in
+                guard case .copyToPasteboard = type else {
+                    return
+                }
+
+                Task { @MainActor in
+                    self?.tableView.scrollToBottom(animated: true)
+                }
+            }
+            
+            dialogService.presentShareAlertFor(
+                string: passphrase,
+                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
+                excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+                animated: true, 
+                from: nil,
+                completion: nil,
+                didSelect: didSelectAction
+            )
         })
         
         <<< ButtonRow {
@@ -355,29 +370,39 @@ final class LoginViewController: FormViewController {
         
         // MARK: tableView position tuning
         if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-            NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
-                guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
-                    return
-                }
-                
-                DispatchQueue.main.async {
+            NotificationCenter.default.addObserver(
+                forName: UITextField.textDidBeginEditingNotification,
+                object: row.cell.textField,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
+                        return
+                    }
+                    
                     tableView.scrollToRow(at: indexPath, at: .none, animated: true)
                 }
             }
         }
         
         // MARK: Requesting biometry onActive
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let vc = self,
-                vc.firstTimeActive,
-                vc.requestBiometryOnFirstTimeActive,
-                vc.accountService.hasStayInAccount,
-                vc.accountService.useBiometry else {
-                return
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                guard let vc = self,
+                    vc.firstTimeActive,
+                    vc.requestBiometryOnFirstTimeActive,
+                    vc.accountService.hasStayInAccount,
+                    vc.accountService.useBiometry else {
+                    return
+                }
+                
+                vc.loginWithBiometry()
+                vc.firstTimeActive = false
             }
-            
-            vc.loginWithBiometry()
-            vc.firstTimeActive = false
         }
         
         setColors()

@@ -33,15 +33,11 @@ public final class AdamantApiService {
 }
 
 extension AdamantApiService: AdamantApiServiceProtocol {
-    public var chosenFastestNodeId: UUID? {
-        service.chosenFastestNodeId
-    }
+    @MainActor
+    public var nodesInfoPublisher: AnyObservable<NodesListInfo> { service.nodesInfoPublisher }
     
-    public func healthCheck() {
-        service.healthCheck()
-    }
+    @MainActor
+    public var nodesInfo: NodesListInfo { service.nodesInfo }
     
-    public var hasActiveNode: Bool {
-        !service.sortedAllowedNodes.isEmpty
-    }
+    public func healthCheck() { service.healthCheck() }
 }

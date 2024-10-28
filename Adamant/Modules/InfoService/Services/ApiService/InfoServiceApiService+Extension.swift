@@ -10,17 +10,13 @@ import Foundation
 import CommonKit
 
 extension InfoServiceApiService: ApiServiceProtocol {
-    var chosenFastestNodeId: UUID? {
-        core.chosenFastestNodeId
-    }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { core.nodesInfoPublisher }
     
-    func healthCheck() {
-        core.healthCheck()
-    }
+    @MainActor
+    var nodesInfo: NodesListInfo { core.nodesInfo }
     
-    var hasActiveNode: Bool {
-        !core.sortedAllowedNodes.isEmpty
-    }
+    func healthCheck() { core.healthCheck() }
 }
 
 extension InfoServiceApiService: InfoServiceApiServiceProtocol {
@@ -51,11 +47,5 @@ extension InfoServiceApiService: InfoServiceApiServiceProtocol {
                 encoding: .url
             )
         }.flatMap { mapper.mapToModel($0) }
-    }
-}
-
-private extension InfoServiceApiService {
-    var mapper: InfoServiceMapperProtocol {
-        core.service.mapper
     }
 }

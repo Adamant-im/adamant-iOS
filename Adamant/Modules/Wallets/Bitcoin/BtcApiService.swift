@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class BtcApiCore: BlockchainHealthCheckableService {
+final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -66,33 +66,30 @@ final class BtcApiCore: BlockchainHealthCheckableService {
 
 final class BtcApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
+
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
     
-    var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
-    }
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
     
-    var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
-    }
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
         self.api = api
     }
     
-    func healthCheck() {
-        api.healthCheck()
-    }
-    
     func request<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.request(origin: origin, request)
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }

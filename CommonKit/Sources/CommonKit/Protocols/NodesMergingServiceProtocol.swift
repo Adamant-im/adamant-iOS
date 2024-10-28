@@ -6,7 +6,7 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-public protocol NodesMergingServiceProtocol {
+public protocol NodesMergingServiceProtocol: Sendable {
     func merge(
         savedNodes: [NodeGroup: [Node]],
         defaultNodes: [NodeGroup: [Node]]

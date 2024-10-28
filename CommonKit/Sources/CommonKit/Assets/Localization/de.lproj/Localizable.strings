@@ -103,6 +103,9 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
+/* Account tab: No enabled nodes */
+"AccountTab.Row.NoEnabledNodes" = "No enabled nodes";
+
 /* Account tab: 'Language' row */
 "AccountTab.Row.Language" = "Sprache";
 
@@ -703,6 +706,9 @@
 /* NodesList.NodeCell: Node is synchronizing */
 "NodesList.NodeCell.Synchronizing" = "Synchronizing";
 
+/* NodesList.NodeCell: Node is updating */
+"NodesList.NodeCell.Updating" = "Updating";
+
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Offline";
 
@@ -1200,7 +1206,7 @@
 "TransferScene.Row.Balance" = "Kontostand";
 
 /* Transfer: maximum amount to transfer: available account money substracting transfer fee */
-"TransferScene.Row.MaxToTransfer" = "Maximalbetrag für den Versand verfügbar";
+"TransferScene.Row.MaxToTransfer" = "Maximaler Übertrag";
 
 /* Transfer: recipient address */
 "TransferScene.Row.RecipientAddress" = "Adresse";

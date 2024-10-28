@@ -8,7 +8,7 @@
 
 import Foundation
 import web3swift
-import struct BigInt.BigUInt
+@preconcurrency import struct BigInt.BigUInt
 import Web3Core
 import CommonKit
 
@@ -42,7 +42,7 @@ extension EthResponse: Decodable {
 
 // MARK: - Eth Transaction
 
-struct EthTransaction {
+struct EthTransaction: @unchecked Sendable {
     let date: Date?
     let hash: String
     let value: Decimal?
@@ -261,14 +261,14 @@ extension CodableTransaction {
 
 // MARK: - Adamant ETH API transactions
 
-struct EthTransactionShort {
+struct EthTransactionShort: @unchecked Sendable {
     let date: Date
     let hash: String
     let from: String
     var to: String
     let gasUsed: Decimal
     let gasPrice: Decimal
-    var value: Decimal
+    let value: Decimal
     let blockNumber: String
     
     let contract_to: String

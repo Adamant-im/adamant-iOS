@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct APIResponseModel {
+public struct APIResponseModel: Sendable {
     public let result: ApiServiceResult<Data>
     public let data: Data?
     public let code: Int?

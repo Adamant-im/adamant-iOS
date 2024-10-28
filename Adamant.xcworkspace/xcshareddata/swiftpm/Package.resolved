@@ -290,6 +290,24 @@
         }
       },
       {
+        "package": "swift-async-algorithms",
+        "repositoryURL": "https://github.com/apple/swift-async-algorithms",
+        "state": {
+          "branch": null,
+          "revision": "5c8bd186f48c16af0775972700626f0b74588278",
+          "version": "1.0.2"
+        }
+      },
+      {
+        "package": "swift-collections",
+        "repositoryURL": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "branch": null,
+          "revision": "671108c96644956dddcd89dd59c203dcdb36cec7",
+          "version": "1.1.4"
+        }
+      },
+      {
         "package": "SwiftProtobuf",
         "repositoryURL": "https://github.com/apple/swift-protobuf.git",
         "state": {
@@ -330,8 +348,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "16a2915ebd1a0fd33bf0a0ed5a9874909a6e187d",
-          "version": "3.1.2"
+          "revision": "8a026108ae5ff730ac83e9b574c8cf1c14413c94",
+          "version": "3.2.2"
         }
       }
     ]

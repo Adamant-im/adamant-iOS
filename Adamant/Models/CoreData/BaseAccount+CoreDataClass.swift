@@ -11,6 +11,6 @@ import Foundation
 import CoreData
 
 @objc(BaseAccount)
-public class BaseAccount: NSManagedObject {
+public class BaseAccount: NSManagedObject, @unchecked Sendable {
     static let baseEntityName = "BaseAccount"
 }

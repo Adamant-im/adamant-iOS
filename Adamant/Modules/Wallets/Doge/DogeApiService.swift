@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class DogeApiCore: BlockchainHealthCheckableService {
+final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -48,32 +48,29 @@ final class DogeApiCore: BlockchainHealthCheckableService {
 final class DogeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
     
-    var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
-    }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
     
-    var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
-    }
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
+    
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
         self.api = api
     }
     
-    func healthCheck() {
-        api.healthCheck()
-    }
-    
     func request<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.request(origin: origin, request)
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }

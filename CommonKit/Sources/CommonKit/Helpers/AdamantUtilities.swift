@@ -24,7 +24,7 @@ public enum AdamantUtilities {
         return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
     }
     
-    private static var magicAdamantTimeInterval: TimeInterval = {
+    private static let magicAdamantTimeInterval: TimeInterval = {
         // JS handles moth as 0-based number, swift handles month as 1-based number.
         let components = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(abbreviation: "UTC"), year: 2017, month: 9, day: 2, hour: 17)
         return components.date!.timeIntervalSince1970

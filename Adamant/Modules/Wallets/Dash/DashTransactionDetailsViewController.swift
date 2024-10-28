@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import CommonKit
+import Combine
 
 final class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -22,7 +23,7 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
     private var cachedBlockInfo: (hash: String, height: String)?
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -47,30 +48,27 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
         }
     }
     
-    deinit {
-        stopUpdate()
-    }
-    
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(DashWalletService.explorerAddress)\(id)")
+        return URL(string: "\(DashWalletService.explorerTx)\(id)")
     }
     
     @MainActor
     @objc func refresh(silent: Bool = false) {
         refreshTask = Task { [weak self] in
-            guard let service = service,
-                    let address = service.wallet?.address,
-                    let id = transaction?.txId
+            guard
+                let service = self?.service,
+                let address = service.wallet?.address,
+                let id = self?.transaction?.txId
             else {
                 return
             }
         
             do {
-                let trs = try await service.getTransaction(by: id)
+                let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 if let blockInfo = self?.cachedBlockInfo,
                    blockInfo.hash == trs.blockHash {
                     self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo.height)
@@ -115,14 +113,12 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
     // MARK: Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true) // Silent, without errors
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

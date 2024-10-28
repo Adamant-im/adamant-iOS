@@ -11,7 +11,7 @@ import Foundation
 /// Word dictionaries
 enum WordList {
     /// English words dictionary
-    static var english: [String.SubSequence] = {
+    static let english: [String.SubSequence] = {
         let url = Bundle.main.url(forResource: "english", withExtension: "txt")
         let data = try! Data(contentsOf: url!)
         let raw = String(data: data, encoding: .utf8)!

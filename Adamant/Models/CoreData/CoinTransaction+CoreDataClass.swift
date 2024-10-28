@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(CoinTransaction)
-public class CoinTransaction: NSManagedObject {
+public class CoinTransaction: NSManagedObject, @unchecked Sendable {
     static let entityCoinName = "CoinTransaction"
     
     var transactionStatus: TransactionStatus? {

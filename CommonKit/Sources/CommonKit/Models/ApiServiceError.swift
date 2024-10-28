@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ApiServiceError: LocalizedError {
+public enum ApiServiceError: LocalizedError, Sendable {
     case notLogged
     case accountNotFound
     case serverError(error: String)
@@ -90,6 +90,10 @@ extension ApiServiceError: HealthCheckableError {
         default:
             return false
         }
+    }
+    
+    public static var noNetworkError: ApiServiceError {
+        .networkError(error: AdamantError(message: .adamant.sharedErrors.networkError))
     }
     
     public static func noEndpointsError(nodeGroupName: String) -> ApiServiceError {

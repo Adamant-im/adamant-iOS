@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import MarkdownKit
+@preconcurrency import MarkdownKit
 import MessageKit
 import CommonKit
 import FilesStorageKit
 
-struct ChatMessageFactory {
+struct ChatMessageFactory: Sendable {
     private let walletServiceCompose: WalletServiceCompose
     
     static let markdownParser = MarkdownParser(
@@ -496,6 +496,7 @@ private extension ChatMessageFactory {
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = .asset(named: "status_pending")
+        attachment.image?.withTintColor(.adamant.secondary)
         attachment.bounds = CGRect(x: .zero, y: -1, width: 10, height: 10)
         return NSAttributedString(attachment: attachment)
     }

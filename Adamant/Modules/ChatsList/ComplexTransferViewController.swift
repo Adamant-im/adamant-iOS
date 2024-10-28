@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Parchment
+@preconcurrency import Parchment
 import SnapKit
 import CommonKit
 
@@ -112,112 +112,122 @@ final class ComplexTransferViewController: UIViewController {
 }
 
 extension ComplexTransferViewController: PagingViewControllerDataSource {
-    func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
-        return services.count
+    nonisolated func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
+        MainActor.assertIsolated()
+        
+        return DispatchQueue.onMainThreadSyncSafe {
+            services.count
+        }
     }
     
-    @MainActor
-    func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
-        let service = services[index]
-        let admService = services.first { $0.core.nodeGroups.contains(.adm) }
-        let vc = screensFactory.makeTransferVC(service: service)
+    nonisolated func pagingViewController(
+        _ pagingViewController: PagingViewController,
+        viewControllerAt index: Int
+    ) -> UIViewController {
+        MainActor.assertIsolated()
         
-        vc.delegate = self
-        
-        guard let address = partner?.address else { return vc }
-        
-        let name = partner?.chatroom?.getName(addressBookService: addressBookService)
-        
-        vc.replyToMessageId = replyToMessageId
-        vc.admReportRecipient = address
-        vc.recipientIsReadonly = true
-        vc.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
-        vc.showProgressView(animated: false)
-        
-        Task {
-            guard service.core.hasActiveNode else {
-                vc.showAlertView(
-                    title: nil,
-                    message: ApiServiceError.noEndpointsAvailable(
-                        nodeGroupName: service.core.tokenName
-                    ).errorDescription ?? .adamant.sharedErrors.unknownError,
-                    animated: true
-                )
-                return
-            }
+        return DispatchQueue.onMainThreadSyncSafe {
+            let service = services[index]
+            let admService = services.first { $0.core.nodeGroups.contains(.adm) }
+            let vc = screensFactory.makeTransferVC(service: service)
             
-            guard admService?.core.hasActiveNode ?? false else {
-                vc.showAlertView(
-                    title: nil,
-                    message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
-                    animated: true
-                )
-                return
-            }
+            vc.delegate = self
             
-            do {
-                let walletAddress = try await service.core
-                    .getWalletAddress(
-                        byAdamantAddress:
-                            address
+            guard let address = partner?.address else { return vc }
+            
+            let name = partner?.chatroom?.getName(addressBookService: addressBookService)
+            
+            vc.replyToMessageId = replyToMessageId
+            vc.admReportRecipient = address
+            vc.recipientIsReadonly = true
+            vc.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
+            vc.showProgressView(animated: false)
+            
+            Task {
+                guard service.core.hasEnabledNode else {
+                    vc.showAlertView(
+                        message: ApiServiceError.noEndpointsAvailable(
+                            nodeGroupName: service.core.tokenName
+                        ).errorDescription ?? .adamant.sharedErrors.unknownError,
+                        animated: true
                     )
-                vc.recipientAddress = walletAddress
-                vc.recipientName = name
-                vc.hideProgress(animated: true)
-                
-                if ERC20Token.supportedTokens.contains(
-                    where: { token in
-                        return token.symbol == service.core.tokenSymbol
-                    }
-                ) {
-                    let ethWallet = walletServiceCompose.getWallet(
-                        by: EthWalletService.richMessageType
-                    )?.core
-                    
-                    vc.rootCoinBalance = ethWallet?.wallet?.balance
+                    return
                 }
-            } catch let error as WalletServiceError {
-                vc.showAlertView(
-                    title: nil,
-                    message: error.message,
-                    animated: true
-                )
-            } catch {
-                vc.showAlertView(
-                    title: nil,
-                    message: String.adamant.sharedErrors.unknownError,
-                    animated: true
-                )
+                
+                guard admService?.core.hasEnabledNode ?? false else {
+                    vc.showAlertView(
+                        message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
+                        animated: true
+                    )
+                    return
+                }
+                
+                do {
+                    let walletAddress = try await service.core
+                        .getWalletAddress(
+                            byAdamantAddress:
+                                address
+                        )
+                    vc.recipientAddress = walletAddress
+                    vc.recipientName = name
+                    vc.hideProgress(animated: true)
+                    
+                    if ERC20Token.supportedTokens.contains(
+                        where: { token in
+                            return token.symbol == service.core.tokenSymbol
+                        }
+                    ) {
+                        let ethWallet = walletServiceCompose.getWallet(
+                            by: EthWalletService.richMessageType
+                        )?.core
+                        
+                        vc.rootCoinBalance = ethWallet?.wallet?.balance
+                    }
+                } catch let error as WalletServiceError {
+                    vc.showAlertView(
+                        message: error.message,
+                        animated: true
+                    )
+                } catch {
+                    vc.showAlertView(
+                        message: String.adamant.sharedErrors.unknownError,
+                        animated: true
+                    )
+                }
             }
+            
+            return vc
         }
-		
-		return vc
 	}
 	
-    func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        let service = services[index].core
-		
-		guard let wallet = service.wallet else {
-            return WalletItemModel(model: .default)
-		}
+    nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
+        MainActor.assertIsolated()
         
-        var network = ""
-        if ERC20Token.supportedTokens.contains(where: { token in
-            return token.symbol == service.tokenSymbol
-        }) {
-            network = type(of: service).tokenNetworkSymbol
+        return DispatchQueue.onMainThreadSyncSafe {
+            let service = services[index].core
+            
+            guard let wallet = service.wallet else {
+                return WalletItemModel(model: .default)
+            }
+            
+            var network = ""
+            if ERC20Token.supportedTokens.contains(where: { token in
+                return token.symbol == service.tokenSymbol
+            }) {
+                network = type(of: service).tokenNetworkSymbol
+            }
+            
+            let item = WalletItem(
+                index: index,
+                currencySymbol: service.tokenSymbol,
+                currencyImage: service.tokenLogo,
+                isBalanceInitialized: wallet.isBalanceInitialized,
+                currencyNetwork: network,
+                balance: wallet.balance
+            )
+            
+            return WalletItemModel(model: item)
         }
-		
-        let item = WalletItem(
-            index: index,
-            currencySymbol: service.tokenSymbol,
-            currencyImage: service.tokenLogo,
-            isBalanceInitialized: wallet.isBalanceInitialized,
-            currencyNetwork: network,
-            balance: wallet.balance
-        )
-		
-		return WalletItemModel(model: item)
 	}
 }
 

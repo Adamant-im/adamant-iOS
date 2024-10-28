@@ -16,7 +16,7 @@ public protocol WrappableCollection: Decodable {
     static var CollectionKey: String { get }
 }
 
-open class ServerResponse: Decodable {
+open class ServerResponse: Decodable, @unchecked Sendable {
     public struct CodingKeys: CodingKey {
         public var intValue: Int?
         public var stringValue: String
@@ -54,7 +54,7 @@ open class ServerResponse: Decodable {
     }
 }
 
-public final class ServerModelResponse<T: WrappableModel>: ServerResponse {
+public final class ServerModelResponse<T: WrappableModel>: ServerResponse, @unchecked Sendable {
     public let model: T?
     
     required public init(from decoder: Decoder) throws {
@@ -68,7 +68,7 @@ public final class ServerModelResponse<T: WrappableModel>: ServerResponse {
     }
 }
 
-public final class ServerCollectionResponse<T: WrappableCollection>: ServerResponse {
+public final class ServerCollectionResponse<T: WrappableCollection>: ServerResponse, @unchecked Sendable {
     public let collection: [T]?
     
     required public init(from decoder: Decoder) throws {
