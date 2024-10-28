@@ -74,7 +74,7 @@ final class PKGeneratorViewController: FormViewController {
         self.dialogService = dialogService
         self.walletServiceCompose = walletServiceCompose
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {

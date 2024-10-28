@@ -145,7 +145,7 @@ final class AboutViewController: FormViewController {
         self.screensFactory = screensFactory
         self.vibroService = vibroService
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
