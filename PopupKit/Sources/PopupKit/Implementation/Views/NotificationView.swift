@@ -26,6 +26,7 @@ struct NotificationView: View {
         }
         .padding([.leading, .trailing], 15)
         .padding([.top, .bottom], 10)
+        .background(GeometryReader(content: processGeometry))
         .gesture(dragGesture)
         .onTapGesture(perform: onTap)
         .background(Color(.adamant.swipeBlockColor))
