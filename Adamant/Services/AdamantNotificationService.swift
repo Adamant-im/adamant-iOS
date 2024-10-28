@@ -411,25 +411,24 @@ extension AdamantNotificationsService: NSFetchedResultsControllerDelegate {
         for type: NSFetchedResultsChangeType,
         newIndexPath: IndexPath?
     ) {
-        // TOTOLATER
-//        Task { @MainActor in
-//            guard
-//                let transaction = anObject as? ChatTransaction,
-//                type == .insert
-//            else { return }
-//            
-//            if inAppVibrate {
-//                vibroService.applyVibration(.medium)
-//            }
-//            
-//            if inAppSound {
-//                switch transaction {
-//                case let tx as RichMessageTransaction where tx.additionalType == .reaction:
-//                    playSound(by: notificationsReactionSound.fileName)
-//                default:
-//                    playSound(by: notificationsSound.fileName)
-//                }
-//            }
-//        }
+        Task { @MainActor in
+            guard
+                let transaction = anObject as? ChatTransaction,
+                type == .insert
+            else { return }
+            
+            if inAppVibrate {
+                vibroService.applyVibration(.medium)
+            }
+            
+            if inAppSound {
+                switch transaction {
+                case let tx as RichMessageTransaction where tx.additionalType == .reaction:
+                    playSound(by: notificationsReactionSound.fileName)
+                default:
+                    playSound(by: notificationsSound.fileName)
+                }
+            }
+        }
     }
 }
