@@ -63,8 +63,8 @@ extension AdmWalletService {
         8
     }
     
-    static let explorerAddress = "https://explorer.adamant.im/tx/"
-    
+    static let explorerTx = "https://explorer.adamant.im/tx/"
+    static let explorerAddress = "https://explorer.adamant.im/address/"
     static var nodes: [Node] {
         [
             Node.makeDefaultNode(url: URL(string: "https://clown.adamant.im")!),

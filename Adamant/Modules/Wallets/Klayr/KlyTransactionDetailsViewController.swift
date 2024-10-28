@@ -55,7 +55,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(KlyWalletService.explorerAddress)\(id)")
+        return URL(string: "\(KlyWalletService.explorerTx)\(id)")
     }
     
     @MainActor

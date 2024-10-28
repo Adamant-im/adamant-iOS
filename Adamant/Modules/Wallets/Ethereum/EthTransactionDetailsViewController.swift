@@ -48,7 +48,7 @@ final class EthTransactionDetailsViewController: TransactionDetailsViewControlle
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(EthWalletService.explorerAddress)\(id)")
+        return URL(string: "\(EthWalletService.explorerTx)\(id)")
     }
     
     @MainActor

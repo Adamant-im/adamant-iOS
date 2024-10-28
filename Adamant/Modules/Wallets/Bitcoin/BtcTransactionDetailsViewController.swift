@@ -49,7 +49,7 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
-        return URL(string: "\(BtcWalletService.explorerAddress)\(id)")
+        return URL(string: "\(BtcWalletService.explorerTx)\(id)")
     }
     
     @MainActor
