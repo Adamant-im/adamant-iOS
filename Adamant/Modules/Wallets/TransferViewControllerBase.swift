@@ -797,7 +797,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard
-            await apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+            apiServiceCompose.get(.adm)?.hasEnabledNode == true || admReportRecipient == nil
         else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
@@ -807,7 +807,7 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard await walletCore.hasActiveNode else {
+        guard walletCore.hasEnabledNode else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
                     nodeGroupName: walletCore.tokenName

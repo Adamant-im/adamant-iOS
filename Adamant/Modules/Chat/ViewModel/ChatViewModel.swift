@@ -294,7 +294,7 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-            guard await apiServiceCompose.hasActiveNode(group: .adm) else {
+            guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
                 dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                     nodeGroupName: NodeGroup.adm.name
                 ).localizedDescription))
@@ -706,7 +706,7 @@ final class ChatViewModel: NSObject {
             return false
         }
         
-        guard await apiServiceCompose.hasActiveNode(group: .adm) else {
+        guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
@@ -1060,7 +1060,7 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
-        guard await apiServiceCompose.hasActiveNode(group: .ipfs) else {
+        guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.ipfs.name
             ).localizedDescription))

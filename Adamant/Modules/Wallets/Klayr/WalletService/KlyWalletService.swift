@@ -38,8 +38,17 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     static let kvsAddress = "kly:address"
     static let defaultFee: BigUInt = 141000
     
-    var hasActiveNode: Bool {
-        get async { await apiService.hasActiveNode }
+    @MainActor
+    var hasEnabledNode: Bool {
+        klyNodeApiService.hasEnabledNode && klyServiceApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        klyNodeApiService.hasEnabledNodePublisher
+            .combineLatest(klyServiceApiService.hasEnabledNodePublisher)
+            .map { $0.0 && $0.1 }
+            .eraseToAnyPublisher()
     }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
@@ -54,6 +63,7 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var state: WalletServiceState = .notInitiated
     @Atomic private(set) var lastHeight: UInt64 = .zero
     @Atomic private(set) var lastMinFeePerByte: UInt64 = .zero
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
     
     @ObservableValue private(set) var transactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
@@ -210,7 +220,18 @@ private extension KlyWalletService {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.transactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -242,6 +263,7 @@ private extension KlyWalletService {
         }
         
         if let balance = try? await getBalance() {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -271,6 +293,25 @@ private extension KlyWalletService {
         }
         
         setState(.upToDate)
+    }
+    
+    func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    func resetBalance() {
+        klyWallet?.isBalanceInitialized = false
+        guard let wallet = klyWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
 }
 

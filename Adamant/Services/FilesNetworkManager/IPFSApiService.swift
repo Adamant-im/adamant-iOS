@@ -20,6 +20,14 @@ enum IPFSApiCommands {
 final class IPFSApiService: FileApiServiceProtocol {
     let service: BlockchainHealthCheckWrapper<IPFSApiCore>
     
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { service.nodesInfoPublisher }
+    
+    @MainActor
+    var nodesInfo: NodesListInfo { service.nodesInfo }
+    
+    func healthCheck() { service.healthCheck() }
+    
     init(
         healthCheckWrapper: BlockchainHealthCheckWrapper<IPFSApiCore>
     ) {

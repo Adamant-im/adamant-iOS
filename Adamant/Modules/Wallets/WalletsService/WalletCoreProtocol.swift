@@ -124,6 +124,10 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
+    public static var noNetworkError: WalletServiceError {
+        .apiError(.noNetworkError)
+    }
+    
     static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
         .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
@@ -283,7 +287,12 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var enabled: Bool { get }
     
     // MARK: Logic
-    var hasActiveNode: Bool { get async }
+    @MainActor
+    var hasEnabledNode: Bool { get }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> { get }
+    
     func update()
     
     // MARK: Tools
@@ -385,4 +394,8 @@ protocol WalletServiceTwoStepSend: WalletCoreProtocol {
 
 protocol RawTransaction {
     var txHash: String? { get }
+}
+
+extension WalletCoreProtocol {
+    static var balanceLifetime: TimeInterval { 300 }
 }

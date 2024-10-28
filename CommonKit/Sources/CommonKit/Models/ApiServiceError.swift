@@ -92,6 +92,10 @@ extension ApiServiceError: HealthCheckableError {
         }
     }
     
+    public static var noNetworkError: ApiServiceError {
+        .networkError(error: AdamantError(message: .adamant.sharedErrors.networkError))
+    }
+    
     public static func noEndpointsError(nodeGroupName: String) -> ApiServiceError {
         .noEndpointsAvailable(nodeGroupName: nodeGroupName)
     }

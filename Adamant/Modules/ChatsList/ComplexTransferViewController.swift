@@ -144,9 +144,8 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             vc.showProgressView(animated: false)
             
             Task {
-                guard await service.core.hasActiveNode else {
+                guard service.core.hasEnabledNode else {
                     vc.showAlertView(
-                        title: nil,
                         message: ApiServiceError.noEndpointsAvailable(
                             nodeGroupName: service.core.tokenName
                         ).errorDescription ?? .adamant.sharedErrors.unknownError,
@@ -155,9 +154,8 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     return
                 }
                 
-                guard await admService?.core.hasActiveNode ?? false else {
+                guard admService?.core.hasEnabledNode ?? false else {
                     vc.showAlertView(
-                        title: nil,
                         message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
                         animated: true
                     )
@@ -187,13 +185,11 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     }
                 } catch let error as WalletServiceError {
                     vc.showAlertView(
-                        title: nil,
                         message: error.message,
                         animated: true
                     )
                 } catch {
                     vc.showAlertView(
-                        title: nil,
                         message: String.adamant.sharedErrors.unknownError,
                         animated: true
                     )

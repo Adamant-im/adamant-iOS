@@ -10,18 +10,6 @@ import Foundation
 import CommonKit
 
 extension IPFSApiService {
-    var chosenFastestNodeId: UUID? {
-        get async { await service.chosenNodeId }
-    }
-    
-    var hasActiveNode: Bool {
-        get async { await !service.sortedAllowedNodes.isEmpty }
-    }
-    
-    func healthCheck() {
-        Task { await service.healthCheck() }
-    }
-    
     static var symbol: String {
         "IPFS"
     }

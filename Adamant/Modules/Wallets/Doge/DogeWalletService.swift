@@ -126,6 +126,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
     
     let defaultDispatchQueue = DispatchQueue(
         label: "im.adamant.dogeWalletService",
@@ -147,8 +148,14 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        get async { await apiService.hasActiveNode }
+    @MainActor
+    var hasEnabledNode: Bool {
+        dogeApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        dogeApiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -210,7 +217,18 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.historyTransactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -244,6 +262,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
@@ -279,6 +298,25 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         case .p2tr, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh, .unknown, .none:
             return .invalid(description: nil)
         }
+    }
+    
+    private func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    private func resetBalance() {
+        dogeWallet?.isBalanceInitialized = false
+        guard let wallet = dogeWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
 }
 

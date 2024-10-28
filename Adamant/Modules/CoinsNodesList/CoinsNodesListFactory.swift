@@ -45,7 +45,7 @@ private struct CoinsNodesListAssembly: MainThreadAssembly {
             let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
             
             return .init(
-                mapper: .init(processedGroups: processedGroups),
+                mapper: .init(),
                 nodesStorage: $0.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: $0.resolve(
                     NodesAdditionalParamsStorageProtocol.self

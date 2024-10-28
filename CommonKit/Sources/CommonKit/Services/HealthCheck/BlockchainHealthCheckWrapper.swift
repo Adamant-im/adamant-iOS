@@ -43,14 +43,13 @@ public final class BlockchainHealthCheckWrapper<
             nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
         
-        Task.sync { @HealthCheckActor [self] in
+        Task { @HealthCheckActor [self] in
             configure(nodesAdditionalParamsStorage: nodesAdditionalParamsStorage)
         }
     }
     
-    public override func healthCheck() {
-        super.healthCheck()
-        guard isActive else { return }
+    public override func healthCheckInternal() {
+        super.healthCheckInternal()
         
         Task { @HealthCheckActor in
             updateNodesAvailability(update: nil)
@@ -58,18 +57,10 @@ public final class BlockchainHealthCheckWrapper<
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
                     group.addTask { @HealthCheckActor [weak self] in
-                        guard
-                            let self = self,
-                            !currentRequests.contains(node.id)
-                        else { return }
+                        guard let self, !currentRequests.contains(node.id) else { return }
                         
                         currentRequests.insert(node.id)
-                        updateNode(id: node.id) { $0.isUpdating = true }
-                        
-                        defer {
-                            currentRequests.remove(node.id)
-                            updateNode(id: node.id) { $0.isUpdating = false }
-                        }
+                        defer { currentRequests.remove(node.id) }
                         
                         let update = await updateNodeStatusInfo(node: node)
                         updateNodesAvailability(update: update)
@@ -92,7 +83,8 @@ private extension BlockchainHealthCheckWrapper {
     func configure(nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol) {
         nodesAdditionalParamsStorage
             .fastestNodeMode(group: params.group)
-            .sink { [weak self] in self?.fastestNodeMode = $0 }
+            .values
+            .sink { [weak self] in await self?.setFastestMode($0) }
             .store(in: &subscriptions)
     }
     

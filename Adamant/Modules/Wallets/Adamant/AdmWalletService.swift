@@ -94,8 +94,14 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        get async { await apiService.hasActiveNode }
+    @MainActor
+    var hasEnabledNode: Bool {
+        apiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        apiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -151,7 +157,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         
         if let wallet = wallet as? AdmWallet {
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
-            if wallet.balance != account.balance {
+            if wallet.balance != account.balance || wallet.isBalanceInitialized != !accountService.isBalanceExpired {
                 wallet.balance = account.balance
                 notify = true
             } else if !wallet.isBalanceInitialized {
@@ -159,10 +165,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             } else {
                 notify = false
             }
-            wallet.isBalanceInitialized = true
+            wallet.isBalanceInitialized = !accountService.isBalanceExpired
         } else {
             let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
-            wallet.isBalanceInitialized = true
+            wallet.isBalanceInitialized = !accountService.isBalanceExpired
             wallet.balance = account.balance
             
             self.wallet = wallet

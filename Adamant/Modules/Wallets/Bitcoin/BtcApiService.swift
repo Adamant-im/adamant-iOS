@@ -66,21 +66,17 @@ final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
 
 final class BtcApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
+
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
     
-    var chosenFastestNodeId: UUID? {
-        get async { await api.chosenNodeId }
-    }
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
     
-    var hasActiveNode: Bool {
-        get async { await !api.sortedAllowedNodes.isEmpty }
-    }
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
         self.api = api
-    }
-    
-    func healthCheck() {
-        Task { await api.healthCheck() }
     }
     
     func request<Output>(

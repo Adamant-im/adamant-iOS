@@ -118,8 +118,14 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    var hasActiveNode: Bool {
-        get async { await apiService.hasActiveNode }
+    @MainActor
+    var hasEnabledNode: Bool {
+        dashApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        dashApiService.hasEnabledNodePublisher
     }
     
     // MARK: - Notifications
@@ -136,6 +142,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
@@ -213,7 +220,18 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.historyTransactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -247,6 +265,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
@@ -286,6 +305,25 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         case .p2tr, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh, .unknown, .none:
             return .invalid(description: nil)
         }
+    }
+    
+    private func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    private func resetBalance() {
+        dashWallet?.isBalanceInitialized = false
+        guard let wallet = dashWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Combine
+import AsyncAlgorithms
 
 public extension AsyncSequence where Self: Sendable {
     func sink(
@@ -23,5 +24,22 @@ public extension AsyncSequence where Self: Sendable {
                 await receiveCompletion(error)
             }
         }.eraseToAnyCancellable()
+    }
+    
+    func combineLatest<T: AsyncSequence & Sendable>(_ other: T) -> AsyncCombineLatest2Sequence<Self, T> {
+        AsyncAlgorithms.combineLatest(self, other)
+    }
+}
+
+public extension AsyncSequence {
+    var first: Element? {
+        get async throws { try await first { _ in true } }
+    }
+    
+    func handleEvents(receiveOutput: @escaping (Element) async throws -> Void) -> AsyncMapSequence<Self, Element> {
+        map { [receiveOutput] in
+            try? await receiveOutput($0)
+            return $0
+        }
     }
 }
