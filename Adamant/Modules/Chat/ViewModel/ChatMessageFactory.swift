@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import MarkdownKit
+@preconcurrency import MarkdownKit
 import MessageKit
 import CommonKit
 import FilesStorageKit
 
-struct ChatMessageFactory {
+struct ChatMessageFactory: Sendable {
     private let walletServiceCompose: WalletServiceCompose
     
     static let markdownParser = MarkdownParser(
@@ -108,10 +108,9 @@ struct ChatMessageFactory {
                 status: status,
                 expireDate: &expireDate
             ).map { .init(string: $0) },
-            dateHeader: dateHeaderOn
-                ? makeDateHeader(sentDate: sentDate)
-                : nil,
-            topSpinnerOn: topSpinnerOn
+            dateHeader: makeDateHeader(sentDate: sentDate),
+            topSpinnerOn: topSpinnerOn, 
+            dateHeaderIsHidden: !dateHeaderOn
         )
     }
 }
@@ -261,7 +260,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
-        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
+        let defaultIcon: UIImage = .asset(named: "no-token")?.withTintColor(.adamant.primary) ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,
@@ -497,6 +496,7 @@ private extension ChatMessageFactory {
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = .asset(named: "status_pending")
+        attachment.image?.withTintColor(.adamant.secondary)
         attachment.bounds = CGRect(x: .zero, y: -1, width: 10, height: 10)
         return NSAttributedString(attachment: attachment)
     }
@@ -521,7 +521,7 @@ private extension ChatMessageFactory {
     
     func makeDateHeader(sentDate: Date) -> ComparableAttributedString {
         .init(string: .init(
-            string: sentDate.humanizedDay(),
+            string: sentDate.humanizedDay(useTimeFormat: false),
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.secondary

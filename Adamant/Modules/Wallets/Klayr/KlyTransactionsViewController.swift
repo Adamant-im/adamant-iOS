@@ -39,7 +39,7 @@ final class KlyTransactionsViewController: TransactionsListViewControllerBase {
     }
 }
 
-extension Transactions.TransactionModel: TransactionDetails {
+extension Transactions.TransactionModel: TransactionDetails, @unchecked @retroactive Sendable {
     var nonceRaw: String? {
         return self.nonce
     }
@@ -121,9 +121,13 @@ extension Transactions.TransactionModel: TransactionDetails {
     var sentDate: Date? {
         timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
+    
+    var txBlockchainComment: String? {
+        txData
+    }
 }
 
-extension LocalTransaction: TransactionDetails {
+extension LocalTransaction: TransactionDetails, @unchecked @retroactive Sendable {
 
     var defaultCurrencySymbol: String? { KlyWalletService.currencySymbol }
     

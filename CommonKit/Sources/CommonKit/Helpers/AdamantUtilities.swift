@@ -10,6 +10,8 @@ import Foundation
 import os
 
 public enum AdamantUtilities {
+    public enum Git {}
+    
     public static let admCurrencyExponent: Int = -8
     
     // MARK: - Dates
@@ -22,7 +24,7 @@ public enum AdamantUtilities {
         return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
     }
     
-    private static var magicAdamantTimeInterval: TimeInterval = {
+    private static let magicAdamantTimeInterval: TimeInterval = {
         // JS handles moth as 0-based number, swift handles month as 1-based number.
         let components = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(abbreviation: "UTC"), year: 2017, month: 9, day: 2, hour: 17)
         return components.date!.timeIntervalSince1970
@@ -57,4 +59,11 @@ public enum AdamantUtilities {
         let message = args.joined(separator: separator)
         os_log("adamant-console-log %{public}@", message)
     }
+}
+
+public extension AdamantUtilities.Git {
+    static let commitHash = Bundle.module.url(
+        forResource: "GitData",
+        withExtension: "plist"
+    ).flatMap { NSDictionary(contentsOf: $0)?.value(forKey: "CommitHash") as? String }
 }

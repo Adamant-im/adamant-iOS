@@ -48,7 +48,8 @@ enum AccountsProviderDummyAccountError: Error {
     case internalError(Error)
 }
 
-protocol AccountsProvider {
+@MainActor
+protocol AccountsProvider: Sendable {
     
     /// Search for fetched account, if not found, asks server for account.
     ///

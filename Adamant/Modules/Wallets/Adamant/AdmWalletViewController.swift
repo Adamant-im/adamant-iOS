@@ -27,6 +27,15 @@ extension String.adamant.wallets {
     static var exchangeInChatAdmTokens: String {
         String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
     }
+    
+    static var exchangesOnCoinMarketCap: String {
+        String.localized("AccountTab.Row.ExchangesOnCoinMarketCap", comment: "Account tab: Exchanges on CMC")
+    }
+    
+    static var exchangesOnCoinGecko: String {
+        String.localized("AccountTab.Row.ExchangesOnCoinGecko", comment: "Account tab: Exchanges on CoinGecko")
+    }
+    
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
         return String.localizedStringWithFormat(.localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
@@ -43,10 +52,11 @@ extension String.adamant.wallets {
 final class AdmWalletViewController: WalletViewControllerBase {
     // MARK: - Rows & Sections
     enum Rows {
-        case buyTokens, freeTokens
+        case stakeAdm, buyTokens, freeTokens
         
         var tag: String {
             switch self {
+            case .stakeAdm: return "stakeAdm"
             case .buyTokens: return "bTkns"
             case .freeTokens: return "frrTkns"
             }
@@ -54,6 +64,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
         
         var localized: String {
             switch self {
+            case .stakeAdm: return .localized("AccountTab.Row.StakeAdm", comment: "Stake ADM tokens' row")
             case .buyTokens: return .localized("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
             case .freeTokens: return .localized("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
             }
@@ -61,6 +72,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
         
         var image: UIImage? {
             switch self {
+            case .stakeAdm: return .asset(named: "row_stake")
             case .buyTokens: return .asset(named: "row_buy-coins")
             case .freeTokens: return .asset(named: "row_free-tokens")
             }
@@ -86,6 +98,30 @@ final class AdmWalletViewController: WalletViewControllerBase {
         }
         
         // MARK: Rows
+        
+        let stakeAdmRow = LabelRow {
+            $0.tag = Rows.stakeAdm.tag
+            $0.title = Rows.stakeAdm.localized
+            $0.cell.imageView?.image = Rows.stakeAdm.image
+            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+            $0.cell.selectionStyle = .gray
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
+        }.cellUpdate { (cell, row) in
+            cell.accessoryType = .disclosureIndicator
+        
+            row.title = Rows.stakeAdm.localized
+        }.onCellSelection { [weak self] (_, row) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeDelegatesList()
+            row.deselect()
+
+            if let split = splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                navigationController?.pushViewController(vc, animated: true)
+            }
+        }
         
         let buyTokensRow = LabelRow {
             $0.tag = Rows.buyTokens.tag
@@ -147,6 +183,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             }
         }
         
+        section.append(stakeAdmRow)
         section.append(buyTokensRow)
         section.append(freeTokensRow)
         
@@ -156,13 +193,19 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 forName: service.core.walletUpdatedNotification,
                 object: service.core,
                 queue: OperationQueue.main,
-                using: { [weak self] _ in self?.updateRows() }
+                using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
             )
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateRows()
-            self?.tableView.reloadData()
+        NotificationCenter.default.addObserver(
+            forName: .AdamantAccountService.userLoggedIn,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.updateRows()
+                self?.tableView.reloadData()
+            }
         }
         
         setColors()

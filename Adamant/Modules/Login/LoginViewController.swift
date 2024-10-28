@@ -139,13 +139,15 @@ final class LoginViewController: FormViewController {
     let adamantCore: AdamantCore
     let localAuth: LocalAuthentication
     let screensFactory: ScreensFactory
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     let dialogService: DialogService
     
     // MARK: Properties
     private var hideNewPassphrase: Bool = true
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
+    
+    private lazy var versionFooterView = VersionFooterView()
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
@@ -158,7 +160,7 @@ final class LoginViewController: FormViewController {
         dialogService: DialogService,
         localAuth: LocalAuthentication,
         screensFactory: ScreensFactory,
-        apiService: ApiService
+        apiService: AdamantApiServiceProtocol
     ) {
         self.accountService = accountService
         self.adamantCore = adamantCore
@@ -167,7 +169,7 @@ final class LoginViewController: FormViewController {
         self.screensFactory = screensFactory
         self.apiService = apiService
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -179,6 +181,8 @@ final class LoginViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationOptions = RowNavigationOptions.Disabled
+        tableView.tableFooterView = versionFooterView
+        setVersion()
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -187,14 +191,6 @@ final class LoginViewController: FormViewController {
             if let label = header.viewWithTag(888) as? UILabel {
                 label.text = String.adamant.shared.productName
                 label.textColor = UIColor.adamant.primary
-            }
-        }
-        
-        if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-            if let label = footer.viewWithTag(555) as? UILabel {
-                label.text = AdamantUtilities.applicationVersion
-                label.textColor = UIColor.adamant.primary
-                tableView.tableFooterView = footer
             }
         }
         
@@ -359,32 +355,47 @@ final class LoginViewController: FormViewController {
         
         // MARK: tableView position tuning
         if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-            NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
-                guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
-                    return
-                }
-                
-                DispatchQueue.main.async {
+            NotificationCenter.default.addObserver(
+                forName: UITextField.textDidBeginEditingNotification,
+                object: row.cell.textField,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
+                        return
+                    }
+                    
                     tableView.scrollToRow(at: indexPath, at: .none, animated: true)
                 }
             }
         }
         
         // MARK: Requesting biometry onActive
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let vc = self,
-                vc.firstTimeActive,
-                vc.requestBiometryOnFirstTimeActive,
-                vc.accountService.hasStayInAccount,
-                vc.accountService.useBiometry else {
-                return
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                guard let vc = self,
+                    vc.firstTimeActive,
+                    vc.requestBiometryOnFirstTimeActive,
+                    vc.accountService.hasStayInAccount,
+                    vc.accountService.useBiometry else {
+                    return
+                }
+                
+                vc.loginWithBiometry()
+                vc.firstTimeActive = false
             }
-            
-            vc.loginWithBiometry()
-            vc.firstTimeActive = false
         }
         
         setColors()
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        versionFooterView.sizeToFit()
     }
     
     // MARK: - Other
@@ -392,6 +403,13 @@ final class LoginViewController: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    private func setVersion() {
+        versionFooterView.model = .init(
+            version: AdamantUtilities.applicationVersion,
+            commit: nil
+        )
     }
 }
 
@@ -419,7 +437,7 @@ extension LoginViewController {
     }
     
     func generateNewPassphrase() {
-        let passphrase = adamantCore.generateNewPassphrase()
+        let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
         
         hideNewPassphrase = false
         

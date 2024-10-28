@@ -11,19 +11,25 @@ import MessageUI
 import PopupKit
 import SafariServices
 import CommonKit
+import AVFoundation
 
 @MainActor
 final class AdamantDialogService: DialogService {
     
     // MARK: Dependencies
+    private let notificationsService: NotificationsService
     private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
     
     private weak var window: UIWindow?
     
-    nonisolated init(vibroService: VibroService) {
+    init(
+        vibroService: VibroService,
+        notificationsService: NotificationsService
+    ) {
         self.vibroService = vibroService
+        self.notificationsService = notificationsService
     }
     
     func setup(window: UIWindow) {
@@ -207,6 +213,8 @@ extension AdamantDialogService {
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
+        guard notificationsService.inAppToasts else { return }
+        
         popupManager.showNotification(
             icon: image,
             title: title,
@@ -587,6 +595,7 @@ fileprivate extension AdamantAlertStyle {
 }
 
 fileprivate extension AdamantAlertAction {
+    @MainActor
     func asUIAlertAction() -> UIAlertAction {
         let handler = self.handler
         return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
@@ -629,8 +638,14 @@ extension AdamantDialogService {
 }
 
 private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        controller.dismiss(animated: true, completion: nil)
+    nonisolated func mailComposeController(
+        _ controller: MFMailComposeViewController,
+        didFinishWith result: MFMailComposeResult,
+        error: Error?
+    ) {
+        MainActor.assumeIsolatedSafe {
+            controller.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

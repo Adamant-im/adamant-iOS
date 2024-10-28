@@ -9,28 +9,28 @@
 import Swinject
 import SwiftUI
 
+@MainActor
 struct ContributeFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [ContributeAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([ContributeAssembly()], parent: parent)
+        self.parent = parent
     }
     
     func makeViewController() -> UIViewController {
-        UIHostingController(
-            rootView: ContributeView(
-                viewModel: assembler.resolve(ContributeViewModel.self)!
-            )
-        )
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(ContributeViewModel.self)! }
+        return UIHostingController(rootView: ContributeView(viewModel: viewModel))
     }
 }
 
-private struct ContributeAssembly: Assembly {
-    func assemble(container: Container) {
+private struct ContributeAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(ContributeViewModel.self) {
             ContributeViewModel(
                 crashliticsService: $0.resolve(CrashlyticsService.self)!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

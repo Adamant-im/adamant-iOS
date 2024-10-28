@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "d120af1e8638c7da36c8481fd61a66c0c08dc4fc",
-          "version": "5.4.4"
+          "revision": "bc268c28fb170f494de9e9927c371b8342979ece",
+          "version": "5.7.1"
         }
       },
       {
@@ -60,7 +60,7 @@
         "repositoryURL": "https://github.com/EFPrefix/EFQRCode.git",
         "state": {
           "branch": null,
-          "revision": "2991c2f318ad9529d93b2a73a382a3f9c72c64ce",
+          "revision": "3a6c5012f1a0df404a92e55bb01b4b685ff5a2d1",
           "version": "6.2.2"
         }
       },
@@ -309,11 +309,11 @@
       },
       {
         "package": "swift_qrcodejs",
-        "repositoryURL": "https://github.com/ApolloZhu/swift_qrcodejs.git",
+        "repositoryURL": "https://github.com/EFPrefix/swift_qrcodejs.git",
         "state": {
           "branch": null,
-          "revision": "374dc7f7b9e76c6aeb393f6a84590c6d387e1ecb",
-          "version": "2.2.2"
+          "revision": "817ba220a2eba840bae888e7eeb11207bec05f8c",
+          "version": "2.3.0"
         }
       },
       {
@@ -330,8 +330,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "16a2915ebd1a0fd33bf0a0ed5a9874909a6e187d",
-          "version": "3.1.2"
+          "revision": "8a026108ae5ff730ac83e9b574c8cf1c14413c94",
+          "version": "3.2.2"
         }
       }
     ]

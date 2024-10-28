@@ -91,9 +91,9 @@ class Coins
                 url = node["url"]
                 altUrl = node["alt_ip"]
                 if altUrl == nil
-                    nodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                    nodes += "Node.makeDefaultNode(url: URL(string: \"#{url}\")!),\n"
                 else
-                    nodes += "Node(url: URL(string: \"#{url}\")!, altUrl: URL(string: \"#{altUrl}\")),\n"
+                    nodes += "Node.makeDefaultNode(url: URL(string: \"#{url}\")!, altUrl: URL(string: \"#{altUrl}\")),\n"
                 end
             end
         end
@@ -107,7 +107,7 @@ class Coins
                 if serviceNodesArray != nil
                     serviceNodesArray.each do |node|
                         url = node["url"]
-                        serviceNodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                        serviceNodes += "Node.makeDefaultNode(url: URL(string: \"#{url}\")!),\n"
                     end
                 end
             end

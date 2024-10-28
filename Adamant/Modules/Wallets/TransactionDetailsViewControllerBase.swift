@@ -15,9 +15,9 @@ import CommonKit
 private extension TransactionStatus {
     var color: UIColor {
         switch self {
-        case .failed: return .adamant.danger
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered: return .adamant.alert
-        case .success: return .adamant.good
+        case .failed: return .adamant.warning
+        case .notInitiated, .inconsistent, .pending, .registered: return .adamant.attention
+        case .success: return .adamant.success
         }
     }
     
@@ -71,6 +71,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case historyFiat
         case currentFiat
         case inconsistentReason
+        case txBlockchainComment
         
         var tag: String {
             switch self {
@@ -89,6 +90,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .historyFiat: return "hfiat"
             case .currentFiat: return "cfiat"
             case .inconsistentReason: return "incReason"
+            case .txBlockchainComment: return "data"
             }
         }
         
@@ -110,6 +112,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .currentFiat: return .localized("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
             case .inconsistentReason:
                 return .localized("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
+            case .txBlockchainComment:
+                return
+                    .localized("TransactionStatus.Inconsistent.RecordData.Title", comment: "Transaction details: Tx data record")
             }
         }
         
@@ -152,13 +157,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - Dependencies
     
     let dialogService: DialogService
-    let currencyInfo: CurrencyInfoService
+    let currencyInfo: InfoServiceProtocol
     let addressBookService: AddressBookService
     let accountService: AccountService
     let walletService: WalletService?
     let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
+    
+    var showTxBlockchainComment: Bool {
+        false
+    }
     
     var transaction: TransactionDetails? {
         didSet {
@@ -244,7 +253,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     init(
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService,
+        currencyInfo: InfoServiceProtocol,
         addressBookService: AddressBookService,
         accountService: AccountService,
         walletService: WalletService?,
@@ -427,13 +436,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        let dateRow = LabelRow { [weak self] in
+        let dateRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
             
-            if let raw = transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
-                $0.value = value
+            if let raw = transaction?.dateValue {
+                $0.value = dateFormatter.string(from: raw)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -647,6 +656,52 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         detailsSection.append(fiatRow)
         
+        // MARK: Tx blockchain comment
+        let txBlockchainComment = LabelRow {
+            $0.disabled = true
+            $0.tag = Rows.txBlockchainComment.tag
+            $0.title = Rows.txBlockchainComment.localized
+            
+            if let value = transaction?.txBlockchainComment {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+            
+            $0.cell.detailTextLabel?.textAlignment = .right
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
+            
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                guard let value = self?.transaction?.txBlockchainComment else {
+                    return false
+                }
+                
+                if value.isEmpty {
+                    return true
+                }
+                return false
+            })
+            
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            if let value = self?.transaction?.txBlockchainComment {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }
+        
+        if showTxBlockchainComment {
+            detailsSection.append(txBlockchainComment)
+        }
+        
         // MARK: Comments section
         
         if let comment = comment {
@@ -772,14 +827,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
         Task {
             var tickers = try await currencyInfo.getHistory(
                 for: currencySymbol,
-                timestamp: date
-            )
+                date: date
+            ).get()
             
             isFiatSet = true
             
-            guard var ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
-                return
-            }
+            guard
+                var ticker = tickers[.init(
+                    crypto: currencySymbol,
+                    fiat: currentFiat
+                )]
+            else { return }
             
             let totalFiat = amount * ticker
             valueAtTimeTxn = fiatFormatter.string(from: totalFiat)
@@ -790,12 +848,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
                feeCurrencySymbol != currencySymbol {
                 tickers = try await currencyInfo.getHistory(
                     for: feeCurrencySymbol,
-                    timestamp: date
-                )
+                    date: date
+                ).get()
                 
-                guard let feeTicker = tickers["\(feeCurrencySymbol)/\(currentFiat)"] else {
-                    return
-                }
+                guard
+                    let feeTicker = tickers[.init(
+                        crypto: feeCurrencySymbol,
+                        fiat: currentFiat
+                    )]
+                else { return }
                 
                 ticker = feeTicker
             }
@@ -813,6 +874,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         section.evaluateHidden()
         
         checkAddressesIfNeeded()
+    }
+    
+    func updateTxDataRow() {
+        let row = form.rowBy(tag: Rows.txBlockchainComment.tag)
+        row?.evaluateHidden()
     }
     
     // MARK: - Other

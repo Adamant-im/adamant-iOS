@@ -2,7 +2,7 @@
 //  Atomic.swift
 //  
 //
-//  Created by Andrey Golubenko on 21.08.2023.
+//  Created by Andrew on 21.08.2023.
 //
 
 import Foundation
@@ -16,42 +16,52 @@ import Foundation
 /// results or crashes.
 /// In order to ensure you've acquired the lock for a certain amount of time use the `mutate` method.
 @propertyWrapper
-public final class Atomic<Value> {
-    private var value: Value
+public final class Atomic<Value>: @unchecked Sendable {
+    private var _value: Value
     private let lock = NSLock()
     
     public var projectedValue: Atomic<Value> { self }
     
     public var wrappedValue: Value {
+        get { value }
+        set { value = newValue }
+    }
+    
+    public var value: Value {
         get {
             lock.lock()
             defer { lock.unlock() }
-            return value
+            return _value
         }
         set {
             lock.lock()
             defer { lock.unlock() }
-            value = newValue
+            _value = newValue
         }
     }
-
-    public init(wrappedValue: Value) {
-        value = wrappedValue
+    
+    public init(_ value: Value) {
+        _value = value
     }
-
-    /// Synchronises mutation to ensure the value doesn't get changed by another thread during this mutation.
-    public func mutate(_ mutation: (inout Value) -> Void) {
-        lock.lock()
-        defer { lock.unlock() }
-        mutation(&value)
+    
+    public convenience init(wrappedValue: Value) {
+        self.init(wrappedValue)
     }
 
     /// Synchronises mutation to ensure the value doesn't get changed by another thread during this mutation.
     /// This method returns a value specified in the `mutation` closure.
+    @discardableResult
     public func mutate<T>(_ mutation: (inout Value) -> T) -> T {
         lock.lock()
         defer { lock.unlock() }
-        return mutation(&value)
+        return mutation(&_value)
+    }
+    
+    @discardableResult
+    public func isolated<T>(_ processing: (Value) -> T) -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return processing(_value)
     }
 }
 

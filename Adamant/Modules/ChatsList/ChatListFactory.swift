@@ -8,7 +8,9 @@
 
 import UIKit
 import Swinject
+import CommonKit
 
+@MainActor
 struct ChatListFactory {
     let assembler: Assembler
     

@@ -8,7 +8,7 @@
 
 import UIKit
 import Eureka
-import QRCodeReader
+@preconcurrency import QRCodeReader
 import EFQRCode
 import AVFoundation
 import Photos
@@ -40,6 +40,7 @@ extension String.adamant {
 }
 
 // MARK: - Delegate
+@MainActor
 protocol NewChatViewControllerDelegate: AnyObject {
     func newChatController(
         didSelectAccount account: CoreDataAccount,
@@ -333,11 +334,9 @@ final class NewChatViewController: FormViewController {
         case .address(address: let addr, params: let params):
             if let params = params?.first {
                 switch params {
-                case .address:
-                    break
                 case .label(label: let label):
                     startNewChat(with: addr, name: label, message: nil)
-                case .message:
+                case .address, .message, .amount:
                     break
                 }
             } else {
@@ -411,23 +410,27 @@ extension NewChatViewController {
 
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
-    func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        if let admAddress = result.value.getAdamantAddress() {
-            startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
-            dismiss(animated: true, completion: nil)
-        } else if let admAddress = result.value.getLegacyAdamantAddress() {
-            startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
-            dismiss(animated: true, completion: nil)
-        } else {
-            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                reader.startScanning()
+    nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+        MainActor.assumeIsolatedSafe {
+            if let admAddress = result.value.getAdamantAddress() {
+                startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
+                dismiss(animated: true, completion: nil)
+            } else if let admAddress = result.value.getLegacyAdamantAddress() {
+                startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
+                dismiss(animated: true, completion: nil)
+            } else {
+                dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    reader.startScanning()
+                }
             }
         }
     }
     
-    func readerDidCancel(_ reader: QRCodeReaderViewController) {
-        reader.dismiss(animated: true, completion: nil)
+    nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
+        MainActor.assumeIsolatedSafe {
+            reader.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

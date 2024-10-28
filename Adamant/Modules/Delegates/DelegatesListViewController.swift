@@ -9,6 +9,9 @@
 import UIKit
 import SnapKit
 import CommonKit
+import MarkdownKit
+import SafariServices
+import Combine
 
 // MARK: - Localization
 extension String.adamant {
@@ -42,7 +45,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let accountService: AccountService
     private let dialogService: DialogService
     private let screensFactory: ScreensFactory
@@ -57,8 +60,39 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Properties
     
+    private var headerTextView: UITextView {
+        let textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.isEditable = false
+        textView.delegate = self
+        
+        let attributedString = NSMutableAttributedString(
+            attributedString: MarkdownParser(
+                font: UIFont.preferredFont(forTextStyle: .subheadline),
+                color: .adamant.chatPlaceholderTextColor 
+            ).parse(.localized("Delegates.HeaderText"))
+        )
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.firstLineHeadIndent = 10
+            paragraphStyle.headIndent = 10
+       
+        attributedString.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: .init(location: .zero, length: attributedString.length)
+        )
+        
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
+        
+        textView.sizeToFit()
+        
+        return textView
+    }
+    
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = 50
         tableView.backgroundColor = .clear
@@ -86,9 +120,9 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     private lazy var bottomPanel = DelegatesBottomPanel()
     
-    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
+    private(set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
     private var filteredDelegates: [Int]?
-    private var forcedUpdateTimer: Timer?
+    private var timerSubscription: AnyCancellable?
     private var loadingView: LoadingView?
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
@@ -99,7 +133,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     // MARK: - Lifecycle
     
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         accountService: AccountService,
         dialogService: DialogService,
         screensFactory: ScreensFactory
@@ -126,11 +160,6 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        
-        if let timer = forcedUpdateTimer {
-            timer.invalidate()
-            forcedUpdateTimer = nil
-        }
     }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
@@ -192,6 +221,13 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         )
     }
     
+    private func openURL(_ url: URL) {
+        let safari = SFSafariViewController(url: url)
+        safari.preferredControlTintColor = UIColor.adamant.primary
+        safari.modalPresentationStyle = .overFullScreen
+        present(safari, animated: true, completion: nil)
+    }
+    
     private func setupViews() {
         view.addSubview(tableView)
         view.addSubview(bottomPanel)
@@ -202,7 +238,8 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         }
         
         bottomPanel.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 }
@@ -222,19 +259,11 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
-        UIView()
-    }
-    
-    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
-        UIView()
+        return self.headerTextView
     }
     
     func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
-        .zero
-    }
-    
-    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
-        .zero
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -281,7 +310,7 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 // MARK: - Voting
 private extension DelegatesListViewController {
     func vote() {
-        if forcedUpdateTimer != nil {
+        if timerSubscription != nil {
             self.dialogService.showWarning(withMessage: String.adamant.delegates.timeOutBeforeNewVote)
             return
         }
@@ -379,18 +408,15 @@ private extension DelegatesListViewController {
     }
     
     func scheduleUpdate() {
-        if let timer = forcedUpdateTimer {
-            timer.invalidate()
-            forcedUpdateTimer = nil
-        }
-        
-        let timer = Timer.scheduledTimer(timeInterval: 20.0, target: self, selector: #selector(updateTimerCallback), userInfo: nil, repeats: false)
-        forcedUpdateTimer = timer
+        timerSubscription = Timer.publish(every: 20, on: .main, in: .default)
+            .autoconnect()
+            .first()
+            .sink { [weak self] _ in self?.updateTimerCallback() }
     }
     
-    @objc func updateTimerCallback(_ timer: Timer) {
+    func updateTimerCallback() {
         handleRefresh(refreshControl)
-        forcedUpdateTimer = nil
+        timerSubscription = nil
     }
     
     func updateVotePanel() {
@@ -409,8 +435,8 @@ private extension DelegatesListViewController {
         let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
         
         let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-        let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alert : UIColor.adamant.primary
-        let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alert : UIColor.adamant.primary
+        let newVotesColor = changes.count > maxVotes ? UIColor.adamant.attention : UIColor.adamant.primary
+        let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.attention : UIColor.adamant.primary
         
         DispatchQueue.onMainAsync { [self] in
             bottomPanel.model = .init(
@@ -449,5 +475,18 @@ private extension DelegatesListViewController {
                 loadingView = nil
             }
         )
+    }
+}
+
+// MARK: - UITextViewDelegate
+extension DelegatesListViewController: UITextViewDelegate {
+    func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        openURL(URL)
+        return false
     }
 }

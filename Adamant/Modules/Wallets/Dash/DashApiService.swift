@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class DashApiCore: BlockchainHealthCheckableService {
+final class DashApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -17,17 +17,17 @@ final class DashApiCore: BlockchainHealthCheckableService {
     }
     
     func request<Output>(
-        node: Node,
-        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        origin: NodeOrigin,
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await request(apiCore, node).mapError { $0.asWalletServiceError() }
+        await request(apiCore, origin).mapError { $0.asWalletServiceError() }
     }
 
-    func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
         let response = await apiCore.sendRequestRPC(
-            node: node,
+            origin: origin,
             path: .empty,
             requests: [
                 .init(method: DashApiComand.networkInfoMethod),
@@ -59,16 +59,20 @@ final class DashApiCore: BlockchainHealthCheckableService {
             height: blockchainInfo.blocks,
             wsEnabled: false,
             wsPort: nil,
-            version: networkInfo.buildversion
+            version: .init(networkInfo.buildversion)
         ))
     }
 }
 
-final class DashApiService: WalletApiService {
+final class DashApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DashApiCore>
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        get async { await api.chosenNodeId }
+    }
+    
+    var hasActiveNode: Bool {
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<DashApiCore>) {
@@ -76,20 +80,21 @@ final class DashApiService: WalletApiService {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func request<Output>(
-        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        waitsForConnectivity: Bool,
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, request)
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
+            await core.request(origin: origin, request)
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, node in
-            await core.getStatusInfo(node: node)
+        await api.request(waitsForConnectivity: false) { core, origin in
+            await core.getStatusInfo(origin: origin)
         }
     }
 }

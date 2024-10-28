@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: Cell's Delegate
+@MainActor
 protocol AdamantDelegateCellDelegate: AnyObject {
     func delegateCell(_ cell: AdamantDelegateCell, didChangeCheckedStateTo state: Bool)
 }
@@ -58,8 +59,8 @@ final class AdamantDelegateCell: UITableViewCell {
     var isUpvoted: Bool = false {
         didSet {
             checkmarkRowView.checkmarkImage = isUpvoted ? .asset(named: "Downvote") : .asset(named: "Upvote")
-            checkmarkRowView.checkmarkImageBorderColor = isUpvoted ? UIColor.adamant.good.cgColor : UIColor.adamant.secondary.cgColor
-            checkmarkRowView.checkmarkImageTintColor = isUpvoted ? .adamant.danger : .adamant.good
+            checkmarkRowView.checkmarkImageBorderColor = isUpvoted ? UIColor.adamant.success.cgColor : UIColor.adamant.secondary.cgColor
+            checkmarkRowView.checkmarkImageTintColor = isUpvoted ? .adamant.warning : .adamant.success
         }
     }
     

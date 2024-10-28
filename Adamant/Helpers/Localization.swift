@@ -6,19 +6,10 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
+import CommonKit
 import UIKit
 
-protocol Localizable {
-    var localized: String { get }
-}
-
-extension String: Localizable {
-    var localized: String {
-        return .localized(self, comment: "")
-    }
-}
-
+@MainActor
 protocol XIBLocalizable {
     var xibLocKey: String? { get set }
 }

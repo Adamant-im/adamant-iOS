@@ -8,7 +8,9 @@
 
 import UIKit
 import CommonKit
+import Combine
 
+@MainActor
 final class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
@@ -19,7 +21,7 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
     // MARK: - Properties
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     override var feeFormatter: NumberFormatter {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
@@ -49,10 +51,6 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
         startUpdate()
     }
     
-    deinit {
-        stopUpdate()
-    }
-    
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
@@ -70,7 +68,7 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
             }
             
             do {
-                let trs = try await service.getTransaction(by: id)
+                let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 transaction = trs
                 updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
@@ -88,14 +86,12 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

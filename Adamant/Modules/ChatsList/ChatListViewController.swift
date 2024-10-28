@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import MarkdownKit
 import MessageKit
 import Combine
@@ -62,6 +62,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var newChatButton: UIBarButtonItem!
     
+    private lazy var scrollUpButton = ChatScrollButton(position: .up)
+
     // MARK: Properties
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
@@ -129,6 +131,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private var onMessagesLoadedActions = [() -> Void]()
     private var areMessagesLoaded = false
+    private var lastDatesUpdate: Date = Date()
     
     // MARK: Tasks
     
@@ -186,7 +189,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
         
-        addObservers()        
+        configureScrollUpButton()
+        addObservers()
         setColors()
     }
     
@@ -258,31 +262,44 @@ final class ChatListViewController: KeyboardObservingViewController {
         tableView.tableHeaderView = UIView()
     }
     
+    func configureScrollUpButton() {
+        view.addSubview(scrollUpButton)
+        
+        scrollUpButton.isHidden = true
+        
+        scrollUpButton.action = { [weak self] in
+            self?.tableView.scrollToRow(at: IndexPath(row: .zero, section: .zero), at: .top, animated: true)
+        }
+        
+        scrollUpButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-20)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.size.equalTo(30)
+        }
+    }
+    
     // MARK: Add Observers
     
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: nil)
                 self?.areMessagesLoaded = false
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
+            .notifications(named: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
+            .sink { @MainActor notification in
                 Task { [weak self] in
                     await self?.handleInitiallySyncedNotification(notification)
                 }
@@ -290,31 +307,27 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
+            .notifications(named: .AdamantTransfersProvider.stateChanged, object: nil)
+            .sink { @MainActor [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageProprietiesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageProprietiesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
@@ -347,7 +360,21 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         if case .updating = newState {
             updatingIndicatorView.startAnimate()
+            refreshDatesIfNeeded()
         }
+    }
+    
+    /// If the user opens the app from the background and new chats are not loaded,
+    /// update specific rows in the tableView to refresh the dates.
+    private func refreshDatesIfNeeded() {
+        guard !isBusy,
+              let indexPaths = tableView.indexPathsForVisibleRows
+        else {
+            return
+        }
+        
+        lastDatesUpdate = Date()
+        tableView.reloadRows(at: indexPaths, with: .none)
     }
     
     private func updateChats() {
@@ -562,6 +589,11 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
+        scrollUpButton.isHidden = offsetY < cellHeight * 0.75
+    }
 }
 
 // MARK: - UITableView Cells
@@ -666,7 +698,7 @@ extension ChatListViewController {
         }
                 
         if let date = chatroom.updatedAt as Date?, date != .adamantNullDate {
-            cell.dateLabel.text = date.humanizedDay()
+            cell.dateLabel.text = date.humanizedDay(useTimeFormat: true)
         } else {
             cell.dateLabel.text = nil
         }
@@ -689,99 +721,115 @@ extension ChatListViewController {
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        if controller == chatsController {
-            tableView.beginUpdates()
-            updatingIndicatorView.startAnimate()
+    nonisolated func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            if controller == chatsController {
+                tableView.beginUpdates()
+                updatingIndicatorView.startAnimate()
+            }
         }
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        switch controller {
-        case let c where c == chatsController:
-            tableView.endUpdates()
-            updatingIndicatorView.stopAnimate()
-            
-        case let c where c == unreadController:
-            setBadgeValue(controller.fetchedObjects?.count)
-            
-        default:
-            break
+    nonisolated func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            switch controller {
+            case let c where c == chatsController:
+                tableView.endUpdates()
+                updatingIndicatorView.stopAnimate()
+                
+            case let c where c == unreadController:
+                setBadgeValue(controller.fetchedObjects?.count)
+                
+            default:
+                break
+            }
         }
     }
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if isBusy { return }
-        switch controller {
-        // MARK: Chats controller
-        case let c where c == chatsController:
-            switch type {
-            case .insert:
-                if let newIndexPath = newIndexPath {
-                    tableView.insertRows(at: [newIndexPath], with: .automatic)
-                }
-                
-            case .delete:
-                if let indexPath = indexPath {
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
-                }
-                
-            case .update:
-                if let indexPath = indexPath,
-                   let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-                   let chatroom = anObject as? Chatroom {
-                    configureCell(cell, for: chatroom)
-                }
-                
-            case .move:
-                if let indexPath = indexPath, let newIndexPath = newIndexPath {
-                    if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+    nonisolated func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        let sendableObject = Atomic(anObject)
+        
+        Task { @MainActor in
+            if isBusy { return }
+            let anObject = sendableObject.value
+            
+            switch controller {
+            // MARK: Chats controller
+            case let c where c == chatsController:
+                switch type {
+                case .insert:
+                    if let newIndexPath = newIndexPath {
+                        tableView.insertRows(at: [newIndexPath], with: .automatic)
+                    }
+                    
+                case .delete:
+                    if let indexPath = indexPath {
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                    
+                case .update:
+                    if let indexPath = indexPath,
+                       let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+                       let chatroom = anObject as? Chatroom {
                         configureCell(cell, for: chatroom)
                     }
-                    tableView.moveRow(at: indexPath, to: newIndexPath)
+                    
+                case .move:
+                    if let indexPath = indexPath, let newIndexPath = newIndexPath {
+                        if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+                            configureCell(cell, for: chatroom)
+                        }
+                        tableView.moveRow(at: indexPath, to: newIndexPath)
+                    }
+                @unknown default:
+                    break
                 }
-            @unknown default:
+                
+            // MARK: Unread controller
+                
+            case let c where c == unreadController:
+                guard let transaction = anObject as? ChatTransaction else { break }
+                
+                if self.view.window == nil,
+                   type == .insert {
+                    showNotification(for: transaction)
+                }
+                
+                let shouldForceUpdate = anObject is TransferTransaction
+                || anObject is RichMessageTransaction
+                
+                if shouldForceUpdate, type == .insert {
+                    transactionsRequiringBalanceUpdate.append(transaction.txId)
+                }
+                
+                guard shouldForceUpdate,
+                      let blockId = transaction.blockId,
+                      !blockId.isEmpty,
+                      transactionsRequiringBalanceUpdate.contains(transaction.txId)
+                else {
+                    break
+                }
+                
+                if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
+                    transactionsRequiringBalanceUpdate.remove(at: index)
+                }
+                
+                NotificationCenter.default.post(
+                    name: .AdamantAccountService.forceUpdateBalance,
+                    object: nil
+                )
+                
+            default:
                 break
             }
-            
-        // MARK: Unread controller
-            
-        case let c where c == unreadController:
-            guard let transaction = anObject as? ChatTransaction else { break }
-            
-            if self.view.window == nil,
-               type == .insert {
-                showNotification(for: transaction)
-            }
-            
-            let shouldForceUpdate = anObject is TransferTransaction
-            || anObject is RichMessageTransaction
-            
-            if shouldForceUpdate, type == .insert {
-                transactionsRequiringBalanceUpdate.append(transaction.txId)
-            }
-            
-            guard shouldForceUpdate,
-                  let blockId = transaction.blockId,
-                  !blockId.isEmpty,
-                  transactionsRequiringBalanceUpdate.contains(transaction.txId)
-            else {
-                break
-            }
-            
-            if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
-                transactionsRequiringBalanceUpdate.remove(at: index)
-            }
-            
-            NotificationCenter.default.post(
-                name: .AdamantAccountService.forceUpdateBalance,
-                object: nil
-            )
-            
-        default:
-            break
         }
     }
 }
@@ -1058,15 +1106,25 @@ extension ChatListViewController {
         let more = makeMooreContextualAction(for: chatroom)
         actions.append(more)
         
-        // Mark as read
-        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
-            let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
-            actions.append(markAsRead)
-        }
-        
         // Block
         let block = makeBlockContextualAction(for: chatroom)
         actions.append(block)
+        
+        return UISwipeActionsConfiguration(actions: actions)
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
+            return nil
+        }
+        
+        var actions: [UIContextualAction] = []
+      
+        let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
+        actions.append(markAsRead)
         
         return UISwipeActionsConfiguration(actions: actions)
     }
@@ -1112,7 +1170,8 @@ extension ChatListViewController {
             )
         }
         
-        block.image = .asset(named: "swipe_block")
+        block.image = .asset(named: "swipe_block")?.withTintColor(.adamant.warning, renderingMode: .alwaysOriginal)
+        block.backgroundColor = .adamant.swipeBlockColor
         
         return block
     }
@@ -1120,15 +1179,18 @@ extension ChatListViewController {
     private func makeMarkAsReadContextualAction(for chatroom: Chatroom) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
-            title: nil
+            title: "👀"
         ) { (_, _, completionHandler) in
-            chatroom.markAsReaded()
+            if chatroom.hasUnread {
+                chatroom.markAsReaded()
+            } else {
+                chatroom.markAsUnread()
+            }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
         }
-        
-        markAsRead.image = .asset(named: "swipe_mark-as-read")
-        markAsRead.backgroundColor = UIColor.adamant.primary
+
+        markAsRead.backgroundColor = UIColor.adamant.contextMenuDefaultBackgroundColor
         return markAsRead
     }
     
@@ -1181,14 +1243,19 @@ extension ChatListViewController {
                 return
             }
             
+            let closeAction: (() -> Void)? = { [completionHandler] in
+                completionHandler(true)
+            }
+            
             let share = self.makeShareAction(
                 for: address,
                 encodedAddress: encodedAddress,
-                sender: view
+                sender: view,
+                completion: closeAction
             )
             
-            let rename = self.makeRenameAction(for: address)
-            let cancel = self.makeCancelAction()
+            let rename = self.makeRenameAction(for: address, completion: closeAction)
+            let cancel = self.makeCancelAction(completion: closeAction)
             
             self.dialogService.showAlert(
                 title: nil,
@@ -1197,19 +1264,18 @@ extension ChatListViewController {
                 actions: [share, rename, cancel],
                 from: .view(view)
             )
-            
-            completionHandler(true)
         }
         
         more.image = .asset(named: "swipe_more")
-        more.backgroundColor = .adamant.secondary
+        more.backgroundColor = .adamant.swipeMoreColor
         return more
     }
     
     private func makeShareAction(
         for address: String,
         encodedAddress: String,
-        sender: UIView
+        sender: UIView,
+        completion: (() -> Void)? = nil
     ) -> UIAlertAction {
         .init(
             title: ShareType.share.localized,
@@ -1231,12 +1297,15 @@ extension ChatListViewController {
                 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                 animated: true,
                 from: sender,
-                completion: nil
+                completion: completion
             )
         }
     }
     
-    private func makeRenameAction(for address: String) -> UIAlertAction {
+    private func makeRenameAction(
+        for address: String,
+        completion: (() -> Void)? = nil
+    ) -> UIAlertAction {
         .init(
             title: .adamant.chat.rename,
             style: .default
@@ -1244,6 +1313,7 @@ extension ChatListViewController {
             guard let alert = self?.makeRenameAlert(for: address) else { return }
             self?.dialogService.present(alert, animated: true) {
                 self?.dialogService.selectAllTextFields(in: alert)
+                completion?()
             }
         }
     }
@@ -1282,8 +1352,13 @@ extension ChatListViewController {
         return alert
     }
     
-    private func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
+        .init(
+            title: .adamant.alert.cancel,
+            style: .cancel
+        ) { _ in
+            completion?()
+        }
     }
 }
 

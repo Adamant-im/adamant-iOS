@@ -18,6 +18,10 @@ class NotificationService: UNNotificationServiceExtension {
         return AdamantProvider()
     }()
     
+    private lazy var securedStore: SecuredStore = {
+        KeychainStore(secureStorage: AdamantSecureStorage())
+    }()
+
     /// Lazy constructors
     private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
         var providers: [String: TransferNotificationContentProvider] = [
@@ -59,17 +63,8 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         // MARK: 1. Getting services
-        let securedStore = KeychainStore()
         let core = NativeAdamantCore()
-        let api = ExtensionsApi(keychainStore: securedStore)
-        
-        if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
-            if sound.isEmpty {
-                bestAttemptContent.sound = nil
-            } else {
-                bestAttemptContent.sound = UNNotificationSound(named: UNNotificationSoundName(sound))
-            }
-        }
+        let api = ExtensionsApiFactory(core: core, securedStore: securedStore).make()
         
         // No passphrase - no point of trying to get and decode
         guard
@@ -115,6 +110,8 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         var shouldIgnoreNotification = false
+        
+        var isReaction = false
         
         // MARK: 5. Content
         switch transaction.type {
@@ -238,6 +235,8 @@ class NotificationService: UNNotificationServiceExtension {
                         attachments: nil,
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
+                    
+                    isReaction = true
                 }
                 
                 // rich file reply
@@ -299,6 +298,11 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
+        bestAttemptContent.sound = getSound(
+            securedStore: securedStore,
+            isReaction: isReaction
+        )
+        
         // MARK: 6. Other configurations
         bestAttemptContent.threadIdentifier = partnerAddress
         
@@ -317,6 +321,18 @@ class NotificationService: UNNotificationServiceExtension {
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
+    }
+    
+    private func getSound(securedStore: SecuredStore, isReaction: Bool) -> UNNotificationSound? {
+        let key = isReaction 
+        ? StoreKey.notificationsService.notificationsReactionSound
+        : StoreKey.notificationsService.notificationsSound
+        
+        let sound: String = securedStore.get(key) ?? .empty
+        
+        return sound.isEmpty 
+        ? nil
+        : UNNotificationSound(named: UNNotificationSoundName(sound))
     }
     
     private func handleAdamantTransfer(

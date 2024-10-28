@@ -7,21 +7,28 @@
 //
 
 import Foundation
-import BitcoinKit
+@preconcurrency import BitcoinKit
+import CommonKit
 
-final class DashWallet: WalletAccount {
+final class DashWallet: WalletAccount, @unchecked Sendable {
+    let unicId: String
     let addressEntity: Address
     let privateKey: PrivateKey
     let publicKey: PublicKey
-    var balance: Decimal = 0.0
-    var notifications: Int = 0
-    var minBalance: Decimal = 0.0001
-    var minAmount: Decimal = 0.00002
-    var isBalanceInitialized: Bool = false
+    @Atomic var balance: Decimal = 0.0
+    @Atomic var notifications: Int = 0
+    @Atomic var minBalance: Decimal = 0.0001
+    @Atomic var minAmount: Decimal = 0.00002
+    @Atomic var isBalanceInitialized: Bool = false
     
     var address: String { addressEntity.stringValue }
     
-    init(privateKey: PrivateKey, addressConverter: AddressConverter) throws {
+    init(
+        unicId: String,
+        privateKey: PrivateKey,
+        addressConverter: AddressConverter
+    ) throws {
+        self.unicId = unicId
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
         

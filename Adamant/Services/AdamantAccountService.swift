@@ -11,18 +11,18 @@ import UIKit
 import Combine
 import CommonKit
 
-final class AdamantAccountService: AccountService {
+final class AdamantAccountService: AccountService, @unchecked Sendable {
     
     // MARK: Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
+    private let currencyInfoService: InfoServiceProtocol
 
     weak var notificationsService: NotificationsService?
-    weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
     weak var visibleWalletService: VisibleWalletsService?
     
@@ -38,17 +38,19 @@ final class AdamantAccountService: AccountService {
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         dialogService: DialogService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        currencyInfoService: InfoServiceProtocol
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.dialogService = dialogService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
+        self.currencyInfoService = currencyInfoService
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -59,9 +61,8 @@ final class AdamantAccountService: AccountService {
         }
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
                 self?.update()
@@ -69,9 +70,8 @@ final class AdamantAccountService: AccountService {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { @MainActor [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
         setupSecuredStore()
@@ -80,7 +80,7 @@ final class AdamantAccountService: AccountService {
 
 // MARK: - Saved data
 extension AdamantAccountService {
-    func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void) {
+    func setStayLoggedIn(pin: String, completion: @escaping @Sendable (AccountServiceResult) -> Void) {
         guard let account = account, let keypair = keypair else {
             completion(.failure(.userNotLogged))
             return
@@ -190,11 +190,11 @@ extension AdamantAccountService {
         update(nil, updateOnlyVisible: false)
     }
     
-    func update(_ completion: ((AccountServiceResult) -> Void)?) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         update(completion, updateOnlyVisible: true)
     }
     
-    func update(_ completion: ((AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
         switch state {
         case .notLogged, .isLoggingIn, .updating:
             return
@@ -212,7 +212,7 @@ extension AdamantAccountService {
         
         let wallets = walletServiceCompose.getWallets().map { $0.core }
         
-        Task {
+        Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
             
             switch result {

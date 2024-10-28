@@ -47,14 +47,14 @@ struct DogeApiCommands {
     }
 }
 
-final class DogeWalletService: WalletCoreProtocol {
+final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     var wallet: WalletAccount? { return dogeWallet }
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "doge_transaction"
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var dogeApiService: DogeApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
@@ -147,6 +147,10 @@ final class DogeWalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        get async { await apiService.hasActiveNode }
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
@@ -154,7 +158,7 @@ final class DogeWalletService: WalletCoreProtocol {
     )
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -182,25 +186,22 @@ final class DogeWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.dogeWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -258,7 +259,7 @@ final class DogeWalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -303,7 +304,11 @@ extension DogeWalletService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = try DogeWallet(privateKey: privateKey, addressConverter: addressConverter)
+        let eWallet = try DogeWallet(
+            unicId: tokenUnicID,
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
         self.dogeWallet = eWallet
         
         NotificationCenter.default.post(
@@ -363,7 +368,7 @@ extension DogeWalletService {
 extension DogeWalletService: SwinjectDependentService {
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
@@ -387,9 +392,9 @@ extension DogeWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dogeApiService.request { core, node in
+        let data: Data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.balance(for: address)
             )
         }.get()
@@ -434,7 +439,7 @@ extension DogeWalletService {
     ///   - dogeAddress: DOGE address to save into KVS
     ///   - adamantAddress: Owner of Doge address
     ///   - completion: success
-    private func save(dogeAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(dogeAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -445,7 +450,7 @@ extension DogeWalletService {
             return
         }
         
-        Task {
+        Task { @Sendable in
             let result = await apiService.store(
                 key: DogeWalletService.kvsAddress,
                 value: dogeAddress,
@@ -484,7 +489,7 @@ extension DogeWalletService {
                         return
                     }
                     
-                    self?.save(dogeAddress: dogeAddress) { result in
+                    self?.save(dogeAddress: dogeAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(dogeAddress: dogeAddress, result: result)
                     }
                 }
@@ -529,9 +534,9 @@ extension DogeWalletService {
             "to": to
         ]
         
-        return try await dogeApiService.request { core, node in
+        return try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getTransactions(for: address),
                 method: .get,
                 parameters: parameters,
@@ -552,9 +557,9 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        let data = try await dogeApiService.request { core, node in
+        let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getUnspentTransactions(for: address),
                 method: .get,
                 parameters: parameters,
@@ -600,18 +605,18 @@ extension DogeWalletService {
         return utxos
     }
     
-    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        try await dogeApiService.request { core, node in
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BTCRawTransaction {
+        try await dogeApiService.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getTransaction(by: hash)
             )
         }.get()
     }
     
     func getBlockId(by hash: String) async throws -> String {
-        let data = try await dogeApiService.request { core, node in
-            await core.sendRequest(node: node, path: DogeApiCommands.getBlock(by: hash))
+        let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
+            await core.sendRequest(origin: origin, path: DogeApiCommands.getBlock(by: hash))
         }.get()
         
         let json = try? JSONSerialization.jsonObject(

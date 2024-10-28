@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-struct ChatMessage: Identifiable, Equatable {
+struct ChatMessage: Identifiable, Equatable, Sendable {
     let id: String
     let sentDate: Date
     let senderModel: ChatSender
@@ -20,22 +20,26 @@ struct ChatMessage: Identifiable, Equatable {
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
     let topSpinnerOn: Bool
+    let dateHeaderIsHidden: Bool
     
-    static let `default` = Self(
-        id: "",
-        sentDate: .init(),
-        senderModel: .default,
-        status: .failed,
-        content: .default,
-        backgroundColor: .failed,
-        bottomString: nil,
-        dateHeader: nil,
-        topSpinnerOn: false
-    )
+    static var `default`: Self {
+        Self(
+            id: "",
+            sentDate: .init(),
+            senderModel: .default,
+            status: .failed,
+            content: .default,
+            backgroundColor: .failed,
+            bottomString: nil,
+            dateHeader: nil,
+            topSpinnerOn: false,
+            dateHeaderIsHidden: true
+        )
+    }
 }
 
 extension ChatMessage {
-    struct EqualWrapper<Value>: Equatable {
+    struct EqualWrapper<Value: Sendable>: Equatable {
         let value: Value
         
         static func == (lhs: Self, rhs: Self) -> Bool { true }
@@ -47,13 +51,15 @@ extension ChatMessage {
         case failed
     }
     
-    enum Content: Equatable {
+    enum Content: Equatable, Sendable {
         case message(EqualWrapper<ChatMessageCell.Model>)
         case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
 		case reply(EqualWrapper<ChatMessageReplyCell.Model>)
         case file(EqualWrapper<ChatMediaContainerView.Model>)
         
-        static let `default` = Self.message(.init(value: .default))
+        static var `default`: Self {
+            Self.message(.init(value: .default))
+        }
     }
 }
 

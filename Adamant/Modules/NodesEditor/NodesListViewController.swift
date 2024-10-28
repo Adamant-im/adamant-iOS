@@ -86,14 +86,14 @@ final class NodesListViewController: FormViewController {
     private let screensFactory: ScreensFactory
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let socketService: SocketService
     
     // Properties
     
     @ObservableValue private var nodesList = [Node]()
     @ObservableValue private var currentSocketsNodeId: UUID?
-    @ObservableValue private var currentRestNodesIds = [UUID]()
+    @ObservableValue private var chosenFastestNodeId: UUID?
     
     private var nodesHaveBeenDisplayed = false
     private var timerSubsctiption: AnyCancellable?
@@ -107,7 +107,7 @@ final class NodesListViewController: FormViewController {
         screensFactory: ScreensFactory,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         socketService: SocketService
     ) {
         self.dialogService = dialogService
@@ -117,7 +117,7 @@ final class NodesListViewController: FormViewController {
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.apiService = apiService
         self.socketService = socketService
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -204,24 +204,25 @@ final class NodesListViewController: FormViewController {
     private func setupObservers() {
         nodesStorage.getNodesPublisher(group: nodeGroup)
             .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: nodeGroup))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.setNewNodesList($0.0) }
+            .values
+            .sink { @MainActor [weak self] in await self?.setNewNodesList($0.0) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .SocketService.currentNodeUpdate, object: nil)
-            .receive(on: DispatchQueue.main)
-            .map { [weak self] _ in self?.socketService.currentNode?.id }
-            .removeDuplicates()
-            .assign(to: _currentSocketsNodeId)
+            .notifications(named: .SocketService.currentNodeUpdate, object: nil)
+            .sink { @MainActor [weak self] _ in
+                let newId = self?.socketService.currentNode?.id
+                guard self?.currentSocketsNodeId != newId else { return }
+                self?.currentSocketsNodeId = newId
+            }
             .store(in: &subscriptions)
         
         currentSocketsNodeId = socketService.currentNode?.id
     }
     
-    private func setNewNodesList(_ newNodes: [Node]) {
+    private func setNewNodesList(_ newNodes: [Node]) async {
         nodesList = newNodes
-        currentRestNodesIds = apiService.preferredNodeIds
+        await chosenFastestNodeId = apiService.chosenFastestNodeId
         
         if !nodesHaveBeenDisplayed {
             UIView.performWithoutAnimation {
@@ -250,7 +251,7 @@ extension NodesListViewController {
         guard let index = getNodeIndex(nodeId: nodeId) else { return }
         
         getNodesSection()?.remove(at: index)
-        nodesStorage.removeNode(id: nodeId)
+        nodesStorage.removeNode(id: nodeId, group: .adm)
     }
     
     func getNodeIndex(nodeId: UUID) -> Int? {
@@ -281,7 +282,7 @@ extension NodesListViewController {
     
     func resetToDefault(silent: Bool = false) {
         if silent {
-            nodesStorage.resetNodes(group: nodeGroup)
+            nodesStorage.resetNodes([nodeGroup])
             return
         }
         
@@ -290,7 +291,7 @@ extension NodesListViewController {
         alert.addAction(UIAlertAction(
             title: Rows.reset.localized,
             style: .destructive,
-            handler: { [weak self] _ in self?.nodesStorage.resetNodes(group: nodeGroup) }
+            handler: { [weak self] _ in self?.nodesStorage.resetNodes([nodeGroup]) }
         ))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
@@ -335,7 +336,7 @@ extension NodesListViewController: NodeEditorDelegate {
 
 extension NodesListViewController {
     func loadDefaultNodes(showAlert: Bool) {
-        nodesStorage.resetNodes(group: nodeGroup)
+        nodesStorage.resetNodes([nodeGroup])
         
         if showAlert {
             dialogService.showSuccess(withMessage: String.adamant.nodesList.defaultNodesWasLoaded)
@@ -414,22 +415,18 @@ extension NodesListViewController {
     }
     
     private func makeNodeCellModel(node: Node) -> NodeCell.Model {
-        let connectionStatus = node.isEnabled
-            ? node.connectionStatus
-            : .none
-        
-        return .init(
+        .init(
             id: node.id,
-            title: node.asString(),
+            title: node.title,
             indicatorString: node.indicatorString(
-                isRest: currentRestNodesIds.contains(node.id),
+                isRest: chosenFastestNodeId == node.id,
                 isWs: currentSocketsNodeId == node.id
             ),
             indicatorColor: node.indicatorColor,
-            statusString: node.statusString(showVersion: true) ?? .empty,
+            statusString: node.statusString(showVersion: true, dateHeight: false) ?? .empty,
             isEnabled: node.isEnabled,
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
-                nodesStorage.updateNodeParams(id: node.id, isEnabled: isEnabled)
+                nodesStorage.updateNode(id: node.id, group: .adm) { $0.isEnabled = isEnabled }
             }
         )
     }
@@ -437,7 +434,7 @@ extension NodesListViewController {
     private func makeNodeCellPublisher(nodeId: UUID) -> some Observable<NodeCell.Model> {
         $nodesList.combineLatest(
             $currentSocketsNodeId,
-            $currentRestNodesIds
+            $chosenFastestNodeId
         ).compactMap { [weak self] tuple in
             let nodes = tuple.0
             

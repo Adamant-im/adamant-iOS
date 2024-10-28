@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import Combine
 
 final class KlyTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -19,7 +20,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Properties
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -28,6 +29,9 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
         return control
     }()
     
+    override var showTxBlockchainComment: Bool {
+        true
+    }
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -44,10 +48,6 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
         if transaction != nil {
             startUpdate()
         }
-    }
-    
-    deinit {
-        stopUpdate()
     }
     
     // MARK: - Overrides
@@ -69,13 +69,14 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
             }
             
             do {
-                var trs = try await service.getTransaction(by: id)
+                var trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 let result = try await service.getCurrentFee()
                 
                 let lastHeight = result.lastHeight
                 trs.updateConfirmations(value: lastHeight)
                 transaction = trs
                 updateIncosinstentRowIfNeeded()
+                updateTxDataRow()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -91,14 +92,12 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

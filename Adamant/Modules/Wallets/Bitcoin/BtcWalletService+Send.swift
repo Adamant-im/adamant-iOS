@@ -65,9 +65,9 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         let txHex = transaction.serialized().hex
         
         // MARK: Sending request
-        let responseData = try await btcApiService.request { core, node in
+        let responseData = try await btcApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.sendTransaction(),
                 method: .post,
                 parameters: [String.empty: txHex],
@@ -88,9 +88,9 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         let address = wallet.address
         let parameters = ["noCache": "1"]
         
-        let responseData = try await btcApiService.request { core, node in
+        let responseData = try await btcApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.getUnspentTransactions(for: address),
                 method: .get,
                 parameters: parameters,
@@ -128,5 +128,4 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         
         return utxos
     }
-
 }

@@ -6,13 +6,13 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Combine
+@preconcurrency import Combine
 import CoreData
 import MarkdownKit
 import UIKit
 import CommonKit
 import AdvancedContextMenuKit
-import ElegantEmojiPicker
+@preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
 
@@ -28,7 +28,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
-    private let richTransactionStatusService: TransactionStatusService
+    private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     private let chatCacheService: ChatCacheService
     private let walletServiceCompose: WalletServiceCompose
     private let avatarService: AvatarService
@@ -37,7 +37,7 @@ final class ChatViewModel: NSObject {
     private let filesStorage: FilesStorageProtocol
     private let chatFileService: ChatFileProtocol
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
-    private let nodesStorage: NodesStorageProtocol
+    private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     
@@ -65,12 +65,15 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
+    private var hideHeaderTimer: AnyCancellable?
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
+    private var lastDateHeaderUpdate: Date = Date()
     private var havePartnerName: Bool = false
+    private let delayHideHeaderInSeconds: Double = 2.0
     
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
@@ -104,6 +107,8 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue private(set) var partnerImage: UIImage?
     @ObservableValue private(set) var isNeedToAnimateScroll = false
+    @ObservableValue private(set) var dateHeader: String?
+    @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
@@ -152,7 +157,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
-        richTransactionStatusService: TransactionStatusService,
+        richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
         chatCacheService: ChatCacheService,
         walletServiceCompose: WalletServiceCompose,
         avatarService: AvatarService,
@@ -162,7 +167,7 @@ final class ChatViewModel: NSObject {
         filesStorage: FilesStorageProtocol,
         chatFileService: ChatFileProtocol,
         filesStorageProprieties: FilesStorageProprietiesProtocol,
-        nodesStorage: NodesStorageProtocol,
+        apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol
     ) {
@@ -184,7 +189,7 @@ final class ChatViewModel: NSObject {
         self.filesStorage = filesStorage
         self.chatFileService = chatFileService
         self.filesStorageProprieties = filesStorageProprieties
-        self.nodesStorage = nodesStorage
+        self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         
@@ -288,15 +293,15 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard nodesStorage.haveActiveNode(in: .adm) else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.adm.name
-            ).localizedDescription))
-            return
-        }
-        
-        if !(filesPicked?.isEmpty ?? true) {
-            Task {
+        Task {
+            guard await apiServiceCompose.hasActiveNode(group: .adm) else {
+                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                    nodeGroupName: NodeGroup.adm.name
+                ).localizedDescription))
+                return
+            }
+            
+            if !(filesPicked?.isEmpty ?? true) {
                 do {
                     try await sendFiles(with: text)
                 } catch {
@@ -306,11 +311,9 @@ final class ChatViewModel: NSObject {
                         filesPicked: filesPicked
                     )
                 }
+                return
             }
-            return
-        }
-        
-        Task {
+    
             let message: AdamantMessage
             
             if let replyMessage = replyMessage {
@@ -697,15 +700,15 @@ final class ChatViewModel: NSObject {
         )
     }
     
-    func canSendMessage(withText text: String) -> Bool {
+    func canSendMessage(withText text: String) async -> Bool {
         guard text.count <= maxMessageLenght else {
             dialog.send(.alert(.adamant.chat.messageIsTooBig))
             return false
         }
         
-        guard nodesStorage.haveActiveNode(in: .adm) else {
+        guard await apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.adm.name
+                nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
             return false
         }
@@ -713,6 +716,17 @@ final class ChatViewModel: NSObject {
         return true
     }
     
+    /// If the user opens the app from the background
+    /// update messages to refresh the header dates.
+    func refreshDateHeadersIfNeeded() {
+        guard !Calendar.current.isDate(Date(), inSameDayAs: lastDateHeaderUpdate) else {
+            return
+        }
+        
+        lastDateHeaderUpdate = Date()
+        updateMessages(resetLoadingProperty: false)
+    }
+
     func openFile(messageId: String, file: ChatFile) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
@@ -1014,19 +1028,41 @@ extension ChatViewModel {
             processFileResult(.failure(error))
         }
     }
+    
+    func checkTopMessage(indexPath: IndexPath) {
+        guard let message = messages[safe: indexPath.section],
+              let date = message.dateHeader?.string.string,
+              message.sentDate != .adamantNullDate
+        else { return }
+        dateHeader = date
+        dateHeaderHidden = false
+        hideHeaderTimer?.cancel()
+        hideHeaderTimer = nil
+    }
+    
+    func startHideDateTimer() {
+        hideHeaderTimer?.cancel()
+        hideHeaderTimer = Timer
+            .publish(every: delayHideHeaderInSeconds, on: .main, in: .common)
+            .autoconnect()
+            .first()
+            .sink { [weak self] _ in
+                self?.dateHeaderHidden = true
+            }
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
+    nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in updateTransactions(performFetch: false) }
     }
 }
 
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
-        guard nodesStorage.haveActiveNode(in: .ipfs) else {
+        guard await apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.ipfs.name
+                nodeGroupName: NodeGroup.ipfs.name
             ).localizedDescription))
             return
         }
@@ -1078,9 +1114,8 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantVisibleWalletsService.visibleWallets)
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
+            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
+            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {
@@ -1161,7 +1196,7 @@ private extension ChatViewModel {
         updateMessages(
             resetLoadingProperty: performFetch,
             completion: isNewReaction
-                ? { [commitVibro] in commitVibro.send() }
+                ? { @Sendable [commitVibro] in commitVibro.send() }
                 : {}
         )
     }
@@ -1433,11 +1468,12 @@ private extension ChatViewModel {
     func waitForChatLoading(with address: String) async {
         await withUnsafeContinuation { continuation in
             Task {
-                await chatsProvider.chatLoadingStatusPublisher
-                    .filter { $0.contains(
-                        where: {
+                let publisher = await chatsProvider.chatLoadingStatusPublisher
+                publisher
+                    .filter { dict in
+                        dict.contains {
                             $0.key == address && $0.value == .loaded
-                        })
+                        }
                     }
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] _ in
@@ -1666,24 +1702,28 @@ private extension Sequence where Element == ChatTransaction {
 }
 
 extension ChatViewModel: ElegantEmojiPickerDelegate {
-    func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
-        dialog.send(.dismissMenu)
+    nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+        let sendableEmoji = Atomic(emoji)
         
-        guard let previousArg = previousArg else { return }
-        
-        let emoji = emoji?.emoji == previousArg.selectedEmoji
-        ? ""
-        : (emoji?.emoji ?? "")
-        
-        let type: EmojiUpdateType = emoji.isEmpty
-        ? .decrement
-        : .increment
-        
-        emojiService.updateFrequentlySelectedEmojis(
-            selectedEmoji: emoji,
-            type: type
-        )
-        
-        reactAction(previousArg.messageId, emoji: emoji)
+        MainActor.assumeIsolatedSafe {
+            dialog.send(.dismissMenu)
+            
+            guard let previousArg = previousArg else { return }
+            
+            let emoji = sendableEmoji.value?.emoji == previousArg.selectedEmoji
+            ? ""
+            : (sendableEmoji.value?.emoji ?? "")
+            
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
+            
+            reactAction(previousArg.messageId, emoji: emoji)
+        }
     }
 }

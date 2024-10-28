@@ -8,8 +8,9 @@
 
 import Foundation
 
-protocol CrashlyticsService: AnyObject {
-    @MainActor func configureIfNeeded()
+@MainActor
+protocol CrashlyticsService: AnyObject, Sendable {
+    func configureIfNeeded()
     func setCrashlyticsEnabled(_ value: Bool)
     func isCrashlyticsEnabled() -> Bool
 }

@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import CommonKit
+import Combine
 
 final class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
@@ -22,7 +23,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     
     var showToChat: Bool = false
     
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -48,7 +49,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         transfersProvider: TransfersProvider,
         screensFactory: ScreensFactory,
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService,
+        currencyInfo: InfoServiceProtocol,
         addressBookService: AddressBookService,
         languageService: LanguageStorageProtocol
     ) {
@@ -100,10 +101,6 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         refresh(silent: true)
         
         startUpdate()
-    }
-    
-    deinit {
-        stopUpdate()
     }
     
     // MARK: - Overrides
@@ -169,13 +166,11 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

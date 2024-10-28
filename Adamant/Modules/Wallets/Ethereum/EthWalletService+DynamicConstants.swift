@@ -14,7 +14,7 @@ extension EthWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 5,
-        normalServiceUpdateInterval: 300,
+        normalServiceUpdateInterval: 330,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
@@ -48,7 +48,7 @@ extension EthWalletService {
     }
         
     var defaultGasPriceGwei: BigUInt {
-        30
+        10
     }
         
     var defaultGasLimit: BigUInt {
@@ -56,7 +56,7 @@ extension EthWalletService {
     }
         
     var warningGasPriceGwei: BigUInt {
-        70
+        25
     }
         
     var tokenName: String {
@@ -95,8 +95,8 @@ extension EthWalletService {
     static let explorerAddress = "https://etherscan.io/address/"
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
-Node(url: URL(string: "https://ethnode3.adamant.im")!, altUrl: URL(string: "http://46.4.37.157:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
+Node.makeDefaultNode(url: URL(string: "https://ethnode3.adamant.im")!, altUrl: URL(string: "http://46.4.37.157:44099")),
         ]
     }
     

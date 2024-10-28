@@ -18,7 +18,7 @@ final class AdamantAddressBookService: AddressBookService {
     
     // MARK: - Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     private let dialogService: DialogService
@@ -37,8 +37,8 @@ final class AdamantAddressBookService: AddressBookService {
     private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: - Lifecycle
-    nonisolated init(
-        apiService: ApiService,
+    init(
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService,
         dialogService: DialogService
@@ -47,10 +47,7 @@ final class AdamantAddressBookService: AddressBookService {
         self.adamantCore = adamantCore
         self.accountService = accountService
         self.dialogService = dialogService
-        
-        Task {
-            await addObservers()
-        }
+        addObservers()
     }
     
     // MARK: Observers
@@ -59,7 +56,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Update on login
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.update()
@@ -70,7 +67,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Save on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userWillLogOut)
+            .notifications(named: .AdamantAccountService.userWillLogOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userWillLogOut()
@@ -81,7 +78,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Clean on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userLoggedOut()
@@ -291,13 +288,8 @@ final class AdamantAddressBookService: AddressBookService {
             ).get()
             
             return id
-        } catch let error as ApiServiceError {
+        } catch let error {
             throw AddressBookServiceError.apiServiceError(error: error)
-        } catch {
-            throw AddressBookServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
-            )
         }
     }
     

@@ -15,6 +15,8 @@ struct QQAddressInformation {
 
 enum QQAddressParam {
     case amount(String)
+    case recipient(String)
+    case klyrMessage(String)
     
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
@@ -24,9 +26,13 @@ enum QQAddressParam {
         let key = keyValue[0]
         let value = String(keyValue[1])
         
-        switch keyValue[0] {
+        switch key {
         case "amount":
             self = .amount(value)
+        case "recipient":
+            self = .recipient(value)
+        case "reference":
+            self = .klyrMessage(value)
         default:
             return nil
         }
@@ -38,24 +44,43 @@ final class AdamantCoinTools {
         let url = URLComponents(string: uri)
         
         guard !uri.isEmpty,
-              let url = url,
-              let raw = url.string
+              let url = url
         else {
             return nil
         }
         
-        guard let prefix = uri.split(separator: ":").first,
-              prefix.caseInsensitiveCompare(qqPrefix) == .orderedSame
+        let array = uri.split(separator: ":")
+        
+        guard array.count > 1,
+              let prefix = array.first 
         else {
-            return QQAddressInformation(address: raw, params: nil)
+            return parseAdress(url: url)
         }
         
-        let addressRaw = url.path
+        guard prefix.caseInsensitiveCompare(qqPrefix) == .orderedSame else {
+            return nil
+        }
+        
+        return parseAdress(url: url)
+    }
+    
+    private class func parseAdress(url: URLComponents) -> QQAddressInformation {
         
         let params = url.queryItems?.compactMap {
             QQAddressParam(raw: String($0.description))
         }
         
+        var recipient: String?
+        
+        params?.forEach({ param in
+            guard case .recipient(let address) = param else {
+                return
+            }
+            recipient = address
+        })
+        
+        let addressRaw = recipient ?? url.path
+       
         return QQAddressInformation(address: addressRaw, params: params)
     }
 }

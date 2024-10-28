@@ -32,7 +32,7 @@ final class AMenuViewController: UIViewController {
     // MARK: Proprieties
         
     let menuContent: AMenuSection
-    var finished: ((Action?) -> Void)?
+    var finished: (((() -> Void)?) -> Void)?
     
     private var done = false
     private var selectedItem: IndexPath?
@@ -246,7 +246,7 @@ extension AMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.configure(
             with: menuItem,
-            accentColor: .adamant.contextMenuTextColor,
+            accentColor: .adamant.textColor,
             backgroundColor: .adamant.contextMenuDefaultBackgroundColor,
             font: font,
             rowPosition: rowPosition

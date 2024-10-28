@@ -10,6 +10,7 @@ import UIKit
 import CommonKit
 import Swinject
 
+@MainActor
 struct SettingsFactory {
     let assembler: Assembler
     
@@ -44,13 +45,6 @@ struct SettingsFactory {
             screensFactory: screensFactory,
             vibroService: assembler.resolve(VibroService.self)!
         )
-    }
-    
-    func makeNotificationsVC() -> UIViewController {
-        let c = NotificationsViewController()
-        c.notificationsService = assembler.resolve(NotificationsService.self)
-        c.dialogService = assembler.resolve(DialogService.self)
-        return c
     }
     
     func makeVisibleWalletsVC() -> UIViewController {

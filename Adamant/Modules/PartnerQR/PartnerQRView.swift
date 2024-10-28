@@ -26,6 +26,10 @@ struct PartnerQRView: View {
             }
         }
     }
+    
+    init(viewModel: @escaping () -> PartnerQRViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
+    }
 }
 
 private extension PartnerQRView {

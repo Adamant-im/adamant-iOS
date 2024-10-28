@@ -61,6 +61,10 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         stack.addArrangedSubview(statusButton)
         stack.addArrangedSubview(ownReactionLabel)
         stack.addArrangedSubview(opponentReactionLabel)
+        
+        stack.snp.makeConstraints {
+            $0.width.equalTo(Self.maxVStackWidth)
+        }
         return stack
     }()
     
@@ -118,11 +122,11 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     private let ownReactionSize = CGSize(width: 40, height: 27)
-    private let opponentReactionSize = CGSize(width: opponentReactionWidth, height: 27)
+    private let opponentReactionSize = CGSize(width: maxVStackWidth, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     
-    static let opponentReactionWidth: CGFloat = 55
     static let horizontalStackSpacing: CGFloat = 12
+    static let maxVStackWidth: CGFloat = 55
     
     var isSelected: Bool = false {
         didSet {
@@ -195,8 +199,8 @@ private extension ChatTransactionContainerView {
             : viewsList.reversed()
         
         guard horizontalStack.arrangedSubviews != viewsList else { return }
-        horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
-        viewsList.forEach(horizontalStack.addArrangedSubview)
+        horizontalStack.arrangedSubviews.forEach { horizontalStack.removeArrangedSubview($0) }
+        viewsList.forEach { horizontalStack.addArrangedSubview($0) }
     }
     
     @objc func onStatusButtonTap() {
@@ -257,6 +261,7 @@ private extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView.Model {
+    @MainActor
     func height(for width: CGFloat) -> CGFloat {
         content.height(for: width)
     }
@@ -266,7 +271,7 @@ private extension TransactionStatus {
     var image: UIImage {
         switch self {
         case .notInitiated: return .asset(named: "status_updating") ?? .init()
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .asset(named: "status_pending") ?? .init()
+        case .pending, .registered: return .asset(named: "status_pending") ?? .init()
         case .success: return .asset(named: "status_success") ?? .init()
         case .failed: return .asset(named: "status_failed") ?? .init()
         case .inconsistent: return .asset(named: "status_warning") ?? .init()
@@ -276,9 +281,9 @@ private extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated: return .adamant.secondary
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .adamant.primary
+        case .pending, .registered: return .adamant.primary
         case .success: return .adamant.active
-        case .failed, .inconsistent: return .adamant.alert
+        case .failed, .inconsistent: return .adamant.attention
         }
     }
 }
@@ -343,6 +348,7 @@ extension ChatTransactionContainerView {
         view.contentView.model = model.content
         view.updateStatus(model.status)
         view.updateLayout()
+        view.contentView.setFixWidth(width: contentView.frame.width)
         return view
     }
 }

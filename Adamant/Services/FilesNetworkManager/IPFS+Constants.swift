@@ -10,12 +10,16 @@ import Foundation
 import CommonKit
 
 extension IPFSApiService {
-    var preferredNodeIds: [UUID] {
-        service.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        get async { await service.chosenNodeId }
+    }
+    
+    var hasActiveNode: Bool {
+        get async { await !service.sortedAllowedNodes.isEmpty }
     }
     
     func healthCheck() {
-        service.healthCheck()
+        Task { await service.healthCheck() }
     }
     
     static var symbol: String {
@@ -24,28 +28,27 @@ extension IPFSApiService {
     
     static var nodes: [Node] {
         [
-            Node(
+            Node.makeDefaultNode(
                 url: URL(string: "https://ipfs4.adm.im")!,
                 altUrl: URL(string: "http://95.216.45.88:44099")!
             ),
-            Node(
+            Node.makeDefaultNode(
                 url: URL(string: "https://ipfs5.adamant.im")!,
                 altUrl: URL(string: "http://62.72.43.99:44099")!
             ),
-            Node(
+            Node.makeDefaultNode(
                 url: URL(string: "https://ipfs6.adamant.business")!,
                 altUrl: URL(string: "http://75.119.138.235:44099")!
             )
         ]
     }
     
-    static let healthCheckParameters = CoinHealthCheckParameters(
-        normalUpdateInterval: 210,
+    static let healthCheckParameters = BlockchainHealthCheckParams(
+        group: .ipfs,
+        name: symbol,
+        normalUpdateInterval: 300,
         crucialUpdateInterval: 30,
-        onScreenUpdateInterval: 10,
-        threshold: 3,
-        normalServiceUpdateInterval: 210,
-        crucialServiceUpdateInterval: 30,
-        onScreenServiceUpdateInterval: 10
+        minNodeVersion: nil,
+        nodeHeightEpsilon: 1
     )
 }

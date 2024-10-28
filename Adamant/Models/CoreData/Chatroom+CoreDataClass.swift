@@ -11,8 +11,12 @@ import Foundation
 import CoreData
 
 @objc(Chatroom)
-public class Chatroom: NSManagedObject {
+public class Chatroom: NSManagedObject, @unchecked Sendable {
     static let entityName = "Chatroom"
+    
+    var hasUnread: Bool {
+        return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
+    }
     
     func markAsReaded() {
         hasUnreadMessages = false
@@ -21,6 +25,11 @@ public class Chatroom: NSManagedObject {
             trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
         }
         lastTransaction?.isUnread = false
+    }
+    
+    func markAsUnread() {
+        hasUnreadMessages = true
+        lastTransaction?.isUnread = true
     }
     
     func getFirstUnread() -> ChatTransaction? {

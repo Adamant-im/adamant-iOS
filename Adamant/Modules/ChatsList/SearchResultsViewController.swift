@@ -28,6 +28,7 @@ extension String.adamant {
     }
 }
 
+@MainActor
 protocol SearchResultDelegate: AnyObject {
     func didSelected(_ message: MessageTransaction)
     func didSelected(_ chatroom: Chatroom)
@@ -202,7 +203,7 @@ final class SearchResultsViewController: UITableViewController {
         cell.lastMessageLabel.attributedText = shortDescription(for: message)
         
         if let date = message.dateValue, date != .adamantNullDate {
-            cell.dateLabel.text = date.humanizedDay()
+            cell.dateLabel.text = date.humanizedDay(useTimeFormat: false)
         } else {
             cell.dateLabel.text = nil
         }

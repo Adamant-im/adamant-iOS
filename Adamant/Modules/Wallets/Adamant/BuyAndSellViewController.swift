@@ -16,36 +16,24 @@ final class BuyAndSellViewController: FormViewController {
     enum Rows {
         case adamantMessage
         case adamantSite
-        case azbit
-        case stakecube
-        case coinstore
-        case fameEX
-        case xeggeX
-        case nonKYC
-        
+        case coinMarketCap
+        case coinGecko
+       
         var tag: String {
             switch self {
             case .adamantMessage: return "admChat"
             case .adamantSite: return "admSite"
-            case .azbit: return "cDeal"
-            case .stakecube: return "stakecube"
-            case .coinstore: return "coinstore"
-            case .fameEX: return "fameEX"
-            case .xeggeX: return "xeggeX"
-            case .nonKYC: return "nonKYC"
+            case .coinMarketCap: return "coinMarketCap"
+            case .coinGecko: return "coinGecko"
             }
         }
         
         var image: UIImage? {
             switch self {
             case .adamantMessage: return .asset(named: "row_logo")
-            case .adamantSite: return .asset(named: "row_logo")
-            case .azbit: return .asset(named: "azbit_logo")
-            case .stakecube: return .asset(named: "row_stakecube")
-            case .coinstore: return .asset(named: "row_coinstore")
-            case .fameEX: return .asset(named: "row_fameex")
-            case .xeggeX: return .asset(named: "row_xeggex")
-            case .nonKYC: return .asset(named: "row_nonkyc")
+            case .adamantSite: return .asset(named: "exch_anon")
+            case .coinMarketCap: return .asset(named: "row_coinmarket")
+            case .coinGecko: return .asset(named: "row_coingecko")
             }
         }
         
@@ -53,12 +41,8 @@ final class BuyAndSellViewController: FormViewController {
             switch self {
             case .adamantMessage: return String.adamant.wallets.exchangeInChatAdmTokens
             case .adamantSite: return String.adamant.wallets.buyAdmTokens
-            case .azbit: return "Azbit"
-            case .stakecube: return "StakeCube"
-            case .coinstore: return "Coinstore"
-            case .fameEX: return "FameEX"
-            case .xeggeX: return "XeggeX"
-            case .nonKYC: return "NonKYC"
+            case .coinMarketCap: return String.adamant.wallets.exchangesOnCoinMarketCap
+            case .coinGecko: return String.adamant.wallets.exchangesOnCoinGecko
             }
         }
         
@@ -66,12 +50,8 @@ final class BuyAndSellViewController: FormViewController {
             switch self {
             case .adamantMessage: return ""
             case .adamantSite: return "https://adamant.im/buy-tokens/"
-            case .azbit: return "https://azbit.com?referralCode=9YVWYAF"
-            case .stakecube: return "https://stakecube.net/app/exchange/adm_usdt?layout=pro&team=adm"
-            case .coinstore: return "https://h5.coinstore.com/h5/signup?invitCode=o951vZ"
-            case .fameEX: return "https://www.fameex.com/en-US/trade/adm-usdt/commissiondispense?code=MKKAWV"
-            case .xeggeX: return "https://xeggex.com/market/ADM_USDT?ref=656846d209bbed85b91aba4d"
-            case .nonKYC: return "https://nonkyc.io/market/ADM_USDT?ref=655b4df9eb13acde84677358"
+            case .coinMarketCap: return "https://coinmarketcap.com/currencies/adamant-messenger/#Markets"
+            case .coinGecko: return "https://www.coingecko.com/en/coins/adamant-messenger#markets"
             }
         }
     }
@@ -80,6 +60,16 @@ final class BuyAndSellViewController: FormViewController {
     
     var accountService: AccountService!
     var dialogService: DialogService!
+    
+    // MARK: Init
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -109,29 +99,14 @@ final class BuyAndSellViewController: FormViewController {
         
         section.append(admRow)
         
-        // MARK: Azbit
-        let coinRow = buildUrlRow(for: .azbit)
-        section.append(coinRow)
+        // MARK: CoinMarketCap
+        let coinMarketCap = buildUrlRow(for: .coinMarketCap)
+        section.append(coinMarketCap)
         
-        // MARK: StakeCube
-        let stakecubeCoinRow = buildUrlRow(for: .stakecube)
-        section.append(stakecubeCoinRow)
+        // MARK: CoinGecko
+        let coinGecko = buildUrlRow(for: .coinGecko)
+        section.append(coinGecko)
         
-        // MARK: Coinstore
-        let coinstoreCoinRow = buildUrlRow(for: .coinstore)
-        section.append(coinstoreCoinRow)
-        
-        // MARK: FameEX
-        let fameEXCoinRow = buildUrlRow(for: .fameEX)
-        section.append(fameEXCoinRow)
-        
-        // MARK: XeggeX
-        let xeggeXCoinRow = buildUrlRow(for: .xeggeX)
-        section.append(xeggeXCoinRow)
-        
-        // MARK: NonKYC
-        let nonKYCCoinRow = buildUrlRow(for: .nonKYC)
-        section.append(nonKYCCoinRow)
         form.append(section)
         
         setColors()

@@ -68,7 +68,7 @@ extension TransferViewControllerBase {
             hideView(alertView, animated: animated)
         }
         
-        let callback = {
+        let callback: @MainActor () -> Void = {
             guard let alert = UINib(nibName: "FullscreenAlertView", bundle: nil).instantiate(withOwner: nil).first as? FullscreenAlertView else {
                 fatalError("Can't get FullscreenAlertView")
             }
@@ -105,7 +105,7 @@ extension TransferViewControllerBase {
     
     // MARK: - Tools
     private func hideView(_ view: UIView, animated: Bool) {
-        let callback: () -> Void
+        let callback: @MainActor () -> Void
         
         if animated {
             callback = {

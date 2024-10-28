@@ -9,7 +9,7 @@
 import SwiftUI
 
 public extension Axis.Set {
-    static var all = Axis.Set([.vertical, .horizontal])
+    static var all: Axis.Set { .init([.vertical, .horizontal]) }
 }
 
 public extension View {
@@ -39,6 +39,7 @@ public extension View {
         return resultView
     }
     
+    // TODO: Remove this function (or fix)
     func fullScreen() -> some View {
         return frame(width: .infinity, height: .infinity)
             .ignoresSafeArea()

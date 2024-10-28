@@ -1,6 +1,7 @@
 import SwiftUI
 import CommonKit
 
+@MainActor
 public final class PopupManager {
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
     private let coordinatorModel = PopupCoordinatorModel()

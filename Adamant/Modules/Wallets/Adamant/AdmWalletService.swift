@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 import Swinject
-import CoreData
+@preconcurrency import CoreData
 import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol {
+final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -62,7 +62,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
-	var apiService: ApiService!
+	var apiService: AdamantApiServiceProtocol!
 	var transfersProvider: TransfersProvider!
     var coreDataStack: CoreDataStack!
     var vibroService: VibroService!
@@ -94,6 +94,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        get async { await apiService.hasActiveNode }
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
@@ -114,25 +118,22 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.wallet = nil
             }
             .store(in: &subscriptions)
@@ -153,14 +154,14 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
-            } else if wallet.isBalanceInitialized {
+            } else if !wallet.isBalanceInitialized {
                 notify = true
             } else {
                 notify = false
             }
             wallet.isBalanceInitialized = true
         } else {
-            let wallet = AdmWallet(address: account.address)
+            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
             wallet.isBalanceInitialized = true
             wallet.balance = account.balance
             
@@ -170,7 +171,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         }
         
         if isRaised {
-            vibroService.applyVibration(.success)
+            Task { @MainActor in vibroService.applyVibration(.success) }
         }
         if notify, let wallet = wallet {
             postUpdateNotification(with: wallet)
@@ -188,7 +189,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     }
     
     private func postUpdateNotification(with wallet: WalletAccount) {
-        NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -234,7 +239,7 @@ extension AdmWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         vibroService = container.resolve(VibroService.self)

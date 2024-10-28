@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CoreData
+@preconcurrency import CoreData
 import Combine
 import CommonKit
 
@@ -16,7 +16,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     static let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
     
     // MARK: Dependencies
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     private let stack: CoreDataStack
     private let adamantCore: AdamantCore
     private let accountService: AccountService
@@ -25,8 +25,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
-    @Published private(set) var state: State = .empty
-    var stateObserver: Published<State>.Publisher { $state }
+    @ObservableValue private(set) var state: State = .empty
+    var stateObserver: AnyObservable<State> { $state.eraseToAnyPublisher() }
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -61,7 +61,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     // MARK: Lifecycle
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         stack: CoreDataStack,
         adamantCore: AdamantCore,
         accountService: AccountService,
@@ -86,23 +86,20 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     private func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
-                let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String
-                Task { [weak self] in
-                    await self?.userLoggedInAction(loggedAddress)
-                }
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { [weak self] notification in
+                let loggedAddress = notification
+                    .userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress]
+                    as? String
+                
+                await self?.userLoggedInAction(loggedAddress)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { _ in
-                Task { [weak self] in
-                    await self?.userLogOutAction()
-                }
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { [weak self] _ in
+                await self?.userLogOutAction()
             }
             .store(in: &subscriptions)
     }

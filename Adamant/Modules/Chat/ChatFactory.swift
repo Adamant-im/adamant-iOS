@@ -13,6 +13,7 @@ import Combine
 import Swinject
 import FilesStorageKit
 import FilesPickerKit
+import CommonKit
 
 @MainActor
 struct ChatFactory {
@@ -22,7 +23,7 @@ struct ChatFactory {
     let transferProvider: TransfersProvider
     let accountService: AccountService
     let accountProvider: AccountsProvider
-    let richTransactionStatusService: TransactionStatusService
+    let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let avatarService: AvatarService
@@ -32,17 +33,17 @@ struct ChatFactory {
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
     let filesStorageProprieties: FilesStorageProprietiesProtocol
-    let nodesStorage: NodesStorageProtocol
+    let apiServiceCompose: ApiServiceComposeProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
    
-    nonisolated init(assembler: Assembler) {
+    init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
         transferProvider = assembler.resolve(TransfersProvider.self)!
         accountService = assembler.resolve(AccountService.self)!
         accountProvider = assembler.resolve(AccountsProvider.self)!
-        richTransactionStatusService = assembler.resolve(TransactionStatusService.self)!
+        richTransactionStatusService = assembler.resolve(TransactionsStatusServiceComposeProtocol.self)!
         addressBookService = assembler.resolve(AddressBookService.self)!
         visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
         avatarService = assembler.resolve(AvatarService.self)!
@@ -52,7 +53,7 @@ struct ChatFactory {
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
-        nodesStorage = assembler.resolve(NodesStorageProtocol.self)!
+        apiServiceCompose = assembler.resolve(ApiServiceComposeProtocol.self)!
         reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
         filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
     }
@@ -131,8 +132,8 @@ private extension ChatFactory {
             filesStorage: filesStorage,
             chatFileService: chatFileService,
             filesStorageProprieties: filesStorageProprieties,
-            nodesStorage: nodesStorage,
-            reachabilityMonitor: reachabilityMonitor, 
+            apiServiceCompose: apiServiceCompose,
+            reachabilityMonitor: reachabilityMonitor,
             filesPicker: filesPickerKit
         )
     }

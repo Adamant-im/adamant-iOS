@@ -20,11 +20,11 @@ enum WalletServiceSimpleResult {
     case failure(error: WalletServiceError)
 }
 
-typealias WalletServiceResult<T> = Result<T, WalletServiceError>
+typealias WalletServiceResult<T: Sendable> = Result<T, WalletServiceError>
 
 // MARK: - Errors
 
-enum WalletServiceError: Error {
+enum WalletServiceError: Error, Sendable {
     case notLogged
     case notEnoughMoney
     case networkError
@@ -124,17 +124,8 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
-    var isRequestCancelledError: Bool {
-        switch self {
-        case .requestCancelled:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    static func noEndpointsError(coin: String) -> WalletServiceError {
-        .apiError(.noEndpointsError(coin: coin))
+    static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
+        .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
 }
 
@@ -223,6 +214,7 @@ extension Notification.Name {
     }
 }
 
+@MainActor
 protocol WalletViewController {
     var viewController: UIViewController { get }
     var height: CGFloat { get }
@@ -230,7 +222,7 @@ protocol WalletViewController {
 }
 
 // MARK: - Wallet Service
-protocol WalletCoreProtocol: AnyObject {
+protocol WalletCoreProtocol: AnyObject, Sendable {
     // MARK: Currency
     static var currencySymbol: String { get }
     static var currencyLogo: UIImage { get }
@@ -291,6 +283,7 @@ protocol WalletCoreProtocol: AnyObject {
     var enabled: Bool { get }
     
     // MARK: Logic
+    var hasActiveNode: Bool { get async }
     func update()
     
     // MARK: Tools
