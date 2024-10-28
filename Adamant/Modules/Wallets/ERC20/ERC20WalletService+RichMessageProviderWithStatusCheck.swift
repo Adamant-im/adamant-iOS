@@ -28,7 +28,7 @@ extension ERC20WalletService {
         let erc20Transaction: EthTransaction
         
         do {
-            erc20Transaction = try await getTransaction(by: hash)
+            erc20Transaction = try await getTransaction(by: hash, waitsForConnectivity: true)
         } catch {
             return .init(error: error)
         }

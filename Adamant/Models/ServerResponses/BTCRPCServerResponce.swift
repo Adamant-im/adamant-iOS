@@ -8,13 +8,13 @@
 
 import Foundation
 
-final class BTCRPCServerResponce<T:Decodable>: Decodable {
+struct BTCRPCServerResponce<T: Decodable & Sendable>: Decodable, Sendable {
     let result: T?
     let error: BTCRPCError?
     let id: String?
 }
 
-final class BTCRPCError: Decodable {
+struct BTCRPCError: Decodable, Sendable {
     let code: Int
     let message: String
 }

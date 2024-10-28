@@ -68,7 +68,7 @@ public extension StoreKey {
     }
 }
 
-public protocol SecuredStore: AnyObject {
+public protocol SecuredStore: AnyObject, Sendable {
     func get<T: Decodable>(_ key: String) -> T?
     func set<T: Encodable>(_ value: T, for key: String)
 

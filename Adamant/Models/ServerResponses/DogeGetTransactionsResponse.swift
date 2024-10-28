@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class DogeGetTransactionsResponse: Decodable {
+final class DogeGetTransactionsResponse: Decodable, Sendable {
     let totalItems: Int
     let from: Int
     let to: Int

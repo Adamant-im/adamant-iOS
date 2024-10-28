@@ -12,7 +12,7 @@ import CommonKit
 
 extension AdamantUtilities {
     // MARK: Application version
-    static var applicationVersion: String = {
+    static let applicationVersion: String = {
         if let infoDictionary = Bundle.main.infoDictionary,
             let version = infoDictionary["CFBundleShortVersionString"] as? String,
             let build = infoDictionary["CFBundleVersion"] as? String {
@@ -30,7 +30,8 @@ extension AdamantUtilities {
     }
     
     // MARK: Device info
-    static var deviceInfo: String = {
+    @MainActor
+    static let deviceInfo: String = {
         [
             "Model": deviceModelCode,
             "System name": UIDevice.current.systemName,
@@ -147,6 +148,7 @@ extension AdamantUtilities {
 
 // MARK: - Email deeplink
 extension AdamantUtilities {
+    @MainActor
     static func openEmailApp(recipient: String, subject: String?, body: String?) {
         guard var urlComponents = URLComponents(string: "mailto:\(recipient)") else { return }
         

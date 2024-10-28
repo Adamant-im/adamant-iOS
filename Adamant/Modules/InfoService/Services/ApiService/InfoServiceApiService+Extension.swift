@@ -11,15 +11,15 @@ import CommonKit
 
 extension InfoServiceApiService: ApiServiceProtocol {
     var chosenFastestNodeId: UUID? {
-        core.chosenFastestNodeId
+        get async { await core.chosenNodeId }
     }
     
     func healthCheck() {
-        core.healthCheck()
+        Task { await core.healthCheck() }
     }
     
     var hasActiveNode: Bool {
-        !core.sortedAllowedNodes.isEmpty
+        get async { await !core.sortedAllowedNodes.isEmpty }
     }
 }
 
@@ -51,11 +51,5 @@ extension InfoServiceApiService: InfoServiceApiServiceProtocol {
                 encoding: .url
             )
         }.flatMap { mapper.mapToModel($0) }
-    }
-}
-
-private extension InfoServiceApiService {
-    var mapper: InfoServiceMapperProtocol {
-        core.service.mapper
     }
 }

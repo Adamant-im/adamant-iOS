@@ -32,7 +32,7 @@ final class AMenuViewController: UIViewController {
     // MARK: Proprieties
         
     let menuContent: AMenuSection
-    var finished: ((Action?) -> Void)?
+    var finished: (((() -> Void)?) -> Void)?
     
     private var done = false
     private var selectedItem: IndexPath?

@@ -6,7 +6,7 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import MessageKit
+@preconcurrency import MessageKit
 import UIKit
 import Combine
 
@@ -18,20 +18,22 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         self.viewModel = viewModel
     }
     
-    func messageStyle(
+    nonisolated func messageStyle(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> MessageStyle {
-        .bubbleTail(
-            message.sender.senderId == viewModel.sender.senderId
-                ? .bottomRight
-                : .bottomLeft,
-            .curved
-        )
+        DispatchQueue.onMainThreadSyncSafe {
+            .bubbleTail(
+                message.sender.senderId == viewModel.sender.senderId
+                    ? .bottomRight
+                    : .bottomLeft,
+                .curved
+            )
+        }
     }
     
-    func backgroundColor(
+    nonisolated func backgroundColor(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
@@ -39,31 +41,33 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         message.fullModel.backgroundColor.uiColor
     }
     
-    func textColor(
+    nonisolated func textColor(
         for _: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor { .adamant.primary }
     
-    func messageHeaderView(
+    nonisolated func messageHeaderView(
         for indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageReusableView {
-        let header = messagesCollectionView.dequeueReusableHeaderView(
-            ChatViewController.SpinnerCell.self,
-            for: indexPath
-        )
-        
-        if viewModel.messages[indexPath.section].topSpinnerOn {
-            header.wrappedView.startAnimating()
-        } else {
-            header.wrappedView.stopAnimating()
+        DispatchQueue.onMainThreadSyncSafe {
+            let header = messagesCollectionView.dequeueReusableHeaderView(
+                ChatViewController.SpinnerCell.self,
+                for: indexPath
+            )
+            
+            if viewModel.messages[indexPath.section].topSpinnerOn {
+                header.wrappedView.startAnimating()
+            } else {
+                header.wrappedView.stopAnimating()
+            }
+            
+            return header
         }
-        
-        return header
     }
     
-    func enabledDetectors(
+    nonisolated func enabledDetectors(
         for _: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
@@ -71,7 +75,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         return [.url]
     }
     
-    func detectorAttributes(
+    nonisolated func detectorAttributes(
         for detector: DetectorType,
         and _: MessageType,
         at _: IndexPath
@@ -81,27 +85,29 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             : [:]
     }
     
-    func configureAccessoryView(
+    nonisolated func configureAccessoryView(
         _ accessoryView: UIView,
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) {
-        switch message.fullModel.status {
-        case .failed:
-            guard accessoryView.subviews.isEmpty else { break }
-            
-            if case .file = message.fullModel.content {
-                break
+        DispatchQueue.onMainThreadSyncSafe {
+            switch message.fullModel.status {
+            case .failed:
+                guard accessoryView.subviews.isEmpty else { break }
+                
+                if case .file = message.fullModel.content {
+                    break
+                }
+                
+                let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
+                icon.contentMode = .scaleAspectFit
+                icon.tintColor = .adamant.secondary
+                icon.image = .asset(named: "cross")?.withRenderingMode(.alwaysTemplate) ?? .init()
+                accessoryView.addSubview(icon)
+            case .delivered, .pending:
+                accessoryView.subviews.forEach { $0.removeFromSuperview() }
             }
-            
-            let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
-            icon.contentMode = .scaleAspectFit
-            icon.tintColor = .adamant.secondary
-            icon.image = .asset(named: "cross")?.withRenderingMode(.alwaysTemplate) ?? .init()
-            accessoryView.addSubview(icon)
-        case .delivered, .pending:
-            accessoryView.subviews.forEach { $0.removeFromSuperview() }
         }
     }
 }

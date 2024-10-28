@@ -14,16 +14,15 @@ public protocol BlockchainHealthCheckableService {
     func getStatusInfo(origin: NodeOrigin) async -> Result<NodeStatusInfo, Error>
 }
 
+@HealthCheckActor
 public final class BlockchainHealthCheckWrapper<
     Service: BlockchainHealthCheckableService
->: HealthCheckWrapper<Service, Service.Error> {
+>: HealthCheckWrapper<Service, Service.Error>, Sendable {
     private let nodesStorage: NodesStorageProtocol
-    private let updateNodesAvailabilityLock = NSLock()
     private let params: BlockchainHealthCheckParams
+    private var currentRequests = Set<UUID>()
     
-    @Atomic private var currentRequests = Set<UUID>()
-    
-    public init(
+    nonisolated public init(
         service: Service,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
@@ -44,27 +43,35 @@ public final class BlockchainHealthCheckWrapper<
             nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
         
-        nodesAdditionalParamsStorage
-            .fastestNodeMode(group: params.group)
-            .sink { [weak self] in self?.fastestNodeMode = $0 }
-            .store(in: &subscriptions)
+        Task.sync { @HealthCheckActor [self] in
+            configure(nodesAdditionalParamsStorage: nodesAdditionalParamsStorage)
+        }
     }
     
     public override func healthCheck() {
         super.healthCheck()
         guard isActive else { return }
         
-        Task {
+        Task { @HealthCheckActor in
             updateNodesAvailability(update: nil)
             
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
-                    group.addTask { [weak self] in
+                    group.addTask { @HealthCheckActor [weak self] in
                         guard
                             let self = self,
-                            let update = await updateNodeStatusInfo(node: node)
+                            !currentRequests.contains(node.id)
                         else { return }
                         
+                        currentRequests.insert(node.id)
+                        updateNode(id: node.id) { $0.isUpdating = true }
+                        
+                        defer {
+                            currentRequests.remove(node.id)
+                            updateNode(id: node.id) { $0.isUpdating = false }
+                        }
+                        
+                        let update = await updateNodeStatusInfo(node: node)
                         updateNodesAvailability(update: update)
                     }
                 }
@@ -82,11 +89,14 @@ private extension BlockchainHealthCheckWrapper {
         let preferMainOrigin: Bool?
     }
     
-    func updateNodeStatusInfo(node: Node) async -> NodeUpdate? {
-        guard !currentRequests.contains(node.id) else { return nil }
-        currentRequests.insert(node.id)
-        defer { currentRequests.remove(node.id) }
-        
+    func configure(nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol) {
+        nodesAdditionalParamsStorage
+            .fastestNodeMode(group: params.group)
+            .sink { [weak self] in self?.fastestNodeMode = $0 }
+            .store(in: &subscriptions)
+    }
+    
+    func updateNodeStatusInfo(node: Node) async -> NodeUpdate {
         guard
             node.preferMainOrigin == nil,
             let altOrigin = node.altOrigin
@@ -147,8 +157,6 @@ private extension BlockchainHealthCheckWrapper {
     }
     
     func updateNodesAvailability(update: NodeUpdate?) {
-        updateNodesAvailabilityLock.lock()
-        defer { updateNodesAvailabilityLock.unlock() }
         let forceIncludeId = update?.info != nil ? update?.id : nil
         
         if let update = update {

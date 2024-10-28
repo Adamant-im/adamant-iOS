@@ -11,6 +11,7 @@ import SwiftUI
 import AdvancedContextMenuKit
 import CommonKit
 
+@MainActor
 protocol ChatMenuManagerDelegate: AnyObject {
     func getCopyView() -> UIView?
     func presentMenu(

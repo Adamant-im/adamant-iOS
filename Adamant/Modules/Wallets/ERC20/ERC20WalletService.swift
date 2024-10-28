@@ -11,18 +11,18 @@ import UIKit
 import Swinject
 import web3swift
 import Alamofire
-import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import struct BigInt.BigUInt
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletCoreProtocol {
+final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
-    static var currencySymbol: String = ""
-    static var currencyLogo: UIImage = UIImage()
-    static var qqPrefix: String = ""
+    static let currencySymbol: String = ""
+    static let currencyLogo: UIImage = UIImage()
+    static let qqPrefix: String = ""
     
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
@@ -87,6 +87,10 @@ final class ERC20WalletService: WalletCoreProtocol {
         token.transferDecimals
     }
     
+    var explorerAddress: String {
+        EthWalletService.explorerAddress
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0
@@ -133,7 +137,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -151,7 +155,7 @@ final class ERC20WalletService: WalletCoreProtocol {
         }
     }
     
-    private (set) var ethWallet: EthWallet?
+    private(set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     
@@ -167,7 +171,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     }
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -191,25 +195,22 @@ final class ERC20WalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.ethWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -267,7 +268,7 @@ final class ERC20WalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -324,7 +325,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     }
     
     func getGasPrices() async throws -> BigUInt {
-        try await erc20ApiService.requestWeb3 { web3 in
+        try await erc20ApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.gasPrice()
         }.get()
     }
@@ -342,7 +343,7 @@ final class ERC20WalletService: WalletCoreProtocol {
             ).transaction
         }.get()
         
-        return try await erc20ApiService.requestWeb3 { web3 in
+        return try await erc20ApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.estimateGas(for: transaction)
         }.get()
     }
@@ -429,17 +430,20 @@ extension ERC20WalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension ERC20WalletService {
-    func getTransaction(by hash: String) async throws -> EthTransaction {
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> EthTransaction {
         let sender = wallet?.address
         let isOutgoing: Bool
         
         // MARK: 1. Transaction details
-        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3 {
-            web3 in
+        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
         
-        let receipt = try await erc20ApiService.requestWeb3 { web3 in
+        let receipt = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.transactionReceipt(hash)
         }.get()
         
@@ -460,11 +464,15 @@ extension ERC20WalletService {
         }
         
         // MARK: 4. Block timestamp & confirmations
-        let currentBlock = try await erc20ApiService.requestWeb3 { web3 in
+        let currentBlock = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.blockNumber()
         }.get()
         
-        let block = try await erc20ApiService.requestWeb3 { web3 in
+        let block = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.block(by: receipt.blockHash)
         }.get()
         
@@ -557,7 +565,7 @@ extension ERC20WalletService {
             "order": "time.desc"
         ]
         
-        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore { core, origin in
+        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,

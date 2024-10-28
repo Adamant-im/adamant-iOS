@@ -19,9 +19,9 @@ extension Notification.Name {
 
 // - MARK: SocketService
 
-protocol SocketService: AnyObject {
+protocol SocketService: AnyObject, Sendable {
     var currentNode: Node? { get }
     
-    func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void)
+    func connect(address: String, handler: @escaping @Sendable (ApiServiceResult<Transaction>) -> Void)
     func disconnect()
 }

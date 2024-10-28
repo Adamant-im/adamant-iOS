@@ -204,24 +204,25 @@ final class NodesListViewController: FormViewController {
     private func setupObservers() {
         nodesStorage.getNodesPublisher(group: nodeGroup)
             .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: nodeGroup))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.setNewNodesList($0.0) }
+            .values
+            .sink { @MainActor [weak self] in await self?.setNewNodesList($0.0) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .SocketService.currentNodeUpdate, object: nil)
-            .receive(on: DispatchQueue.main)
-            .map { [weak self] _ in self?.socketService.currentNode?.id }
-            .removeDuplicates()
-            .assign(to: _currentSocketsNodeId)
+            .notifications(named: .SocketService.currentNodeUpdate, object: nil)
+            .sink { @MainActor [weak self] _ in
+                let newId = self?.socketService.currentNode?.id
+                guard self?.currentSocketsNodeId != newId else { return }
+                self?.currentSocketsNodeId = newId
+            }
             .store(in: &subscriptions)
         
         currentSocketsNodeId = socketService.currentNode?.id
     }
     
-    private func setNewNodesList(_ newNodes: [Node]) {
+    private func setNewNodesList(_ newNodes: [Node]) async {
         nodesList = newNodes
-        chosenFastestNodeId = apiService.chosenFastestNodeId
+        await chosenFastestNodeId = apiService.chosenFastestNodeId
         
         if !nodesHaveBeenDisplayed {
             UIView.performWithoutAnimation {

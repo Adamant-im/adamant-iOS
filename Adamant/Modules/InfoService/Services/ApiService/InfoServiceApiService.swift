@@ -9,8 +9,9 @@
 import Foundation
 import CommonKit
 
-final class InfoServiceApiService {
+final class InfoServiceApiService: Sendable {
     let core: BlockchainHealthCheckWrapper<InfoServiceApiCore>
+    let mapper: InfoServiceMapperProtocol
     
     func request<Output>(
         _ request: @Sendable (
@@ -18,12 +19,13 @@ final class InfoServiceApiService {
             NodeOrigin
         ) async -> ApiServiceResult<Output>
     ) async -> InfoServiceApiResult<Output> {
-        await core.request { core, origin in
+        await core.request(waitsForConnectivity: false) { core, origin in
             await request(core.apiCore, origin)
         }.mapError { .apiError($0) }
     }
     
-    init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>) {
+    init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>, mapper: InfoServiceMapperProtocol) {
         self.core = core
+        self.mapper = mapper
     }
 }

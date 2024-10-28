@@ -10,7 +10,7 @@
 
 import Foundation
 
-public struct Node: Equatable, Identifiable {
+public struct Node: Equatable, Identifiable, @unchecked Sendable {
     public let id: UUID
     public var mainOrigin: NodeOrigin
     public var altOrigin: NodeOrigin?
@@ -22,6 +22,7 @@ public struct Node: Equatable, Identifiable {
     public var preferMainOrigin: Bool?
     public var isEnabled: Bool
     public var type: NodeType
+    public var isUpdating = false
     
     public init(
         id: UUID,

@@ -21,14 +21,16 @@ extension NodeCell {
         let isEnabled: Bool
         let nodeUpdateAction: IDWrapper<NodeUpdateAction>
         
-        static let `default` = Self(
-            id: .init(),
-            title: .empty,
-            indicatorString: .init(),
-            indicatorColor: .adamant.inactive,
-            statusString: .empty,
-            isEnabled: false,
-            nodeUpdateAction: .init(id: .empty) { _ in }
-        )
+        static var `default`: Self {
+            Self(
+                id: .init(),
+                title: .empty,
+                indicatorString: .init(),
+                indicatorColor: .adamant.inactive,
+                statusString: .empty,
+                isEnabled: false,
+                nodeUpdateAction: .init(id: .empty) { _ in }
+            )
+        }
     }
 }

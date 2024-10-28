@@ -10,7 +10,7 @@ import UIKit
 import CoreGraphics
 import CryptoSwift
 
-public final class AdamantAvatarService {
+public final class AdamantAvatarService: @unchecked Sendable {
     private let colors: [[UIColor]] = [
         [
             UIColor(hex: "#ffffff"), //background

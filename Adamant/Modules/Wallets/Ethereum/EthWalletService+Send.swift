@@ -7,9 +7,9 @@
 //
 
 import UIKit
-import web3swift
+@preconcurrency import web3swift
 import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 extension CodableTransaction: RawTransaction {
@@ -28,7 +28,7 @@ extension EthWalletService: WalletServiceTwoStepSend {
         fee: Decimal,
         comment: String?
     ) async throws -> CodableTransaction {
-        try await ethApiService.requestWeb3 { [weak self] web3 in
+        try await ethApiService.requestWeb3(waitsForConnectivity: false) { [weak self] web3 in
             guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
             return try await createTransaction(recipient: recipient, amount: amount, web3: web3)
         }.get()
@@ -98,7 +98,7 @@ extension EthWalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.internalError(message: .adamant.sharedErrors.unknownError, error: nil)
         }
         
-        _ = try await ethApiService.requestWeb3 { web3 in
+        _ = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.send(raw: txEncoded)
         }.get()
     }

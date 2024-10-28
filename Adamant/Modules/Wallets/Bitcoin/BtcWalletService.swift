@@ -70,7 +70,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletCoreProtocol {
+final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -110,6 +110,10 @@ final class BtcWalletService: WalletCoreProtocol {
     
     var nodeGroups: [NodeGroup] {
         [.btc]
+    }
+    
+    var explorerAddress: String {
+        Self.explorerAddress
     }
     
     var wallet: WalletAccount? { return btcWallet }
@@ -176,7 +180,7 @@ final class BtcWalletService: WalletCoreProtocol {
     }
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -212,25 +216,22 @@ final class BtcWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.btcWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -289,7 +290,7 @@ final class BtcWalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -524,7 +525,7 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let response: BtcBalanceResponse = try await btcApiService.request { api, origin in
+        let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
         }.get()
 
@@ -532,7 +533,7 @@ extension BtcWalletService {
     }
 
     func getFeeRate() async throws -> Decimal {
-        let response: [String: Decimal] = try await btcApiService.request { api, origin in
+        let response: [String: Decimal] = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
         }.get()
         
@@ -551,7 +552,7 @@ extension BtcWalletService {
     ///   - btcAddress: Bitcoin address to save into KVS
     ///   - adamantAddress: Owner of BTC address
     ///   - completion: success
-    private func save(btcAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(btcAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -601,7 +602,7 @@ extension BtcWalletService {
                         return
                     }
                     
-                    self?.save(btcAddress: btcAddress) { result in
+                    self?.save(btcAddress: btcAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(btcAddress: btcAddress, result: result)
                     }
                 }
@@ -671,7 +672,7 @@ extension BtcWalletService {
         for address: String,
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
-        return try await btcApiService.request { api, origin in
+        return try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransactions(
@@ -682,12 +683,14 @@ extension BtcWalletService {
         }.get()
     }
 
-    func getTransaction(by hash: String) async throws -> BtcTransaction {
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BtcTransaction {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
         }
         
-        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, origin in
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request(
+            waitsForConnectivity: waitsForConnectivity
+        ) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransaction(by: hash)

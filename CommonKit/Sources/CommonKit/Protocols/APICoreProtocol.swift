@@ -149,7 +149,7 @@ public extension APICoreProtocol {
         origin: NodeOrigin,
         path: String,
         timeout: TimeoutSize,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> APIResponseModel {
         await sendRequest(
             origin: origin,

@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import CommonKit
 
-final class AdamantIncreaseFeeService: IncreaseFeeService {
+final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
     
     // MARK: Dependencies
     
@@ -27,14 +27,14 @@ final class AdamantIncreaseFeeService: IncreaseFeeService {
         self.securedStore = securedStore
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
                 self?.userLoggedOut()
             }
             .store(in: &notificationsSet)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { [weak self] _ in
                 self?.userLoggedIn()
             }

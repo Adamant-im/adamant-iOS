@@ -7,15 +7,17 @@
 //
 
 import Foundation
+import CommonKit
 
-final class AdmWallet: WalletAccount {
-    var unicId: String
+final class AdmWallet: WalletAccount, @unchecked Sendable {
+    let unicId: String
     let address: String
-    var balance: Decimal = 0
-    var notifications: Int = 0
-    var minBalance: Decimal = 0
-    var minAmount: Decimal = 0
-    var isBalanceInitialized: Bool = false
+    
+    @Atomic var balance: Decimal = 0
+    @Atomic var notifications: Int = 0
+    @Atomic var minBalance: Decimal = 0
+    @Atomic var minAmount: Decimal = 0
+    @Atomic var isBalanceInitialized: Bool = false
     
     init(unicId: String, address: String) {
         self.unicId = unicId

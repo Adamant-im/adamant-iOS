@@ -11,10 +11,15 @@ import Swinject
 import UIKit
 import CommonKit
 import Combine
-import struct BigInt.BigUInt
-import LiskKit
+@preconcurrency import struct BigInt.BigUInt
+@preconcurrency import LiskKit
 
-final class KlyWalletService: WalletCoreProtocol {
+final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
+    struct CurrentFee: Sendable {
+        let fee: BigUInt
+        let lastHeight: UInt64
+        let minFeePerByte: UInt64
+    }
     
     // MARK: Dependencies
     
@@ -34,7 +39,7 @@ final class KlyWalletService: WalletCoreProtocol {
     static let defaultFee: BigUInt = 141000
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
@@ -101,7 +106,7 @@ final class KlyWalletService: WalletCoreProtocol {
         try await getBalance(for: address)
     }
     
-    func getCurrentFee() async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getCurrentFee() async throws -> CurrentFee {
         try await getFees(comment: .empty)
     }
     
@@ -142,9 +147,10 @@ final class KlyWalletService: WalletCoreProtocol {
     }
     
     func getTransaction(
-        by hash: String
+        by hash: String,
+        waitsForConnectivity: Bool
     ) async throws -> Transactions.TransactionModel {
-        try await getTransaction(hash: hash)
+        try await getTransaction(hash: hash, waitsForConnectivity: waitsForConnectivity)
     }
     
     func isExist(address: String) async throws -> Bool {
@@ -179,25 +185,22 @@ extension KlyWalletService: SwinjectDependentService {
 private extension KlyWalletService {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.klyWallet = nil
                 
                 if let balanceObserver = self?.balanceObserver {
@@ -255,7 +258,7 @@ private extension KlyWalletService {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -303,7 +306,7 @@ private extension KlyWalletService {
         return UInt64(nonce) ?? .zero
     }
 
-    func getFees(comment: String) async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getFees(comment: String) async throws -> CurrentFee {
         guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
         }
@@ -333,7 +336,7 @@ private extension KlyWalletService {
         
         let height = UInt64(lastBlock.header.height)
         
-        return (fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
+        return .init(fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
     }
     
     func getFee(minFeePerByte: UInt64, comment: String) throws -> BigUInt {
@@ -486,7 +489,8 @@ private extension KlyWalletService {
         
         balanceObserver?.cancel()
         
-        balanceObserver = NotificationCenter.default.publisher(for: .AdamantAccountService.accountDataUpdated)
+        balanceObserver = NotificationCenter.default
+            .notifications(named: .AdamantAccountService.accountDataUpdated)
             .compactMap { [weak self] _ in
                 self?.accountService.account?.balance
             }
@@ -567,7 +571,7 @@ private extension KlyWalletService {
             throw WalletServiceError.internalError(message: "KLY Wallet: not found", error: nil)
         }
         
-        return try await klyServiceApiService.requestServiceApi { api, completion in
+        return try await klyServiceApiService.requestServiceApi(waitsForConnectivity: false) { api, completion in
             api.transactions(
                 ownerAddress: address,
                 senderIdOrRecipientId: address,
@@ -579,14 +583,16 @@ private extension KlyWalletService {
         }.get()
     }
     
-    func getTransaction(hash: String) async throws -> Transactions.TransactionModel {
+    func getTransaction(hash: String, waitsForConnectivity: Bool) async throws -> Transactions.TransactionModel {
         guard !hash.isEmpty else {
             throw ApiServiceError.internalError(message: "No hash", error: nil)
         }
         
         let ownerAddress = klyWallet?.address
         
-        let result = try await klyServiceApiService.requestServiceApi { api, completion in
+        let result = try await klyServiceApiService.requestServiceApi(
+            waitsForConnectivity: waitsForConnectivity
+        ) { api, completion in
             api.transactions(
                 ownerAddress: ownerAddress,
                 id: hash,
@@ -604,7 +610,7 @@ private extension KlyWalletService {
     }
     
     func isAccountExist(with address: String) async throws -> Bool {
-        try await klyServiceApiService.requestServiceApi { api in
+        try await klyServiceApiService.requestServiceApi(waitsForConnectivity: false) { api in
             try await withUnsafeThrowingContinuation { continuation in
                 api.exist(address: address) { result in
                     switch result {
