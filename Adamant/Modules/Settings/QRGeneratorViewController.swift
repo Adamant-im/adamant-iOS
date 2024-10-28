@@ -111,7 +111,7 @@ final class QRGeneratorViewController: FormViewController {
                 vc.excludedActivityTypes = ShareContentType.passphrase.excludedActivityTypes
                 vc.completionWithItemsHandler = { (_, completed: Bool, _, error: Error?) in
                     if completed {
-                        self?.dialogService.showToastMessage(String.adamant.alert.done)
+                        self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
                     } else if let error = error {
                         self?.dialogService.showToastMessage(error.localizedDescription)
                     }
