@@ -699,7 +699,6 @@ private extension ChatViewController {
     }
     
     func updateFullscreenLoadingView() {
-        guard loadingView.isHidden == viewModel.fullscreenLoading else { return }
         loadingView.isHidden = !viewModel.fullscreenLoading
         
         if viewModel.fullscreenLoading {
