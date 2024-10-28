@@ -5,10 +5,9 @@ import CommonKit
 import UIKit
 import SwiftUI
 import AVFoundation
-@preconcurrency import QuickLook
+import QuickLook
 import FilesStorageKit
 
-@MainActor
 public final class FilesPickerKit: FilesPickerProtocol {
     private let storageKit: FilesStorageProtocol
     public var previewExtension: String { "jpeg" }
@@ -139,22 +138,20 @@ public final class FilesPickerKit: FilesPickerProtocol {
         by type: String,
         itemProvider: NSItemProvider
     ) async throws -> URL {
-        let url: URL = try await withCheckedThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { url, error in
+        try await withCheckedThrowingContinuation { continuation in
+            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { [weak self] url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else if let url = url {
-                    continuation.resume(returning: url)
+                    if let targetURL = try? self?.storageKit.copyFileToTempCache(from: url) {
+                        continuation.resume(returning: targetURL)
+                    } else {
+                        continuation.resume(throwing: FileValidationError.fileNotFound)
+                    }
                 } else {
                     continuation.resume(throwing: FileValidationError.fileNotFound)
                 }
             }
-        }
-        
-        do {
-            return try storageKit.copyFileToTempCache(from: url)
-        } catch {
-            throw FileValidationError.fileNotFound
         }
     }
     
