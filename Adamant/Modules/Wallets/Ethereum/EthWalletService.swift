@@ -11,8 +11,8 @@ import UIKit
 import web3swift
 import Swinject
 import Alamofire
-import BigInt
-import Web3Core
+@preconcurrency import BigInt
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
@@ -57,6 +57,9 @@ extension Web3Error {
              .dataError,
              .walletError,
              .unknownError,
+             .rpcError,
+             .revert,
+             .revertCustom,
              .typeError:
             return .internalError(message: "Unknown error", error: nil)
         case .valueError(desc: let desc):
@@ -69,7 +72,7 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol {
+final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
@@ -115,11 +118,16 @@ final class EthWalletService: WalletCoreProtocol {
         [.eth]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
     @Atomic private(set) var isDynamicFee: Bool = true
     @Atomic private(set) var transactionFee: Decimal = 0.0
     @Atomic private(set) var gasPrice: BigUInt = 0
     @Atomic private(set) var gasLimit: BigUInt = 0
     @Atomic private(set) var isWarningGasPrice = false
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
 	
 	static let transferGas: Decimal = 21000
 	static let kvsAddress = "eth:address"
@@ -163,8 +171,14 @@ final class EthWalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        apiService.hasActiveNode
+    @MainActor
+    var hasEnabledNode: Bool {
+        ethApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        ethApiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -208,25 +222,22 @@ final class EthWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.ethWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -235,7 +246,18 @@ final class EthWalletService: WalletCoreProtocol {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.historyTransactions = []
+                self?.balanceInvalidationSubscription = nil
             }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
             .store(in: &subscriptions)
     }
     
@@ -279,6 +301,7 @@ final class EthWalletService: WalletCoreProtocol {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            setBalanceInvalidationSubscription()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -307,6 +330,25 @@ final class EthWalletService: WalletCoreProtocol {
 		
         await calculateFee()
 	}
+    
+    private func setBalanceInvalidationSubscription() {
+        balanceInvalidationSubscription = Task { [weak self] in
+            await Task.sleep(interval: Self.balanceLifetime)
+            try Task.checkCancellation()
+            self?.resetBalance()
+        }.eraseToAnyCancellable()
+    }
+    
+    private func resetBalance() {
+        ethWallet?.isBalanceInitialized = false
+        guard let wallet = ethWallet else { return }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
+    }
     
     func calculateFee(for address: EthereumAddress? = nil) async {
         let priceRaw = try? await getGasPrices()
@@ -354,7 +396,7 @@ final class EthWalletService: WalletCoreProtocol {
 	}
 	
 	func getGasPrices() async throws -> BigUInt {
-        try await ethApiService.requestWeb3 { web3 in
+        try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.gasPrice()
         }.get()
 	}
@@ -365,7 +407,7 @@ final class EthWalletService: WalletCoreProtocol {
         transaction.from = ethWallet.ethAddress
         transaction.to = address ?? ethWallet.ethAddress
         
-        return try await ethApiService.requestWeb3 { [transaction] web3 in
+        return try await ethApiService.requestWeb3(waitsForConnectivity: false) { [transaction] web3 in
             try await web3.eth.estimateGas(for: transaction)
         }.get()
     }
@@ -489,7 +531,7 @@ extension EthWalletService {
                         return
                     }
                     
-                    self?.save(ethAddress: ethAddress) { result in
+                    self?.save(ethAddress: ethAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(ethAddress: ethAddress, result: result)
                     }
                 }
@@ -531,7 +573,7 @@ extension EthWalletService {
     }
     
 	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
-        let balance = try await ethApiService.requestWeb3 { web3 in
+        let balance = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.getBalance(for: address)
         }.get()
         
@@ -567,7 +609,7 @@ extension EthWalletService {
     ///   - ethAddress: Ethereum address to save into KVS
     ///   - adamantAddress: Owner of Ethereum address
     ///   - completion: success
-    private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(ethAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService?.account, let keypair = accountService?.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -604,7 +646,7 @@ extension EthWalletService {
         let sender = wallet?.address
         
         // MARK: 1. Transaction details
-        let details = try await ethApiService.requestWeb3 { web3 in
+        let details = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
         
@@ -617,7 +659,7 @@ extension EthWalletService {
         
         // MARK: 2. Transaction receipt
         do {
-            let receipt = try await ethApiService.requestWeb3 { web3 in
+            let receipt = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.transactionReceipt(hash)
             }.get()
             
@@ -638,11 +680,11 @@ extension EthWalletService {
             }
             
             // MARK: 4. Block timestamp & confirmations
-            let currentBlock = try await ethApiService.requestWeb3 { web3 in
+            let currentBlock = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.blockNumber()
             }.get()
             
-            let block = try await ethApiService.requestWeb3 { web3 in
+            let block = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.block(by: receipt.blockHash)
             }.get()
             
@@ -711,7 +753,7 @@ extension EthWalletService {
             "contract_to": "eq."
         ]
         
-        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
+        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
@@ -721,7 +763,7 @@ extension EthWalletService {
             )
         }.get()
         
-        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
+        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,

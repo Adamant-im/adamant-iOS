@@ -17,11 +17,9 @@ final class VibrationSelectionViewModel: ObservableObject {
     
     @Published var type: AdamantVibroType?
     
-    nonisolated init(vibroService: VibroService) {
+    init(vibroService: VibroService) {
         self.vibroService = vibroService
-        Task {
-            await self.setup()
-        }
+        setup()
     }
 }
 

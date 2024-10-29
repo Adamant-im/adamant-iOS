@@ -19,7 +19,7 @@ public enum Crypto {
     public static let ed2Curve = ED2Curve()
 }
 
-public struct Sign {
+public struct Sign: Sendable {
     public var SignBytes: Int { return Int(crypto_sign_bytes()) }
     public var PublicKeyBytes: Int { return Int(crypto_sign_publickeybytes()) }
     public var SecretKeyBytes: Int { return Int(crypto_sign_secretkeybytes()) }
@@ -54,7 +54,7 @@ public struct Sign {
     public init() {}
 }
 
-public struct ED2Curve {
+public struct ED2Curve: Sendable {
     public var KeyBytes: Int { return Int(crypto_scalarmult_curve25519_bytes()) }
     
     public func publicKey(_ key: Bytes) -> Bytes? {
@@ -171,7 +171,7 @@ public struct SecretBox: NonceGenerator {
     }
 }
 
-public protocol NonceGenerator {
+public protocol NonceGenerator: Sendable {
     var NonceBytes: Int { get }
 }
 

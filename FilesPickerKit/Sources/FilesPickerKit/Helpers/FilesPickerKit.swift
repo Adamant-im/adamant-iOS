@@ -103,7 +103,6 @@ public final class FilesPickerKit: FilesPickerProtocol {
         )
     }
     
-    @MainActor
     public func getUrlConforms(
         to type: UTType,
         for itemProvider: NSItemProvider
@@ -123,7 +122,6 @@ public final class FilesPickerKit: FilesPickerProtocol {
         throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
     }
     
-    @MainActor
     public func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
         for type in itemProvider.registeredTypeIdentifiers {
             do {
@@ -136,7 +134,6 @@ public final class FilesPickerKit: FilesPickerProtocol {
         throw FileValidationError.fileNotFound
     }
     
-    @MainActor
     public func getFileURL(
         by type: String,
         itemProvider: NSItemProvider

@@ -150,12 +150,14 @@ extension NodeGroup {
         }
     }
     
-    var useDateHeight: Bool {
+    var heightType: Node.HeightType? {
         switch self {
-        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
-            false
+        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm:
+            .blocks
         case .infoService:
-            true
+            .date
+        case .ipfs:
+            .none
         }
     }
     

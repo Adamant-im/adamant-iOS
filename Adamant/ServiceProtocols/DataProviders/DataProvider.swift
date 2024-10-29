@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 enum State {
     case empty
@@ -17,7 +18,7 @@ enum State {
 
 protocol DataProvider: AnyObject, Actor {
     var state: State { get }
-    var stateObserver: Published<State>.Publisher { get }
+    var stateObserver: AnyObservable<State> { get }
     var isInitiallySynced: Bool { get }
     
     func reload() async

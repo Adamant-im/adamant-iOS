@@ -85,7 +85,7 @@ enum AccountServiceState {
     case notLogged, isLoggingIn, loggedIn, updating
 }
 
-enum AccountServiceResult {
+enum AccountServiceResult: Sendable {
     case success(account: AdamantAccount, alert: (title: String, message: String)?)
     case failure(AccountServiceError)
 }
@@ -147,10 +147,11 @@ extension AccountServiceError: RichError {
 }
 
 // MARK: - Protocol
-protocol AccountService: AnyObject {
+protocol AccountService: AnyObject, Sendable {
     // MARK: State
     
     var state: AccountServiceState { get }
+    var isBalanceExpired: Bool { get }
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
     
@@ -158,7 +159,7 @@ protocol AccountService: AnyObject {
     
     /// Update logged account info
     func update()
-    func update(_ completion: ((AccountServiceResult) -> Void)?)
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?)
     
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String) async -> AccountServiceResult
@@ -185,7 +186,7 @@ protocol AccountService: AnyObject {
     /// - Parameters:
     ///   - pin: pincode to login
     ///   - completion: completion handler
-    func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void)
+    func setStayLoggedIn(pin: String, completion: @escaping @Sendable (AccountServiceResult) -> Void)
     
     /// Remove stored data
     func dropSavedAccount()

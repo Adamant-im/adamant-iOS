@@ -27,12 +27,12 @@ struct NotificationView: View {
         .padding([.leading, .trailing], 15)
         .padding([.top, .bottom], 10)
         .background(GeometryReader(content: processGeometry))
-        .padding(.top, safeAreaInsets.top)
-        .expanded(axes: .horizontal)
-        .background(Blur(style: Constants.blurStyle))
-        .offset(y: dragTranslation < .zero ? dragTranslation : .zero)
         .gesture(dragGesture)
         .onTapGesture(perform: onTap)
+        .background(Color(.adamant.swipeBlockColor))
+        .cornerRadius(10)
+        .padding(.horizontal, 15)
+        .padding(.top, safeAreaInsets.top)
     }
 }
 

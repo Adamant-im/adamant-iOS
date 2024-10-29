@@ -13,7 +13,7 @@ extension IPFSApiCommands {
     static let status = "/api/node/info"
 }
 
-final class IPFSApiCore {
+final class IPFSApiCore: Sendable {
     let apiCore: APICoreProtocol
     
     init(apiCore: APICoreProtocol) {

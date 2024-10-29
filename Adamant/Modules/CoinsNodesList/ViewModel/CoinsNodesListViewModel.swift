@@ -21,7 +21,7 @@ final class CoinsNodesListViewModel: ObservableObject {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private var subscriptions = Set<AnyCancellable>()
     
-    nonisolated init(
+    init(
         mapper: CoinsNodesListMapper,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
@@ -33,7 +33,7 @@ final class CoinsNodesListViewModel: ObservableObject {
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.processedGroups = processedGroups
         self.apiServiceCompose = apiServiceCompose
-        Task { @MainActor in setup() }
+        setup()
     }
     
     func setIsEnabled(id: UUID, group: NodeGroup, value: Bool) {
@@ -47,9 +47,10 @@ final class CoinsNodesListViewModel: ObservableObject {
 
 private extension CoinsNodesListViewModel {
     func setup() {
-        state.fastestNodeMode = processedGroups
-            .map { nodesAdditionalParamsStorage.isFastestNodeMode(group: $0) }
-            .reduce(into: true) { $0 = $0 && $1 }
+        state.sections = processedGroups.compactMap {
+            guard let info = apiServiceCompose.get($0)?.nodesInfo else { return nil }
+            return mapper.map(group: $0, nodesInfo: info)
+        }
         
         $state
             .map(\.fastestNodeMode)
@@ -57,13 +58,15 @@ private extension CoinsNodesListViewModel {
             .sink { [weak self] in self?.saveFastestNodeMode($0) }
             .store(in: &subscriptions)
         
-        guard let someGroup = processedGroups.first else { return }
+        processedGroups.forEach { group in
+            apiServiceCompose.get(group)?
+                .nodesInfoPublisher
+                .sink { [weak self] in self?.updateSections(group: group, nodesInfo: $0) }
+                .store(in: &subscriptions)
+        }
         
-        nodesStorage.nodesPublisher
-            .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: someGroup))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.updateSections(items: $0.0) }
-            .store(in: &subscriptions)
+        guard let someGroup = processedGroups.first else { return }
+        state.fastestNodeMode = nodesAdditionalParamsStorage.isFastestNodeMode(group: someGroup)
         
         Timer
             .publish(every: someGroup.onScreenUpdateInterval, on: .main, in: .default)
@@ -74,13 +77,9 @@ private extension CoinsNodesListViewModel {
         healthCheck()
     }
     
-    func updateSections(items: [NodeGroup: [Node]]) {
-        state.sections = mapper.map(
-            items: items,
-            restNodeIds: processedGroups.compactMap {
-                apiServiceCompose.chosenFastestNodeId(group: $0)
-            }
-        )
+    func updateSections(group: NodeGroup, nodesInfo: NodesListInfo) {
+        guard let index = state.sections.firstIndex(where: { $0.id == group }) else { return }
+        state.sections[index] = mapper.map(group: group, nodesInfo: nodesInfo)
     }
     
     func saveFastestNodeMode(_ value: Bool) {
@@ -92,7 +91,7 @@ private extension CoinsNodesListViewModel {
     
     func healthCheck() {
         processedGroups.forEach {
-            apiServiceCompose.healthCheck(group: $0)
+            apiServiceCompose.get($0)?.healthCheck()
         }
     }
 }

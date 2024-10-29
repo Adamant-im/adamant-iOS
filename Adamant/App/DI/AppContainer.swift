@@ -8,6 +8,7 @@
 
 import Swinject
 
+@MainActor
 struct AppContainer {
     let assembler = Assembler([
         AppAssembly(),

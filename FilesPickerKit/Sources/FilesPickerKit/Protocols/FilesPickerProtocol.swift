@@ -9,6 +9,7 @@ import UIKit
 import CommonKit
 import QuickLook
 
+@MainActor
 public protocol FilesPickerProtocol {
     var previewExtension: String {
         get
@@ -25,16 +26,13 @@ public protocol FilesPickerProtocol {
     ) async throws -> UIImage?
     func getFileResult(for url: URL) throws -> FileResult
     
-    @MainActor
     func getUrlConforms(
         to type: UTType,
         for itemProvider: NSItemProvider
     ) async throws -> URL
     
-    @MainActor
     func getUrl(for itemProvider: NSItemProvider) async throws -> URL
     
-    @MainActor
     func getFileURL(
         by type: String,
         itemProvider: NSItemProvider

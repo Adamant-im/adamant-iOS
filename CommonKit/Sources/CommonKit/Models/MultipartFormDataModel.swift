@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct MultipartFormDataModel {
+public struct MultipartFormDataModel: Sendable {
     public let keyName: String
     public let fileName: String
     public let data: Data

@@ -10,12 +10,14 @@ import CommonKit
 import UIKit
 
 extension Node {
+    enum HeightType {
+        case date
+        case blocks
+    }
+    
     // swiftlint:disable switch_case_alignment
-    func statusString(showVersion: Bool, dateHeight: Bool) -> String? {
-        guard
-            isEnabled,
-            let connectionStatus = connectionStatus
-        else { return Strings.disabled }
+    func statusString(showVersion: Bool, heightType: HeightType?) -> String? {
+        guard isEnabled else { return Strings.disabled }
         
         let statusTitle = switch connectionStatus {
         case .allowed:
@@ -26,12 +28,24 @@ extension Node {
             Strings.offline
         case .notAllowed(let reason):
             reason.text
+        case .none:
+            Strings.disabled
+        }
+        
+        let heightString: String?
+        switch heightType {
+        case .date:
+            heightString = dateHeightString
+        case .blocks:
+            heightString = blocksHeightString
+        case nil:
+            heightString = nil
         }
         
         return [
             statusTitle,
             showVersion ? versionString : nil,
-            dateHeight ? dateHeightString : heightString
+            heightString
         ]
         .compactMap { $0 }
         .joined(separator: " ")
@@ -96,6 +110,13 @@ private extension Node {
             )
         }
         
+        static var updating: String {
+            String.localized(
+                "NodesList.NodeCell.Updating",
+                comment: "NodesList.NodeCell: Node is updating"
+            )
+        }
+        
         static var offline: String {
             String.localized(
                 "NodesList.NodeCell.Offline",
@@ -123,7 +144,7 @@ private extension Node {
         return "\(Strings.ping): \(Int(ping * 1000)) \(Strings.milliseconds)"
     }
     
-    var heightString: String? {
+    var blocksHeightString: String? {
         height.map { " ❐ \(getFormattedHeight(from: $0))" }
     }
     

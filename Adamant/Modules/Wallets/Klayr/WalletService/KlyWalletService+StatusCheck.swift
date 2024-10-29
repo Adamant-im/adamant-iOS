@@ -26,7 +26,7 @@ extension KlyWalletService {
         var klyTransaction: Transactions.TransactionModel
         
         do {
-            klyTransaction = try await getTransaction(by: hash)
+            klyTransaction = try await getTransaction(by: hash, waitsForConnectivity: true)
         } catch {
             return .init(error: error)
         }

@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import CommonKit
+import Combine
 
 final class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
@@ -22,7 +23,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     
     var showToChat: Bool = false
     
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -102,16 +103,12 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         startUpdate()
     }
     
-    deinit {
-        stopUpdate()
-    }
-    
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdmWalletService.explorerAddress)\(id)")
+        return URL(string: "\(AdmWalletService.explorerTx)\(id)")
     }
     
     override func getName(by adamantAddress: String?) -> String? {
@@ -169,13 +166,11 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

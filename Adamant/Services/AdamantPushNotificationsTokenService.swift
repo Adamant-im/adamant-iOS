@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-final class AdamantPushNotificationsTokenService: PushNotificationsTokenService {
+final class AdamantPushNotificationsTokenService: PushNotificationsTokenService, @unchecked Sendable {
     private let securedStore: SecuredStore
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
@@ -111,7 +111,7 @@ private extension AdamantPushNotificationsTokenService {
         token.map { String(format: "%02.2hhx", $0) }.joined()
     }
     
-    func updateCurrentToken(newToken: String, keypair: Keypair, completion: @escaping () -> Void) {
+    func updateCurrentToken(newToken: String, keypair: Keypair, completion: @escaping @Sendable () -> Void) {
         guard let encodedPayload = makeEncodedPayload(token: newToken, keypair: keypair, action: .add) else {
             return completion()
         }
@@ -120,7 +120,7 @@ private extension AdamantPushNotificationsTokenService {
             self?.sendMessageToANS(
                 keypair: keypair,
                 encodedPayload: encodedPayload
-            ) { success in
+            ) { [weak self] success in
                 defer { completion() }
                 guard success else { return }
                 self?.setTokenToStorage(newToken)
@@ -128,7 +128,7 @@ private extension AdamantPushNotificationsTokenService {
         }
     }
     
-    func removeCurrentToken(keypair: Keypair, completion: @escaping () -> Void) {
+    func removeCurrentToken(keypair: Keypair, completion: @escaping @Sendable () -> Void) {
         guard
             let token = getToken(),
             let encodedPayload = makeEncodedPayload(
@@ -140,14 +140,14 @@ private extension AdamantPushNotificationsTokenService {
         
         setTokenToStorage(nil)
         
-        var transaction: UnregisteredTransaction?
+        let transaction = Atomic<UnregisteredTransaction?>(nil)
         
-        transaction = sendMessageToANS(
+        transaction.value = sendMessageToANS(
             keypair: keypair,
             encodedPayload: encodedPayload
         ) { [weak self] success in
             defer { completion() }
-            guard !success, let self = self, let transaction = transaction else { return }
+            guard !success, let self = self, let transaction = transaction.value else { return }
             self.addTokenDeletionTransaction(transaction)
         }
     }
@@ -176,7 +176,7 @@ private extension AdamantPushNotificationsTokenService {
     func sendMessageToANS(
         keypair: Keypair,
         encodedPayload: EncodedPayload,
-        completion: @escaping (_ success: Bool) -> Void
+        completion: @escaping @Sendable (_ success: Bool) -> Void
     ) -> UnregisteredTransaction? {
         guard let messageTransaction = try? adamantCore.makeSendMessageTransaction(
             senderId: AdamantUtilities.generateAddress(publicKey: keypair.publicKey),

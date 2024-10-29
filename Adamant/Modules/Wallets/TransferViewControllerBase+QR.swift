@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import QRCodeReader
+@preconcurrency import QRCodeReader
 import EFQRCode
 import AVFoundation
 import Photos
@@ -106,7 +106,7 @@ extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePic
         
         let codes = EFQRCode.recognize(cgImage)
         
-        if codes.contains(where: handleRawAddress) {
+        if codes.contains(where: { handleRawAddress($0) }) {
             vibroService.applyVibration(.medium)
             return
         }
@@ -121,19 +121,23 @@ extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePic
 
 // MARK: - QRCodeReaderViewControllerDelegate
 extension TransferViewControllerBase: QRCodeReaderViewControllerDelegate {
-    func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        if handleRawAddress(result.value) {
-            vibroService.applyVibration(.medium)
-            dismiss(animated: true, completion: nil)
-        } else {
-            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                reader.startScanning()
+    nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+        Task { @MainActor in
+            if handleRawAddress(result.value) {
+                vibroService.applyVibration(.medium)
+                dismiss(animated: true, completion: nil)
+            } else {
+                dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    reader.startScanning()
+                }
             }
         }
     }
     
-    func readerDidCancel(_ reader: QRCodeReaderViewController) {
-        reader.dismiss(animated: true, completion: nil)
+    nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
+        Task { @MainActor in
+            reader.dismiss(animated: true, completion: nil)
+        }
     }
 }

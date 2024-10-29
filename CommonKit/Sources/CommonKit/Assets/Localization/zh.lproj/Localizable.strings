@@ -103,6 +103,9 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "货币";
 
+/* Account tab: No enabled nodes */
+"AccountTab.Row.NoEnabledNodes" = "No enabled nodes";
+
 /* Account tab: 'Language' row */
 "AccountTab.Row.Language" = "语言";
 
@@ -690,6 +693,9 @@
 
 /* NodesList.NodeCell: Node is synchronizing */
 "NodesList.NodeCell.Synchronizing" = "正在同步";
+
+/* NodesList.NodeCell: Node is updating */
+"NodesList.NodeCell.Updating" = "更新";
 
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "离线";

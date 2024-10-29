@@ -12,12 +12,12 @@ import CommonKit
 import Combine
 
 extension String.adamant {
-    struct wallets {
-        
-        private init() {}
+    enum wallets {
+        static let noEnabledNodes = String.localized("AccountTab.Row.NoEnabledNodes")
     }
 }
 
+@MainActor
 protocol WalletViewControllerDelegate: AnyObject {
     func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase)
 }
@@ -59,7 +59,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     // MARK: - Properties, WalletViewController
     
     var viewController: UIViewController { return self }
-    var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
+    var height: CGFloat { tableView.contentSize.height + additionalSpace }
         
     weak var delegate: WalletViewControllerDelegate?
     
@@ -68,6 +68,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     }()
     
     private var subscriptions = Set<AnyCancellable>()
+    private let headerHeight: CGFloat = 2
+    private let additionalSpace: CGFloat = 5
     
     // MARK: - IBOutlets
     
@@ -109,7 +111,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         super.viewDidLoad()
         setTitle()
         addObservers()
-        tableView.tableFooterView = UIView()
         
         let section = Section()
         // MARK: Address
@@ -163,7 +164,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 let service = service
             else { return }
             
-            let vc = screensFactory.makeTransferListVC(service: service)
+            let vc = service.core.hasEnabledNode
+                ? screensFactory.makeTransferListVC(service: service)
+                : makeNodesList()
             
             if let split = splitViewController {
                 let details = UINavigationController(rootViewController:vc)
@@ -259,10 +262,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
     }
     
-    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return headerHeight
     }
-    
     // MARK: - To override
     
     func sendRowLocalizedLabel() -> NSAttributedString {
@@ -300,22 +302,35 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            if let address = self?.service?.core.wallet?.address {
+            if let address = self?.service?.core.wallet?.address,
+               let explorerAddress = self?.service?.core.explorerAddress,
+            let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let types: [ShareType]
                 let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
+                    types = [
+                        .copyToPasteboard,
+                        .share,
+                        .generateQr(
+                            encodedContent: encodedAddress,
+                            sharingTip: address,
+                            withLogo: withLogo
+                        ),
+                        .openInExplorer(url: explorerAddressUrl)
+                    ]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
                 
-                self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: types,
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true,
-                                                         from: cell,
-                                                         completion: completion)
+                self?.dialogService.presentShareAlertFor(
+                    string: address,
+                    types: types,
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: completion
+                )
             }
         }
         return addressRow
@@ -359,9 +374,15 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         alert: Int?,
         isBalanceInitialized: Bool
     ) -> BalanceRowValue {
-        let cryptoString = isBalanceInitialized
-        ? AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
-        : String.adamant.account.updatingBalance
+        guard service?.core.hasEnabledNode == true else {
+            return .init(crypto: .adamant.wallets.noEnabledNodes, fiat: nil, alert: nil)
+        }
+        
+        guard isBalanceInitialized else {
+            return .init(crypto: .adamant.account.updatingBalance, fiat: nil, alert: nil)
+        }
+        
+        let cryptoString = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
         
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
@@ -405,9 +426,8 @@ private extension WalletViewControllerBase {
         guard let service = service else { return }
         
         NotificationCenter.default
-            .publisher(for: service.core.serviceStateChanged)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in
+            .notifications(named: service.core.serviceStateChanged)
+            .sink { @MainActor [weak self] notification in
                 guard let newState = notification.userInfo?[AdamantUserInfoKey.WalletService.walletState] as? WalletServiceState
                 else { return }
                 
@@ -416,28 +436,29 @@ private extension WalletViewControllerBase {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: service.core.walletUpdatedNotification)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: service.core.walletUpdatedNotification)
+            .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.tableView.reloadData()
                 self?.setTitle()
             }
+            .store(in: &subscriptions)
+        
+        service.core.hasEnabledNodePublisher
+            .sink { [weak self] _ in self?.updateWalletUI() }
             .store(in: &subscriptions)
     }
     
@@ -465,6 +486,12 @@ private extension WalletViewControllerBase {
             isBalanceInitialized: wallet.isBalanceInitialized
         )
         row.updateCell()
+    }
+    
+    func makeNodesList() -> UIViewController {
+        service?.core.nodeGroups.contains(.adm) == true
+            ? screensFactory.makeNodesList()
+            : screensFactory.makeCoinsNodesList(context: .menu)
     }
 }
 

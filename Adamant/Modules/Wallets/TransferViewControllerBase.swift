@@ -333,7 +333,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.apiServiceCompose = apiServiceCompose
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -384,25 +384,22 @@ class TransferViewControllerBase: FormViewController {
     
     private func addObservers() {
         NotificationCenter.default
-            .publisher(for: walletCore.transactionFeeUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: walletCore.transactionFeeUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.feeUpdated()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: walletCore.walletUpdatedNotification)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: walletCore.walletUpdatedNotification)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadFormData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.currencyRateUpdated()
             }
             .store(in: &subscriptions)
@@ -800,7 +797,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard
-            apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+            apiServiceCompose.get(.adm)?.hasEnabledNode == true || admReportRecipient == nil
         else {
             dialogService.showNoActiveNodesAlert(
                 nodeName: NodeGroup.adm.name
@@ -814,7 +811,7 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard walletCore.hasActiveNode else {
+        guard walletCore.hasEnabledNode else {
             dialogService.showNoActiveNodesAlert(
                 nodeName: walletCore.tokenName
             ) { [weak self] in
@@ -958,6 +955,13 @@ class TransferViewControllerBase: FormViewController {
             case .amount(let amount):
                 let row: SafeDecimalRow? = form.rowBy(tag: BaseRows.amount.tag)
                 row?.value  = Double(amount)
+                row?.updateCell()
+            case .recipient:
+                break
+            case .klyrMessage(let message):
+                let commentRow = BaseRows.blockchainComments(coin: walletCore.tokenName)
+                let row: TextAreaRow? = form.rowBy(tag: commentRow.tag)
+                row?.value = message
                 row?.updateCell()
             }
         }

@@ -203,8 +203,8 @@ extension ChatMediaContainerView {
             : viewsList.reversed()
         
         guard horizontalStack.arrangedSubviews != viewsList else { return }
-        horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
-        viewsList.forEach(horizontalStack.addArrangedSubview)
+        horizontalStack.arrangedSubviews.forEach { horizontalStack.removeArrangedSubview($0) }
+        viewsList.forEach { horizontalStack.addArrangedSubview($0) }
     }
     
     func updateOwnReaction() {
@@ -340,6 +340,7 @@ extension ChatMediaContainerView {
 }
 
 extension ChatMediaContainerView.Model {
+    @MainActor
     func height() -> CGFloat {
         content.height()
     }

@@ -40,6 +40,9 @@ extension String.adamant.alert {
     static var uploadMedia: String {
         String.localized("Shared.UploadMedia", comment: "Shared alert 'Upload Media'")
     }
+    static var openInExplorer: String {
+        String.localized("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+    }
 }
 
 enum AddressChatShareType {
@@ -60,6 +63,7 @@ enum ShareType {
     case copyToPasteboard
     case share
     case generateQr(encodedContent: String?, sharingTip: String?, withLogo: Bool)
+    case openInExplorer(url: URL)
     case saveToPhotolibrary(image: UIImage)
     case partnerQR
     case sendTokens
@@ -76,6 +80,9 @@ enum ShareType {
             
         case .generateQr, .partnerQR:
             return String.adamant.alert.generateQr
+            
+        case .openInExplorer:
+            return String.adamant.alert.openInExplorer
             
         case .saveToPhotolibrary:
             return String.adamant.alert.saveToPhotolibrary

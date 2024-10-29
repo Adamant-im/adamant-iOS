@@ -9,49 +9,47 @@
 import CommonKit
 import Foundation
 import web3swift
-import Web3Core
+@preconcurrency import Web3Core
 
-class EthApiService: ApiServiceProtocol {
+class EthApiService: ApiServiceProtocol, @unchecked Sendable {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {
         get async { await api.service.keystoreManager }
     }
     
-    var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
-    }
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
     
-    var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
-    }
+    @MainActor
+    var nodesInfo: NodesListInfo { api.nodesInfo }
+    
+    func healthCheck() { api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {
         self.api = api
     }
     
-    func healthCheck() {
-        api.healthCheck()
-    }
-    
     func requestWeb3<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (Web3) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.performRequest(origin: origin, request)
         }
     }
     
     func requestApiCore<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await request(core.apiCore, origin).mapError { $0.asWalletServiceError() }
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }

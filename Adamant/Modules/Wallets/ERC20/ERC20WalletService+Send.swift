@@ -7,9 +7,9 @@
 //
 
 import UIKit
-import web3swift
+@preconcurrency import web3swift
 import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 extension ERC20WalletService: WalletServiceTwoStepSend {
@@ -34,7 +34,10 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)
         }
         
-        let provider = try await erc20ApiService.requestWeb3 { web3 in web3.provider }.get()
+        let provider = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: false
+        ) { web3 in web3.provider }.get()
+        
         let resolver = PolicyResolver(provider: provider)
         
         // MARK: Create transaction
@@ -71,7 +74,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.internalError(message: .adamant.sharedErrors.unknownError, error: nil)
         }
         
-        _ = try await erc20ApiService.requestWeb3 { web3 in
+        _ = try await erc20ApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.send(raw: txEncoded)
         }.get()
     }

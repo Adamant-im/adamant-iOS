@@ -61,6 +61,16 @@ final class BuyAndSellViewController: FormViewController {
     var accountService: AccountService!
     var dialogService: DialogService!
     
+    // MARK: Init
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
