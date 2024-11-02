@@ -112,6 +112,10 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         [.btc]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     // MARK: RichMessageProvider properties

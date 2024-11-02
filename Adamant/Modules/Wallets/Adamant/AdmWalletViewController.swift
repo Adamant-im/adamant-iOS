@@ -241,19 +241,27 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
 
-            if let address = self?.service?.core.wallet?.address {
+            if let address = self?.service?.core.wallet?.address,
+               let explorerAddress = self?.service?.core.explorerAddress,
+               let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-                self?.dialogService.presentShareAlertFor(stringForPasteboard: address,
-                                                   stringForShare: encodedAddress,
-                                                   stringForQR: encodedAddress,
-                                                   types: [.copyToPasteboard,
-                                                           .share,
-                                                           .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
-                                                          ],
-                                                   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                   animated: true,
-                                                   from: cell,
-                                                   completion: completion)
+                self?.dialogService.presentShareAlertFor(
+                    stringForPasteboard: address,
+                    stringForShare: encodedAddress,
+                    stringForQR: encodedAddress,
+                    types: [.copyToPasteboard,
+                            .share,
+                            .generateQr(
+                                encodedContent: encodedAddress,
+                                sharingTip: address,
+                                withLogo: true
+                            ),
+                            .openInExplorer(url: explorerAddressUrl)
+                    ],
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: completion)
             }
         }
         return addressRow

@@ -108,7 +108,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdmWalletService.explorerAddress)\(id)")
+        return URL(string: "\(AdmWalletService.explorerTx)\(id)")
     }
     
     override func getName(by adamantAddress: String?) -> String? {

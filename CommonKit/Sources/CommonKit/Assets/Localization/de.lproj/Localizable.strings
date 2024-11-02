@@ -1206,7 +1206,7 @@
 "TransferScene.Row.Balance" = "Kontostand";
 
 /* Transfer: maximum amount to transfer: available account money substracting transfer fee */
-"TransferScene.Row.MaxToTransfer" = "Maximalbetrag für den Versand verfügbar";
+"TransferScene.Row.MaxToTransfer" = "Maximaler Übertrag";
 
 /* Transfer: recipient address */
 "TransferScene.Row.RecipientAddress" = "Adresse";

@@ -248,6 +248,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var coinStorage: CoinStorageService { get }
     var nodeGroups: [NodeGroup] { get }
     var transferDecimals: Int { get }
+    var explorerAddress: String { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get

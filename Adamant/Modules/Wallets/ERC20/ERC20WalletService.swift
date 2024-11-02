@@ -87,12 +87,16 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         token.transferDecimals
     }
     
-    private(set) var blockchainSymbol: String = "ETH"
-    private(set) var isDynamicFee: Bool = true
-    private(set) var transactionFee: Decimal = 0.0
-    private(set) var gasPrice: BigUInt = 0
-    private(set) var gasLimit: BigUInt = 0
-    private(set) var isWarningGasPrice = false
+    var explorerAddress: String {
+        EthWalletService.explorerAddress
+    }
+    
+    private (set) var blockchainSymbol: String = "ETH"
+    private (set) var isDynamicFee: Bool = true
+    private (set) var transactionFee: Decimal = 0.0
+    private (set) var gasPrice: BigUInt = 0
+    private (set) var gasLimit: BigUInt = 0
+    private (set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
         return ethWallet?.balance ?? 0 > transactionFee

@@ -59,7 +59,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     // MARK: - Properties, WalletViewController
     
     var viewController: UIViewController { return self }
-    var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
+    var height: CGFloat { tableView.contentSize.height + additionalSpace }
         
     weak var delegate: WalletViewControllerDelegate?
     
@@ -68,6 +68,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     }()
     
     private var subscriptions = Set<AnyCancellable>()
+    private let headerHeight: CGFloat = 2
+    private let additionalSpace: CGFloat = 5
     
     // MARK: - IBOutlets
     
@@ -109,7 +111,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         super.viewDidLoad()
         setTitle()
         addObservers()
-        tableView.tableFooterView = UIView()
         
         let section = Section()
         // MARK: Address
@@ -261,10 +262,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
     }
     
-    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return headerHeight
     }
-    
     // MARK: - To override
     
     func sendRowLocalizedLabel() -> NSAttributedString {
@@ -302,22 +302,35 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            if let address = self?.service?.core.wallet?.address {
+            if let address = self?.service?.core.wallet?.address,
+               let explorerAddress = self?.service?.core.explorerAddress,
+            let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let types: [ShareType]
                 let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
+                    types = [
+                        .copyToPasteboard,
+                        .share,
+                        .generateQr(
+                            encodedContent: encodedAddress,
+                            sharingTip: address,
+                            withLogo: withLogo
+                        ),
+                        .openInExplorer(url: explorerAddressUrl)
+                    ]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
                 
-                self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: types,
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true,
-                                                         from: cell,
-                                                         completion: completion)
+                self?.dialogService.presentShareAlertFor(
+                    string: address,
+                    types: types,
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: completion
+                )
             }
         }
         return addressRow

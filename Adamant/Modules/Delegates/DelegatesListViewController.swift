@@ -92,7 +92,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     }
     
     private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .grouped)
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = 50
         tableView.backgroundColor = .clear
@@ -238,7 +238,8 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         }
         
         bottomPanel.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 }

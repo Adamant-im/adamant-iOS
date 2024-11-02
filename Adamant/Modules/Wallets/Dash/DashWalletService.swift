@@ -53,6 +53,10 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         [.dash]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     // MARK: RichMessageProvider properties

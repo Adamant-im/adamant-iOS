@@ -333,7 +333,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.apiServiceCompose = apiServiceCompose
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -947,6 +947,13 @@ class TransferViewControllerBase: FormViewController {
             case .amount(let amount):
                 let row: SafeDecimalRow? = form.rowBy(tag: BaseRows.amount.tag)
                 row?.value  = Double(amount)
+                row?.updateCell()
+            case .recipient:
+                break
+            case .klyrMessage(let message):
+                let commentRow = BaseRows.blockchainComments(coin: walletCore.tokenName)
+                let row: TextAreaRow? = form.rowBy(tag: commentRow.tag)
+                row?.value = message
                 row?.updateCell()
             }
         }

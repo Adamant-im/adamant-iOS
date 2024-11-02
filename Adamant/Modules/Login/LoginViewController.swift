@@ -169,7 +169,7 @@ final class LoginViewController: FormViewController {
         self.screensFactory = screensFactory
         self.apiService = apiService
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -306,11 +306,26 @@ final class LoginViewController: FormViewController {
             }
             
             let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-            dialogService.presentShareAlertFor(string: passphrase,
-                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
-                                               excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-                                               animated: true, from: cell,
-                                               completion: nil)
+            
+            let didSelectAction: ((ShareType) -> Void)? = { [weak self] type in
+                guard case .copyToPasteboard = type else {
+                    return
+                }
+
+                Task { @MainActor in
+                    self?.tableView.scrollToBottom(animated: true)
+                }
+            }
+            
+            dialogService.presentShareAlertFor(
+                string: passphrase,
+                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
+                excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+                animated: true, 
+                from: nil,
+                completion: nil,
+                didSelect: didSelectAction
+            )
         })
         
         <<< ButtonRow {

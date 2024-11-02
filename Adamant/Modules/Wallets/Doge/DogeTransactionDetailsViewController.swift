@@ -53,7 +53,7 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(DogeWalletService.explorerAddress)\(id)")
+        return URL(string: "\(DogeWalletService.explorerTx)\(id)")
     }
     
     @MainActor
