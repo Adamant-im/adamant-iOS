@@ -16,6 +16,7 @@
 		2657A0CD2C707D800021E7E6 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		2657A0CE2C707D830021E7E6 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
 		265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */; };
+		26843D2B2CD8D7130010F047 /* UIViewController+NodeListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26843D2A2CD8D7130010F047 /* UIViewController+NodeListPresenter.swift */; };
 		269B83102C74A2FF002AA1D7 /* note.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B830F2C74A2FF002AA1D7 /* note.mp3 */; };
 		269B83112C74A34F002AA1D7 /* note.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B830F2C74A2FF002AA1D7 /* note.mp3 */; };
 		269B831E2C74B4EC002AA1D7 /* handoff.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B83122C74B4EA002AA1D7 /* handoff.mp3 */; };
@@ -706,6 +707,7 @@
 		2621AB382C60E7AE00046D7A /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
 		2621AB3A2C613C8100046D7A /* NotificationsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsFactory.swift; sourceTree = "<group>"; };
 		265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservation.swift; sourceTree = "<group>"; };
+		26843D2A2CD8D7130010F047 /* UIViewController+NodeListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+NodeListPresenter.swift"; sourceTree = "<group>"; };
 		269B830F2C74A2FF002AA1D7 /* note.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = note.mp3; sourceTree = "<group>"; };
 		269B83122C74B4EA002AA1D7 /* handoff.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = handoff.mp3; sourceTree = "<group>"; };
 		269B83132C74B4EA002AA1D7 /* portal.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = portal.mp3; sourceTree = "<group>"; };
@@ -2349,6 +2351,7 @@
 		E913C9101FFFAA4B001A83F7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				26843D2A2CD8D7130010F047 /* UIViewController+NodeListPresenter.swift */,
 				93775E452A674FA9009061AC /* Markdown+Adamant.swift */,
 				E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */,
 				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
@@ -3473,6 +3476,7 @@
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				938F7D692955C9EC001915CA /* ChatViewModel.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
+				26843D2B2CD8D7130010F047 /* UIViewController+NodeListPresenter.swift in Sources */,
 				3A26D9352C3C1BE2003AD832 /* KlyWalletService.swift in Sources */,
 				41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */,
 				2621AB392C60E7AE00046D7A /* NotificationsViewModel.swift in Sources */,
