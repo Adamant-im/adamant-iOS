@@ -43,7 +43,8 @@ struct ChatListFactory {
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
+            dialogService: assembler.resolve(DialogService.self)!
         )
     }
     

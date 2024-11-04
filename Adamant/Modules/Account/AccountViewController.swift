@@ -1116,11 +1116,16 @@ final class AccountViewController: FormViewController {
         }
         
         if let disabledGroup {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: disabledGroup.name
-                ).localizedDescription
-            )
+            dialogService.showNoActiveNodesAlert(
+                nodeName: disabledGroup.name
+            ) { [weak self] in
+                guard let self = self else { return }
+                
+                self.presentNodeListVC(
+                    screensFactory: self.screensFactory,
+                    node: disabledGroup
+                )
+            }
         }
         
         refreshControl.endRefreshing()

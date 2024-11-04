@@ -797,29 +797,33 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard
-            apiServiceCompose.get(.adm)?.hasEnabledNode == true || admReportRecipient == nil
+            apiServiceCompose.get(.adm)?.hasEnabledNode == true || (admReportRecipient == nil && walletCore.nodeGroups != [.adm])
         else {
             dialogService.showNoActiveNodesAlert(
                 nodeName: NodeGroup.adm.name
             ) { [weak self] in
                 guard let self = self else { return }
-                let vc = self.screensFactory.makeNodesList()
-                vc.modalPresentationStyle = .pageSheet
                 
-                self.present(vc, animated: true, completion: nil)
+                self.presentNodeListVC(
+                    screensFactory: self.screensFactory,
+                    node: .adm
+                )
             }
             return
         }
         
         guard walletCore.hasEnabledNode else {
+            let network = type(of: walletCore).tokenNetworkSymbol
             dialogService.showNoActiveNodesAlert(
-                nodeName: walletCore.tokenName
+                nodeName: network
             ) { [weak self] in
-                guard let self = self else { return }
-                let vc = self.screensFactory.makeCoinsNodesList(context: .menu)
-                vc.modalPresentationStyle = .pageSheet
+                guard let self = self,
+                      let nodeGroup = walletCore.nodeGroups.first else { return }
                 
-                self.present(vc, animated: true, completion: nil)
+                self.presentNodeListVC(
+                    screensFactory: self.screensFactory,
+                    node: nodeGroup
+                )
             }
             return
         }

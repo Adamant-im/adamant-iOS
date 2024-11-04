@@ -461,12 +461,10 @@ extension LoginViewController {
             nodeName: NodeGroup.adm.name
         ) { [weak self] in
             guard let self = self else { return }
-            
-            let vc = self.screensFactory.makeNodesList()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .pageSheet
-            
-            self.present(nav, animated: true, completion: nil)
+            self.presentNodeListVC(
+                screensFactory: self.screensFactory,
+                node: .adm
+            )
         }
     }
     func generateNewPassphrase() {

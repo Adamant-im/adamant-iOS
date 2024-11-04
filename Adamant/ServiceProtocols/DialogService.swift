@@ -183,10 +183,6 @@ protocol DialogService: AnyObject {
     func showRichError(error: Error)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
-    func showNoActiveNodesAlert(
-        nodeName: String,
-        completion: @escaping () -> Void
-    )
     
     // MARK: - Notifications
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)
@@ -236,4 +232,8 @@ protocol DialogService: AnyObject {
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?)
     
     func selectAllTextFields(in alert: UIAlertController)
+    func showNoActiveNodesAlert(
+        nodeName: String,
+        completion: @escaping () -> Void
+    )
 }

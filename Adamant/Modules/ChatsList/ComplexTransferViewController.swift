@@ -24,6 +24,7 @@ final class ComplexTransferViewController: UIViewController {
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
     private let nodesStorage: NodesStorageProtocol
+    private let dialogService: DialogService
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -44,13 +45,15 @@ final class ComplexTransferViewController: UIViewController {
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
-        nodesStorage: NodesStorageProtocol
+        nodesStorage: NodesStorageProtocol,
+        dialogService: DialogService
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.addressBookService = addressBookService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
         self.nodesStorage = nodesStorage
+        self.dialogService = dialogService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -145,12 +148,16 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             
             Task {
                 guard service.core.hasEnabledNode else {
-                    vc.showAlertView(
-                        message: ApiServiceError.noEndpointsAvailable(
-                            nodeGroupName: service.core.tokenName
-                        ).errorDescription ?? .adamant.sharedErrors.unknownError,
-                        animated: true
-                    )
+                    dialogService.showNoActiveNodesAlert(
+                        nodeName: NodeGroup.adm.name
+                    ) { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.presentNodeListVC(
+                            screensFactory: self.screensFactory,
+                            node: .adm
+                        )
+                    }
                     return
                 }
                 

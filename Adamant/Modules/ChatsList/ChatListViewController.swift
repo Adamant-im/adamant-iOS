@@ -477,8 +477,17 @@ final class ChatListViewController: KeyboardObservingViewController {
             case .success:
                 tableView.reloadData()
                 
-            case .failure(let error):
-                dialogService.showRichError(error: error)
+            case .failure:
+                dialogService.showNoActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name
+                ) { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.presentNodeListVC(
+                        screensFactory: self.screensFactory,
+                        node: .adm
+                    )
+                }
             }
             
             refreshControl.endRefreshing()

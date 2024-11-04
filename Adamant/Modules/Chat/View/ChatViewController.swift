@@ -479,7 +479,14 @@ private extension ChatViewController {
             .store(in: &subscriptions)
         
         viewModel.presentNodeListVC
-            .sink { [weak self] in self?.presentNodeListViewer() }
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                self.presentNodeListVC(
+                    screensFactory: self.screensFactory,
+                    node: .adm
+                )
+            }
             .store(in: &subscriptions)
     }
 }
@@ -664,14 +671,6 @@ private extension ChatViewController {
         UIView.animate(withDuration: 0.25) {
             self.chatDropView.alpha = value ? 1.0 : .zero
         }
-    }
-    
-    func presentNodeListViewer() {
-        let vc = screensFactory.makeNodesList()
-        let nav = UINavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .pageSheet
-        
-        self.present(nav, animated: true, completion: nil)
     }
 }
 
