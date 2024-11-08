@@ -14,4 +14,8 @@ public extension NSManagedObjectContext {
         action(context)
         try? context.save()
     }
+    
+    func existingObject<T: NSManagedObject>(_ object: T) -> T? {
+        try? existingObject(with: object.objectID) as? T
+    }
 }
