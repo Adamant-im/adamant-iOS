@@ -57,6 +57,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private let addressBook: AddressBookService
     private let avatarService: AvatarService
     private let walletServiceCompose: WalletServiceCompose
+    private let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -149,7 +150,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         dialogService: DialogService,
         addressBook: AddressBookService,
         avatarService: AvatarService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.accountService = accountService
         self.chatsProvider = chatsProvider
@@ -160,6 +162,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         self.addressBook = addressBook
         self.avatarService = avatarService
         self.walletServiceCompose = walletServiceCompose
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(nibName: "ChatListViewController", bundle: nil)
     }
@@ -467,9 +470,9 @@ final class ChatListViewController: KeyboardObservingViewController {
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         Task {
             let result = await chatsProvider.update(notifyState: true)
+            defer { refreshControl.endRefreshing() }
             
             guard let result = result else {
-                refreshControl.endRefreshing()
                 return
             }
             
@@ -478,19 +481,11 @@ final class ChatListViewController: KeyboardObservingViewController {
                 tableView.reloadData()
                 
             case .failure:
-                dialogService.showNoActiveNodesAlert(
-                    nodeName: NodeGroup.adm.name
-                ) { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.presentNodeListVC(
-                        screensFactory: self.screensFactory,
-                        node: .adm
-                    )
-                }
+                guard nodeAvailabilityService.checkNodeAvailability(
+                    in: .adm,
+                    vc: self
+                ) else { return }
             }
-            
-            refreshControl.endRefreshing()
         }
     }
     

@@ -141,6 +141,7 @@ final class LoginViewController: FormViewController {
     let screensFactory: ScreensFactory
     let apiService: AdamantApiServiceProtocol
     let dialogService: DialogService
+    let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: Properties
     private var hideNewPassphrase: Bool = true
@@ -160,7 +161,8 @@ final class LoginViewController: FormViewController {
         dialogService: DialogService,
         localAuth: LocalAuthentication,
         screensFactory: ScreensFactory,
-        apiService: AdamantApiServiceProtocol
+        apiService: AdamantApiServiceProtocol,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.accountService = accountService
         self.adamantCore = adamantCore
@@ -168,6 +170,7 @@ final class LoginViewController: FormViewController {
         self.localAuth = localAuth
         self.screensFactory = screensFactory
         self.apiService = apiService
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(style: .insetGrouped)
     }
@@ -457,16 +460,12 @@ extension LoginViewController {
             return
         }
         
-        dialogService.showNoActiveNodesAlert(
-            nodeName: NodeGroup.adm.name
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.presentNodeListVC(
-                screensFactory: self.screensFactory,
-                node: .adm
-            )
-        }
+        guard nodeAvailabilityService.checkNodeAvailability(
+            in: .adm,
+            vc: self
+        ) else { return }
     }
+    
     func generateNewPassphrase() {
         let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
         

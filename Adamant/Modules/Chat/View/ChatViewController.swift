@@ -479,13 +479,16 @@ private extension ChatViewController {
             .store(in: &subscriptions)
         
         viewModel.presentNodeListVC
-            .sink { [weak self] in
+            .sink { [weak self] node in
                 guard let self = self else { return }
                 
-                self.presentNodeListVC(
-                    screensFactory: self.screensFactory,
-                    node: .adm
-                )
+                let vc = node == .adm
+                ? screensFactory.makeNodesList()
+                : screensFactory.makeCoinsNodesList(context: .menu)
+                
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .pageSheet
+                self.present(nav, animated: true, completion: nil)
             }
             .store(in: &subscriptions)
     }

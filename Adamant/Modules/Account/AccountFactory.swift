@@ -26,7 +26,12 @@ struct AccountFactory {
             currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!, nodeAvailabilityService: NodeAvailabilityService(
+                dialogService: assembler.resolve(DialogService.self)!,
+                apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+                screensFactory: screensFactory
+            )
+
         )
     }
 }

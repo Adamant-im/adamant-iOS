@@ -97,7 +97,7 @@ final class ChatViewModel: NSObject {
     let presentDocumentPickerVC = ObservableSender<Void>()
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
-    let presentNodeListVC = ObservableSender<Void>()
+    let presentNodeListVC = ObservableSender<NodeGroup>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -300,7 +300,7 @@ final class ChatViewModel: NSObject {
                     nodeName: NodeGroup.adm.name,
                     action: { [weak self] in
                         guard let self = self else { return }
-                        self.presentNodeListVC.send()
+                        self.presentNodeListVC.send(.adm)
                     }
                 ))
                 return
@@ -716,7 +716,7 @@ final class ChatViewModel: NSObject {
                     nodeName: NodeGroup.adm.name,
                     action: { [weak self] in
                         guard let self = self else { return }
-                        self.presentNodeListVC.send()
+                        self.presentNodeListVC.send(.adm)
                     }
                 ))
             return false
@@ -1074,7 +1074,7 @@ private extension ChatViewModel {
                     nodeName: NodeGroup.adm.name,
                     action: { [weak self] in
                         guard let self = self else { return }
-                        self.presentNodeListVC.send()
+                        self.presentNodeListVC.send(.ipfs)
                     }
                 )
             )

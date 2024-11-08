@@ -188,6 +188,7 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let apiServiceCompose: ApiServiceComposeProtocol
+    let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: - Properties
     
@@ -319,7 +320,8 @@ class TransferViewControllerBase: FormViewController {
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -333,6 +335,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.apiServiceCompose = apiServiceCompose
+        self.nodeAvailabilityService = nodeAvailabilityService
         super.init(style: .insetGrouped)
     }
     
@@ -796,37 +799,17 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard
-            apiServiceCompose.get(.adm)?.hasEnabledNode == true || (admReportRecipient == nil && walletCore.nodeGroups != [.adm])
-        else {
-            dialogService.showNoActiveNodesAlert(
-                nodeName: NodeGroup.adm.name
-            ) { [weak self] in
-                guard let self = self else { return }
-                
-                self.presentNodeListVC(
-                    screensFactory: self.screensFactory,
-                    node: .adm
-                )
-            }
-            return
+        if admReportRecipient != nil || walletCore.nodeGroups == [.adm] {
+            guard nodeAvailabilityService.checkNodeAvailability(
+                in: .adm,
+                vc: self
+            )else { return }
         }
         
-        guard walletCore.hasEnabledNode else {
-            let network = type(of: walletCore).tokenNetworkSymbol
-            dialogService.showNoActiveNodesAlert(
-                nodeName: network
-            ) { [weak self] in
-                guard let self = self,
-                      let nodeGroup = walletCore.nodeGroups.first else { return }
-                
-                self.presentNodeListVC(
-                    screensFactory: self.screensFactory,
-                    node: nodeGroup
-                )
-            }
-            return
-        }
+        guard nodeAvailabilityService.checkNodeAvailability(
+            in: walletCore,
+            vc: self
+        ) else { return }
         
         let recipient: String
         if let recipientName = recipientName {

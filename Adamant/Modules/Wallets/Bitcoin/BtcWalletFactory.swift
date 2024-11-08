@@ -49,7 +49,12 @@ struct BtcWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            nodeAvailabilityService: NodeAvailabilityService(
+                dialogService: assembler.resolve(DialogService.self)!,
+                apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+                screensFactory: screensFactory
+            )
         )
     }
     

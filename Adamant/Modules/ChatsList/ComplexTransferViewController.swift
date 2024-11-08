@@ -25,6 +25,7 @@ final class ComplexTransferViewController: UIViewController {
     private let walletServiceCompose: WalletServiceCompose
     private let nodesStorage: NodesStorageProtocol
     private let dialogService: DialogService
+    private let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -46,7 +47,8 @@ final class ComplexTransferViewController: UIViewController {
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
         nodesStorage: NodesStorageProtocol,
-        dialogService: DialogService
+        dialogService: DialogService,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.addressBookService = addressBookService
@@ -54,6 +56,7 @@ final class ComplexTransferViewController: UIViewController {
         self.walletServiceCompose = walletServiceCompose
         self.nodesStorage = nodesStorage
         self.dialogService = dialogService
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -147,19 +150,10 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             vc.showProgressView(animated: false)
             
             Task {
-                guard service.core.hasEnabledNode else {
-                    dialogService.showNoActiveNodesAlert(
-                        nodeName: NodeGroup.adm.name
-                    ) { [weak self] in
-                        guard let self = self else { return }
-                        
-                        self.presentNodeListVC(
-                            screensFactory: self.screensFactory,
-                            node: .adm
-                        )
-                    }
-                    return
-                }
+                guard nodeAvailabilityService.checkNodeAvailability(
+                    in: .adm,
+                    vc: self
+                ) else { return }
                 
                 guard admService?.core.hasEnabledNode ?? false else {
                     vc.showAlertView(
