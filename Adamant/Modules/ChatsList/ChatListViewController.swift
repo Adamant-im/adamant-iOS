@@ -201,6 +201,12 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        tableView.reloadData()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -691,7 +697,8 @@ extension ChatListViewController {
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
 
         if let lastTransaction = chatroom.lastTransaction {
-            cell.hasUnreadMessages = lastTransaction.isUnread
+            let isUnread = chatsProvider.isUnreadChat(chatroom: chatroom)
+            cell.hasUnreadMessages = isUnread
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
         } else {
             cell.lastMessageLabel.text = nil
@@ -1164,14 +1171,42 @@ extension ChatListViewController {
         let markAsRead = UIContextualAction(
             style: .normal,
             title: "👀"
-        ) { (_, _, completionHandler) in
-            if chatroom.hasUnread {
-                chatroom.markAsReaded()
-            } else {
-                chatroom.markAsUnread()
+        ) { [weak self] (_, _, completionHandler) in
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                defer {
+                    completionHandler(true)
+                    self.tableView.reloadData()
+                }
+                
+                guard
+                    let address = chatroom.partner?.address,
+                    let lastTransaction = chatroom.lastTransaction
+                else {
+                    return
+                }
+                
+                let isUnread = await self.chatsProvider.isUnreadChat(chatroom: chatroom)
+                
+                guard let transactions = chatroom.transactions as? Set<ChatTransaction>
+                else { return }
+                
+                if isUnread {
+                    await self.chatsProvider.setLastReadMessage(
+                        height: lastTransaction.height,
+                        transactions: transactions,
+                        chatroom: address
+                    )
+                    return
+                }
+                
+                await self.chatsProvider.setLastReadMessage(
+                    height: lastTransaction.height - 1,
+                    transactions: [],
+                    chatroom: address
+                )
             }
-            try? chatroom.managedObjectContext?.save()
-            completionHandler(true)
         }
 
         markAsRead.backgroundColor = UIColor.adamant.contextMenuDefaultBackgroundColor

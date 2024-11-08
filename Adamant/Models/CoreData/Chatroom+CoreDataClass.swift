@@ -14,30 +14,21 @@ import CoreData
 public class Chatroom: NSManagedObject, @unchecked Sendable {
     static let entityName = "Chatroom"
     
-    var hasUnread: Bool {
-        return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
-    }
-    
-    func markAsReaded() {
-        hasUnreadMessages = false
-       
-        if let trs = transactions as? Set<ChatTransaction> {
-            trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
-        }
-        lastTransaction?.isUnread = false
-    }
-    
-    func markAsUnread() {
-        hasUnreadMessages = true
-        lastTransaction?.isUnread = true
-    }
-    
-    func getFirstUnread() -> ChatTransaction? {
-        if let trs = transactions as? Set<ChatTransaction> {
-            return trs.filter { $0.isUnread }.map { $0 }.first
-        }
-        return nil
-    }
+//    func hasUnread(with lastHeight: Int64) -> Bool {
+//        guard let height = lastTransaction?.height else { return false }
+//        
+//        return lastHeight < height
+//    }
+//  
+//    func markAsReaded() {
+//        hasUnreadMessages = false
+//        lastTransaction?.isUnread = false
+//    }
+//    
+//    func markAsUnread() {
+//        hasUnreadMessages = true
+//        lastTransaction?.isUnread = true
+//    }
     
     @MainActor func getName(addressBookService: AddressBookService) -> String? {
         guard let partner = partner else { return nil }

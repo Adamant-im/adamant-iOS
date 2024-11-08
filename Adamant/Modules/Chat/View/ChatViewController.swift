@@ -207,6 +207,7 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        identifyBottomVisibleMessage()
         
         if scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating {
             updateDateHeaderIfNeeded()
@@ -712,6 +713,27 @@ private extension ChatViewController {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
     }
     
+    func identifyBottomVisibleMessage() {
+        let targetY: CGFloat = view.frame.height - view.safeAreaInsets.bottom - targetYOffsetBottom
+        
+        guard let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems.sorted(by: {
+            $0.row > $1.row
+        }) as [IndexPath]? else { return }
+        
+        for indexPath in visibleIndexPaths {
+            guard let cell = messagesCollectionView.cellForItem(at: indexPath)
+            else { continue }
+            
+            let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
+            
+            guard cellRect.maxY >= targetY && cellRect.minY <= targetY
+            else { continue }
+            
+            viewModel.checkBottomMessage(indexPath: indexPath)
+            break
+        }
+    }
+    
     func updateDateHeaderIfNeeded() {
         guard viewAppeared else { return }
         
@@ -1093,3 +1115,4 @@ private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
+private let targetYOffsetBottom: CGFloat = 100

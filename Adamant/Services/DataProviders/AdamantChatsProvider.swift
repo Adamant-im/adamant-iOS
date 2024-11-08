@@ -12,6 +12,11 @@ import MarkdownKit
 import Combine
 import CommonKit
 
+struct ReadMessage: Codable {
+    let height: Int64
+    var transactionsId: Set<String>
+}
+
 actor AdamantChatsProvider: ChatsProvider {
     
     // MARK: Dependencies
@@ -473,7 +478,7 @@ extension AdamantChatsProvider {
         }
         
         let offset = (offset ?? 0) + messageCount
-
+        
         let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
         chatLoadedMessages[addressRecipient] = loadedCount + messageCount
         
@@ -532,7 +537,7 @@ extension AdamantChatsProvider {
               let privateKey = accountService.keypair?.privateKey else {
             return
         }
-
+        
         // MARK: 3. Get transactions
         
         socketService.connect(address: address) { [weak self] result in
@@ -553,6 +558,70 @@ extension AdamantChatsProvider {
     
     func disconnectFromSocket() {
         self.socketService.disconnect()
+    }
+    
+    func appendLastReadMessage(
+        readMessage: ReadMessage,
+        chatroom: String
+    ) {
+        var lastReadMessage = getLastReadMessage(chatroom: chatroom) ?? readMessage
+        
+        if lastReadMessage.height == readMessage.height {
+            lastReadMessage.transactionsId.formUnion(readMessage.transactionsId)
+        } else {
+            lastReadMessage = readMessage
+        }
+        
+        setLastReadMessage(readMessage: lastReadMessage, chatroom: chatroom)
+    }
+    
+    func setLastReadMessage(
+        height: Int64,
+        transactions: Set<ChatTransaction>,
+        chatroom: String
+    ) {
+        let unreadTransactions = transactions.filter {
+            $0.height == height || $0.height == .zero
+        }.compactMap { $0.transactionId }
+        
+        setLastReadMessage(
+            readMessage: .init(
+                height: height,
+                transactionsId: Set(unreadTransactions)
+            ),
+            chatroom: chatroom
+        )
+    }
+    
+    func setLastReadMessage(
+        readMessage: ReadMessage,
+        chatroom: String
+    ) {
+        securedStore.set(readMessage, for: StoreKey.chat.lastReadHeight(for: chatroom))
+    }
+    
+    func getLastReadMessage(chatroom: String) -> ReadMessage? {
+        guard let result: ReadMessage = securedStore.get(StoreKey.chat.lastReadHeight(for: chatroom))
+        else {
+            return nil
+        }
+        return result
+    }
+    
+    func isUnreadChat(chatroom: Chatroom) -> Bool {
+        guard
+            let address = chatroom.partner?.address,
+            let lastTransaction = chatroom.lastTransaction,
+            let lastReadMessage = getLastReadMessage(chatroom: address) else {
+            return false
+        }
+        
+        if lastReadMessage.height == lastTransaction.height
+            || lastTransaction.height == .zero {
+            return !lastReadMessage.transactionsId.contains(lastTransaction.transactionId)
+        }
+        
+        return lastReadMessage.height < lastTransaction.height
     }
     
     func update(notifyState: Bool) async -> ChatsProviderResult? {
@@ -1806,19 +1875,28 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 4. Unread messagess
-        if let readedLastHeight = readedLastHeight {
-            var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
-            if unreadTransactions.count == 0 {
-                unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
+        let chatrooms = Dictionary(grouping: newMessageTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
+        
+        for (chatroom, trs) in chatrooms {
+            guard let address = chatroom.partner?.address,
+                  let lastTransactionHeight = trs.last?.height
+            else {
+                continue
             }
-            let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
-            for (chatroom, trs) in chatrooms {
-                if let address = chatroom.partner?.address {
-                    chatroom.isHidden = self.blockList.contains(address)
-                }
-                chatroom.hasUnreadMessages = true
-                trs.forEach { $0.isUnread = true }
+            
+            chatroom.isHidden = self.blockList.contains(address)
+            
+            guard getLastReadMessage(chatroom: address) == nil else {
+                print("ignore setLastReadMessage for \(address)")
+                continue
             }
+            
+            print("setLastReadMessage for \(address)")
+            setLastReadMessage(
+                height: lastTransactionHeight,
+                transactions: Set(trs),
+                chatroom: address
+            )
         }
         
         // MARK: 5. Dump new transactions
@@ -1955,10 +2033,10 @@ extension AdamantChatsProvider {
     }
     
     func markChatAsRead(chatroom: Chatroom) {
-        chatroom.managedObjectContext?.perform {
-            chatroom.markAsReaded()
-            try? chatroom.managedObjectContext?.save()
-        }
+//        chatroom.managedObjectContext?.perform {
+//            chatroom.markAsReaded()
+//            try? chatroom.managedObjectContext?.save()
+//        }
     }
     
     private func onConnectionToTheInternetRestored() {

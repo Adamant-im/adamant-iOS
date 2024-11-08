@@ -209,6 +209,26 @@ protocol ChatsProvider: DataProvider, Actor {
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
     
+    func setLastReadMessage(
+        readMessage: ReadMessage,
+        chatroom: String
+    )
+    
+    func getLastReadMessage(chatroom: String) -> ReadMessage?
+    
+    func isUnreadChat(chatroom: Chatroom) -> Bool
+    
+    func appendLastReadMessage(
+        readMessage: ReadMessage,
+        chatroom: String
+    )
+    
+    func setLastReadMessage(
+        height: Int64,
+        transactions: Set<ChatTransaction>,
+        chatroom: String
+    )
+    
     // ForceUpdate chats
     func update(notifyState: Bool) async -> ChatsProviderResult?
     

@@ -66,6 +66,12 @@ public extension StoreKey {
         public static let autoDownloadFullMedia = "autoDownloadFullMediaEnabled"
         public static let saveFileEncrypted = "saveFileEncrypted"
     }
+    
+    enum chat {
+        public static func lastReadHeight(for chatRoom: String) -> String {
+            "lastReadHeight\(chatRoom)"
+        }
+    }
 }
 
 public protocol SecuredStore: AnyObject, Sendable {
