@@ -104,7 +104,7 @@
 "AccountTab.Row.Currency" = "货币";
 
 /* Account tab: No enabled nodes */
-"AccountTab.Row.NoEnabledNodes" = "No enabled nodes";
+"AccountTab.Row.NoEnabledNodes" = "没有可用的服务器";
 
 /* Account tab: 'Language' row */
 "AccountTab.Row.Language" = "语言";
