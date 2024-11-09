@@ -328,12 +328,14 @@ extension AdamantAccountsProvider {
         switch validation {
         case .valid:
             return await withUnsafeContinuation { contituation in
-                context.safeUpdate {
+                context.safeUpdate { context in
+                    let dummy = dummy.flatMap { context.existingObject($0) }
+                    
                     let account = createAndSaveCoreDataAccount(
                         for: address,
                         publicKey: publicKey,
                         dummy: dummy,
-                        in: $0
+                        in: context
                     )
                     
                     contituation.resume(returning: account)
@@ -395,6 +397,7 @@ extension AdamantAccountsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
         
+        let dummy = dummy.flatMap { privateContext.existingObject($0) }
         let coreAccount = createCoreDataAccount(from: account, context: privateContext)
         
         coreAccount.isDummy = account.isDummy
