@@ -48,13 +48,13 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             return applyNewIds(newIds)
         }
         
-        if Set(newIds) != Set(currentIds) {
-            stopDecelerating()
-        }
-        
         let bottomOffset = self.bottomOffset
         applyNewIds(newIds)
         setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
+        
+        if Set(newIds) != Set(currentIds) {
+            scrollRectToVisible(.init(origin: contentOffset, size: visibleSize), animated: false)
+        }
     }
     
     func setFullBottomInset(_ inset: CGFloat) {
