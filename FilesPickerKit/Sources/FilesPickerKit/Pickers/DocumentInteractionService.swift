@@ -59,6 +59,8 @@ extension DocumentInteractionService: QLPreviewControllerDelegate, QLPreviewCont
         QLPreviewItemEq(url: urls[index])
     }
     
+    public func previewController(_: QLPreviewController, transitionViewFor _: QLPreviewItem) -> UIView? { .init() }
+    
     public func previewControllerDidDismiss(_ controller: QLPreviewController) {
         guard needToDelete else { return }
         urls.forEach { url in

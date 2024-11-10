@@ -13,7 +13,7 @@ import Combine
 
 extension String.adamant {
     enum wallets {
-        static let noEnabledNodes = String.localized("AccountTab.Row.NoEnabledNodes")
+        static var noEnabledNodes: String { .localized("AccountTab.Row.NoEnabledNodes") }
     }
 }
 
@@ -455,6 +455,7 @@ private extension WalletViewControllerBase {
             .sink { @MainActor [weak self] _ in
                 self?.tableView.reloadData()
                 self?.setTitle()
+                self?.updateWalletUI()
             }
             .store(in: &subscriptions)
         
