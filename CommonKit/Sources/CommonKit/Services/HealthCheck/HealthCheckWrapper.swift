@@ -22,6 +22,7 @@ public protocol HealthCheckableError: Error {
 open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
     @ObservableValue private(set) var nodes: [Node] = .init()
     @ObservableValue private var sortedAllowedNodes: [Node] = .init()
+    @ObservableValue private var connection = false
     
     @MainActor
     private var _nodesInfo: ObservableValue<NodesListInfo> = .init(.default)
@@ -119,15 +120,15 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
 
 private extension HealthCheckWrapper {
     func configure(nodes: AnyObservable<[Node]>, connection: AnyObservable<Bool>) {
-        let connection = connection
-            .removeDuplicates()
-            .filter { $0 }
+        connection
+            .assign(to: _connection)
+            .store(in: &subscriptions)
         
         nodes
             .removeDuplicates()
             .handleEvents(receiveOutput: { [weak self] in self?.updateNodes($0) })
             .removeDuplicates { !$0.doesNeedHealthCheck($1) }
-            .combineLatest(connection)
+            .combineLatest(connection.filter { $0 })
             .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
         
@@ -149,9 +150,12 @@ private extension HealthCheckWrapper {
     }
     
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.values.first {
-            !waitsForConnectivity || !$0.isEmpty
-        } ?? .init()
+        let item = await $sortedAllowedNodes
+            .combineLatest($connection)
+            .values
+            .first { (!waitsForConnectivity || !$0.0.isEmpty) && $0.1 }
+        
+        return item?.0 ?? .init()
     }
     
     func updateHealthCheckTimerSubscription() {

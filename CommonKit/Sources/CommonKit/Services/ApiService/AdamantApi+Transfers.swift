@@ -14,7 +14,8 @@ extension AdamantApiService {
     public func transferFunds(transaction: UnregisteredTransaction) async -> ApiServiceResult<UInt64> {
         return await sendTransaction(
             path: ApiCommands.Transactions.processTransaction,
-            transaction: transaction
+            transaction: transaction,
+            waitsForConnectivity: false
         )
     }
 
