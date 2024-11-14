@@ -169,7 +169,7 @@ final class LoginViewController: FormViewController {
         self.screensFactory = screensFactory
         self.apiService = apiService
         
-        super.init(style: .insetGrouped)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
