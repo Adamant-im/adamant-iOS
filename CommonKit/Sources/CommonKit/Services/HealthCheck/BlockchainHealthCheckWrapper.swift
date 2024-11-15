@@ -68,6 +68,7 @@ public final class BlockchainHealthCheckWrapper<
                 }
                 
                 await group.waitForAll()
+                healthCheckPostProcessing()
             }
         }
     }
@@ -177,8 +178,8 @@ private extension BlockchainHealthCheckWrapper {
             } else {
                 status = node.height.map { height in
                     actualHeightsRange?.contains(height) ?? false
-                    ? .allowed
-                    : .synchronizing
+                        ? .allowed
+                        : .synchronizing(isFinal: !node.connectionStatus.notFinalSync)
                 } ?? .none
             }
             
@@ -192,6 +193,17 @@ private extension BlockchainHealthCheckWrapper {
             group: params.group,
             mutate: mutate
         )
+    }
+    
+    func healthCheckPostProcessing() {
+        nodes.forEach { node in
+            guard
+                case let .synchronizing(isFinal) = node.connectionStatus,
+                !isFinal
+            else { return }
+            
+            updateNode(id: node.id) { $0.connectionStatus = .synchronizing(isFinal: true) }
+        }
     }
 }
 
@@ -236,4 +248,17 @@ private func getActualNodeHeightsRange(
     }
     
     return bestInterval?.range
+}
+
+private extension Optional where Wrapped == NodeConnectionStatus {
+    var notFinalSync: Bool {
+        switch self {
+        case .offline, .notAllowed, .none:
+            false
+        case let .synchronizing(isFinal):
+            !isFinal
+        case .allowed:
+            true
+        }
+    }
 }

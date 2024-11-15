@@ -25,6 +25,19 @@ struct NodeKeychainDTO: Codable {
     let version: String?
     let height: Int?
     let ping: TimeInterval?
-    let connectionStatus: NodeConnectionStatus?
+    let connectionStatus: NodeConnectionStatusKeychainDTO?
     let type: NodeType
+}
+
+enum NodeConnectionStatusKeychainDTO: Equatable, Codable, Sendable {
+    case offline
+    case synchronizing
+    case allowed
+    case notAllowed(RejectedReason)
+}
+
+extension NodeConnectionStatusKeychainDTO {
+    enum RejectedReason: Codable, Equatable, Sendable {
+        case outdatedApiVersion
+    }
 }
