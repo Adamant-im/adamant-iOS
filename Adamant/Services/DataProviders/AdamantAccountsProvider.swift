@@ -105,45 +105,40 @@ final class AdamantAccountsProvider: AccountsProvider {
                     return
                 }
                 
-                DispatchQueue.global(qos: .utility).async {
-                    let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                    context.parent = viewContext
-                    
-                    let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
-                    requestSingle.fetchLimit = 1
-                    
-                    // Process changes
-                    for change in changes {
-                        switch change {
-                        case .newName(let address, let name), .updated(let address, let name):
-                            let predicate = NSPredicate(format: "address == %@", address)
-                            requestSingle.predicate = predicate
-                            
-                            guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                                continue
-                            }
-                            
-                            account.name = name
-                            account.chatroom?.title = name
-                            
-                        case .removed(let address):
-                            let predicate = NSPredicate(format: "address == %@", address)
-                            requestSingle.predicate = predicate
-                            
-                            guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                                continue
-                            }
-                            
-                            account.name = nil
-                            account.chatroom?.title = nil
-                        }
+                let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+                requestSingle.fetchLimit = 1
+                
+                // Process changes
+                for change in changes {
+                    switch change {
+                    case .newName(let address, let name), .updated(let address, let name):
+                        let predicate = NSPredicate(format: "address == %@", address)
+                        requestSingle.predicate = predicate
+                        
+                        guard
+                            let result = try? viewContext.fetch(requestSingle),
+                            let account = result.first
+                        else { continue }
+                        
+                        account.name = name
+                        account.chatroom?.title = name
+                        
+                    case .removed(let address):
+                        let predicate = NSPredicate(format: "address == %@", address)
+                        requestSingle.predicate = predicate
+                        
+                        guard
+                            let result = try? viewContext.fetch(requestSingle),
+                            let account = result.first
+                        else { continue }
+                        
+                        account.name = nil
+                        account.chatroom?.title = nil
                     }
-                    
-                    if context.hasChanges {
-                        DispatchQueue.main.async {
-                            try? context.save()
-                        }
-                    }
+                }
+                
+                if viewContext.hasChanges {
+                    try? viewContext.save()
                 }
             }
         }
@@ -256,7 +251,8 @@ extension AdamantAccountsProvider {
                     account.isDummy = true
                     let coreAccount = createAndSaveCoreDataAccount(
                         from: account,
-                        dummy: dummy
+                        dummy: dummy,
+                        in: stack.container.viewContext
                     )
                     
                     return coreAccount
@@ -264,11 +260,12 @@ extension AdamantAccountsProvider {
                 
                 let coreAccount = createAndSaveCoreDataAccount(
                     from: account,
-                    dummy: dummy
+                    dummy: dummy,
+                    in: stack.container.viewContext
                 )
                 
                 return coreAccount
-            } catch let error as ApiServiceError {
+            } catch let error {
                 switch error {
                 case .accountNotFound:
                     if let dummy = dummy {
@@ -327,19 +324,15 @@ extension AdamantAccountsProvider {
         
         switch validation {
         case .valid:
-            return await withUnsafeContinuation { contituation in
-                context.safeUpdate { context in
-                    let dummy = dummy.flatMap { context.existingObject($0) }
-                    
-                    let account = createAndSaveCoreDataAccount(
-                        for: address,
-                        publicKey: publicKey,
-                        dummy: dummy,
-                        in: context
-                    )
-                    
-                    contituation.resume(returning: account)
-                }
+            return await withUnsafeContinuation { @MainActor contituation in
+                let account = createAndSaveCoreDataAccount(
+                    for: address,
+                    publicKey: publicKey,
+                    dummy: dummy,
+                    in: context
+                )
+                
+                contituation.resume(returning: account)
             }
         case .system:
             let coreAccount = createCoreDataAccount(with: address, publicKey: "")
@@ -387,18 +380,15 @@ extension AdamantAccountsProvider {
     
     private func createAndSaveCoreDataAccount(
         from account: AdamantAccount,
-        dummy: DummyAccount?
+        dummy: DummyAccount?,
+        in context: NSManagedObjectContext
     ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
             return account
         }
         
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = stack.container.viewContext
-        
-        let dummy = dummy.flatMap { privateContext.existingObject($0) }
-        let coreAccount = createCoreDataAccount(from: account, context: privateContext)
+        let coreAccount = createCoreDataAccount(from: account, context: context)
         
         coreAccount.isDummy = account.isDummy
         
@@ -414,10 +404,10 @@ extension AdamantAccountsProvider {
                     chatroom.updateLastTransaction()
                 }
             }
-            privateContext.delete(dummy)
+            context.delete(dummy)
         }
         
-        try? privateContext.save()
+        try? context.save()
         return coreAccount
     }
     
@@ -598,8 +588,7 @@ extension AdamantAccountsProvider {
             throw AccountsProviderDummyAccountError.invalidAddress(address: address)
         }
         
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = stack.container.viewContext
+        let context = stack.container.viewContext
         
         switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):
