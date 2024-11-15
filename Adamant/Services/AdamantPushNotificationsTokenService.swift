@@ -48,7 +48,8 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService,
             Task {
                 let result = await apiService.sendTransaction(
                     path: ApiCommands.Chats.processTransaction,
-                    transaction: transaction
+                    transaction: transaction,
+                    waitsForConnectivity: true
                 )
                 
                 switch result {

@@ -49,7 +49,8 @@ extension AdamantApiService {
         
         return await sendTransaction(
             path: ApiCommands.States.store,
-            transaction: transaction
+            transaction: transaction,
+            waitsForConnectivity: true
         )
     }
     
