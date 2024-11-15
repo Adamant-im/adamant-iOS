@@ -95,8 +95,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     
     func sendTransaction(
         path: String,
-        transaction: UnregisteredTransaction,
-        waitsForConnectivity: Bool
+        transaction: UnregisteredTransaction
     ) async -> ApiServiceResult<UInt64>
 
     func sendMessageTransaction(

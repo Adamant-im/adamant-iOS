@@ -57,8 +57,7 @@ extension AdamantApiService {
     ) async -> ApiServiceResult<UInt64> {
         await sendTransaction(
             path: ApiCommands.Chats.processTransaction,
-            transaction: transaction,
-            waitsForConnectivity: false
+            transaction: transaction
         )
     }
     
