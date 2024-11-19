@@ -10,8 +10,11 @@ import CommonKit
 
 struct NotificationView: View {
     @State private var dragTranslation: CGFloat = .zero
+    @State private var horizontalDragTranslation: CGFloat = .zero
     @State private var minTranslationForDismiss: CGFloat = .infinity
-    
+    @State private var minTranslationXForDismiss: CGFloat = .infinity
+    @State private var isTextLimited: Bool = true
+
     let model: NotificationModel
     let safeAreaInsets: EdgeInsets
     let dismissAction: () -> Void
@@ -27,9 +30,11 @@ struct NotificationView: View {
         .padding([.leading, .trailing], 15)
         .padding([.top, .bottom], 10)
         .background(GeometryReader(content: processGeometry))
+        .expanded(axes: .horizontal)
+        .offset(y: dragTranslation < .zero ? dragTranslation : .zero)
+        .offset(x: horizontalDragTranslation < .zero ? horizontalDragTranslation : .zero)
         .gesture(dragGesture)
         .onTapGesture(perform: onTap)
-        .background(Color(.adamant.swipeBlockColor))
         .cornerRadius(10)
         .padding(.horizontal, 15)
         .padding(.top, safeAreaInsets.top)
@@ -48,7 +53,7 @@ private extension NotificationView {
     }
     
     var textStack: some View {
-        VStack(alignment: .leading, spacing: .zero) {
+        VStack(alignment: .leading, spacing: 3) {
             if let title = model.title {
                 Text(title)
                     .font(.system(size: 15, weight: .bold))
@@ -56,20 +61,32 @@ private extension NotificationView {
             if let description = model.description {
                 Text(description)
                     .font(.system(size: 13))
-                    .lineLimit(3)
+                    .lineLimit(isTextLimited ? 3 : nil)
+               
             }
         }
     }
     
     var dragGesture: some Gesture {
         DragGesture()
-            .onChanged { dragTranslation = $0.translation.height }
+            .onChanged {
+                dragTranslation = $0.translation.height
+                horizontalDragTranslation = $0.translation.width
+            }
             .onEnded {
-                print(-$0.translation.height, minTranslationForDismiss)
                 if $0.velocity.height < -100 || -$0.translation.height > minTranslationForDismiss {
                     dismissAction()
+                } else if $0.velocity.width < -100 || $0.translation.width > minTranslationXForDismiss {
+                    dismissAction()
+                } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationForDismiss {
+                    horizontalDragTranslation = .zero
+                    isTextLimited = false
+                    model.cancelAutoDismiss()
                 } else {
-                    withAnimation { dragTranslation = .zero }
+                    withAnimation {
+                        dragTranslation = .zero
+                        horizontalDragTranslation = .zero
+                    }
                 }
             }
     }
@@ -77,9 +94,11 @@ private extension NotificationView {
     func processGeometry(_ geometry: GeometryProxy) -> some View {
         DispatchQueue.main.async {
             minTranslationForDismiss = geometry.size.height / 2
+            minTranslationXForDismiss = geometry.size.width / 2
         }
 
-        return Color.clear
+        return Color.init(uiColor: .adamant.swipeBlockColor)
+            .cornerRadius(10)
     }
     
     func onTap() {
