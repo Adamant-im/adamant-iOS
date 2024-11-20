@@ -570,7 +570,7 @@ private extension ChatViewController {
         }
         
         filesToolbarView.openFileAction = { [weak self] data in
-            self?.presentDocumentViewer(url: data.url)
+            self?.presentDocumentViewer(file: data)
         }
     }
     
@@ -641,8 +641,8 @@ private extension ChatViewController {
         }
     }
     
-    func presentDocumentViewer(url: URL) {
-        viewModel.documentViewerService.openFile(url: url)
+    func presentDocumentViewer(file: FileResult) {
+        viewModel.documentViewerService.openFile(files: [file])
         
         let quickVC = QLPreviewController()
         quickVC.delegate = viewModel.documentViewerService
