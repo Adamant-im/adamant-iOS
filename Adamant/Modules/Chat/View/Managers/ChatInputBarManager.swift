@@ -21,7 +21,7 @@ final class ChatInputBarManager: InputBarAccessoryViewDelegate {
         Task { @MainActor in
             guard await viewModel.canSendMessage(withText: text) else { return }
             inputBar.inputTextView.text = ""
-            viewModel.sendMessage(text: text)
+            viewModel.sendMessage(text: text.replacingOccurrences(of: "\u{2028}", with: "\n"))
         }
     }
 }
