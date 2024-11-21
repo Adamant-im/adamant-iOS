@@ -37,9 +37,11 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
     override func update() {
         checkmarkRowView.setIsChecked(model.isEnabled, animated: true)
         checkmarkRowView.title = model.title
+        checkmarkRowView.titleColor = model.titleColor
         checkmarkRowView.captionColor = model.indicatorColor
         checkmarkRowView.caption = model.indicatorString
         checkmarkRowView.subtitle = model.statusString
+        checkmarkRowView.subtitleColor = model.statusColor
     }
     
     func subscribe<P: Observable<Model>>(_ publisher: P) {

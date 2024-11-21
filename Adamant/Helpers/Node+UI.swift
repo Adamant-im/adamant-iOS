@@ -89,6 +89,28 @@ extension Node {
     var title: String {
         mainOrigin.asString()
     }
+    
+    var statusStringColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
+    }
+    
+    var titleColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
+    }
 }
 
 private extension Node {
