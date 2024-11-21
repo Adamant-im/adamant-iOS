@@ -376,6 +376,39 @@ extension AdamantChatsProvider {
             privateKey: privateKey
         )
         
+        if !accountService.hasStayInAccount {
+            chatrooms.chats?.forEach({ chatroom in
+                guard let lastTransaction = chatroom.lastTransaction else { return }
+                setLastReadMessage(
+                    readMessage: .init(
+                        height: lastTransaction.height,
+                        transactionsId: [String(lastTransaction.id)]
+                    ),
+                    chatroom: lastTransaction.recipientId
+                )
+            })
+            
+//            for (chatroom, trs) in chatrooms {
+//                guard let address = chatroom.partner?.address,
+//                      let lastTransactionHeight = trs.last?.height
+//                else {
+//                    continue
+//                }
+//                
+//                chatroom.isHidden = self.blockList.contains(address)
+//                
+//                guard getLastReadMessage(chatroom: address) == nil else {
+//                    continue
+//                }
+//                
+//                setLastReadMessage(
+//                    height: lastTransactionHeight,
+//                    transactions: Set(trs),
+//                    chatroom: address
+//                )
+//            }
+        }
+        
         if !isInitiallySynced {
             isInitiallySynced = true
             preLoadChats(array, address: address)
@@ -613,7 +646,7 @@ extension AdamantChatsProvider {
             let address = chatroom.partner?.address,
             let lastTransaction = chatroom.lastTransaction,
             let lastReadMessage = getLastReadMessage(chatroom: address) else {
-            return false
+            return true
         }
         
         if lastReadMessage.height == lastTransaction.height
@@ -1874,31 +1907,6 @@ extension AdamantChatsProvider {
             }
         }
         
-        // MARK: 4. Unread messagess
-        let chatrooms = Dictionary(grouping: newMessageTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
-        
-        for (chatroom, trs) in chatrooms {
-            guard let address = chatroom.partner?.address,
-                  let lastTransactionHeight = trs.last?.height
-            else {
-                continue
-            }
-            
-            chatroom.isHidden = self.blockList.contains(address)
-            
-            guard getLastReadMessage(chatroom: address) == nil else {
-                print("ignore setLastReadMessage for \(address)")
-                continue
-            }
-            
-            print("setLastReadMessage for \(address)")
-            setLastReadMessage(
-                height: lastTransactionHeight,
-                transactions: Set(trs),
-                chatroom: address
-            )
-        }
-        
         // MARK: 5. Dump new transactions
         if privateContext.hasChanges {
             do {
@@ -2030,13 +2038,6 @@ extension AdamantChatsProvider {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
-    }
-    
-    func markChatAsRead(chatroom: Chatroom) {
-//        chatroom.managedObjectContext?.perform {
-//            chatroom.markAsReaded()
-//            try? chatroom.managedObjectContext?.save()
-//        }
     }
     
     private func onConnectionToTheInternetRestored() {

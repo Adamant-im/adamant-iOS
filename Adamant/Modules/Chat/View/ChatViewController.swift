@@ -715,11 +715,8 @@ private extension ChatViewController {
     
     func identifyBottomVisibleMessage() {
         let targetY: CGFloat = view.frame.height - view.safeAreaInsets.bottom - targetYOffsetBottom
-        
-        guard let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems.sorted(by: {
-            $0.row > $1.row
-        }) as [IndexPath]? else { return }
-        
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+                
         for indexPath in visibleIndexPaths {
             guard let cell = messagesCollectionView.cellForItem(at: indexPath)
             else { continue }
