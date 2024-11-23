@@ -160,7 +160,7 @@ final class AdamantAddressBookService: AddressBookService {
             userInfo: [AdamantUserInfoKey.AddressBook.changes: changes]
         )
         
-        await Task.sleep(interval: waitTime)
+        try? await Task.sleep(interval: waitTime)
         await saveIfNeeded()
     }
     
@@ -233,7 +233,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Hold updates until transaction passed on backend
         
         while !done {
-            await Task.sleep(interval: 3.0)
+            try? await Task.sleep(interval: 3.0)
             
             if let _ = try? await apiService.getTransaction(id: id) {
                 done = true
