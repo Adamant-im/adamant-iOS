@@ -594,6 +594,7 @@ private extension ChatViewController {
     }
 
     func presentMediaPicker() {
+        guard !isMacOS else { return presentDocumentPicker() }
         messageInputBar.inputTextView.resignFirstResponder()
         
         viewModel.mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
