@@ -387,26 +387,6 @@ extension AdamantChatsProvider {
                     chatroom: lastTransaction.recipientId
                 )
             })
-            
-//            for (chatroom, trs) in chatrooms {
-//                guard let address = chatroom.partner?.address,
-//                      let lastTransactionHeight = trs.last?.height
-//                else {
-//                    continue
-//                }
-//                
-//                chatroom.isHidden = self.blockList.contains(address)
-//                
-//                guard getLastReadMessage(chatroom: address) == nil else {
-//                    continue
-//                }
-//                
-//                setLastReadMessage(
-//                    height: lastTransactionHeight,
-//                    transactions: Set(trs),
-//                    chatroom: address
-//                )
-//            }
         }
         
         if !isInitiallySynced {
