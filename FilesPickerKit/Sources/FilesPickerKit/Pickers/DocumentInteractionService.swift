@@ -27,12 +27,14 @@ public final class DocumentInteractionService: NSObject {
             var copyURL = URL(fileURLWithPath: file.url.deletingLastPathComponent().path)
             copyURL.appendPathComponent(fullName)
             
-            if !FileManager.default.fileExists(atPath: copyURL.path) {
-                if let data = file.data {
-                    try? data.write(to: copyURL, options: [.atomic, .completeFileProtection])
-                } else {
-                    try? FileManager.default.copyItem(at: file.url, to: copyURL)
-                }
+            if FileManager.default.fileExists(atPath: copyURL.path) {
+                try? FileManager.default.removeItem(at: copyURL)
+            }
+            
+            if let data = file.data {
+                try? data.write(to: copyURL, options: [.atomic, .completeFileProtection])
+            } else {
+                try? FileManager.default.copyItem(at: file.url, to: copyURL)
             }
             
             return copyURL
