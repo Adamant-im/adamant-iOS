@@ -84,9 +84,9 @@ public extension PopupManager {
             title: title,
             description: description,
             tapHandler: tapHandler.map { .init(id: .empty, value: $0) },
-            cancelAutoDismiss: { [weak self] in
+            cancelAutoDismiss: .init(id: .empty, value: { [weak self] in
                 self?.autoDismissManager.notificationDismissSubscription?.cancel()
-            }
+            })
         )
         
         if autoDismiss {

@@ -14,7 +14,9 @@ struct NotificationView: View {
     @State private var minTranslationForDismiss: CGFloat = .infinity
     @State private var minTranslationXForDismiss: CGFloat = .infinity
     @State private var isTextLimited: Bool = true
-
+    
+    @Binding var dismissEdge: Edge
+    var onDismissEdgeChanged: ((Edge) -> Void)?
     let model: NotificationModel
     let safeAreaInsets: EdgeInsets
     let dismissAction: () -> Void
@@ -75,13 +77,19 @@ private extension NotificationView {
             }
             .onEnded {
                 if $0.velocity.height < -100 || -$0.translation.height > minTranslationForDismiss {
-                    dismissAction()
+                    onDismissEdgeChanged?(.top)
+                    Task {
+                        dismissAction()
+                    }
                 } else if $0.velocity.width < -100 || $0.translation.width > minTranslationXForDismiss {
-                    dismissAction()
+                    onDismissEdgeChanged?(.leading)
+                    Task {
+                        dismissAction()
+                    }
                 } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationForDismiss {
                     horizontalDragTranslation = .zero
                     isTextLimited = false
-                    model.cancelAutoDismiss()
+                    model.cancelAutoDismiss?.value()
                 } else {
                     withAnimation {
                         dragTranslation = .zero

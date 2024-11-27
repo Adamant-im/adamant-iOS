@@ -26,5 +26,5 @@ struct NotificationModel: Equatable, Hashable {
     let title: String?
     let description: String?
     let tapHandler: IDWrapper<() -> Void>?
-    let cancelAutoDismiss: () -> Void
+    let cancelAutoDismiss: IDWrapper<() -> Void>?
 }
