@@ -779,7 +779,7 @@ private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
         // "becomeFirstResponder()" causes content animation on start without this fix
         Task {
-            await Task.sleep(interval: .zero)
+            try await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
         }
     }

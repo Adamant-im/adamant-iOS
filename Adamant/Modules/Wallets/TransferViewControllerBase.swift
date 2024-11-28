@@ -807,13 +807,15 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard walletCore.hasEnabledNode else {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: walletCore.tokenName
-                ).localizedDescription
-            )
-            return
+        for group in walletCore.nodeGroups {
+            guard apiServiceCompose.get(group)?.hasEnabledNode == true else {
+                dialogService.showWarning(
+                    withMessage: ApiServiceError.noEndpointsAvailable(
+                        nodeGroupName: group.name
+                    ).localizedDescription
+                )
+                return
+            }
         }
         
         let recipient: String

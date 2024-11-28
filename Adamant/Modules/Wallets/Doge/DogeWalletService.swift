@@ -302,8 +302,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     private func setBalanceInvalidationSubscription() {
         balanceInvalidationSubscription = Task { [weak self] in
-            await Task.sleep(interval: Self.balanceLifetime)
-            try Task.checkCancellation()
+            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
             self?.resetBalance()
         }.eraseToAnyCancellable()
     }
