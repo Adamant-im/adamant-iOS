@@ -841,6 +841,8 @@ extension EthWalletService: PrivateKeyGenerator {
         return .asset(named: "ethereum_wallet_row")
     }
     
+    var keyFormat: KeyFormat { .HEX }
+    
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             return nil

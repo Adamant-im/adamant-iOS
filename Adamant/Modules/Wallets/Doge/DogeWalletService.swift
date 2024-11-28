@@ -713,6 +713,8 @@ extension DogeWalletService: PrivateKeyGenerator {
         return .asset(named: "doge_wallet_row")
     }
     
+    var keyFormat: KeyFormat { .WIF }
+    
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
             return nil

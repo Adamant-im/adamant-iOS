@@ -269,6 +269,11 @@
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
 		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
 		9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */; };
+		9306E0932CF8C50E00A99BA4 /* PKGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9306E0912CF8C50E00A99BA4 /* PKGeneratorView.swift */; };
+		9306E0942CF8C50E00A99BA4 /* PKGeneratorFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9306E08F2CF8C50E00A99BA4 /* PKGeneratorFactory.swift */; };
+		9306E0952CF8C50E00A99BA4 /* PKGeneratorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9306E0922CF8C50E00A99BA4 /* PKGeneratorViewModel.swift */; };
+		9306E0962CF8C50E00A99BA4 /* PKGeneratorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9306E0902CF8C50E00A99BA4 /* PKGeneratorState.swift */; };
+		9306E0982CF8C67B00A99BA4 /* AdamantSecureField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9306E0972CF8C67B00A99BA4 /* AdamantSecureField.swift */; };
 		931224A92C7AA0E4009E0ED0 /* InfoServiceApiService+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931224A82C7AA0E4009E0ED0 /* InfoServiceApiService+Extension.swift */; };
 		931224AB2C7AA212009E0ED0 /* InfoServiceRatesRequestDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931224AA2C7AA212009E0ED0 /* InfoServiceRatesRequestDTO.swift */; };
 		931224AD2C7AA67B009E0ED0 /* InfoServiceHistoryRequestDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931224AC2C7AA67B009E0ED0 /* InfoServiceHistoryRequestDTO.swift */; };
@@ -533,7 +538,6 @@
 		E9484B79227C617E008E10F0 /* BalanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */; };
 		E9484B7A227CA93B008E10F0 /* BalanceTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */; };
 		E9484B7D2285BAD9008E10F0 /* PrivateKeyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9484B7C2285BAD8008E10F0 /* PrivateKeyGenerator.swift */; };
-		E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9484B7E2285C016008E10F0 /* PKGeneratorViewController.swift */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
 		E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsFactory.swift */; };
 		E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B00205D3F090042B639 /* ChatListViewController.xib */; };
@@ -941,6 +945,11 @@
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
 		9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationsTokenService.swift; sourceTree = "<group>"; };
 		9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPushNotificationsTokenService.swift; sourceTree = "<group>"; };
+		9306E08F2CF8C50E00A99BA4 /* PKGeneratorFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorFactory.swift; sourceTree = "<group>"; };
+		9306E0902CF8C50E00A99BA4 /* PKGeneratorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorState.swift; sourceTree = "<group>"; };
+		9306E0912CF8C50E00A99BA4 /* PKGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorView.swift; sourceTree = "<group>"; };
+		9306E0922CF8C50E00A99BA4 /* PKGeneratorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorViewModel.swift; sourceTree = "<group>"; };
+		9306E0972CF8C67B00A99BA4 /* AdamantSecureField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecureField.swift; sourceTree = "<group>"; };
 		931224A82C7AA0E4009E0ED0 /* InfoServiceApiService+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoServiceApiService+Extension.swift"; sourceTree = "<group>"; };
 		931224AA2C7AA212009E0ED0 /* InfoServiceRatesRequestDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoServiceRatesRequestDTO.swift; sourceTree = "<group>"; };
 		931224AC2C7AA67B009E0ED0 /* InfoServiceHistoryRequestDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoServiceHistoryRequestDTO.swift; sourceTree = "<group>"; };
@@ -1175,7 +1184,6 @@
 		E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceTableViewCell.swift; sourceTree = "<group>"; };
 		E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BalanceTableViewCell.xib; sourceTree = "<group>"; };
 		E9484B7C2285BAD8008E10F0 /* PrivateKeyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateKeyGenerator.swift; sourceTree = "<group>"; };
-		E9484B7E2285C016008E10F0 /* PKGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorViewController.swift; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFactory.swift; sourceTree = "<group>"; };
 		E94E7B00205D3F090042B639 /* ChatListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatListViewController.xib; sourceTree = "<group>"; };
@@ -1733,6 +1741,17 @@
 				648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */,
 			);
 			path = Doge;
+			sourceTree = "<group>";
+		};
+		9306E08E2CF8C4EF00A99BA4 /* PKGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				9306E08F2CF8C50E00A99BA4 /* PKGeneratorFactory.swift */,
+				9306E0902CF8C50E00A99BA4 /* PKGeneratorState.swift */,
+				9306E0912CF8C50E00A99BA4 /* PKGeneratorView.swift */,
+				9306E0922CF8C50E00A99BA4 /* PKGeneratorViewModel.swift */,
+			);
+			path = PKGenerator;
 			sourceTree = "<group>";
 		};
 		931224A72C7A9F9C009E0ED0 /* ApiService */ = {
@@ -2688,6 +2707,7 @@
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				9306E08E2CF8C4EF00A99BA4 /* PKGenerator */,
 				2621AB352C60E52900046D7A /* Notifications */,
 				411742FE2A39B1B1008CD98A /* Contribute */,
 				4197B9C72952FAA2004CAF64 /* VisibleWallets */,
@@ -2697,7 +2717,6 @@
 				E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */,
 				E90055FA20ECE78A00D0CB2D /* SecurityViewController+notifications.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
-				E9484B7E2285C016008E10F0 /* PKGeneratorViewController.swift */,
 				E9484B7C2285BAD8008E10F0 /* PrivateKeyGenerator.swift */,
 			);
 			path = Settings;
@@ -2760,6 +2779,7 @@
 				E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */,
 				E921534D20EE1E8700C0843F /* AlertLabelCell.xib */,
 				E926E031213EC43B005E536B /* FullscreenAlertView.swift */,
+				9306E0972CF8C67B00A99BA4 /* AdamantSecureField.swift */,
 				E9B4E1A7210F079E007E77FC /* DoubleDetailsTableViewCell.swift */,
 				E9B4E1A9210F08BE007E77FC /* DoubleDetailsTableViewCell.xib */,
 				649D6BEB21BD5A53009E727B /* UISuffixTextField.swift */,
@@ -3350,6 +3370,7 @@
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				4184F1772A33173100D7B8B9 /* ContributeView.swift in Sources */,
 				3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */,
+				9306E0982CF8C67B00A99BA4 /* AdamantSecureField.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
 				3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
@@ -3487,7 +3508,6 @@
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
 				3AE0A4372BC6AA6000BF7125 /* FilesNetworkManagerProtocol.swift in Sources */,
 				932B34E92974AA4A002A75BA /* ChatPreservationProtocol.swift in Sources */,
-				E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
 				6449BA71235CA0930033B936 /* ERC20WalletService+RichMessageProvider.swift in Sources */,
 				938F7D642955C94F001915CA /* ChatViewController.swift in Sources */,
@@ -3537,6 +3557,10 @@
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */,
 				3AF9DF0D2C049161009A43A8 /* CircularProgressView.swift in Sources */,
+				9306E0932CF8C50E00A99BA4 /* PKGeneratorView.swift in Sources */,
+				9306E0942CF8C50E00A99BA4 /* PKGeneratorFactory.swift in Sources */,
+				9306E0952CF8C50E00A99BA4 /* PKGeneratorViewModel.swift in Sources */,
+				9306E0962CF8C50E00A99BA4 /* PKGeneratorState.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,

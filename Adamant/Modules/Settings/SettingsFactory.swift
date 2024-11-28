@@ -30,13 +30,6 @@ struct SettingsFactory {
         return c
     }
     
-    func makePKGeneratorVC() -> UIViewController {
-        PKGeneratorViewController(
-            dialogService: assembler.resolve(DialogService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
-        )
-    }
-    
     func makeAboutVC(screensFactory: ScreensFactory) -> UIViewController {
         AboutViewController(
             accountService: assembler.resolve(AccountService.self)!,
