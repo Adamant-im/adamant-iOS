@@ -77,6 +77,8 @@ extension KlyWalletService: PrivateKeyGenerator {
         .asset(named: "klayr_wallet_row")
     }
     
+    var keyFormat: KeyFormat { .HEX }
+    
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase),
               let keypair = try? LiskKit.Crypto.keyPair(

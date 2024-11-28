@@ -622,6 +622,8 @@ extension DashWalletService: PrivateKeyGenerator {
         return .asset(named: "dash_wallet_row")
     }
     
+    var keyFormat: KeyFormat { .WIF }
+    
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
             return nil
