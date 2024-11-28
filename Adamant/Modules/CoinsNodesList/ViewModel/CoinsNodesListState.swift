@@ -36,8 +36,8 @@ extension CoinsNodesListState.Section {
         let id: UUID
         let group: NodeGroup
         let isEnabled: Bool
-        let title: String
+        let title: AttributedString
         let connectionStatus: AttributedString
-        let description: String
+        let subtitle: AttributedString
     }
 }
