@@ -288,17 +288,15 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard reachabilityMonitor.connection else {
+        if reachabilityMonitor.connection == false {
             dialog.send(.alert(.adamant.sharedErrors.networkError))
-            return
         }
         
         Task {
-            guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
+            if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
                 dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                     nodeGroupName: NodeGroup.adm.name
                 ).localizedDescription))
-                return
             }
             
             if !(filesPicked?.isEmpty ?? true) {
