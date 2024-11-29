@@ -195,7 +195,7 @@ private extension TxStatusService {
         }
         
         guard let interval = nextUpdateInterval else { return false }
-        await Task.sleep(interval: interval)
+        try? await Task.sleep(interval: interval)
         return true
     }
 }

@@ -72,16 +72,16 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         waitsForConnectivity: Bool,
         _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
-        let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
-        updateSortedNodes()
+        defer { updateSortedNodes() }
+        var usedNodesIds: Set<UUID> = .init()
+        var lastConnectionError: Error?
         
-        var lastConnectionError: Error? = nodesList.isEmpty
-            ? nodes.contains { $0.isEnabled }
-                ? .noNetworkError
-                : .noEndpointsError(nodeGroupName: name)
-            : nil
-        
-        for node in nodesList {
+        while true {
+            let node = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
+                .first { !usedNodesIds.contains($0.id) }
+            
+            guard let node else { break }
+            usedNodesIds.insert(node.id)
             let response = await requestAction(service, node.preferredOrigin)
             
             switch response {
@@ -93,7 +93,12 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
             }
         }
         
-        if lastConnectionError != nil { healthCheck() }
+        healthCheck()
+        
+        lastConnectionError = lastConnectionError
+            ?? (nodes.contains { $0.isEnabled }
+                ? .noNetworkError
+                : .noEndpointsError(nodeGroupName: name))
         
         return await waitsForConnectivity
             ? request(waitsForConnectivity: waitsForConnectivity, requestAction)

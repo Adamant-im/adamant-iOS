@@ -28,9 +28,19 @@ final class CheckmarkRowView: UIView {
         set { titleLabel.text = newValue }
     }
     
+    var titleColor: UIColor {
+        get { titleLabel.textColor }
+        set { titleLabel.textColor = newValue }
+    }
+    
     var subtitle: String? {
         get { subtitleLabel.text }
         set { subtitleLabel.text = newValue }
+    }
+    
+    var subtitleColor: UIColor {
+        get { subtitleLabel.textColor }
+        set { subtitleLabel.textColor = newValue }
     }
     
     var caption: String? {

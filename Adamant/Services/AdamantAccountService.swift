@@ -145,8 +145,11 @@ extension AdamantAccountService {
     
     private func setBalanceInvalidationSubscription() {
         balanceInvalidationSubscription = Task { [weak self] in
-            await Task.sleep(interval: AdmWalletService.balanceLifetime)
-            try Task.checkCancellation()
+            try await Task.sleep(
+                interval: AdmWalletService.balanceLifetime,
+                pauseInBackground: true
+            )
+            
             self?.resetBalance()
         }.eraseToAnyCancellable()
     }

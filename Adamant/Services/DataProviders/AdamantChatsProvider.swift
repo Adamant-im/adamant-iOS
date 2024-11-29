@@ -510,12 +510,12 @@ extension AdamantChatsProvider {
                 limit: limit
             ).get()
             return chatrooms
-        } catch let error as ApiServiceError {
+        } catch let error {
             guard case .networkError = error else {
                 return nil
             }
             
-            await Task.sleep(interval: requestRepeatDelay)
+            try await Task.sleep(interval: requestRepeatDelay)
             
             return try await apiGetChatMessages(
                 address: address,
