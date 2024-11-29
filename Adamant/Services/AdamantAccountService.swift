@@ -67,7 +67,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
-                self?.setBalanceInvalidationSubscription()
                 self?.update()
             }
             .store(in: &subscriptions)
@@ -76,7 +75,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             .notifications(named: UIApplication.willResignActiveNotification, object: nil)
             .sink { @MainActor [weak self] _ in
                 self?.previousAppState = .background
-                self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
         
@@ -135,6 +133,7 @@ extension AdamantAccountService {
         useBiometry = false
         isBalanceExpired = true
         pushNotificationsTokenService?.removeCurrentToken()
+        balanceInvalidationSubscription = nil
         Key.allCases.forEach(securedStore.remove)
         
         hasStayInAccount = false
@@ -143,24 +142,22 @@ extension AdamantAccountService {
         Task { @MainActor in notificationsService?.setNotificationsMode(.disabled, completion: nil) }
     }
     
-    private func setBalanceInvalidationSubscription() {
+    private func markBalanceAsFresh() {
+        isBalanceExpired = false
+        
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(
                 interval: AdmWalletService.balanceLifetime,
                 pauseInBackground: true
             )
             
-            self?.resetBalance()
+            guard let self else { return }
+            isBalanceExpired = true
+            NotificationCenter.default.post(
+                name: .AdamantAccountService.accountDataUpdated,
+                object: self
+            )
         }.eraseToAnyCancellable()
-    }
-    
-    private func resetBalance() {
-        isBalanceExpired = true
-        
-        NotificationCenter.default.post(
-            name: .AdamantAccountService.accountDataUpdated,
-            object: self
-        )
     }
     
     private func setupSecuredStore() {
@@ -250,8 +247,7 @@ extension AdamantAccountService {
                     return
                 }
                 
-                setBalanceInvalidationSubscription()
-                isBalanceExpired = false
+                markBalanceAsFresh()
                 
                 if loggedAccount.balance != account.balance {
                     self.account = account
@@ -383,8 +379,7 @@ extension AdamantAccountService {
             let account = try await apiService.getAccount(byPublicKey: keypair.publicKey).get()
             self.account = account
             self.keypair = keypair
-            isBalanceExpired = false
-            setBalanceInvalidationSubscription()
+            markBalanceAsFresh()
             
             let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
             
