@@ -877,6 +877,9 @@
 /* PrivateKeyGenerator: scene title */
 "PkGeneratorScene.Title" = "Генератор Приватных ключей";
 
+/* PrivateKeyGenerator: key format */
+"PkGeneratorScene.KeyFormat" = "Формат: %@";
+
 /* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
 "PkGeneratorScene.Alert" = "В аккаунте АДАМАНТа несколько встроенных криптокошельков. Все они объединены вашей пассфразой, и только у вас есть доступ к ним. Вы можете экспортировать приватные ключи, чтобы использовать эти кошельки в других приложениях. Храните ключи в надежном месте.";
 

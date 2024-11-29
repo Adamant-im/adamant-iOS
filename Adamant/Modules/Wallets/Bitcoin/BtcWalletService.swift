@@ -781,6 +781,8 @@ extension BtcWalletService: PrivateKeyGenerator {
         return .asset(named: "bitcoin_wallet_row")
     }
     
+    var keyFormat: KeyFormat { .WIF }
+    
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard
             AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase),

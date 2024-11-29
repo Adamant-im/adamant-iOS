@@ -877,6 +877,9 @@
 /* PrivateKeyGenerator: scene title */
 "PkGeneratorScene.Title" = "Private Key Generator";
 
+/* PrivateKeyGenerator: key format */
+"PkGeneratorScene.KeyFormat" = "Format: %@";
+
 /* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
 "PkGeneratorScene.Alert" = "ADAMANT account includes crypto wallets. All of them are connected with your Passphrase, and only you have access to these wallets. You can export private key to use them in other applications. Store keys in secure place.";
 
