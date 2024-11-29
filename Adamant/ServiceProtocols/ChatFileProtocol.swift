@@ -18,11 +18,12 @@ struct FileUpdateProperties {
     let fileNonce: String?
     let preview: UIImage??
     let cached: Bool?
+    let previewCached: Bool?
     let downloadStatus: DownloadStatus?
     let uploading: Bool?
     let progress: Int?
-    let isPreviewDownloadAllowed: Bool?
-    let isFullMediaDownloadAllowed: Bool?
+    let isPreviewDownloadFromNetworkAllowed: Bool?
+    let isFullMediaDownloadFromNetworkAllowed: Bool?
 }
 
 protocol ChatFileProtocol: Sendable {

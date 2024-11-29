@@ -100,7 +100,7 @@ private extension MediaContainerView {
         let filesToDownload = fileList.filter {
             $0.fileType.isMedia
             && (
-                (!$0.isCached && $0.isFullMediaDownloadAllowed)
+                $0.isFullMediaDownloadAllowed
                 || (
                     $0.previewImage == nil
                     && $0.file.preview != nil

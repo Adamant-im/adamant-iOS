@@ -1097,11 +1097,12 @@ private extension ChatViewModel {
                     fileNonce: data.fileNonce,
                     preview: data.preview,
                     cached: data.cached,
+                    previewCached: data.previewCached,
                     downloadStatus: data.downloadStatus,
                     uploading: data.uploading,
                     progress: data.progress,
-                    isPreviewDownloadAllowed: nil,
-                    isFullMediaDownloadAllowed: nil
+                    isPreviewDownloadFromNetworkAllowed: nil,
+                    isFullMediaDownloadFromNetworkAllowed: nil
                 )
                 
                 self.updateFileFields(
@@ -1265,12 +1266,16 @@ private extension ChatViewModel {
         let cached = filesStorage.isCachedLocally(fileId)
         let isUploading = chatFileService.uploadingFiles.contains(fileId)
         
-        let isPreviewDownloadAllowed = isDownloadAllowed(
+        let previewCached = file.file.preview.map {
+            filesStorage.isCachedLocally($0.id)
+        }
+        
+        let isPreviewDownloadFromNetworkAllowed = isDownloadAllowed(
             policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
             havePartnerName: havePartnerName
         )
         
-        let isFullMediaDownloadAllowed = isDownloadAllowed(
+        let isFullMediaDownloadFromNetworkAllowed = isDownloadAllowed(
             policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
             havePartnerName: havePartnerName
         )
@@ -1281,11 +1286,12 @@ private extension ChatViewModel {
             fileNonce: nil,
             preview: .some(previewImage),
             cached: cached,
+            previewCached: previewCached,
             downloadStatus: downloadStatus,
             uploading: isUploading,
             progress: progress,
-            isPreviewDownloadAllowed: isPreviewDownloadAllowed,
-            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
+            isPreviewDownloadFromNetworkAllowed: isPreviewDownloadFromNetworkAllowed,
+            isFullMediaDownloadFromNetworkAllowed: isFullMediaDownloadFromNetworkAllowed
         )
         
         updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
@@ -1517,11 +1523,12 @@ private extension ChatViewModel {
             fileProprieties.fileNonce.map { file.file.nonce = $0 }
             fileProprieties.preview.map { file.previewImage = $0 }
             fileProprieties.cached.map { file.isCached = $0 }
+            fileProprieties.previewCached.map { file.isPreviewCached = $0 }
             fileProprieties.uploading.map { file.isUploading = $0 }
             fileProprieties.downloadStatus.map { file.downloadStatus = $0 }
             fileProprieties.progress.map { file.progress = $0 }
-            fileProprieties.isPreviewDownloadAllowed.map { file.isPreviewDownloadAllowed = $0 }
-            fileProprieties.isFullMediaDownloadAllowed.map { file.isFullMediaDownloadAllowed = $0 }
+            fileProprieties.isPreviewDownloadFromNetworkAllowed.map { file.isPreviewDownloadFromNetworkAllowed = $0 }
+            fileProprieties.isFullMediaDownloadFromNetworkAllowed.map { file.isFullMediaDownloadFromNetworkAllowed = $0 }
         } mutateModel: { model in
             model.status = getStatus(from: model)
         }

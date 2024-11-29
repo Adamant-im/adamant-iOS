@@ -337,11 +337,12 @@ private extension ChatFileService {
             fileNonce: nil,
             preview: .some(image),
             cached: nil,
+            previewCached: nil,
             downloadStatus: nil,
             uploading: nil,
             progress: nil,
-            isPreviewDownloadAllowed: nil,
-            isFullMediaDownloadAllowed: nil)
+            isPreviewDownloadFromNetworkAllowed: nil,
+            isFullMediaDownloadFromNetworkAllowed: nil)
         )
     }
     
@@ -469,11 +470,12 @@ private extension ChatFileService {
                     fileNonce: nil,
                     preview: .some(preview),
                     cached: nil,
+                    previewCached: nil,
                     downloadStatus: nil,
                     uploading: nil,
                     progress: nil,
-                    isPreviewDownloadAllowed: nil,
-                    isFullMediaDownloadAllowed: nil
+                    isPreviewDownloadFromNetworkAllowed: nil,
+                    isFullMediaDownloadFromNetworkAllowed: nil
                 ))
             } else if !filesStorage.isCachedInMemory(previewDTO.id) {
                 cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
@@ -511,11 +513,12 @@ private extension ChatFileService {
                 fileNonce: nil,
                 preview: nil,
                 cached: cached,
+                previewCached: nil,
                 downloadStatus: nil,
                 uploading: nil,
                 progress: nil,
-                isPreviewDownloadAllowed: nil,
-                isFullMediaDownloadAllowed: nil)
+                isPreviewDownloadFromNetworkAllowed: nil,
+                isFullMediaDownloadFromNetworkAllowed: nil)
             )
         }
     }
@@ -677,11 +680,12 @@ private extension ChatFileService {
                 fileNonce: nil,
                 preview: nil,
                 cached: nil,
+                previewCached: nil,
                 downloadStatus: downloadStatus,
                 uploading: uploading,
                 progress: progress,
-                isPreviewDownloadAllowed: nil,
-                isFullMediaDownloadAllowed: nil
+                isPreviewDownloadFromNetworkAllowed: nil,
+                isFullMediaDownloadFromNetworkAllowed: nil
             ))
             
             if progress != nil {
@@ -701,11 +705,12 @@ private extension ChatFileService {
             fileNonce: nil,
             preview: nil,
             cached: nil,
+            previewCached: nil,
             downloadStatus: nil,
             uploading: nil,
             progress: progress,
-            isPreviewDownloadAllowed: nil,
-            isFullMediaDownloadAllowed: nil
+            isPreviewDownloadFromNetworkAllowed: nil,
+            isFullMediaDownloadFromNetworkAllowed: nil
         ))
         
         $fileProgressValue.mutate {
@@ -1025,11 +1030,12 @@ private extension ChatFileService {
             fileNonce: fileResult.nonce,
             preview: .some(filesStorage.getPreview(for: previewResult?.cid ?? .empty)),
             cached: cached,
+            previewCached: nil,
             downloadStatus: nil,
             uploading: false,
             progress: nil,
-            isPreviewDownloadAllowed: nil,
-            isFullMediaDownloadAllowed: nil
+            isPreviewDownloadFromNetworkAllowed: nil,
+            isFullMediaDownloadFromNetworkAllowed: nil
         ))
         
         var previewDTO: RichMessageFile.Preview?

@@ -25,13 +25,22 @@ struct ChatFile: Equatable, Hashable, @unchecked Sendable {
     var downloadStatus: DownloadStatus
     var isUploading: Bool
     var isCached: Bool
+    var isPreviewCached: Bool
     var storage: String
     var nonce: String
     var isFromCurrentSender: Bool
     var fileType: FileType
     var progress: Int?
-    var isPreviewDownloadAllowed: Bool
-    var isFullMediaDownloadAllowed: Bool
+    var isPreviewDownloadFromNetworkAllowed: Bool
+    var isFullMediaDownloadFromNetworkAllowed: Bool
+    
+    var isPreviewDownloadAllowed: Bool {
+        isPreviewDownloadFromNetworkAllowed || isPreviewCached
+    }
+    
+    var isFullMediaDownloadAllowed: Bool {
+        isFullMediaDownloadFromNetworkAllowed || isCached
+    }
     
     var isBusy: Bool {
         isDownloading
@@ -50,13 +59,14 @@ struct ChatFile: Equatable, Hashable, @unchecked Sendable {
             downloadStatus: .default,
             isUploading: false,
             isCached: false,
+            isPreviewCached: false,
             storage: .empty,
             nonce: .empty,
             isFromCurrentSender: false,
             fileType: .other,
             progress: .zero,
-            isPreviewDownloadAllowed: false,
-            isFullMediaDownloadAllowed: false
+            isPreviewDownloadFromNetworkAllowed: false,
+            isFullMediaDownloadFromNetworkAllowed: false
         )
     }
 }
