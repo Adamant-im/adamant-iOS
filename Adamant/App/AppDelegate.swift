@@ -350,7 +350,7 @@ extension AppDelegate {
             let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+            chatVC.messagesCollectionView.scrollToBottom(animated: true)
             return
         }
         
@@ -358,7 +358,7 @@ extension AppDelegate {
             let chatVC = chatListNav.viewControllers.last as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+            chatVC.messagesCollectionView.scrollToBottom(animated: true)
             return
         }
         
