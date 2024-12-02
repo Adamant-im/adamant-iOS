@@ -249,16 +249,6 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
-            .store(in: &subscriptions)
     }
     
     func addTransactionObserver() {
@@ -301,7 +291,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            setBalanceInvalidationSubscription()
+            markBalanceAsFresh()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -314,8 +304,6 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
             } else {
                 notification = nil
             }
-            
-            wallet.isBalanceInitialized = true
             
             if isRaised {
                 vibroService.applyVibration(.success)
@@ -331,22 +319,20 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         await calculateFee()
 	}
     
-    private func setBalanceInvalidationSubscription() {
+    private func markBalanceAsFresh() {
+        ethWallet?.isBalanceInitialized = true
+        
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            self?.resetBalance()
+            guard let self, let wallet = ethWallet else { return }
+            wallet.isBalanceInitialized = false
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
         }.eraseToAnyCancellable()
-    }
-    
-    private func resetBalance() {
-        ethWallet?.isBalanceInitialized = false
-        guard let wallet = ethWallet else { return }
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
     }
     
     func calculateFee(for address: EthereumAddress? = nil) async {
