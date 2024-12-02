@@ -15,13 +15,6 @@ struct NotificationModel: Equatable, Hashable {
         && lhs.description == rhs.description
     }
     
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(icon)
-        hasher.combine(title)
-        hasher.combine(description)
-        hasher.combine(tapHandler)
-    }
-    
     let icon: UIImage?
     let title: String?
     let description: String?

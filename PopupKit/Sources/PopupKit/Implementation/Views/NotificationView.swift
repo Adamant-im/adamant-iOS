@@ -9,17 +9,8 @@ import SwiftUI
 import CommonKit
 
 struct NotificationView: View {
-    @State private var dragTranslation: CGFloat = .zero
-    @State private var horizontalDragTranslation: CGFloat = .zero
-    @State private var minTranslationForDismiss: CGFloat = .infinity
-    @State private var minTranslationXForDismiss: CGFloat = .infinity
-    @State private var isTextLimited: Bool = true
-    
-    @Binding var dismissEdge: Edge
-    var onDismissEdgeChanged: ((Edge) -> Void)?
+    @Binding var isTextLimited: Bool
     let model: NotificationModel
-    let safeAreaInsets: EdgeInsets
-    let dismissAction: () -> Void
     
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
@@ -29,17 +20,6 @@ struct NotificationView: View {
             textStack
             Spacer(minLength: .zero)
         }
-        .padding([.leading, .trailing], 15)
-        .padding([.top, .bottom], 10)
-        .background(GeometryReader(content: processGeometry))
-        .expanded(axes: .horizontal)
-        .offset(y: dragTranslation < .zero ? dragTranslation : .zero)
-        .offset(x: horizontalDragTranslation < .zero ? horizontalDragTranslation : .zero)
-        .gesture(dragGesture)
-        .onTapGesture(perform: onTap)
-        .cornerRadius(10)
-        .padding(.horizontal, 15)
-        .padding(.top, safeAreaInsets.top)
     }
 }
 
@@ -67,50 +47,5 @@ private extension NotificationView {
                
             }
         }
-    }
-    
-    var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged {
-                dragTranslation = $0.translation.height
-                horizontalDragTranslation = $0.translation.width
-            }
-            .onEnded {
-                if $0.velocity.height < -100 || -$0.translation.height > minTranslationForDismiss {
-                    onDismissEdgeChanged?(.top)
-                    Task {
-                        dismissAction()
-                    }
-                } else if $0.velocity.width < -100 || $0.translation.width > minTranslationXForDismiss {
-                    onDismissEdgeChanged?(.leading)
-                    Task {
-                        dismissAction()
-                    }
-                } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationForDismiss {
-                    horizontalDragTranslation = .zero
-                    isTextLimited = false
-                    model.cancelAutoDismiss?.value()
-                } else {
-                    withAnimation {
-                        dragTranslation = .zero
-                        horizontalDragTranslation = .zero
-                    }
-                }
-            }
-    }
-    
-    func processGeometry(_ geometry: GeometryProxy) -> some View {
-        DispatchQueue.main.async {
-            minTranslationForDismiss = geometry.size.height / 2
-            minTranslationXForDismiss = geometry.size.width / 2
-        }
-
-        return Color.init(uiColor: .adamant.swipeBlockColor)
-            .cornerRadius(10)
-    }
-    
-    func onTap() {
-        model.tapHandler?.value()
-        dismissAction()
     }
 }

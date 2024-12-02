@@ -34,16 +34,15 @@ private extension PopupCoordinatorView {
     func makeNotificationView(safeAreaInsets: EdgeInsets) -> some View {
         VStack {
             if let notificationModel = model.notification {
-                NotificationView(
-                    dismissEdge: $dismissEdge,
-                    onDismissEdgeChanged: { newEdge in
-                        dismissEdge = newEdge
-                    },
+                NotificationPresenterView(
                     model: notificationModel,
                     safeAreaInsets: safeAreaInsets,
-                    dismissAction: { [weak model] in
-                        model?.notification = nil
-                        dismissEdge = .top
+                    dismissAction: { [weak model] edge in
+                        dismissEdge = edge
+                        Task {
+                            model?.notification = nil
+                            dismissEdge = .top
+                        }
                     }
                 )
                 .id(model.notification?.hashValue)
