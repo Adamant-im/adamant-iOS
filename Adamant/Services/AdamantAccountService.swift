@@ -241,8 +241,6 @@ extension AdamantAccountService {
         
         Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
-            setBalanceInvalidationSubscription()
-            isBalanceExpired = false
             
             switch result {
             case .success(let account):
@@ -251,6 +249,9 @@ extension AdamantAccountService {
                     state = .notLogged
                     return
                 }
+                
+                setBalanceInvalidationSubscription()
+                isBalanceExpired = false
                 
                 if loggedAccount.balance != account.balance {
                     self.account = account
@@ -382,6 +383,8 @@ extension AdamantAccountService {
             let account = try await apiService.getAccount(byPublicKey: keypair.publicKey).get()
             self.account = account
             self.keypair = keypair
+            isBalanceExpired = false
+            setBalanceInvalidationSubscription()
             
             let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
             
