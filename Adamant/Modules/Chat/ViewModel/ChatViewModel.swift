@@ -288,10 +288,6 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        if reachabilityMonitor.connection == false {
-            dialog.send(.alert(.adamant.sharedErrors.networkError))
-        }
-        
         Task {
             if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
                 dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
