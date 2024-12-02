@@ -11,7 +11,7 @@ import CommonKit
 struct NotificationPresenterView: View {
     @State private var dragTranslation: CGFloat = .zero
     @State private var horizontalDragTranslation: CGFloat = .zero
-    @State private var minTranslationForDismiss: CGFloat = .infinity
+    @State private var minTranslationYForDismiss: CGFloat = .infinity
     @State private var minTranslationXForDismiss: CGFloat = .infinity
     @State private var isTextLimited: Bool = true
     
@@ -46,7 +46,7 @@ private extension NotificationPresenterView {
                 horizontalDragTranslation = $0.translation.width
             }
             .onEnded {
-                if $0.velocity.height < -100 || -$0.translation.height > minTranslationForDismiss {
+                if $0.velocity.height < -100 || -$0.translation.height > minTranslationYForDismiss {
                     Task {
                         dismissAction(.top)
                     }
@@ -54,9 +54,11 @@ private extension NotificationPresenterView {
                     Task {
                         dismissAction(.leading)
                     }
-                } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationForDismiss {
-                    horizontalDragTranslation = .zero
-                    isTextLimited = false
+                } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationYForDismiss {
+                    withAnimation {
+                        horizontalDragTranslation = .zero
+                        isTextLimited = false
+                    }
                     model.cancelAutoDismiss?.value()
                 } else {
                     withAnimation {
@@ -69,7 +71,7 @@ private extension NotificationPresenterView {
     
     func processGeometry(_ geometry: GeometryProxy) -> some View {
         DispatchQueue.main.async {
-            minTranslationForDismiss = geometry.size.height / 2
+            minTranslationYForDismiss = geometry.size.height / 2
             minTranslationXForDismiss = geometry.size.width / 2
         }
 
