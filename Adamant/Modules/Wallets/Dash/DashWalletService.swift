@@ -223,16 +223,6 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
-            .store(in: &subscriptions)
     }
     
     func addTransactionObserver() {
@@ -265,7 +255,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            setBalanceInvalidationSubscription()
+            markBalanceAsFresh()
             let notification: Notification.Name?
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
@@ -277,8 +267,6 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
             } else {
                 notification = nil
             }
-            
-            wallet.isBalanceInitialized = true
             
             if isRaised {
                 await vibroService.applyVibration(.success)
@@ -307,22 +295,20 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    private func setBalanceInvalidationSubscription() {
+    private func markBalanceAsFresh() {
+        dashWallet?.isBalanceInitialized = true
+        
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            self?.resetBalance()
+            guard let self, let wallet = dashWallet else { return }
+            wallet.isBalanceInitialized = false
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
         }.eraseToAnyCancellable()
-    }
-    
-    private func resetBalance() {
-        dashWallet?.isBalanceInitialized = false
-        guard let wallet = dashWallet else { return }
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
     }
 }
 
