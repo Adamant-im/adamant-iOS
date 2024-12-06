@@ -32,7 +32,7 @@ final class FileListContainerView: UIView {
     static let cellSize: CGFloat = 70
     
     var model: ChatMediaContentView.FileModel = .default {
-        didSet { update() }
+        didSet { update(old: oldValue) }
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in }
@@ -56,28 +56,23 @@ private extension FileListContainerView {
         filesStack.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
     
-    func update() {
+    func onAppear() {
+        let filesToDownload = model.files
+            .prefix(FilesConstants.maxFilesCount)
+            .filter { $0.fileType.isMedia }
+        
+        guard !filesToDownload.isEmpty else { return }
+        
+        actionHandler(.autoDownloadContentIfNeeded(
+            messageId: model.messageId,
+            files: filesToDownload
+        ))
+    }
+    
+    func update(old: ChatMediaContentView.FileModel) {
+        if old.messageId != model.messageId { onAppear() }
+        
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
-        
-        let filesToDownload = fileList.filter {
-            $0.fileType.isMedia
-            && (
-                $0.isFullMediaDownloadAllowed
-                || (
-                    $0.previewImage == nil
-                    && $0.file.preview != nil
-                    && $0.isPreviewDownloadAllowed
-                )
-            )
-        }
-        
-        if !filesToDownload.isEmpty {
-            actionHandler(.downloadContentIfNeeded(
-                messageId: model.messageId,
-                files: filesToDownload
-            ))
-        }
-        
         filesStack.arrangedSubviews.forEach { $0.isHidden = true }
 
         for (index, file) in fileList.enumerated() {

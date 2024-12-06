@@ -72,13 +72,14 @@ final class ChatViewModel: NSObject {
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
     private var lastDateHeaderUpdate: Date = Date()
-    private var havePartnerName: Bool = false
+    private var hasPartnerName: Bool = false
     private let delayHideHeaderInSeconds: Double = 2.0
     
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
+    var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
 
     let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
@@ -396,7 +397,7 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
         
         partnerName = newName
-        havePartnerName = !newName.isEmpty
+        hasPartnerName = !newName.isEmpty
     }
     
     func saveChatOffset(_ offset: CGFloat?) {
@@ -743,9 +744,10 @@ final class ChatViewModel: NSObject {
         
         let chatFiles = fileModel.value.content.fileModel.files
         
-        let isPreviewAutoDownloadAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            havePartnerName: havePartnerName
+        let isPreviewAutoDownloadAllowed = chatFileService.isPreviewAutoDownloadAllowedByPolicy(
+            hasPartnerName: hasPartnerName,
+            isFromCurrentSender: file.isFromCurrentSender,
+            downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
         )
         
         if !isPreviewAutoDownloadAllowed,
@@ -772,7 +774,7 @@ final class ChatViewModel: NSObject {
         )
     }
     
-    func downloadContentIfNeeded(
+    func autoDownloadContentIfNeeded(
         messageId: String,
         files: [ChatFile]
     ) {
@@ -789,7 +791,7 @@ final class ChatViewModel: NSObject {
                 await chatFileService.autoDownload(
                     file: file,
                     chatroom: chatroom,
-                    havePartnerName: havePartnerName,
+                    hasPartnerName: hasPartnerName,
                     previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
                     fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
                     saveEncrypted: filesStorageProprieties.saveFileEncrypted()
@@ -799,14 +801,19 @@ final class ChatViewModel: NSObject {
     }
     
     func forceDownloadAllFiles(messageId: String, files: [ChatFile]) {
-        let isPreviewDownloadAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            havePartnerName: havePartnerName
+        guard let message = messages.first(where: { $0.messageId == messageId })
+        else { return }
+    
+        let isPreviewDownloadAllowed = chatFileService.isPreviewAutoDownloadAllowedByPolicy(
+            hasPartnerName: hasPartnerName,
+            isFromCurrentSender: message.isFromCurrentSender,
+            downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
         )
         
-        let isFullMediaDownloadAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
-            havePartnerName: havePartnerName
+        let isFullMediaDownloadAllowed = chatFileService.isOriginalAutoDownloadAllowedByPolicy(
+            hasPartnerName: hasPartnerName,
+            isFromCurrentSender: message.isFromCurrentSender,
+            downloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy()
         )
         
         let needToDownload: [ChatFile]
@@ -953,7 +960,7 @@ final class ChatViewModel: NSObject {
                   case let .file(model) = message.content
             else { return }
             
-            downloadContentIfNeeded(
+            autoDownloadContentIfNeeded(
                 messageId: message.messageId,
                 files: model.value.content.fileModel.files
             )
@@ -1097,18 +1104,17 @@ private extension ChatViewModel {
                     fileNonce: data.fileNonce,
                     preview: data.preview,
                     cached: data.cached,
-                    previewCached: data.previewCached,
                     downloadStatus: data.downloadStatus,
                     uploading: data.uploading,
-                    progress: data.progress,
-                    isPreviewDownloadFromNetworkAllowed: nil,
-                    isFullMediaDownloadFromNetworkAllowed: nil
+                    progress: data.progress
                 )
                 
                 self.updateFileFields(
                     &self.messages,
                     fileProprieties: fileProprieties
                 )
+                
+                updateAutoDownloadWarning(messages: &messages)
             }
             .store(in: &subscriptions)
         
@@ -1169,6 +1175,11 @@ private extension ChatViewModel {
                 self?.presentDialog(progress: true)
             }
         }
+        
+        filesStorageProprieties.autoDownloadFullMediaPolicyPublisher
+            .combineLatest(filesStorageProprieties.autoDownloadPreviewPolicyPublisher)
+            .sink { [weak self] _ in self?.autoDownloadPolicyChanged() }
+            .store(in: &subscriptions)
     }
     
     func loadMessages(address: String, offset: Int) async {
@@ -1233,8 +1244,7 @@ private extension ChatViewModel {
         }
     }
     
-    @MainActor
-    func postProcess(messages: inout[ChatMessage]) {
+    func postProcess(messages: inout [ChatMessage]) {
         let indexes = messages.indices.filter {
             messages[$0].getFiles().count > .zero
         }
@@ -1246,6 +1256,56 @@ private extension ChatViewModel {
                 setupFileFields(file, messages: &messages, index: index)
             }
         }
+        
+        updateAutoDownloadWarning(messages: &messages)
+    }
+    
+    func autoDownloadPolicyChanged() {
+        updateAutoDownloadWarning(messages: &messages)
+        
+        indexPathsForVisibleItems().forEach { index in
+            guard let message = messages[safe: index.section] else { return }
+            
+            switch message.content {
+            case let .file(model):
+                autoDownloadContentIfNeeded(
+                    messageId: message.messageId,
+                    files: model.value.content.fileModel.files
+                )
+            case .message, .reply, .transaction:
+                break
+            }
+        }
+    }
+    
+    func updateAutoDownloadWarning(messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].updateFileFields {
+                $0.content.fileModel.showAutoDownloadWarningLabel = showAutoDownloadWarning(
+                    files: $0.content.fileModel.files,
+                    isFromCurrentSender: $0.isFromCurrentSender
+                )
+            }
+        }
+    }
+    
+    func showAutoDownloadWarning(
+        files: [ChatFile],
+        isFromCurrentSender: Bool
+    ) -> Bool {
+        let isPreviewDownloadAllowed = chatFileService.isPreviewAutoDownloadAllowedByPolicy(
+            hasPartnerName: hasPartnerName,
+            isFromCurrentSender: isFromCurrentSender,
+            downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
+        )
+        
+        let hasNoPreview = files.contains {
+            $0.fileType.isMedia
+            && $0.previewImage == nil
+            && $0.file.preview.map { !filesStorage.isCachedLocally($0.id) } ?? false
+        }
+
+        return !isPreviewDownloadAllowed && hasNoPreview
     }
     
     func setupFileFields(
@@ -1266,32 +1326,15 @@ private extension ChatViewModel {
         let cached = filesStorage.isCachedLocally(fileId)
         let isUploading = chatFileService.uploadingFiles.contains(fileId)
         
-        let previewCached = file.file.preview.map {
-            filesStorage.isCachedLocally($0.id)
-        }
-        
-        let isPreviewDownloadFromNetworkAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            havePartnerName: havePartnerName
-        )
-        
-        let isFullMediaDownloadFromNetworkAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
-            havePartnerName: havePartnerName
-        )
-        
         let fileProprieties = FileUpdateProperties(
             id: file.file.id,
             newId: nil,
             fileNonce: nil,
             preview: .some(previewImage),
             cached: cached,
-            previewCached: previewCached,
             downloadStatus: downloadStatus,
             uploading: isUploading,
-            progress: progress,
-            isPreviewDownloadFromNetworkAllowed: isPreviewDownloadFromNetworkAllowed,
-            isFullMediaDownloadFromNetworkAllowed: isFullMediaDownloadFromNetworkAllowed
+            progress: progress
         )
         
         updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
@@ -1384,7 +1427,7 @@ private extension ChatViewModel {
         }
         
         partnerName = chatroom?.getName(addressBookService: addressBookService)
-        havePartnerName = chatroom?.hasPartnerName(addressBookService: addressBookService) ?? false
+        hasPartnerName = chatroom?.hasPartnerName(addressBookService: addressBookService) ?? false
         
         guard let avatarName = chatroom?.partner?.avatar,
               let avatar = UIImage.asset(named: avatarName)
@@ -1472,8 +1515,7 @@ private extension ChatViewModel {
     func waitForChatLoading(with address: String) async {
         await withUnsafeContinuation { continuation in
             Task {
-                let publisher = await chatsProvider.chatLoadingStatusPublisher
-                publisher
+                await chatsProvider.chatLoadingStatusPublisher
                     .filter { dict in
                         dict.contains {
                             $0.key == address && $0.value == .loaded
@@ -1523,12 +1565,9 @@ private extension ChatViewModel {
             fileProprieties.fileNonce.map { file.file.nonce = $0 }
             fileProprieties.preview.map { file.previewImage = $0 }
             fileProprieties.cached.map { file.isCached = $0 }
-            fileProprieties.previewCached.map { file.isPreviewCached = $0 }
             fileProprieties.uploading.map { file.isUploading = $0 }
             fileProprieties.downloadStatus.map { file.downloadStatus = $0 }
             fileProprieties.progress.map { file.progress = $0 }
-            fileProprieties.isPreviewDownloadFromNetworkAllowed.map { file.isPreviewDownloadFromNetworkAllowed = $0 }
-            fileProprieties.isFullMediaDownloadFromNetworkAllowed.map { file.isFullMediaDownloadFromNetworkAllowed = $0 }
         } mutateModel: { model in
             model.status = getStatus(from: model)
         }
@@ -1606,23 +1645,22 @@ private extension ChatViewModel {
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
     }
-    
-    func isDownloadAllowed(
-        policy: DownloadPolicy,
-        havePartnerName: Bool
-    ) -> Bool {
-        switch policy {
-        case .everybody:
-            return true
-        case .nobody:
-            return false
-        case .contacts:
-            return havePartnerName
-        }
-    }
 }
 
 private extension ChatMessage {
+    var isFromCurrentSender: Bool {
+        switch content {
+        case let .message(model):
+            return model.value.isFromCurrentSender
+        case let .reply(model):
+            return model.value.isFromCurrentSender
+        case let .transaction(model):
+            return model.value.isFromCurrentSender
+        case let .file(model):
+            return model.value.isFromCurrentSender
+        }
+    }
+    
     var isHidden: Bool {
         get {
             switch content {
@@ -1685,6 +1723,18 @@ private extension ChatMessage {
             return
         }
         
+        content = .file(.init(value: model))
+    }
+    
+    mutating func updateFileFields(
+        mutateModel: (inout ChatMediaContainerView.Model) -> Void
+    ) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        let previousValue = model
+        mutateModel(&model)
+        
+        guard model != previousValue else { return }
         content = .file(.init(value: model))
     }
 }

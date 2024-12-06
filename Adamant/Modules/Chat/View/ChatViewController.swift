@@ -99,11 +99,17 @@ final class ChatViewController: MessagesViewController {
         self.screensFactory = screensFactory
         self.sendTransaction = sendTransaction
         super.init(nibName: nil, bundle: nil)
+        
         inputBar.onAttachmentButtonTap = { [weak self] in
             self?.viewModel.presentActionMenu()
         }
+        
         inputBar.onImagePasted = { [weak self] image in
             self?.viewModel.handlePastedImage(image)
+        }
+        
+        viewModel.indexPathsForVisibleItems = { [weak self] in
+            self?.messagesCollectionView.indexPathsForVisibleItems ?? .init()
         }
     }
     
