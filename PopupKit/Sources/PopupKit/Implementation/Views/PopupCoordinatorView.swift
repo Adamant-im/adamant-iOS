@@ -10,7 +10,6 @@ import CommonKit
 
 struct PopupCoordinatorView: View {
     @ObservedObject var model: PopupCoordinatorModel
-    @State var dismissEdge: Edge = .top
     
     var body: some View {
         GeometryReader { geomerty in
@@ -37,16 +36,11 @@ private extension PopupCoordinatorView {
                 NotificationPresenterView(
                     model: notificationModel,
                     safeAreaInsets: safeAreaInsets,
-                    dismissAction: { [weak model] edge in
-                        dismissEdge = edge
-                        Task {
-                            model?.notification = nil
-                            dismissEdge = .top
-                        }
+                    dismissAction: { [weak model] in
+                        model?.notification = nil
                     }
                 )
                 .id(model.notification?.hashValue)
-                .transition(.move(edge: dismissEdge))
             }
             Spacer()
         }

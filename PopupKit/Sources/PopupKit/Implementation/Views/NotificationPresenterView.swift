@@ -9,15 +9,22 @@ import SwiftUI
 import CommonKit
 
 struct NotificationPresenterView: View {
-    @State private var dragTranslation: CGFloat = .zero
+    enum DragDirection {
+        case vertical
+        case horizontal
+    }
+    
+    @State private var verticalDragTranslation: CGFloat = .zero
     @State private var horizontalDragTranslation: CGFloat = .zero
     @State private var minTranslationYForDismiss: CGFloat = .infinity
     @State private var minTranslationXForDismiss: CGFloat = .infinity
     @State private var isTextLimited: Bool = true
+    @State private var dismissEdge: Edge = .top
+    @State private var dragDirection: DragDirection? 
     
     let model: NotificationModel
     let safeAreaInsets: EdgeInsets
-    let dismissAction: ((Edge)) -> Void
+    let dismissAction: () -> Void
     
     var body: some View {
         NotificationView(
@@ -28,13 +35,14 @@ struct NotificationPresenterView: View {
         .padding([.top, .bottom], 10)
         .background(GeometryReader(content: processGeometry))
         .expanded(axes: .horizontal)
-        .offset(y: dragTranslation < .zero ? dragTranslation : .zero)
+        .offset(y: verticalDragTranslation < .zero ? verticalDragTranslation : .zero)
         .offset(x: horizontalDragTranslation < .zero ? horizontalDragTranslation : .zero)
         .gesture(dragGesture)
         .onTapGesture(perform: onTap)
         .cornerRadius(10)
         .padding(.horizontal, 15)
         .padding(.top, safeAreaInsets.top)
+        .transition(.move(edge: dismissEdge))
     }
 }
 
@@ -42,18 +50,25 @@ private extension NotificationPresenterView {
     var dragGesture: some Gesture {
         DragGesture()
             .onChanged {
-                dragTranslation = $0.translation.height
-                horizontalDragTranslation = $0.translation.width
+                if dragDirection == nil {
+                    dragDirection = abs($0.translation.height) > abs($0.translation.width) ? .vertical : .horizontal
+                }
+                switch dragDirection {
+                case .vertical:
+                    verticalDragTranslation = $0.translation.height
+                case .horizontal:
+                    horizontalDragTranslation = $0.translation.width
+                case .none:
+                    break
+                }
             }
             .onEnded {
                 if $0.velocity.height < -100 || -$0.translation.height > minTranslationYForDismiss {
-                    Task {
-                        dismissAction(.top)
-                    }
+                        dismissEdge = .top
+                    Task { dismissAction() }
                 } else if $0.velocity.width < -100 || $0.translation.width > minTranslationXForDismiss {
-                    Task {
-                        dismissAction(.leading)
-                    }
+                        dismissEdge = .leading
+                    Task { dismissAction() }
                 } else if $0.velocity.height > -100 || -$0.translation.height < minTranslationYForDismiss {
                     withAnimation {
                         horizontalDragTranslation = .zero
@@ -62,10 +77,11 @@ private extension NotificationPresenterView {
                     model.cancelAutoDismiss?.value()
                 } else {
                     withAnimation {
-                        dragTranslation = .zero
+                        verticalDragTranslation = .zero
                         horizontalDragTranslation = .zero
                     }
                 }
+                dragDirection = nil
             }
     }
     
@@ -81,6 +97,7 @@ private extension NotificationPresenterView {
     
     func onTap() {
         model.tapHandler?.value()
-        dismissAction(.top)
+        dismissAction()
+        dismissEdge = .top
     }
 }
