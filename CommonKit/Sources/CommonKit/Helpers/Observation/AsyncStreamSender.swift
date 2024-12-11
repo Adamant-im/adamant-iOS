@@ -16,11 +16,11 @@ public final class AsyncStreamSender<Element: Sendable>: Sendable {
         self.continuation = continuation
     }
     
-    func send(_ value: Element) {
+    public func send(_ value: Element) {
         continuation?.yield(value)
     }
     
-    func finish() {
+    public func finish() {
         continuation?.finish()
     }
 }

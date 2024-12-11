@@ -47,6 +47,7 @@ final class ChatFileService: ChatFileProtocol, Sendable {
     private var fileDownloadAttemptsCount: [String: Int] = [:]
     private var uploadingFilesDictionary: [String: FileMessage] = [:]
     private var previewDownloadsAttemps: [String: Int] = [:]
+    private let synchronizer = AsyncStreamSender<@MainActor () -> Void>()
     private let _updateFileFields = ObservableSender<FileUpdateProperties>()
     
     private var subscriptions = Set<AnyCancellable>()
@@ -251,6 +252,10 @@ private extension ChatFileService {
                 self?.fileDownloadAttemptsCount.removeAll()
             }
             .store(in: &subscriptions)
+        
+        synchronizer.stream.sink { @MainActor action in
+            action()
+        }.store(in: &subscriptions)
     }
 }
 
@@ -503,14 +508,15 @@ private extension ChatFileService {
                 fileType: file.fileType,
                 fileExtension: file.file.extension ?? .empty,
                 isPreview: false,
-                downloadProgress: { @MainActor [weak self] value in
-                    // TODO: COMEBACK
-                    fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
-                    
-                    self?.sendProgress(
-                        for: file.file.id, 
-                        progress: Int(totalProgress.fractionCompleted * 100)
-                    )
+                downloadProgress: { [synchronizer] value in
+                    synchronizer.send { [weak self] in
+                        fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
+                        
+                        self?.sendProgress(
+                            for: file.file.id,
+                            progress: Int(totalProgress.fractionCompleted * 100)
+                        )
+                    }
                 }
             )
             
@@ -897,13 +903,13 @@ private extension ChatFileService {
         for i in files.indices where !files[i].isUploaded {
             let file = files[i].file
             
-            let uploadProgress: @Sendable (Int) -> Void = {
-                // TODO: COMEBACK
-                @MainActor [weak self, file] value in
-                self?.sendProgress(
-                    for: file.url.absoluteString,
-                    progress: value
-                )
+            let uploadProgress: @Sendable (Int) -> Void = { [synchronizer, file] value in
+                synchronizer.send { [weak self] in
+                    self?.sendProgress(
+                        for: file.url.absoluteString,
+                        progress: value
+                    )
+                }
             }
             
             let result = try await uploadFileToServer(
