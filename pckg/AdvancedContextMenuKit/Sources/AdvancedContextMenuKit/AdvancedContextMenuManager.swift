@@ -188,8 +188,17 @@ private extension AdvancedContextMenuManager {
 }
 
 // MARK: Delegate
-
+ 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
+    func willDissmis() {
+        guard
+            let newPosition = getPositionOnScreen?(),
+            newPosition != locationOnScreen
+        else { return }
+        
+        viewModel?.update(locationOnScreen: newPosition)
+    }
+    
     func didDissmis() {
         didDismissMenuAction?(messageId)
         getPositionOnScreen = nil
