@@ -50,7 +50,7 @@ final class MediaContainerView: UIView {
     // MARK: Proprieties
     
     var model: ChatMediaContentView.FileModel = .default {
-        didSet { update() }
+        didSet { update(old: oldValue) }
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in }
@@ -94,29 +94,24 @@ private extension MediaContainerView {
         previewDownloadNotAllowedLabel.sizeToFit()
     }
     
-    func update() {
+    func onAppear() {
+        let filesToDownload = model.files
+            .prefix(FilesConstants.maxFilesCount)
+            .filter { $0.fileType.isMedia }
+        
+        guard !filesToDownload.isEmpty else { return }
+        
+        actionHandler(.autoDownloadContentIfNeeded(
+            messageId: model.messageId,
+            files: filesToDownload
+        ))
+    }
+    
+    func update(old: ChatMediaContentView.FileModel) {
+        if model.messageId != old.messageId { onAppear() }
+        
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
-        
-        let filesToDownload = fileList.filter {
-            $0.fileType.isMedia
-            && (
-                (!$0.isCached && $0.isFullMediaDownloadAllowed)
-                || (
-                    $0.previewImage == nil
-                    && $0.file.preview != nil
-                    && $0.isPreviewDownloadAllowed
-                )
-            )
-        }
-        
-        if !filesToDownload.isEmpty {
-            actionHandler(.downloadContentIfNeeded(
-                messageId: model.messageId,
-                files: filesToDownload
-            ))
-        }
-        
-        updatePreviewDownloadLabel(files: Array(fileList))
+        updatePreviewDownloadLabel()
         
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
             guard let horizontalStackView = stackView as? UIStackView else { continue }
@@ -217,24 +212,8 @@ private extension MediaContainerView {
         (availableWidth - stackSpacing) * 0.7
     }
     
-    func updatePreviewDownloadLabel(files: [ChatFile]) {
-        guard let firstFile = files.first else {
-            previewDownloadNotAllowedLabel.isHidden = true
-            return
-        }
-
-        let isPreviewDownloadAllowed = firstFile.isPreviewDownloadAllowed
-        let haveNoPreview = files.contains {
-            $0.fileType.isMedia 
-            && $0.previewImage == nil
-            && $0.file.preview != nil
-        }
-
-        if !isPreviewDownloadAllowed && haveNoPreview {
-            previewDownloadNotAllowedLabel.isHidden = false
-        } else {
-            previewDownloadNotAllowedLabel.isHidden = true
-        }
+    func updatePreviewDownloadLabel() {
+        previewDownloadNotAllowedLabel.isHidden = !model.showAutoDownloadWarningLabel
     }
 }
 

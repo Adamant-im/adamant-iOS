@@ -332,7 +332,8 @@ private extension ChatMessageFactory {
             files: chatFiles,
             isMediaFilesOnly: isMediaFilesOnly,
             isFromCurrentSender: isFromCurrentSender,
-            txStatus: transaction.statusEnum
+            txStatus: transaction.statusEnum,
+            showAutoDownloadWarningLabel: false
         )
         
         return .file(.init(value: .init(
@@ -398,9 +399,7 @@ private extension ChatMessageFactory {
                 nonce: file.nonce,
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: fileType,
-                progress: nil,
-                isPreviewDownloadAllowed: false,
-                isFullMediaDownloadAllowed: false
+                progress: nil
             )
         }
     }

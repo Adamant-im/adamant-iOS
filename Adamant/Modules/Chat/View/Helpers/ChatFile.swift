@@ -30,8 +30,6 @@ struct ChatFile: Equatable, Hashable, @unchecked Sendable {
     var isFromCurrentSender: Bool
     var fileType: FileType
     var progress: Int?
-    var isPreviewDownloadAllowed: Bool
-    var isFullMediaDownloadAllowed: Bool
     
     var isBusy: Bool {
         isDownloading
@@ -54,9 +52,7 @@ struct ChatFile: Equatable, Hashable, @unchecked Sendable {
             nonce: .empty,
             isFromCurrentSender: false,
             fileType: .other,
-            progress: .zero,
-            isPreviewDownloadAllowed: false,
-            isFullMediaDownloadAllowed: false
+            progress: .zero
         )
     }
 }

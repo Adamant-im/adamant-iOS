@@ -203,8 +203,8 @@ private extension ChatDataSourceManager {
             viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file):
             viewModel.openFile(messageId: messageId, file: file)
-        case let .downloadContentIfNeeded(messageId, files):
-            viewModel.downloadContentIfNeeded(
+        case let .autoDownloadContentIfNeeded(messageId, files):
+            viewModel.autoDownloadContentIfNeeded(
                 messageId: messageId,
                 files: files
             )
