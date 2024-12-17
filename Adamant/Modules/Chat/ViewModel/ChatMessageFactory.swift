@@ -104,6 +104,7 @@ struct ChatMessageFactory: Sendable {
             senderModel: senderModel,
             status: status,
             content: content,
+            swipeState: .idle,
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
                 sentDate: sentDate,

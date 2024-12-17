@@ -11,7 +11,7 @@ import SnapKit
 import MessageKit
 
 final class ChatTransactionCell: MessageContentCell {
-    let transactionView = ChatTransactionContainerView()
+    let transactionView = ChatSwipeWrapper(ChatTransactionContainerView())
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,12 +24,12 @@ final class ChatTransactionCell: MessageContentCell {
     }
     
     override func prepareForReuse() {
-        transactionView.prepareForReuse()
+        transactionView.wrappedView.prepareForReuse()
     }
     
     override var isSelected: Bool {
         didSet {
-            transactionView.isSelected = isSelected
+            transactionView.wrappedView.isSelected = isSelected
         }
     }
     

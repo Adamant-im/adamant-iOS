@@ -25,10 +25,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private var messageLabel = MessageLabel()
     private var replyMessageLabel = UILabel()
     
-    private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: contentView, xPadding: 8)
-        return view
-    }()
+    private(set) lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
+    private lazy var cellContainerView = UIView()
     
     static let replyViewHeight: CGFloat = 25
     
@@ -149,10 +147,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
-            
-            swipeView.didSwipeAction = { [actionHandler, model] in
-                actionHandler(.reply(message: model))
-            }
         }
     }
     
@@ -210,16 +204,17 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     }
     
     override func setupSubviews() {
-        super.setupSubviews()
-        
-        contentView.addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.top.equalToSuperview()
-        }
-        
-        swipeView.swipeStateAction = { [actionHandler] state in
-            actionHandler(.swipeState(state: state))
-        }
+        contentView.addSubview(swipeWrapper)
+        cellContainerView.addSubviews(
+            accessoryView,
+            cellTopLabel,
+            messageTopLabel,
+            messageBottomLabel,
+            cellBottomLabel,
+            messageContainerView,
+            avatarView,
+            messageTimestampLabel
+        )
         
         messageContainerView.addSubview(verticalStack)
         messageLabel.numberOfLines = 0
@@ -235,14 +230,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         
         configureMenu()
         
-        contentView.addSubview(reactionsContanerView)
+        cellContainerView.addSubview(reactionsContanerView)
     }
     
     func configureMenu() {
         containerView.layer.cornerRadius = 10
         
         messageContainerView.removeFromSuperview()
-        contentView.addSubview(containerView)
+        cellContainerView.addSubview(containerView)
         
         containerView.addSubview(messageContainerView)
         chatMenuManager.setup(for: containerView)
@@ -434,11 +429,11 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         : minReactionsSpacingToOwnBoundary
         
         if model.isFromCurrentSender {
-            x = min(x, contentView.bounds.width - minSpace)
+            x = min(x, cellContainerView.bounds.width - minSpace)
             x = max(x, minReactionsSpacingToOppositeBoundary)
         } else {
             x = max(x, minSpace)
-            x = min(x, contentView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
+            x = min(x, cellContainerView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
         }
         
         reactionsContanerView.frame = CGRect(
@@ -539,7 +534,7 @@ extension ChatMessageReplyCell {
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [actionHandler, model] in
-            actionHandler(.reply(message: model))
+            actionHandler(.reply(id: model.id))
         }
         
         let copy = AMenuItem.action(

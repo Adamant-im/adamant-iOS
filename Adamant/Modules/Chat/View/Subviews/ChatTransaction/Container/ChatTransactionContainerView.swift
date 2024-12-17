@@ -68,11 +68,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return stack
     }()
     
-    private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: self)
-        return view
-    }()
-    
     private lazy var ownReactionLabel: UILabel = {
         let label = UILabel()
         label.text = getReaction(for: model.address)
@@ -153,19 +148,10 @@ extension ChatTransactionContainerView: ReusableView {
 
 private extension ChatTransactionContainerView {
     func configure() {
-        addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
-        
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-        }
-        
-        swipeView.swipeStateAction = { [actionHandler] state in
-            actionHandler(.swipeState(state: state))
         }
         
         chatMenuManager.setup(for: contentView)
@@ -180,10 +166,6 @@ private extension ChatTransactionContainerView {
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
         updateOwnReaction()
         updateOpponentReaction()
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
-        }
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -309,7 +291,7 @@ extension ChatTransactionContainerView {
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [actionHandler, model] in
-            actionHandler(.reply(message: model))
+            actionHandler(.reply(id: model.id))
         }
         
         return AMenuSection([reply, report, remove])

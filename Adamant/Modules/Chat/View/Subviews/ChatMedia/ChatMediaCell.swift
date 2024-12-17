@@ -11,7 +11,7 @@ import SnapKit
 import MessageKit
 
 final class ChatMediaCell: MessageContentCell {
-    let containerMediaView = ChatMediaContainerView()
+    let containerMediaView = ChatSwipeWrapper(ChatMediaContainerView())
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,12 +24,12 @@ final class ChatMediaCell: MessageContentCell {
     }
     
     override func prepareForReuse() {
-        containerMediaView.prepareForReuse()
+        containerMediaView.wrappedView.prepareForReuse()
     }
     
     override var isSelected: Bool {
         didSet {
-            containerMediaView.isSelected = isSelected
+            containerMediaView.wrappedView.isSelected = isSelected
         }
     }
     

@@ -11,11 +11,6 @@ import Combine
 import CommonKit
 
 final class ChatMediaContainerView: UIView, ChatModelView {
-    private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: self)
-        return view
-    }()
-    
     private let spacingView: UIView = {
         let view = UIView()
         view.setContentCompressionResistancePriority(.dragThatCanResizeScene, for: .horizontal)
@@ -153,20 +148,11 @@ final class ChatMediaContainerView: UIView, ChatModelView {
 }
 
 extension ChatMediaContainerView {
-    func configure() {        
-        addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
-        
+    func configure() {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.verticalEdges.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(4)
-        }
-        
-        swipeView.swipeStateAction = { [actionHandler] state in
-            actionHandler(.swipeState(state: state))
         }
         
         reactionsStack.snp.makeConstraints { $0.width.equalTo(reactionsWidth) }
@@ -175,13 +161,7 @@ extension ChatMediaContainerView {
     
     func update() {
         contentView.model = model.content
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
-        }
-        
         updateLayout()
-        
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
         updateOwnReaction()
@@ -313,7 +293,7 @@ extension ChatMediaContainerView {
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [actionHandler, model] in
-            actionHandler(.reply(message: model))
+            actionHandler(.reply(id: model.id))
         }
         
         let copy = AMenuItem.action(

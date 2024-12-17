@@ -98,7 +98,9 @@ final class ChatViewModel: NSObject {
     let presentDocumentPickerVC = ObservableSender<Void>()
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
+    let enableScroll = ObservableSender<Bool>()
     
+    @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
@@ -110,7 +112,6 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isNeedToAnimateScroll = false
     @ObservableValue private(set) var dateHeader: String?
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
-    @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
@@ -553,11 +554,11 @@ final class ChatViewModel: NSObject {
         }
     }
     
-    func replyMessageIfNeeded(_ messageModel: MessageModel?) {
-        let tx = chatTransactions.first(where: { $0.txId == messageModel?.id })
+    func replyMessageIfNeeded(id: String) {
+        let tx = chatTransactions.first(where: { $0.txId == id })
         guard isSendingAvailable, tx?.isFake == false else { return }
         
-        let message = messages.first(where: { $0.messageId == messageModel?.id })
+        let message = messages.first(where: { $0.messageId == id })
         guard message?.status != .failed else {
             dialog.send(.warning(String.adamant.reply.failedMessageError))
             return
@@ -568,7 +569,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        replyMessage = messageModel
+        replyMessage = message?.messageModel
     }
     
     func animateScrollIfNeeded(to messageIndex: Int, visibleIndex: Int?) {
@@ -962,6 +963,14 @@ final class ChatViewModel: NSObject {
             )
         }
     }
+    
+    func updateSwipeableId(_ id: String?) {
+        swipeableMessage = id.map { .init(id: $0, state: .idle) } ?? .default
+    }
+    
+    func updateSwipingOffset(_ offset: CGFloat) {
+        swipeableMessage.state = .offset(offset)
+    }
 }
 
 extension ChatViewModel {
@@ -1114,6 +1123,14 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
+        $swipeableMessage
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                updateSwipeStates(messages: &messages)
+            }
+            .store(in: &subscriptions)
+        
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
@@ -1226,7 +1243,7 @@ private extension ChatViewModel {
             
             postProcess(messages: &messages)
             
-            await setupNewMessages(
+            setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
@@ -1254,6 +1271,7 @@ private extension ChatViewModel {
         }
         
         updateAutoDownloadWarning(messages: &messages)
+        updateSwipeStates(messages: &messages)
     }
     
     func autoDownloadPolicyChanged() {
@@ -1282,6 +1300,14 @@ private extension ChatViewModel {
                     isFromCurrentSender: $0.isFromCurrentSender
                 )
             }
+        }
+    }
+    
+    func updateSwipeStates(messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].swipeState = messages[$0].id == swipeableMessage.id
+                ? swipeableMessage.state
+                : .idle
         }
     }
     
@@ -1340,7 +1366,7 @@ private extension ChatViewModel {
         newMessages: [ChatMessage],
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
-    ) async {
+    ) {
         var newMessages = newMessages
         updateHiddenMessage(&newMessages)
         
@@ -1644,6 +1670,19 @@ private extension ChatViewModel {
 }
 
 private extension ChatMessage {
+    var messageModel: MessageModel {
+        switch content {
+        case let .message(model):
+            return model.value
+        case let .reply(model):
+            return model.value
+        case let .transaction(model):
+            return model.value
+        case let .file(model):
+            return model.value
+        }
+    }
+    
     var isFromCurrentSender: Bool {
         switch content {
         case let .message(model):

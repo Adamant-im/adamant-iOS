@@ -237,17 +237,6 @@ extension ChatViewController {
         let velocity = panGesture.velocity(in: messagesCollectionView)
         return abs(velocity.x) > abs(velocity.y)
     }
-    
-    private func swipeStateAction(_ state: SwipeableView.State) {
-        if state == .began {
-            chatMessagesCollectionView.stopDecelerating()
-            messagesCollectionView.isScrollEnabled = false
-        }
-        
-        if state == .ended {
-            messagesCollectionView.isScrollEnabled = true
-        }
-    }
 }
 
 // MARK: Delegate Protocols
@@ -412,8 +401,8 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
-        viewModel.$swipeState
-            .sink { [weak self] in self?.swipeStateAction($0) }
+        viewModel.enableScroll
+            .sink { [weak self] in self?.enableScroll($0) }
             .store(in: &subscriptions)
         
         viewModel.$isNeedToAnimateScroll
@@ -787,6 +776,15 @@ private extension ChatViewController {
         Task {
             try await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
+        }
+    }
+    
+    func enableScroll(_ isEnabled: Bool) {
+        if isEnabled {
+            chatMessagesCollectionView.isScrollEnabled = true
+        } else {
+            chatMessagesCollectionView.stopDecelerating()
+            chatMessagesCollectionView.isScrollEnabled = false
         }
     }
     
