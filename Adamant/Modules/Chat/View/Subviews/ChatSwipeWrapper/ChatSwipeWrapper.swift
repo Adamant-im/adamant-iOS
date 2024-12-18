@@ -31,7 +31,7 @@ private extension ChatSwipeWrapper {
     func configure() {
         addSubview(wrappedView)
         wrappedView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
+            $0.directionalVerticalEdges.width.leading.equalToSuperview()
         }
     }
     
@@ -50,7 +50,7 @@ private extension ChatSwipeWrapper {
                 withDuration: 0.25,
                 delay: .zero,
                 options: .curveEaseOut
-            ) { [weak self] in self?.setNeedsLayout() }
+            ) { [weak self] in self?.layoutIfNeeded() }
         case .offset:
             break
         }        

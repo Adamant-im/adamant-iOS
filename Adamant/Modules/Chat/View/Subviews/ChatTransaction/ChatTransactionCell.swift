@@ -9,9 +9,31 @@
 import UIKit
 import SnapKit
 import MessageKit
+import Combine
 
-final class ChatTransactionCell: MessageContentCell {
-    let transactionView = ChatSwipeWrapper(ChatTransactionContainerView())
+final class ChatTransactionCell: MessageContentCell, ChatModelView {
+    private let transactionView = ChatTransactionContainerView()
+    private let cellContainerView = UIView()
+    private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
+    
+    var subscription: AnyCancellable?
+    
+    var model: ChatTransactionContainerView.Model = .default {
+        didSet {
+            swipeWrapper.model = .init(id: model.id, state: model.swipeState)
+            transactionView.model = model
+        }
+    }
+    
+    var actionHandler: (ChatAction) -> Void {
+        get { transactionView.actionHandler }
+        set { transactionView.actionHandler = newValue }
+    }
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel? {
+        get { transactionView.chatMessagesListViewModel }
+        set { transactionView.chatMessagesListViewModel = newValue }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,12 +46,12 @@ final class ChatTransactionCell: MessageContentCell {
     }
     
     override func prepareForReuse() {
-        transactionView.wrappedView.prepareForReuse()
+        transactionView.prepareForReuse()
     }
     
     override var isSelected: Bool {
         didSet {
-            transactionView.wrappedView.isSelected = isSelected
+            transactionView.isSelected = isSelected
         }
     }
     
@@ -50,11 +72,27 @@ final class ChatTransactionCell: MessageContentCell {
         transactionView.frame = messageContainerView.frame
         transactionView.layoutIfNeeded()
     }
+    
+    override func setupSubviews() {
+        cellContainerView.addSubviews(
+            accessoryView,
+            cellTopLabel,
+            messageTopLabel,
+            messageBottomLabel,
+            cellBottomLabel,
+            messageContainerView,
+            avatarView,
+            messageTimestampLabel,
+            transactionView
+        )
+    }
 }
 
 private extension ChatTransactionCell {
     func configure() {
-        contentView.addSubview(transactionView)
-        transactionView.frame = messageContainerView.frame
+        contentView.addSubview(swipeWrapper)
+        swipeWrapper.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
 }

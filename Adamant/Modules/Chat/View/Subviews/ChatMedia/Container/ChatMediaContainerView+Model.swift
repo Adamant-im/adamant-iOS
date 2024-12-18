@@ -19,6 +19,7 @@ extension ChatMediaContainerView {
         let opponentAddress: String
         let txStatus: MessageStatus
         var status: FileMessageStatus
+        var swipeState: ChatSwipeWrapperModel.State
         
         static var `default`: Self {
             Self(
@@ -29,7 +30,8 @@ extension ChatMediaContainerView {
                 address: "",
                 opponentAddress: "",
                 txStatus: .failed,
-                status: .failed
+                status: .failed,
+                swipeState: .idle
             )
         }
         

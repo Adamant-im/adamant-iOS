@@ -13,14 +13,12 @@ import SwiftUI
 import AdvancedContextMenuKit
 import CommonKit
 
-final class ChatTransactionContainerView: UIView, ChatModelView {
+final class ChatTransactionContainerView: UIView {
     // MARK: Dependencies
     
     var chatMessagesListViewModel: ChatMessagesListViewModel?
     
     // MARK: Proprieties
-    
-    var subscription: AnyCancellable?
     
     var model: Model = .default {
         didSet { update() }

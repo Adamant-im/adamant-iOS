@@ -17,6 +17,7 @@ extension ChatTransactionContainerView {
         let reactions: Set<Reaction>?
         let address: String
         let opponentAddress: String
+        var swipeState: ChatSwipeWrapperModel.State
         
         static var `default`: Self {
             Self(
@@ -26,7 +27,8 @@ extension ChatTransactionContainerView {
                 status: .notInitiated,
                 reactions: nil,
                 address: "",
-                opponentAddress: ""
+                opponentAddress: "",
+                swipeState: .idle
             )
         }
         

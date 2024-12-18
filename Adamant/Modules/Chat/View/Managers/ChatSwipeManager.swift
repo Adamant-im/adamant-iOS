@@ -11,18 +11,19 @@ import UIKit
 @MainActor
 final class ChatSwipeManager: NSObject {
     private let viewModel: ChatViewModel
-    private let chatView: UIView
+    private var chatView: UIView?
     private var vibrated = false
     
     private var requiredSwipeOffset: CGFloat {
         -UIScreen.main.bounds.size.width * 0.05
     }
     
-    init(viewModel: ChatViewModel, chatView: UIView) {
+    init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
-        self.chatView = chatView
         super.init()
-        
+    }
+    
+    func configure(chatView: UIView) {
         let recognizer = UIPanGestureRecognizer(
             target: self,
             action: #selector(onSwipe(_:))
@@ -30,6 +31,7 @@ final class ChatSwipeManager: NSObject {
         
         recognizer.delegate = self
         chatView.addGestureRecognizer(recognizer)
+        self.chatView = chatView
     }
 }
 
@@ -59,7 +61,7 @@ extension ChatSwipeManager: UIGestureRecognizerDelegate {
 
 private extension ChatSwipeManager {
     func findChatSwipeWrapperId(_ location: CGPoint) -> String? {
-        var view = chatView.hitTest(location, with: nil)
+        var view = chatView?.hitTest(location, with: nil)
         
         while view != nil {
             if let swipeWrapper = view as? ChatSwipeWrapper {

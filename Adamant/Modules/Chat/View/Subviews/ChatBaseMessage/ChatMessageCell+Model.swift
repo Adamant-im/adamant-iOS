@@ -19,6 +19,7 @@ extension ChatMessageCell {
         let opponentAddress: String
         let isFake: Bool
         var isHidden: Bool
+        var swipeState: ChatSwipeWrapperModel.State
         
         static var `default`: Self {
             Self(
@@ -30,7 +31,8 @@ extension ChatMessageCell {
                 address: "",
                 opponentAddress: "",
                 isFake: false,
-                isHidden: false
+                isHidden: false,
+                swipeState: .idle
             )
         }
         

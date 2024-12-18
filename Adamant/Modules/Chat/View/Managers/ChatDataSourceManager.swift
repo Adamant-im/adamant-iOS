@@ -141,10 +141,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
                 
-                cell.transactionView.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-                cell.transactionView.wrappedView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-                cell.transactionView.wrappedView.model = model.value
-                cell.transactionView.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+                cell.model = model.value
+                cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 return cell
             }
@@ -163,10 +163,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
                 
-                cell.containerMediaView.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-                cell.containerMediaView.wrappedView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-                cell.containerMediaView.wrappedView.model = model.value
-                cell.containerMediaView.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+                cell.model = model.value
+                cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 return cell
             }

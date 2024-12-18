@@ -130,7 +130,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            
+            swipeWrapper.model = .init(id: model.id, state: model.swipeState)
             containerView.isHidden = model.isHidden
             replyMessageLabel.attributedText = model.messageReply
             
@@ -510,6 +510,11 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         default:
             delegate?.didTapBackground(in: self)
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        swipeWrapper.frame = contentView.bounds
     }
 }
 

@@ -104,7 +104,6 @@ struct ChatMessageFactory: Sendable {
             senderModel: senderModel,
             status: status,
             content: content,
-            swipeState: .idle,
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
                 sentDate: sentDate,
@@ -196,7 +195,8 @@ private extension ChatMessageFactory {
                     address: address,
                     opponentAddress: opponentAddress,
                     isFake: transaction.isFake,
-                    isHidden: false
+                    isHidden: false,
+                    swipeState: .idle
                 )
             ))
         } ?? .default
@@ -237,7 +237,8 @@ private extension ChatMessageFactory {
                 reactions: reactions,
                 address: address,
                 opponentAddress: opponentAddress,
-                isHidden: false
+                isHidden: false,
+                swipeState: .idle
             )
         ))
     }
@@ -288,7 +289,8 @@ private extension ChatMessageFactory {
             status: transaction.transactionStatus ?? .notInitiated,
             reactions: reactions,
             address: address,
-            opponentAddress: opponentAddress
+            opponentAddress: opponentAddress,
+            swipeState: .idle
         )))
     }
     
@@ -355,7 +357,8 @@ private extension ChatMessageFactory {
             address: address,
             opponentAddress: opponentAddress, 
             txStatus: transaction.statusEnum,
-            status: .failed
+            status: .failed,
+            swipeState: .idle
         )))
     }
     
@@ -449,7 +452,8 @@ private extension ChatMessageFactory {
             status: transaction.statusEnum.toTransactionStatus(),
             reactions: reactions,
             address: address,
-            opponentAddress: opponentAddress
+            opponentAddress: opponentAddress,
+            swipeState: .idle
         )))
     }
     

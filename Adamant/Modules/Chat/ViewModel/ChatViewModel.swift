@@ -1732,6 +1732,42 @@ private extension ChatMessage {
         }
     }
     
+    var swipeState: ChatSwipeWrapperModel.State {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.swipeState
+            case let .reply(model):
+                return model.value.swipeState
+            case let .transaction(model):
+                return model.value.swipeState
+            case let .file(model):
+                return model.value.swipeState
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.swipeState = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.swipeState = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.swipeState = newValue
+                content = .transaction(.init(value: model))
+            case let .file(model):
+                var model = model.value
+                model.swipeState = newValue
+                content = .file(.init(value: model))
+            }
+        }
+    }
+    
     func getFiles() -> [ChatFile] {
         guard case let .file(model) = content else { return [] }
         return model.value.content.fileModel.files

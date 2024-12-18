@@ -9,9 +9,37 @@
 import UIKit
 import SnapKit
 import MessageKit
+import Combine
 
-final class ChatMediaCell: MessageContentCell {
-    let containerMediaView = ChatSwipeWrapper(ChatMediaContainerView())
+final class ChatMediaCell: MessageContentCell, ChatModelView {
+    private let containerMediaView = ChatMediaContainerView()
+    private let cellContainerView = UIView()
+    private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
+    
+    var subscription: AnyCancellable?
+    
+    var model: ChatMediaContainerView.Model = .default {
+        didSet {
+            swipeWrapper.model = .init(id: model.id, state: model.swipeState)
+            containerMediaView.model = model
+        }
+    }
+    
+    var actionHandler: (ChatAction) -> Void {
+        get { containerMediaView.actionHandler }
+        set { containerMediaView.actionHandler = newValue }
+    }
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel? {
+        get { containerMediaView.chatMessagesListViewModel }
+        set { containerMediaView.chatMessagesListViewModel = newValue }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            containerMediaView.isSelected = isSelected
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,16 +49,6 @@ final class ChatMediaCell: MessageContentCell {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
-    }
-    
-    override func prepareForReuse() {
-        containerMediaView.wrappedView.prepareForReuse()
-    }
-    
-    override var isSelected: Bool {
-        didSet {
-            containerMediaView.wrappedView.isSelected = isSelected
-        }
     }
     
     override func configure(
@@ -54,13 +72,27 @@ final class ChatMediaCell: MessageContentCell {
             make.height.equalTo(messageContainerView.frame.height)
         }
     }
+    
+    override func setupSubviews() {
+        cellContainerView.addSubviews(
+            accessoryView,
+            cellTopLabel,
+            messageTopLabel,
+            messageBottomLabel,
+            cellBottomLabel,
+            messageContainerView,
+            avatarView,
+            messageTimestampLabel,
+            containerMediaView
+        )
+    }
 }
 
 private extension ChatMediaCell {
     func configure() {
-        contentView.addSubview(containerMediaView)
-        containerMediaView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
+        contentView.addSubview(swipeWrapper)
+        swipeWrapper.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
         }
     }
 }

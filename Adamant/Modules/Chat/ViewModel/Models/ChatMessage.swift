@@ -16,7 +16,6 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
     let senderModel: ChatSender
     let status: Status
     var content: Content
-    var swipeState: ChatSwipeWrapperModel.State
     let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
@@ -30,7 +29,6 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
             senderModel: .default,
             status: .failed,
             content: .default,
-            swipeState: .idle,
             backgroundColor: .failed,
             bottomString: nil,
             dateHeader: nil,
@@ -83,10 +81,6 @@ extension ChatMessage: MessageType {
         case let .file(model):
             return .custom(model)
         }
-    }
-    
-    var swipeWrapperModel: ChatSwipeWrapperModel {
-        .init(id: id, state: swipeState)
     }
 }
 

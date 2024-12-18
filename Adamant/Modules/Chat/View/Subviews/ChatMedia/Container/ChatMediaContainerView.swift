@@ -10,7 +10,7 @@ import UIKit
 import Combine
 import CommonKit
 
-final class ChatMediaContainerView: UIView, ChatModelView {
+final class ChatMediaContainerView: UIView {
     private let spacingView: UIView = {
         let view = UIView()
         view.setContentCompressionResistancePriority(.dragThatCanResizeScene, for: .horizontal)
@@ -95,10 +95,6 @@ final class ChatMediaContainerView: UIView, ChatModelView {
     // MARK: Dependencies
     
     var chatMessagesListViewModel: ChatMessagesListViewModel?
-    
-    // MARK: Proprieties
-    
-    var subscription: AnyCancellable?
     
     var model: Model = .default {
         didSet { update() }

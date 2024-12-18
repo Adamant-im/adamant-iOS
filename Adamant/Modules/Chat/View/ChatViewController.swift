@@ -31,6 +31,7 @@ final class ChatViewController: MessagesViewController {
     private let walletServiceCompose: WalletServiceCompose
     private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
+    private let chatSwipeManager: ChatSwipeManager
     
     let viewModel: ChatViewModel
     
@@ -90,6 +91,7 @@ final class ChatViewController: MessagesViewController {
         storedObjects: [AnyObject],
         admWalletService: WalletService?,
         screensFactory: ScreensFactory,
+        chatSwipeManager: ChatSwipeManager,
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
@@ -98,6 +100,7 @@ final class ChatViewController: MessagesViewController {
         self.admWalletService = admWalletService
         self.screensFactory = screensFactory
         self.sendTransaction = sendTransaction
+        self.chatSwipeManager = chatSwipeManager
         super.init(nibName: nil, bundle: nil)
         
         inputBar.onAttachmentButtonTap = { [weak self] in
@@ -132,6 +135,7 @@ final class ChatViewController: MessagesViewController {
         configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
+        chatSwipeManager.configure(chatView: view)
     }
     
     override func viewWillLayoutSubviews() {
