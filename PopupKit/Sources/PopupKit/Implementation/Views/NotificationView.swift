@@ -9,12 +9,8 @@ import SwiftUI
 import CommonKit
 
 struct NotificationView: View {
-    @State private var dragTranslation: CGFloat = .zero
-    @State private var minTranslationForDismiss: CGFloat = .infinity
-    
+    @Binding var isTextLimited: Bool
     let model: NotificationModel
-    let safeAreaInsets: EdgeInsets
-    let dismissAction: () -> Void
     
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
@@ -24,15 +20,6 @@ struct NotificationView: View {
             textStack
             Spacer(minLength: .zero)
         }
-        .padding([.leading, .trailing], 15)
-        .padding([.top, .bottom], 10)
-        .background(GeometryReader(content: processGeometry))
-        .gesture(dragGesture)
-        .onTapGesture(perform: onTap)
-        .background(Color(.adamant.swipeBlockColor))
-        .cornerRadius(10)
-        .padding(.horizontal, 15)
-        .padding(.top, safeAreaInsets.top)
     }
 }
 
@@ -48,7 +35,7 @@ private extension NotificationView {
     }
     
     var textStack: some View {
-        VStack(alignment: .leading, spacing: .zero) {
+        VStack(alignment: .leading, spacing: 3) {
             if let title = model.title {
                 Text(title)
                     .font(.system(size: 15, weight: .bold))
@@ -56,34 +43,9 @@ private extension NotificationView {
             if let description = model.description {
                 Text(description)
                     .font(.system(size: 13))
-                    .lineLimit(3)
+                    .lineLimit(isTextLimited ? 3 : nil)
+               
             }
         }
-    }
-    
-    var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { dragTranslation = $0.translation.height }
-            .onEnded {
-                print(-$0.translation.height, minTranslationForDismiss)
-                if $0.velocity.height < -100 || -$0.translation.height > minTranslationForDismiss {
-                    dismissAction()
-                } else {
-                    withAnimation { dragTranslation = .zero }
-                }
-            }
-    }
-    
-    func processGeometry(_ geometry: GeometryProxy) -> some View {
-        DispatchQueue.main.async {
-            minTranslationForDismiss = geometry.size.height / 2
-        }
-
-        return Color.clear
-    }
-    
-    func onTap() {
-        model.tapHandler?.value()
-        dismissAction()
     }
 }
