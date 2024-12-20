@@ -583,7 +583,8 @@ extension AdamantChatsProvider {
             senderId: address,
             privateKey: privateKey,
             height: receivedLastHeight,
-            offset: nil
+            offset: nil,
+            waitsForConnectivity: true
         )
         
         // MARK: 4. Check
@@ -1483,7 +1484,8 @@ extension AdamantChatsProvider {
         senderId: String,
         privateKey: String,
         height: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async throws {
         if self.accountService.account == nil {
             throw ApiServiceError.accountNotFound
@@ -1493,7 +1495,8 @@ extension AdamantChatsProvider {
             let transactions = try await apiService.getMessageTransactions(
                 address: senderId,
                 height: height,
-                offset: offset
+                offset: offset,
+                waitsForConnectivity: waitsForConnectivity
             ).get()
             
             if transactions.count == 0 {
@@ -1519,7 +1522,8 @@ extension AdamantChatsProvider {
                     senderId: senderId,
                     privateKey: privateKey,
                     height: height,
-                    offset: newOffset
+                    offset: newOffset,
+                    waitsForConnectivity: waitsForConnectivity
                 )
             }
         } catch {
