@@ -979,7 +979,8 @@ extension AdamantChatsProvider {
     ) async throws -> ChatTransaction {
         let transaction = MessageTransaction(context: context)
         let id = UUID().uuidString
-        transaction.date = Date() as NSDate
+        let customDate = Date().addingTimeInterval(-0.5)
+        transaction.date = customDate as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1022,10 +1023,11 @@ extension AdamantChatsProvider {
         context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
     ) async throws -> RichMessageTransaction {
+        let customDate = Date().addingTimeInterval(-0.5)
         let type = ChatType.richMessage
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
-        transaction.date = Date() as NSDate
+        transaction.date = customDate as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)

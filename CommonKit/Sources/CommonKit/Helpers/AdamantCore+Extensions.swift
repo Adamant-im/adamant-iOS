@@ -41,12 +41,13 @@ public extension AdamantCore {
         nonce: String,
         amount: Decimal?
     ) throws -> UnregisteredTransaction {
+        let customDate = Date().addingTimeInterval(-0.5)
         let normalizedTransaction = NormalizedTransaction(
             type: .chatMessage,
             amount: amount ?? .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: Date(),
+            date: customDate,
             recipientId: recipientId,
             asset: TransactionAsset(
                 chat: ChatAsset(message: message, ownMessage: nonce, type: type),
