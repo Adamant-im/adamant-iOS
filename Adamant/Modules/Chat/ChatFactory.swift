@@ -79,6 +79,7 @@ struct ChatFactory {
             storedObjects: delegates.asArray + [dialogManager],
             admWalletService: walletService,
             screensFactory: screensFactory,
+            chatSwipeManager: .init(viewModel: viewModel),
             sendTransaction: makeSendTransactionAction(
                 viewModel: viewModel,
                 screensFactory: screensFactory

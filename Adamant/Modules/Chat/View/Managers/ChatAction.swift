@@ -12,9 +12,8 @@ import CommonKit
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
     case openTransactionDetails(id: String)
-    case reply(message: MessageModel)
+    case reply(id: String)
     case scrollTo(message: ChatMessageReplyCell.Model)
-    case swipeState(state: SwipeableView.State)
     case copy(text: String)
     case copyInPart(text:String)
     case report(id: String)
