@@ -429,11 +429,11 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         : minReactionsSpacingToOwnBoundary
         
         if model.isFromCurrentSender {
-            x = min(x, cellContainerView.bounds.width - minSpace)
+            x = min(x, contentView.bounds.width - minSpace)
             x = max(x, minReactionsSpacingToOppositeBoundary)
         } else {
             x = max(x, minSpace)
-            x = min(x, cellContainerView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
+            x = min(x, contentView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
         }
         
         reactionsContanerView.frame = CGRect(
