@@ -93,7 +93,7 @@ private extension ChatSwipeManager {
                 vibrated = false
             }
             
-            guard !vibrated else { break }
+            guard !vibrated, offset <= requiredSwipeOffset else { break }
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
             vibrated = true
         case .ended, .cancelled, .failed:
