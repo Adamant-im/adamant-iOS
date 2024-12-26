@@ -256,29 +256,18 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         
         if let balance = try? await getBalance() {
             markBalanceAsFresh()
-            let notification: Notification.Name?
-            let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
-            
-            if wallet.balance != balance {
-                wallet.balance = balance
-                notification = walletUpdatedNotification
-            } else if !wallet.isBalanceInitialized {
-                notification = walletUpdatedNotification
-            } else {
-                notification = nil
-            }
-            
-            if isRaised {
+
+            if wallet.balance < balance, wallet.isBalanceInitialized {
                 await vibroService.applyVibration(.success)
             }
             
-            if let notification = notification {
-                NotificationCenter.default.post(
-                    name: notification,
-                    object: self,
-                    userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-                )
-            }
+            wallet.balance = balance
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
         }
         
         setState(.upToDate)

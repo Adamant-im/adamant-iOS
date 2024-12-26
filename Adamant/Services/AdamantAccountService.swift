@@ -248,11 +248,12 @@ extension AdamantAccountService {
                 }
                 
                 markBalanceAsFresh()
+                self.account = account
                 
-                if loggedAccount.balance != account.balance {
-                    self.account = account
-                    NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
-                }
+                NotificationCenter.default.post(
+                    name: .AdamantAccountService.accountDataUpdated,
+                    object: self
+                )
                 
                 state = .loggedIn
                 completion?(.success(account: account, alert: nil))
