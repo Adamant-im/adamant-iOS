@@ -203,7 +203,8 @@ extension AdamantTransfersProvider {
             forAccount: address,
             type: .send,
             fromHeight: prevHeight,
-            offset: nil
+            offset: nil,
+            waitsForConnectivity: true
         )
         
         // MARK: 4. Check
@@ -815,7 +816,8 @@ extension AdamantTransfersProvider {
         forAccount account: String,
         type: TransactionType,
         fromHeight: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async {
         
         do {
@@ -824,7 +826,8 @@ extension AdamantTransfersProvider {
                 type: type,
                 fromHeight: fromHeight,
                 offset: offset,
-                limit: self.apiTransactions
+                limit: self.apiTransactions,
+                waitsForConnectivity: waitsForConnectivity
             ).get()
             
             guard transactions.count > 0 else {
@@ -851,7 +854,8 @@ extension AdamantTransfersProvider {
                     forAccount: account,
                     type: type,
                     fromHeight: fromHeight,
-                    offset: newOffset
+                    offset: newOffset,
+                    waitsForConnectivity: waitsForConnectivity
                 )
             }
         } catch {
@@ -872,7 +876,8 @@ extension AdamantTransfersProvider {
             fromHeight: nil,
             offset: offset,
             limit: limit,
-            orderByTime: orderByTime
+            orderByTime: orderByTime,
+            waitsForConnectivity: true
         ).get()
         
         guard transactions.count > 0 else {
