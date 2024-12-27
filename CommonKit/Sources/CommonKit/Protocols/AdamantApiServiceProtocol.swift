@@ -29,7 +29,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?
+        limit: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     func getTransactions(
@@ -38,7 +39,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         fromHeight: Int64?,
         offset: Int?,
         limit: Int?,
-        orderByTime: Bool?
+        orderByTime: Bool?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     // MARK: - Chats Rooms
