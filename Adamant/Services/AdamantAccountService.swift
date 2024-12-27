@@ -45,7 +45,8 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         dialogService: DialogService,
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
-        currencyInfoService: InfoServiceProtocol
+        currencyInfoService: InfoServiceProtocol,
+        connection: AnyObservable<Bool>
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
@@ -77,6 +78,10 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
                 self?.previousAppState = .background
             }
             .store(in: &subscriptions)
+        
+        connection.filter { $0 }.sink { [weak self] _ in
+            self?.update()
+        }.store(in: &subscriptions)
         
         setupSecuredStore()
     }

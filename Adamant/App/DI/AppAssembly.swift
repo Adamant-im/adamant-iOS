@@ -254,7 +254,8 @@ struct AppAssembly: MainThreadAssembly {
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
-                currencyInfoService: r.resolve(InfoServiceProtocol.self)!
+                currencyInfoService: r.resolve(InfoServiceProtocol.self)!,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             guard let service = c as? AdamantAccountService else { return }
