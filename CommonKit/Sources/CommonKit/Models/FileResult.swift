@@ -89,3 +89,43 @@ public struct FileResult: Sendable {
         self.mimeType = mimeType
     }
 }
+
+public extension FileResult {
+    init(
+        assetId: String? = nil,
+        url: URL,
+        type: FileType,
+        preview: UIImage?,
+        previewUrl: URL?,
+        previewExtension: String?,
+        size: Int64,
+        namePossiblyWithExtension: String,
+        extenstion: String?,
+        resolution: CGSize?,
+        data: Data? = nil,
+        duration: Float64? = nil,
+        mimeType: String? = nil
+    ) {
+        let nameWithExtension = namePossiblyWithExtension.separateFileExtension()
+        
+        let name = nameWithExtension.extension == extenstion
+            ? nameWithExtension.name
+            : namePossiblyWithExtension
+        
+        self.init(
+            assetId: assetId,
+            url: url,
+            type: type,
+            preview: preview,
+            previewUrl: previewUrl,
+            previewExtension: previewExtension,
+            size: size,
+            name: name,
+            extenstion: extenstion,
+            resolution: resolution,
+            data: data,
+            duration: duration,
+            mimeType: mimeType
+        )
+    }
+}

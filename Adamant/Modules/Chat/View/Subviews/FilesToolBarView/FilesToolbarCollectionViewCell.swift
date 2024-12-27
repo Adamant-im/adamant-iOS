@@ -80,12 +80,10 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
         imageView.image = file.preview ?? defaultImage
         removeBtn.tag = tag
         
-        let fileType = file.extenstion ?? ""
+        let fileType = file.extenstion ?? .empty
         let fileName = file.name ?? "UNKNWON"
         
-        nameLabel.text = fileName.contains(fileType)
-        ? fileName
-        : "\(fileName.uppercased()).\(fileType.uppercased())"
+        nameLabel.text = "\(fileName).\(fileType)"
         
         additionalLabel.text = fileType.uppercased()
         additionalLabel.isHidden = file.preview != nil
