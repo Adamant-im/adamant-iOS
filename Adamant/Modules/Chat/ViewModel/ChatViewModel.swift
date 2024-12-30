@@ -1635,9 +1635,11 @@ private extension ChatViewModel {
         dialog.send(.progress(true))
         
         let files: [FileResult] = chatFiles.compactMap { file in
-            guard file.isCached,
-                  !file.isBusy,
-                  let fileDTO = try? filesStorage.getFile(with: file.file.id).get()
+            guard
+                file.isCached,
+                !file.isBusy,
+                let fileDTO = try? filesStorage.getFile(with: file.file.id).get(),
+                let filename = file.file.name
             else {
                 return nil
             }
@@ -1656,7 +1658,7 @@ private extension ChatViewModel {
                 previewUrl: nil,
                 previewExtension: nil,
                 size: file.file.size,
-                name: file.file.name,
+                namePossiblyWithExtension: filename,
                 extenstion: file.file.extension,
                 resolution: nil,
                 data: data

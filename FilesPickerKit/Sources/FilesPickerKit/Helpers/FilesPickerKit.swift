@@ -86,13 +86,13 @@ public final class FilesPickerKit: FilesPickerProtocol {
     public func getFileResult(for url: URL) throws -> FileResult {
         try createFileResult(
             from: url,
-            name: url.lastPathComponent,
+            name: url.lastPathComponent.separateFileExtension().name,
             extension: url.pathExtension
         )
     }
 
     public func getFileResult(for image: UIImage) throws -> FileResult {
-        let fileName = "\(imagePrefix)\(String.random(length: 4)).\(previewExtension)"
+        let fileName = "\(imagePrefix)\(String.random(length: 4))"
         
         let newUrl = try storageKit.getTempUrl(for: image, name: fileName)
         

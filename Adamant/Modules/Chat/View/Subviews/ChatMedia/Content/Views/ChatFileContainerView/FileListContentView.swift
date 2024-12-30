@@ -228,10 +228,7 @@ private extension FileListContentView {
         let fileType = chatFile.file.extension.map { ".\($0)" } ?? .empty
         let fileName = chatFile.file.name ?? .adamant.chat.unknownTitle.uppercased()
         
-        nameLabel.text = fileName.contains(fileType)
-        ? fileName
-        : "\(fileName.uppercased())\(fileType.uppercased())"
-        
+        nameLabel.text = "\(fileName)\(fileType)".withoutFileExtensionDuplication()
         sizeLabel.text = formatSize(chatFile.file.size)
         additionalLabel.text = fileType.uppercased()
         
