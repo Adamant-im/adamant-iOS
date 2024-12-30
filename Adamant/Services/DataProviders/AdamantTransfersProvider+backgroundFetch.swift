@@ -39,7 +39,8 @@ extension AdamantTransfersProvider: BackgroundFetchService {
                 type: .send,
                 fromHeight: lastHeight,
                 offset: 0,
-                limit: 100
+                limit: 100,
+                waitsForConnectivity: false
             ).get()
             
             let total = transactions.filter({$0.recipientId == address}).count

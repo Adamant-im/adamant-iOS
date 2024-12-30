@@ -307,11 +307,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .notifications(named: .AdamantTransfersProvider.stateChanged, object: nil)
-            .sink { @MainActor [weak self] notification in self?.animateUpdateIfNeeded(notification) }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
             .notifications(named: .LanguageStorageService.languageUpdated)
             .sink { @MainActor [weak self] _ in
                 self?.updateUITitles()
@@ -331,6 +326,19 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
+        
+        Task {
+            let chatsProviderState = await chatsProvider.stateObserver
+            let transfersProviderState = await transfersProvider.stateObserver
+            
+            chatsProviderState
+                .combineLatest(transfersProviderState)
+                .map { $0.0.isUpdating || $0.1.isUpdating }
+                .removeDuplicates()
+                .values
+                .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
+                .store(in: &subscriptions)
+        }
     }
     
     private func closeDetailVC() {
@@ -347,20 +355,12 @@ final class ChatListViewController: KeyboardObservingViewController {
         searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
-    private func animateUpdateIfNeeded(_ notification: Notification) {
-        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
-              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
-        else {
-            return
-        }
-        
-        if case .updating = prevState {
-            updatingIndicatorView.stopAnimate()
-        }
-        
-        if case .updating = newState {
+    private func setIsStateUpdating(_ isUpdating: Bool) {
+        if isUpdating {
             updatingIndicatorView.startAnimate()
             refreshDatesIfNeeded()
+        } else {
+            updatingIndicatorView.stopAnimate()
         }
     }
     
@@ -1525,5 +1525,14 @@ extension ChatListViewController {
         ]
         commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         return commands
+    }
+}
+
+private extension State {
+    var isUpdating: Bool {
+        switch self {
+        case .updating: true
+        case .failedToUpdate, .upToDate, .empty: false
+        }
     }
 }
