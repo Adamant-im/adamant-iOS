@@ -296,7 +296,7 @@
 "ApiService.InternalError.NoEnabledNodesAvailable" = "无法请求新消息 — 没有活跃的%@区块链节点。由于您已停用了一些节点，请考虑检查节点列表.";
 
 /* Serious internal error: No active nodes available */
-"ApiService.InternalError.NoActiveNodesAvailable" = "No active %@ nodes. Review the node list";
+"ApiService.InternalError.NoActiveNodesAvailable" = "没有活动的%@节点。查看节点列表";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "没有活动的 ADM 节点来获取合作伙伴的 %@ 地址";
