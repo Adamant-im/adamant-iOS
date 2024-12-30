@@ -188,15 +188,24 @@ private extension AdvancedContextMenuManager {
 }
 
 // MARK: Delegate
-
+ 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
+    func willDissmis() {
+        guard
+            let newPosition = getPositionOnScreen?(),
+            newPosition != locationOnScreen
+        else { return }
+        
+        viewModel?.update(locationOnScreen: newPosition)
+    }
+    
     func didDissmis() {
         didDismissMenuAction?(messageId)
         getPositionOnScreen = nil
         // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
             // TODO: Bug - Occasionally, the copied content view disappears faster than the original view is presented. Fix it later.
-            await Task.sleep(interval: 0.1)
+            try await Task.sleep(interval: 0.1)
             window.rootViewController = nil
             window.isHidden = true
         }

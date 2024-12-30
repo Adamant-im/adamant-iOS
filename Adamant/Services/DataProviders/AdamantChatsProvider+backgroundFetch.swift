@@ -37,7 +37,8 @@ extension AdamantChatsProvider: BackgroundFetchService {
             let transactions = try await apiService.getMessageTransactions(
                 address: address,
                 height: lastHeight,
-                offset: nil
+                offset: nil,
+                waitsForConnectivity: false
             ).get()
             
             guard transactions.count > 0 else { return .noData }

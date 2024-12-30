@@ -172,7 +172,7 @@ final class LoginViewController: FormViewController {
         self.apiService = apiService
         self.nodeAvailabilityService = nodeAvailabilityService
         
-        super.init(style: .insetGrouped)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {

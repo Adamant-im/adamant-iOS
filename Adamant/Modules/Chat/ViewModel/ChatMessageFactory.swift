@@ -92,21 +92,24 @@ struct ChatMessageFactory: Sendable {
             status: status
         )
         
+        let content = makeContent(
+            transaction,
+            isFromCurrentSender: currentSender.senderId == senderModel.senderId,
+            backgroundColor: backgroundColor
+        )
+        
         return .init(
             id: transaction.chatMessageId ?? "",
             sentDate: sentDate,
             senderModel: senderModel,
             status: status,
-            content: makeContent(
-                transaction,
-                isFromCurrentSender: currentSender.senderId == senderModel.senderId,
-                backgroundColor: backgroundColor
-            ),
+            content: content,
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
                 sentDate: sentDate,
                 status: status,
-                expireDate: &expireDate
+                expireDate: &expireDate,
+                content: content
             ).map { .init(string: $0) },
             dateHeader: makeDateHeader(sentDate: sentDate),
             topSpinnerOn: topSpinnerOn, 
@@ -192,7 +195,8 @@ private extension ChatMessageFactory {
                     address: address,
                     opponentAddress: opponentAddress,
                     isFake: transaction.isFake,
-                    isHidden: false
+                    isHidden: false,
+                    swipeState: .idle
                 )
             ))
         } ?? .default
@@ -233,7 +237,8 @@ private extension ChatMessageFactory {
                 reactions: reactions,
                 address: address,
                 opponentAddress: opponentAddress,
-                isHidden: false
+                isHidden: false,
+                swipeState: .idle
             )
         ))
     }
@@ -284,7 +289,8 @@ private extension ChatMessageFactory {
             status: transaction.transactionStatus ?? .notInitiated,
             reactions: reactions,
             address: address,
-            opponentAddress: opponentAddress
+            opponentAddress: opponentAddress,
+            swipeState: .idle
         )))
     }
     
@@ -329,7 +335,8 @@ private extension ChatMessageFactory {
             files: chatFiles,
             isMediaFilesOnly: isMediaFilesOnly,
             isFromCurrentSender: isFromCurrentSender,
-            txStatus: transaction.statusEnum
+            txStatus: transaction.statusEnum,
+            showAutoDownloadWarningLabel: false
         )
         
         return .file(.init(value: .init(
@@ -350,7 +357,8 @@ private extension ChatMessageFactory {
             address: address,
             opponentAddress: opponentAddress, 
             txStatus: transaction.statusEnum,
-            status: .failed
+            status: .failed,
+            swipeState: .idle
         )))
     }
     
@@ -395,9 +403,7 @@ private extension ChatMessageFactory {
                 nonce: file.nonce,
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: fileType,
-                progress: nil,
-                isPreviewDownloadAllowed: false,
-                isFullMediaDownloadAllowed: false
+                progress: nil
             )
         }
     }
@@ -446,25 +452,32 @@ private extension ChatMessageFactory {
             status: transaction.statusEnum.toTransactionStatus(),
             reactions: reactions,
             address: address,
-            opponentAddress: opponentAddress
+            opponentAddress: opponentAddress,
+            swipeState: .idle
         )))
     }
     
     func makeBottomString(
         sentDate: Date,
         status: ChatMessage.Status,
-        expireDate: inout Date?
+        expireDate: inout Date?,
+        content: ChatMessage.Content
     ) -> NSAttributedString? {
-        switch status {
-        case let .delivered(blockchain):
-            return makeMessageTimeString(
-                sentDate: sentDate,
-                blockchain: blockchain,
-                expireDate: &expireDate
-            )
-        case .pending:
-            return makePendingMessageString()
-        case .failed:
+        switch content {
+        case .file, .message, .reply:
+            switch status {
+            case let .delivered(blockchain):
+                return makeMessageTimeString(
+                    sentDate: sentDate,
+                    blockchain: blockchain,
+                    expireDate: &expireDate
+                )
+            case .pending:
+                return makePendingMessageString()
+            case .failed:
+                return nil
+            }
+        case .transaction:
             return nil
         }
     }

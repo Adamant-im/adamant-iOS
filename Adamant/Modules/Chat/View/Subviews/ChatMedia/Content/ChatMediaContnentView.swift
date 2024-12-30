@@ -242,7 +242,8 @@ private extension ChatMediaContentView {
             reactions: nil,
             address: .empty,
             opponentAddress: .empty,
-            isHidden: false
+            isHidden: false,
+            swipeState: .idle
         )))
     }
 }

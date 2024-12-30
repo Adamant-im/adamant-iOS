@@ -237,7 +237,7 @@ final class AccountViewController: FormViewController {
         self.apiServiceCompose = apiServiceCompose
         self.nodeAvailabilityService = nodeAvailabilityService
         
-        super.init(style: .insetGrouped)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {

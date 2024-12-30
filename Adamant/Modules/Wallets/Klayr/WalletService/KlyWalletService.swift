@@ -223,16 +223,6 @@ private extension KlyWalletService {
                 self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
-            .store(in: &subscriptions)
     }
     
     func update() async {
@@ -263,7 +253,7 @@ private extension KlyWalletService {
         }
         
         if let balance = try? await getBalance() {
-            setBalanceInvalidationSubscription()
+            markBalanceAsFresh()
             let notification: Notification.Name?
             
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
@@ -276,8 +266,6 @@ private extension KlyWalletService {
             } else {
                 notification = nil
             }
-            
-            wallet.isBalanceInitialized = true
             
             if isRaised {
                 await vibroService.applyVibration(.success)
@@ -295,23 +283,20 @@ private extension KlyWalletService {
         setState(.upToDate)
     }
     
-    func setBalanceInvalidationSubscription() {
-        balanceInvalidationSubscription = Task { [weak self] in
-            await Task.sleep(interval: Self.balanceLifetime)
-            try Task.checkCancellation()
-            self?.resetBalance()
-        }.eraseToAnyCancellable()
-    }
-    
-    func resetBalance() {
-        klyWallet?.isBalanceInitialized = false
-        guard let wallet = klyWallet else { return }
+    func markBalanceAsFresh() {
+        klyWallet?.isBalanceInitialized = true
         
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
+        balanceInvalidationSubscription = Task { [weak self] in
+            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
+            guard let self, let wallet = klyWallet else { return }
+            wallet.isBalanceInitialized = false
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
+        }.eraseToAnyCancellable()
     }
 }
 

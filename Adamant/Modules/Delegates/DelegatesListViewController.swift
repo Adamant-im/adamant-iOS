@@ -60,7 +60,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Properties
     
-    private var headerTextView: UITextView {
+    private lazy var headerTextView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .clear
         textView.isEditable = false
@@ -74,8 +74,8 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         )
         
         let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.firstLineHeadIndent = 10
-            paragraphStyle.headIndent = 10
+        paragraphStyle.firstLineHeadIndent = 10
+        paragraphStyle.headIndent = 10
        
         attributedString.addAttribute(
             .paragraphStyle,
@@ -84,12 +84,9 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         )
         
         textView.attributedText = attributedString
-        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
-        
-        textView.sizeToFit()
-        
+        textView.linkTextAttributes = [.foregroundColor: UIColor.adamant.active]
         return textView
-    }
+    }()
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -259,11 +256,16 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
-        return self.headerTextView
+        headerTextView
     }
     
     func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
-        return UITableView.automaticDimension
+        headerTextView.sizeThatFits(.init(
+            width: tableView.contentSize.width
+                - tableView.layoutMargins.left
+                - tableView.layoutMargins.right,
+            height: .greatestFiniteMagnitude
+        )).height
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

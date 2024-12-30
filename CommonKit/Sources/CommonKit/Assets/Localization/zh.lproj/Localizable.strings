@@ -104,7 +104,7 @@
 "AccountTab.Row.Currency" = "货币";
 
 /* Account tab: No enabled nodes */
-"AccountTab.Row.NoEnabledNodes" = "No enabled nodes";
+"AccountTab.Row.NoEnabledNodes" = "没有可用的服务器";
 
 /* Account tab: 'Language' row */
 "AccountTab.Row.Language" = "语言";
@@ -882,6 +882,9 @@
 
 /* PrivateKeyGenerator: scene title */
 "PkGeneratorScene.Title" = "私钥生成器";
+
+/* PrivateKeyGenerator: key format */
+"PkGeneratorScene.KeyFormat" = "Format: %@";
 
 /* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
 "PkGeneratorScene.Alert" = "ADAMANT帐户包括加密钱包。所有这些钱包都与您的密码连接，只有您可以访问这些钱包。您可以导出私钥以在其他应用程序中使用它们。将密钥存储在安全的地方。";

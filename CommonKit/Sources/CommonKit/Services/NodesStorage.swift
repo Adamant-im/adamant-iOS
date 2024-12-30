@@ -71,6 +71,8 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
             
             if !node.isEnabled {
                 node.connectionStatus = nil
+                node.height = nil
+                node.ping = nil
             }
             
             switch node.type {
@@ -118,6 +120,13 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
         subscription = items.removeDuplicates().sink { [weak self] in
             guard let self = self else { return }
             saveNodes(nodes: $0)
+        }
+        
+        // Applying empty mutations, so post-mutation code in `func updateNode` will be executed
+        for (group, nodes) in items.wrappedValue {
+            for node in nodes {
+                updateNode(id: node.id, group: group) { _ in }
+            }
         }
     }
 }

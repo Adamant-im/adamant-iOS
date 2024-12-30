@@ -141,10 +141,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
                 
-                cell.transactionView.actionHandler = { [weak self] in self?.handleAction($0) }
-                cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-                cell.transactionView.model = model.value
-                cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+                cell.model = model.value
+                cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 return cell
             }
@@ -163,10 +163,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
                 
-                cell.containerMediaView.actionHandler = { [weak self] in self?.handleAction($0) }
-                cell.containerMediaView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-                cell.containerMediaView.model = model.value
-                cell.containerMediaView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+                cell.model = model.value
+                cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 return cell
             }
@@ -183,12 +183,10 @@ private extension ChatDataSourceManager {
             viewModel.didTapTransfer.send(id)
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
-        case let .reply(message):
-            viewModel.replyMessageIfNeeded(message)
+        case let .reply(id):
+            viewModel.replyMessageIfNeeded(id: id)
         case let .scrollTo(message):
             viewModel.scroll(to: message)
-        case let .swipeState(state):
-            viewModel.swipeState = state
         case let .copy(text):
             viewModel.copyMessageAction(text)
         case let .remove(id):
@@ -203,8 +201,8 @@ private extension ChatDataSourceManager {
             viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file):
             viewModel.openFile(messageId: messageId, file: file)
-        case let .downloadContentIfNeeded(messageId, files):
-            viewModel.downloadContentIfNeeded(
+        case let .autoDownloadContentIfNeeded(messageId, files):
+            viewModel.autoDownloadContentIfNeeded(
                 messageId: messageId,
                 files: files
             )

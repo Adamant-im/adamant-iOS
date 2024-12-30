@@ -15,7 +15,7 @@ extension Node {
             version: version?.string,
             height: height,
             ping: ping,
-            connectionStatus: connectionStatus,
+            connectionStatus: connectionStatus?.mapToDto(),
             type: type
         )
     }
@@ -32,9 +32,57 @@ extension NodeKeychainDTO {
             version: version.flatMap { .init($0) },
             height: height,
             ping: ping,
-            connectionStatus: connectionStatus,
+            connectionStatus: connectionStatus?.mapToModel(),
             preferMainOrigin: nil,
             type: type
         )
+    }
+}
+
+extension NodeConnectionStatus {
+    func mapToDto() -> NodeConnectionStatusKeychainDTO {
+        switch self {
+        case .offline:
+            .offline
+        case .synchronizing:
+            .synchronizing
+        case .allowed:
+            .allowed
+        case let .notAllowed(rejectedReason):
+            .notAllowed(rejectedReason.mapToDto())
+        }
+    }
+}
+
+extension NodeConnectionStatus.RejectedReason {
+    func mapToDto() -> NodeConnectionStatusKeychainDTO.RejectedReason {
+        switch self {
+        case .outdatedApiVersion:
+            .outdatedApiVersion
+        }
+    }
+}
+
+extension NodeConnectionStatusKeychainDTO {
+    func mapToModel() -> NodeConnectionStatus {
+        switch self {
+        case .offline:
+            .offline
+        case .synchronizing:
+            .synchronizing(isFinal: true)
+        case .allowed:
+            .allowed
+        case let .notAllowed(rejectedReason):
+            .notAllowed(rejectedReason.mapToModel())
+        }
+    }
+}
+
+extension NodeConnectionStatusKeychainDTO.RejectedReason {
+    func mapToModel() -> NodeConnectionStatus.RejectedReason {
+        switch self {
+        case .outdatedApiVersion:
+            .outdatedApiVersion
+        }
     }
 }

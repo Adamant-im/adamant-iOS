@@ -90,7 +90,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     func getMessageTransactions(
         address: String,
         height: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     func sendTransaction(

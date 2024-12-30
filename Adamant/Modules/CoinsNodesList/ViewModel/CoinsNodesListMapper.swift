@@ -38,16 +38,24 @@ private extension CoinsNodesListMapper {
         var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
         indicatorAttrString.foregroundColor = .init(uiColor: node.indicatorColor)
         
+        var titleAttrString = AttributedString(stringLiteral: node.title)
+        titleAttrString.foregroundColor = .init(uiColor: node.titleColor)
+        
+        let subtitleString = node.statusString(
+            showVersion: true,
+            heightType: group.heightType
+        ) ?? .empty
+        
+        var subtitleAttrString = AttributedString(stringLiteral: subtitleString)
+        subtitleAttrString.foregroundColor = .init(uiColor: node.statusStringColor)
+        
         return .init(
             id: node.id,
             group: group,
             isEnabled: node.isEnabled,
-            title: node.title,
+            title: titleAttrString,
             connectionStatus: indicatorAttrString,
-            description: node.statusString(
-                showVersion: true,
-                heightType: group.heightType
-            ) ?? .empty
+            subtitle: subtitleAttrString
         )
     }
 }

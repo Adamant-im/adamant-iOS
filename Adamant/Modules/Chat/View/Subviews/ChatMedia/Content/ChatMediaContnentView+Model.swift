@@ -42,6 +42,7 @@ extension ChatMediaContentView {
         var isMediaFilesOnly: Bool
         let isFromCurrentSender: Bool
         let txStatus: MessageStatus
+        var showAutoDownloadWarningLabel: Bool
         
         static var `default`: Self {
             Self(
@@ -49,7 +50,8 @@ extension ChatMediaContentView {
                 files: [],
                 isMediaFilesOnly: false,
                 isFromCurrentSender: false,
-                txStatus: .failed
+                txStatus: .failed,
+                showAutoDownloadWarningLabel: false
             )
         }
     }

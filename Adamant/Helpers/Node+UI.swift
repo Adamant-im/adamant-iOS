@@ -22,14 +22,16 @@ extension Node {
         let statusTitle = switch connectionStatus {
         case .allowed:
             pingString
-        case .synchronizing:
-            Strings.synchronizing
+        case let .synchronizing(isFinal):
+            isFinal
+                ? Strings.synchronizing
+                : Strings.updating
         case .offline:
             Strings.offline
         case .notAllowed(let reason):
             reason.text
         case .none:
-            Strings.disabled
+            Strings.updating
         }
         
         let heightString: String?
@@ -73,8 +75,10 @@ extension Node {
         switch connectionStatus {
         case .allowed:
             return .adamant.success
-        case .synchronizing:
-            return .adamant.attention
+        case let .synchronizing(isFinal):
+            return isFinal
+                ? .adamant.attention
+                : .adamant.inactive
         case .offline, .notAllowed:
             return .adamant.warning
         case .none:
@@ -84,6 +88,28 @@ extension Node {
     
     var title: String {
         mainOrigin.asString()
+    }
+    
+    var statusStringColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
+    }
+    
+    var titleColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
     }
 }
 

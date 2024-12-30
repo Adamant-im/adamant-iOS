@@ -21,11 +21,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     
     // MARK: Proprieties
     
-    private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: contentView, xPadding: 8)
-        return view
-    }()
-    
     private lazy var reactionsContanerView: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [ownReactionLabel, opponentReactionLabel])
         stack.distribution = .fillProportionally
@@ -33,6 +28,9 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         stack.spacing = 6
         return stack
     }()
+    
+    private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
+    private lazy var cellContainerView = UIView()
     
     private lazy var ownReactionLabel: UILabel = {
         let label = UILabel()
@@ -79,7 +77,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            
+            swipeWrapper.model = .init(id: model.id, state: model.swipeState)
             containerView.isHidden = model.isHidden
             reactionsContanerView.isHidden = model.reactions == nil
             ownReactionLabel.isHidden = getReaction(for: model.address) == nil
@@ -87,10 +85,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
-            
-            swipeView.didSwipeAction = { [actionHandler, model] in
-                actionHandler(.reply(message: model))
-            }
         }
     }
     
@@ -143,27 +137,28 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     }
     
     override func setupSubviews() {
-        super.setupSubviews()
+        contentView.addSubview(swipeWrapper)
+        cellContainerView.addSubviews(
+            accessoryView,
+            cellTopLabel,
+            messageTopLabel,
+            messageBottomLabel,
+            cellBottomLabel,
+            messageContainerView,
+            avatarView,
+            messageTimestampLabel
+        )
         
-        contentView.addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.top.equalToSuperview()
-        }
-        
-        swipeView.swipeStateAction = { [actionHandler] state in
-            actionHandler(.swipeState(state: state))
-        }
-        
+        messageContainerView.addSubview(messageLabel)
         configureMenu()
-        
-        contentView.addSubview(reactionsContanerView)
+        cellContainerView.addSubview(reactionsContanerView)
     }
     
     func configureMenu() {
         containerView.layer.cornerRadius = 10
         
         messageContainerView.removeFromSuperview()
-        contentView.addSubview(containerView)
+        cellContainerView.addSubview(containerView)
         
         containerView.addSubview(messageContainerView)
         
@@ -356,11 +351,11 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         : minReactionsSpacingToOwnBoundary
         
         if model.isFromCurrentSender {
-            x = min(x, contentView.bounds.width - minSpace)
+            x = min(x, cellContainerView.bounds.width - minSpace)
             x = max(x, minReactionsSpacingToOppositeBoundary)
         } else {
             x = max(x, minSpace)
-            x = min(x, contentView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
+            x = min(x, cellContainerView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
         }
         
         reactionsContanerView.frame = CGRect(
@@ -418,6 +413,11 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             delegate?.didTapBackground(in: self)
         }
     }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        swipeWrapper.frame = contentView.bounds
+    }
 }
 
 extension ChatMessageCell {
@@ -441,7 +441,7 @@ extension ChatMessageCell {
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [actionHandler, model] in
-            actionHandler(.reply(message: model))
+            actionHandler(.reply(id: model.id))
         }
         
         let copy = AMenuItem.action(

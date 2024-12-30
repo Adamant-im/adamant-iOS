@@ -31,6 +31,7 @@ final class ChatViewController: MessagesViewController {
     private let walletServiceCompose: WalletServiceCompose
     private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
+    private let chatSwipeManager: ChatSwipeManager
     
     let viewModel: ChatViewModel
     
@@ -90,6 +91,7 @@ final class ChatViewController: MessagesViewController {
         storedObjects: [AnyObject],
         admWalletService: WalletService?,
         screensFactory: ScreensFactory,
+        chatSwipeManager: ChatSwipeManager,
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
@@ -98,12 +100,19 @@ final class ChatViewController: MessagesViewController {
         self.admWalletService = admWalletService
         self.screensFactory = screensFactory
         self.sendTransaction = sendTransaction
+        self.chatSwipeManager = chatSwipeManager
         super.init(nibName: nil, bundle: nil)
+        
         inputBar.onAttachmentButtonTap = { [weak self] in
             self?.viewModel.presentActionMenu()
         }
+        
         inputBar.onImagePasted = { [weak self] image in
             self?.viewModel.handlePastedImage(image)
+        }
+        
+        viewModel.indexPathsForVisibleItems = { [weak self] in
+            self?.messagesCollectionView.indexPathsForVisibleItems ?? .init()
         }
     }
     
@@ -126,6 +135,7 @@ final class ChatViewController: MessagesViewController {
         configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
+        chatSwipeManager.configure(chatView: view)
     }
     
     override func viewWillLayoutSubviews() {
@@ -230,17 +240,6 @@ extension ChatViewController {
         }
         let velocity = panGesture.velocity(in: messagesCollectionView)
         return abs(velocity.x) > abs(velocity.y)
-    }
-    
-    private func swipeStateAction(_ state: SwipeableView.State) {
-        if state == .began {
-            chatMessagesCollectionView.stopDecelerating()
-            messagesCollectionView.isScrollEnabled = false
-        }
-        
-        if state == .ended {
-            messagesCollectionView.isScrollEnabled = true
-        }
     }
 }
 
@@ -406,8 +405,8 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
-        viewModel.$swipeState
-            .sink { [weak self] in self?.swipeStateAction($0) }
+        viewModel.enableScroll
+            .sink { [weak self] in self?.enableScroll($0) }
             .store(in: &subscriptions)
         
         viewModel.$isNeedToAnimateScroll
@@ -584,7 +583,7 @@ private extension ChatViewController {
         }
         
         filesToolbarView.openFileAction = { [weak self] data in
-            self?.presentDocumentViewer(url: data.url)
+            self?.presentDocumentViewer(file: data)
         }
     }
     
@@ -608,6 +607,7 @@ private extension ChatViewController {
     }
 
     func presentMediaPicker() {
+        guard !isMacOS else { return presentDocumentPicker() }
         messageInputBar.inputTextView.resignFirstResponder()
         
         viewModel.mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
@@ -655,8 +655,8 @@ private extension ChatViewController {
         }
     }
     
-    func presentDocumentViewer(url: URL) {
-        viewModel.documentViewerService.openFile(url: url)
+    func presentDocumentViewer(file: FileResult) {
+        viewModel.documentViewerService.openFile(files: [file])
         
         let quickVC = QLPreviewController()
         quickVC.delegate = viewModel.documentViewerService
@@ -792,8 +792,17 @@ private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
         // "becomeFirstResponder()" causes content animation on start without this fix
         Task {
-            await Task.sleep(interval: .zero)
+            try await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
+        }
+    }
+    
+    func enableScroll(_ isEnabled: Bool) {
+        if isEnabled {
+            chatMessagesCollectionView.isScrollEnabled = true
+        } else {
+            chatMessagesCollectionView.stopDecelerating()
+            chatMessagesCollectionView.isScrollEnabled = false
         }
     }
     

@@ -239,7 +239,8 @@ private extension ChatTransactionContentView {
                 reactions: nil,
                 address: "",
                 opponentAddress: "",
-                isHidden: false
+                isHidden: false,
+                swipeState: .idle
             )))
             return
         }

@@ -62,6 +62,8 @@ final class ContextMenuOverlayViewModel: ObservableObject {
     }
     
     @MainActor func dismiss() async {
+        delegate?.willDissmis()
+        
         await animate(duration: animationDuration) {
             self.additionalMenuVisible.toggle()
         }

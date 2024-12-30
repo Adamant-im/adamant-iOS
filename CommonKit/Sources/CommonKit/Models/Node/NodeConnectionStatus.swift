@@ -9,7 +9,7 @@ import Foundation
 
 public enum NodeConnectionStatus: Equatable, Codable, Sendable {
     case offline
-    case synchronizing
+    case synchronizing(isFinal: Bool)
     case allowed
     case notAllowed(RejectedReason)
 }

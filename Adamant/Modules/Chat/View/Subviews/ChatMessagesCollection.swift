@@ -48,10 +48,6 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             return applyNewIds(newIds)
         }
         
-        if Set(newIds) != Set(currentIds) {
-            stopDecelerating()
-        }
-        
         let bottomOffset = self.bottomOffset
         applyNewIds(newIds)
         setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)

@@ -32,6 +32,7 @@ struct AdamantScreensFactory: ScreensFactory {
     private let notificationsFactory: NotificationsFactory
     private let notificationSoundsFactory: NotificationSoundsFactory
     private let storageUsageFactory: StorageUsageFactory
+    private let pkGeneratorFactory: PKGeneratorFactory
         
     init(assembler: Assembler) {
         admWalletFactory = .init(assembler: assembler)
@@ -52,6 +53,7 @@ struct AdamantScreensFactory: ScreensFactory {
         notificationsFactory = .init(parent: assembler)
         notificationSoundsFactory = .init(parent: assembler)
         storageUsageFactory = .init(parent: assembler)
+        pkGeneratorFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
             klyWalletFactory: .init(assembler: assembler),
@@ -157,7 +159,7 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makePKGenerator() -> UIViewController {
-        settingsFactory.makePKGeneratorVC()
+        pkGeneratorFactory.makeViewController()
     }
     
     func makeAbout() -> UIViewController {

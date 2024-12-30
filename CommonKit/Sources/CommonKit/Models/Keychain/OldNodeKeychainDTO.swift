@@ -80,7 +80,7 @@ private extension OldNodeKeychainDTO.NodeData.URLScheme {
 }
 
 private extension OldNodeKeychainDTO.NodeData.ConnectionStatus {
-    func map() -> NodeConnectionStatus {
+    func map() -> NodeConnectionStatusKeychainDTO {
         switch self {
         case .offline:
             return .offline
@@ -95,7 +95,7 @@ private extension OldNodeKeychainDTO.NodeData.ConnectionStatus {
 }
 
 private extension OldNodeKeychainDTO.NodeData.RejectedReason {
-    func map() -> NodeConnectionStatus.RejectedReason {
+    func map() -> NodeConnectionStatusKeychainDTO.RejectedReason {
         switch self {
         case .outdatedApiVersion:
             return .outdatedApiVersion

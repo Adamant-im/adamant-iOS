@@ -112,7 +112,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .upToDate
-    @Atomic private(set) var wallet: WalletAccount?
+    @Atomic private(set) var admWallet: AdmWallet?
+    
+    var wallet: WalletAccount? { admWallet }
     
     // MARK: - Logic
     override init() {
@@ -140,14 +142,14 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
             .sink { @MainActor [weak self] _ in
-                self?.wallet = nil
+                self?.admWallet = nil
             }
             .store(in: &subscriptions)
     }
     
     func update() {
         guard let accountService = accountService, let account = accountService.account else {
-            wallet = nil
+            admWallet = nil
             return
         }
                 
@@ -155,7 +157,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         
         let isRaised: Bool
         
-        if let wallet = wallet as? AdmWallet {
+        if let wallet = admWallet {
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             if wallet.balance != account.balance || wallet.isBalanceInitialized != !accountService.isBalanceExpired {
                 wallet.balance = account.balance
@@ -165,16 +167,16 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             } else {
                 notify = false
             }
-            wallet.isBalanceInitialized = !accountService.isBalanceExpired
         } else {
             let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
-            wallet.isBalanceInitialized = !accountService.isBalanceExpired
             wallet.balance = account.balance
             
-            self.wallet = wallet
+            admWallet = wallet
             notify = true
             isRaised = false
         }
+        
+        admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
         
         if isRaised {
             Task { @MainActor in vibroService.applyVibration(.success) }

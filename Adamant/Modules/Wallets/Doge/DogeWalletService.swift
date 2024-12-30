@@ -220,16 +220,6 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.setBalanceInvalidationSubscription() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.balanceInvalidationSubscription = nil }
-            .store(in: &subscriptions)
     }
     
     func addTransactionObserver() {
@@ -262,7 +252,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            setBalanceInvalidationSubscription()
+            markBalanceAsFresh()
             let notification: Notification.Name?
             let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
@@ -274,8 +264,6 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             } else {
                 notification = nil
             }
-            
-            wallet.isBalanceInitialized = true
             
             if isRaised {
                 await vibroService.applyVibration(.success)
@@ -300,23 +288,20 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    private func setBalanceInvalidationSubscription() {
-        balanceInvalidationSubscription = Task { [weak self] in
-            await Task.sleep(interval: Self.balanceLifetime)
-            try Task.checkCancellation()
-            self?.resetBalance()
-        }.eraseToAnyCancellable()
-    }
-    
-    private func resetBalance() {
-        dogeWallet?.isBalanceInitialized = false
-        guard let wallet = dogeWallet else { return }
+    private func markBalanceAsFresh() {
+        dogeWallet?.isBalanceInitialized = true
         
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
+        balanceInvalidationSubscription = Task { [weak self] in
+            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
+            guard let self, let wallet = dogeWallet else { return }
+            wallet.isBalanceInitialized = false
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
+        }.eraseToAnyCancellable()
     }
 }
 
@@ -713,6 +698,8 @@ extension DogeWalletService: PrivateKeyGenerator {
     var rowImage: UIImage? {
         return .asset(named: "doge_wallet_row")
     }
+    
+    var keyFormat: KeyFormat { .WIF }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
