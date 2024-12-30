@@ -83,6 +83,10 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     let transactionFeeUpdated = Notification.Name("adamant.klyWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.klyWallet.stateChanged")
     
+    init() {
+        addObservers()
+    }
+    
     // MARK: -
     
     func initWallet(
@@ -240,18 +244,6 @@ private extension KlyWalletService {
         
         setState(.updating)
         
-        if let nonce = try? await getNonce(address: wallet.address) {
-            wallet.nonce = nonce
-        }
-        
-        if let result = try? await getFees(comment: .empty) {
-            self.lastHeight = result.lastHeight
-            self.transactionFeeRaw = result.fee > KlyWalletService.defaultFee
-            ? result.fee
-            : KlyWalletService.defaultFee
-            self.lastMinFeePerByte = result.minFeePerByte
-        }
-        
         if let balance = try? await getBalance() {
             markBalanceAsFresh()
 
@@ -266,6 +258,18 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+        }
+        
+        if let nonce = try? await getNonce(address: wallet.address) {
+            wallet.nonce = nonce
+        }
+        
+        if let result = try? await getFees(comment: .empty) {
+            self.lastHeight = result.lastHeight
+            self.transactionFeeRaw = result.fee > KlyWalletService.defaultFee
+            ? result.fee
+            : KlyWalletService.defaultFee
+            self.lastMinFeePerByte = result.minFeePerByte
         }
         
         setState(.upToDate)
