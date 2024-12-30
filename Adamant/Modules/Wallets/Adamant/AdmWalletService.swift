@@ -152,27 +152,17 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             admWallet = nil
             return
         }
-                
-        let notify: Bool
         
         let isRaised: Bool
         
         if let wallet = admWallet {
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
-            if wallet.balance != account.balance || wallet.isBalanceInitialized != !accountService.isBalanceExpired {
-                wallet.balance = account.balance
-                notify = true
-            } else if !wallet.isBalanceInitialized {
-                notify = true
-            } else {
-                notify = false
-            }
+            wallet.balance = account.balance
         } else {
             let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
             wallet.balance = account.balance
             
             admWallet = wallet
-            notify = true
             isRaised = false
         }
         
@@ -181,7 +171,8 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         if isRaised {
             Task { @MainActor in vibroService.applyVibration(.success) }
         }
-        if notify, let wallet = wallet {
+        
+        if let wallet = wallet {
             postUpdateNotification(with: wallet)
         }
     }
