@@ -291,13 +291,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh()
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,

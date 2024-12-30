@@ -282,13 +282,12 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            markBalanceAsFresh()
-            
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 await vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh()
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
