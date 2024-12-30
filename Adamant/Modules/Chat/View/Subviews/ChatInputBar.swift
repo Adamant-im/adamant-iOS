@@ -142,6 +142,7 @@ private extension ChatInputBar {
         configureSendButton()
         configureTextView()
         updateIsEnabled()
+        updateFeeLabel()
     }
     
     func configureLayout() {
