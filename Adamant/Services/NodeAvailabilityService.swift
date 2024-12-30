@@ -62,6 +62,16 @@ final class NodeAvailabilityService: NodeAvailabilityProtocol {
             return false
         }
         
+        guard apiServiceCompose.get(nodeGroup)?.hasActiveNode == true
+        else {
+            dialogService.showError(
+                withMessage: noActiveNodesError(for: nodeGroup.name),
+                supportEmail: false,
+                error: nil
+            )
+            return false
+        }
+        
         return true
     }
     
@@ -104,4 +114,14 @@ private extension NodeAvailabilityService {
         nav.modalPresentationStyle = .pageSheet
         rootVC.present(nav, animated: true, completion: nil)
     }
+}
+
+private func noActiveNodesError(for nodeGroupName: String) -> String {
+    .localizedStringWithFormat(
+        .localized(
+            "ApiService.InternalError.NoActiveNodesAvailable",
+            comment: "Serious internal error: No active nodes available"
+        ),
+        nodeGroupName
+    ).localized
 }

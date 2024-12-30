@@ -308,6 +308,7 @@ extension AdamantDialogService {
         )
         
         self.present(alert, animated: true, completion: nil)
+        vibroService.applyVibration(.heavy)
     }
     
     func presentShareAlertFor(

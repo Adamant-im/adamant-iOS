@@ -296,7 +296,10 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Neue Nachrichten können nicht angefordert werden — keine aktiven %@ Blockchain-Knoten. Da Sie einige davon deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+"ApiService.InternalError.NoEnabledNodesAvailable" = "Neue Nachrichten können nicht angefordert werden — keine aktiven %@ Blockchain-Knoten. Da Sie einige davon deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+
+/* Serious internal error: No active nodes available */
+"ApiService.InternalError.NoActiveNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";

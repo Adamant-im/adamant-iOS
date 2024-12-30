@@ -293,7 +293,10 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Не удается получить новые сообщения — нет активных узлов блокчейна %@. Поскольку вы отключили некоторые из них, посмотрите список узлов еще раз.";
+"ApiService.InternalError.NoEnabledNodesAvailable" = "Не удается получить новые сообщения — нет активных узлов блокчейна %@. Поскольку вы отключили некоторые из них, посмотрите список узлов еще раз.";
+
+/* Serious internal error: No active nodes available */
+"ApiService.InternalError.NoActiveNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Нет доступных ADM нод для получения адреса партнера %@";

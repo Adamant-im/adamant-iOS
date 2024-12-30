@@ -31,4 +31,9 @@ public extension ApiServiceProtocol {
     var hasEnabledNode: Bool {
         nodesInfo.nodes.contains { $0.isEnabled }
     }
+    
+    @MainActor
+    var hasActiveNode: Bool {
+        nodesInfo.nodes.contains { $0.connectionStatus == .allowed }
+    }
 }
