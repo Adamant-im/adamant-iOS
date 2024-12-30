@@ -31,8 +31,12 @@ struct NotificationPresenterView: View {
             isTextLimited: $isTextLimited,
             model: model
         )
-        .padding([.leading, .trailing], 15)
+        .padding([.leading, .trailing], 10)
         .padding([.top, .bottom], 10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.init(uiColor:.adamant.chatInputBarBorderColor), lineWidth: 1)
+        )
         .background(GeometryReader(content: processGeometry))
         .expanded(axes: .horizontal)
         .offset(y: verticalDragTranslation < .zero ? verticalDragTranslation : .zero)

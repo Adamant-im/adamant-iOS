@@ -13,12 +13,18 @@ struct NotificationView: View {
     let model: NotificationModel
     
     var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            if let icon = model.icon {
-                makeIcon(image: icon)
+        VStack(alignment: .center, spacing: 5) {
+            HStack(alignment: .top, spacing: 10) {
+                if let icon = model.icon {
+                    makeIcon(image: icon)
+                }
+                textStack
+                Spacer(minLength: .zero)
             }
-            textStack
-            Spacer(minLength: .zero)
+            
+            Image(systemName: isTextLimited ? pullDownIcon : pullUpIcon)
+                .font(.title)
+                .foregroundColor(.gray)
         }
     }
 }
@@ -49,3 +55,6 @@ private extension NotificationView {
         }
     }
 }
+
+private let pullDownIcon = "chevron.compact.down"
+private let pullUpIcon = "chevron.compact.up"
