@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "OpenSSL", url: "https://github.com/krzyzanowskim/OpenSSL.git", .upToNextMinor(from: "1.1.180")),
-        .package(name: "Web3swift", url: "https://github.com/skywinder/web3swift.git", .exact("3.2.2"))
+        .package(name: "Web3swift", url: "https://github.com/skywinder/web3swift.git", .upToNextMajor(from: "3.0.0")) //,
     ],
     targets: [
         .target(
