@@ -329,6 +329,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         repeater.resumeAll()
     }
+  
+    func application(
+        _ application: UIApplication,
+        shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
+    ) -> Bool {
+        switch extensionPointIdentifier {
+        case .keyboard:
+            false
+        default:
+            true
+        }
+    }
 }
 
 // MARK: - Remote notifications
