@@ -331,7 +331,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   
     func application(
-        _ application: UIApplication,
+        _: UIApplication,
         shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
     ) -> Bool {
         switch extensionPointIdentifier {
