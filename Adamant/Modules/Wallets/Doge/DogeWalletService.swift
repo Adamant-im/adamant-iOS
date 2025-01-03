@@ -236,6 +236,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = dogeWallet else {
             return
@@ -253,11 +254,11 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
-            markBalanceAsFresh()
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -280,12 +281,12 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    private func markBalanceAsFresh() {
-        dogeWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: DogeWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = dogeWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(

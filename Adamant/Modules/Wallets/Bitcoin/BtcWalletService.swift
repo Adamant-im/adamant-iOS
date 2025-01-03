@@ -266,6 +266,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = btcWallet else {
             return
@@ -283,11 +284,11 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
-            markBalanceAsFresh()
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -362,12 +363,12 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         return output
     }
     
-    private func markBalanceAsFresh() {
-        btcWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: BtcWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = btcWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -535,16 +536,11 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        do {
-            let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
-                await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
-            }.get()
-
-            return response.value / BtcWalletService.multiplier
-        } catch {
-            print("--debug", error.localizedDescription)
-            return 0
-        }
+        let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
+        }.get()
+        
+        return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
