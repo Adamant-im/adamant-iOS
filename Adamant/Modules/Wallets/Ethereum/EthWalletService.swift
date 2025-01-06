@@ -65,6 +65,12 @@ extension Web3Error {
             return .remoteServiceError(message: "Unknown error \(code)")
         case .clientError(code: let code):
             return .internalError(message: "Unknown error \(code)", error: nil)
+        case .rpcError(_):
+            return .internalError(message: "Unknown error", error: nil)
+        case .revert(_, reason: let reason):
+            return .internalError(message: "Unknown error", error: nil)
+        case .revertCustom(_, _):
+            return .internalError(message: "Unknown error", error: nil)
         }
     }
 }

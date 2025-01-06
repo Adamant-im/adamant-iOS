@@ -265,6 +265,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
+		6FC3222F2D2904FB00B02742 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = 6FC3222E2D2904FB00B02742 /* web3swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
 		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
@@ -432,7 +433,6 @@
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
 		A57282D3262C94DF00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D2262C94DF00C96FA8 /* DateToolsSwift */; };
 		A57282D5262C94E500C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D4262C94E500C96FA8 /* DateToolsSwift */; };
-		A5785ADF262C63580001BC66 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = A5785ADE262C63580001BC66 /* web3swift */; };
 		A578BDE52623051C00090141 /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */; };
 		A5AC8DFF262E0B030053A7E2 /* SipHash in Frameworks */ = {isa = PBXBuildFile; productRef = A5AC8DFE262E0B030053A7E2 /* SipHash */; };
 		A5AC8E00262E0B030053A7E2 /* SipHash in Embed Frameworks */ = {isa = PBXBuildFile; productRef = A5AC8DFE262E0B030053A7E2 /* SipHash */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -1310,6 +1310,7 @@
 			files = (
 				A5AC8DFF262E0B030053A7E2 /* SipHash in Frameworks */,
 				3A8875EF27BBF38D00436195 /* Parchment in Frameworks */,
+				6FC3222F2D2904FB00B02742 /* web3swift in Frameworks */,
 				3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */,
 				A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */,
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
@@ -1318,7 +1319,6 @@
 				A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */,
 				A544F0D4262C9878001F1A6D /* Eureka in Frameworks */,
 				3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */,
-				A5785ADF262C63580001BC66 /* web3swift in Frameworks */,
 				557AC306287B10D8004699D7 /* SnapKit in Frameworks */,
 				9342F6C22A6A35E300A9B39F /* CommonKit in Frameworks */,
 				A5F0A04B262C9CA90009672A /* Swinject in Frameworks */,
@@ -2825,7 +2825,6 @@
 			);
 			name = Adamant;
 			packageProductDependencies = (
-				A5785ADE262C63580001BC66 /* web3swift */,
 				A5DBBABC262C7221004AC028 /* Clibsodium */,
 				A5DBBADB262C729B004AC028 /* CryptoSwift */,
 				A5DBBAED262C72EF004AC028 /* BitcoinKit */,
@@ -2850,6 +2849,7 @@
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
 				3A075C9D2B98A3B100714E3B /* FilesPickerKit */,
 				3A833C3F2B99CDA000238F6A /* FilesStorageKit */,
+				6FC3222E2D2904FB00B02742 /* web3swift */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2995,7 +2995,6 @@
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			packageReferences = (
-				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
 				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
 				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */,
@@ -3013,6 +3012,7 @@
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
+				6FC3222D2D2904FB00B02742 /* XCRemoteSwiftPackageReference "web3swift" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -4355,6 +4355,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		6FC3222D2D2904FB00B02742 /* XCRemoteSwiftPackageReference "web3swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/web3swift-team/web3swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 3.2.2;
+			};
+		};
 		938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MessageKit/MessageKit.git";
@@ -4393,14 +4401,6 @@
 			requirement = {
 				branch = mani_swiftpm_5_3;
 				kind = branch;
-			};
-		};
-		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/skywinder/web3swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
 			};
 		};
 		A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */ = {
@@ -4509,6 +4509,11 @@
 			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
+		6FC3222E2D2904FB00B02742 /* web3swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6FC3222D2D2904FB00B02742 /* XCRemoteSwiftPackageReference "web3swift" */;
+			productName = web3swift;
+		};
 		9342F6C12A6A35E300A9B39F /* CommonKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonKit;
@@ -4583,11 +4588,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
-		};
-		A5785ADE262C63580001BC66 /* web3swift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */;
-			productName = web3swift;
 		};
 		A5AC8DFE262E0B030053A7E2 /* SipHash */ = {
 			isa = XCSwiftPackageProductDependency;

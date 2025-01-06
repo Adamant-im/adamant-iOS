@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "AdamantWalletsAssets",
+        "repositoryURL": "https://github.com/Adamant-im/adamant-wallets.git",
+        "state": {
+          "branch": "trello.com/c/txGIRwKv/771-update-the-script-for-adamant-wallets",
+          "revision": "f31539fa811ce1101248c319f5645a8f7dda42b5",
+          "version": null
+        }
+      },
+      {
         "package": "Alamofire",
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
@@ -327,11 +336,11 @@
       },
       {
         "package": "Web3swift",
-        "repositoryURL": "https://github.com/skywinder/web3swift.git",
+        "repositoryURL": "https://github.com/web3swift-team/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "16a2915ebd1a0fd33bf0a0ed5a9874909a6e187d",
-          "version": "3.1.2"
+          "revision": "8a026108ae5ff730ac83e9b574c8cf1c14413c94",
+          "version": "3.2.2"
         }
       }
     ]
