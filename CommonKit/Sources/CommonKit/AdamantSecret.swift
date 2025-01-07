@@ -4,8 +4,6 @@
 //
 //  Created by Владимир Клевцов on 4.1.25..
 //
-
-
 import Foundation
 
 enum AdamantSecret {

@@ -7,10 +7,17 @@
 //
 
 import UIKit
+import AdamantWalletsAssets
 
 public extension UIImage {
     static func asset(named: String) -> UIImage? {
-        .init(named: named, in: .module, with: nil)
+        if let image = UIImage(named: named, in: .module, compatibleWith: nil) {
+            return image
+        }
+        if let image = UIImage(named: named, in: Bundle.adamantWalletsAssets, compatibleWith: nil) {
+            return image
+        }
+        return nil
     }
     
     func imageResized(to size: CGSize) -> UIImage {
@@ -18,8 +25,4 @@ public extension UIImage {
             draw(in: CGRect(origin: .zero, size: size))
         }
     }
-}
-
-public func getLocalImageUrl(by name: String, withExtension ext: String) -> URL? {
-    Bundle.module.url(forResource: name, withExtension: ext)
 }

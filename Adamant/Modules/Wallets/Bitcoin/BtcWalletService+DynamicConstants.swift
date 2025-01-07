@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 import CommonKit
-    
+
 extension BtcWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 3.153e-05
@@ -18,27 +18,27 @@ extension BtcWalletService {
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
-        
+    
     static var newPendingInterval: Int {
         10000
     }
-        
+    
     static var oldPendingInterval: Int {
         3000
     }
-        
+    
     static var registeredInterval: Int {
         40000
     }
-        
+    
     static var newPendingAttempts: Int {
         20
     }
-        
+    
     static var oldPendingAttempts: Int {
         4
     }
-        
+    
     var tokenName: String {
         "Bitcoin"
     }
@@ -76,7 +76,7 @@ extension BtcWalletService {
     static var nodes: [Node] {
         [
             Node.makeDefaultNode(url: URL(string: "https://btcnode1.adamant.im/bitcoind")!, altUrl: URL(string: "http://176.9.38.204:44099/bitcoind")),
-Node.makeDefaultNode(url: URL(string: "https://btcnode3.adamant.im/bitcoind")!, altUrl: URL(string: "http://195.201.242.108:44099/bitcoind")),
+            Node.makeDefaultNode(url: URL(string: "https://btcnode3.adamant.im/bitcoind")!, altUrl: URL(string: "http://195.201.242.108:44099/bitcoind")),
         ]
     }
     

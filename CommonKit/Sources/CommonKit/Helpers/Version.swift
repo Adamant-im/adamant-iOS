@@ -31,6 +31,25 @@ public extension Version {
     }
 }
 
+extension Version: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let versionString = try container.decode(String.self)
+        guard let version = Version(versionString) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Version string does not match format 'X.Y.Z'"
+            )
+        }
+        self = version
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.string)
+    }
+}
+
 extension Version: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         for i in .zero ..< max(lhs.versions.endIndex, rhs.versions.endIndex) {

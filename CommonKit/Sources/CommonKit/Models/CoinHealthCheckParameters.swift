@@ -34,3 +34,25 @@ public struct CoinHealthCheckParameters {
         self.onScreenServiceUpdateInterval = onScreenServiceUpdateInterval
     }
 }
+extension CoinHealthCheckParameters: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case normalUpdateInterval
+        case crucialUpdateInterval
+        case onScreenUpdateInterval
+        case threshold
+        case normalServiceUpdateInterval
+        case crucialServiceUpdateInterval
+        case onScreenServiceUpdateInterval
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        normalUpdateInterval = try container.decode(TimeInterval.self, forKey: .normalUpdateInterval)
+        crucialUpdateInterval = try container.decode(TimeInterval.self, forKey: .crucialUpdateInterval)
+        onScreenUpdateInterval = try container.decode(TimeInterval.self, forKey: .onScreenUpdateInterval)
+        threshold = try container.decode(Int.self, forKey: .threshold)
+        normalServiceUpdateInterval = try container.decode(TimeInterval.self, forKey: .normalServiceUpdateInterval)
+        crucialServiceUpdateInterval = try container.decode(TimeInterval.self, forKey: .crucialServiceUpdateInterval)
+        onScreenServiceUpdateInterval = try container.decode(TimeInterval.self, forKey: .onScreenServiceUpdateInterval)
+    }
+}
