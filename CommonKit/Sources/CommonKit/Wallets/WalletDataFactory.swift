@@ -7,13 +7,13 @@
 import Foundation
 import AdamantWalletsAssets
 
-struct WalletFactory {
+public struct WalletDataFactory {
     private static var cachedWalletDictionary: [String: WalletDecodingModel] = {
         let jsonFiles = AssetManager.loadInfoFiles()
         return Self.createDictionary(from: jsonFiles)
     }()
     
-    func wallet(for symbol: String) -> WalletDecodingModel? {
+    public static func wallet(for symbol: String) -> WalletDecodingModel? {
         return Self.cachedWalletDictionary[symbol]
     }
     

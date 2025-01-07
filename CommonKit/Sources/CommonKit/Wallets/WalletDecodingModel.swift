@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct WalletDecodingModel: Decodable {
+public struct WalletDecodingModel: Decodable {
     let name: String
     let nameShort: String?
     let website: String?
@@ -17,7 +17,7 @@ struct WalletDecodingModel: Decodable {
     let explorerContract: String?
     let regexAddress: String?
     let research: String?
-    let symbol: String
+    public let symbol: String
     let type: String
     let decimals: Int
     let cryptoTransferDecimals: Int
@@ -33,6 +33,7 @@ struct WalletDecodingModel: Decodable {
     let consensus: String?
     let blockTimeFixed: Int?
     let blockTimeAvg: Int?
+    public let txFetchInfo: TxFetchInfo?
     let walletNodes: WalletNodes?
     let services: [String: Service]?
     let links: [Link]?
@@ -65,6 +66,7 @@ struct WalletDecodingModel: Decodable {
         case consensus
         case blockTimeFixed
         case blockTimeAvg
+        case txFetchInfo
         case walletNodes = "nodes"
         case services
         case links
@@ -131,6 +133,13 @@ struct Tor: Decodable {
     let walletNodes: WalletNodes?
     let services: [String: Service]?
     let links: [Link]?
+}
+public struct TxFetchInfo: Decodable {
+    public let newPendingInterval: Int
+    let oldPendingInterval: Int
+    let registeredInterval: Int
+    let newPendingAttempts: Int
+    let oldPendingAttempts: Int
 }
 extension WalletNodes {
     func toNodes() -> [Node] {
