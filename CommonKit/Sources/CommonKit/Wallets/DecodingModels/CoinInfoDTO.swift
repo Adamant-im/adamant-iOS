@@ -20,6 +20,8 @@ public struct CoinInfoDTO: Decodable {
     public let type: String
     public let decimals: Int
     public let cryptoTransferDecimals: Int
+    public let minBalance: Decimal?
+    public let minTransferAmount: Double?
     public let fixedFee: Decimal?
     public let defaultFee: Decimal?
     public let qqPrefix: String?
@@ -29,6 +31,11 @@ public struct CoinInfoDTO: Decodable {
     public let defaultOrdinalLevel: Int?
     public let consensus: String?
     public let blockTimeFixed: Int?
+    public let reliabilityGasPricePercent: Int?
+    public let reliabilityGasLimitPercent: Int?
+    public let defaultGasPriceGwei: Int?
+    public let defaultGasLimit: Int?
+    public let warningGasPriceGwei: Int?
     public let blockTimeAvg: Int?
     public let nodes: Nodes?
     public let services: Services?
@@ -38,8 +45,8 @@ public struct CoinInfoDTO: Decodable {
     public let timeout: Timeout?
 
     public struct Node: Decodable {
-        let url: String
-        let altIP: String?
+        public let url: String
+        public let altIP: String?
     }
 
     public struct NodeHealthCheck: Decodable {
@@ -51,8 +58,8 @@ public struct CoinInfoDTO: Decodable {
 
     public struct Service: Decodable {
         let description: Description
-        let list: [Node]
-        let healthCheck: NodeHealthCheck?
+        public let list: [Node]
+        public let healthCheck: NodeHealthCheck?
         let minVersion: String?
     }
     
@@ -63,8 +70,8 @@ public struct CoinInfoDTO: Decodable {
     }
 
     public struct Services: Decodable {
-        let infoService: Service?
-        let ipfsNode: Service?
+        public let infoService: Service?
+        public let ipfsNode: Service?
     }
 
     public struct Tor: Decodable {
@@ -77,17 +84,17 @@ public struct CoinInfoDTO: Decodable {
     }
 
     public struct Nodes: Decodable {
-        let list: [Node]
+        public let list: [Node]
         public let healthCheck: NodeHealthCheck
-        let minVersion: String?
+        public let minVersion: String?
     }
 
     public struct TxFetchInfo: Decodable {
         public let newPendingInterval: Int
-        let oldPendingInterval: Int
-        let registeredInterval: Int
-        let newPendingAttempts: Int?
-        let oldPendingAttempts: Int?
+        public let oldPendingInterval: Int
+        public let registeredInterval: Int
+        public let newPendingAttempts: Int?
+        public let oldPendingAttempts: Int?
     }
 
     public struct Timeout: Decodable {

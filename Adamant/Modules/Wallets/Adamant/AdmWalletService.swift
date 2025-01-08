@@ -15,6 +15,7 @@ import Combine
 import CommonKit
 
 final class AdmWalletService: NSObject, WalletCoreProtocol {
+    static let currencySymbol = "ADM"
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     

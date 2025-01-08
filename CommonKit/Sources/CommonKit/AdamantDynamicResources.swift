@@ -24,4 +24,3 @@ extension CoinInfoDTO.Nodes {
         }
     }
 }
-

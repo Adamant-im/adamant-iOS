@@ -20,7 +20,8 @@ struct DashApiComand {
 }
 
 final class DashWalletService: WalletCoreProtocol {
-    
+    static let currencySymbol = "DASH"
+
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }

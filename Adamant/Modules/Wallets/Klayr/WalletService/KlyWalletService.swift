@@ -15,7 +15,7 @@ import struct BigInt.BigUInt
 import LiskKit
 
 final class KlyWalletService: WalletCoreProtocol {
-    
+    static let currencySymbol = "KLY"
     // MARK: Dependencies
     
     var apiService: AdamantApiServiceProtocol!

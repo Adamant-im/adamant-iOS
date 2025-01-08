@@ -17,11 +17,11 @@ struct ERC20TokenProvider {
                 if let coinInfo = allCoins[childBlockchain.symbol] {
                     let defaultVisibility = childBlockchain.defaultVisibility ?? coinInfo.defaultVisibility ?? false
                     let defaultOrdinalLevel = childBlockchain.defaultOrdinalLevel ?? coinInfo.defaultOrdinalLevel
-                    let reliabilityGasPricePercent = coinInfo.txFetchInfo?.newPendingInterval ?? 10
-                    let reliabilityGasLimitPercent = coinInfo.txFetchInfo?.oldPendingInterval ?? 10
-                    let defaultGasPriceGwei = asset.mainInfo.defaultGasLimit
+                    let reliabilityGasPricePercent = coinInfo.reliabilityGasPricePercent ?? 10
+                    let reliabilityGasLimitPercent = coinInfo.reliabilityGasLimitPercent ?? 10
+                    let defaultGasPriceGwei = coinInfo.defaultGasPriceGwei ?? 10
                     let defaultGasLimit = asset.mainInfo.defaultGasLimit
-                    let warningGasPriceGwei = coinInfo.txFetchInfo?.newPendingInterval ?? 25
+                    let warningGasPriceGwei = coinInfo.warningGasPriceGwei ?? 25
                     
                     let token = ERC20Token(
                         symbol: childBlockchain.symbol,

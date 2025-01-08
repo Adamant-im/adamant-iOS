@@ -99,7 +99,6 @@
 		3A9015A52A614A18002A2464 /* EmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A42A614A18002A2464 /* EmojiService.swift */; };
 		3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */; };
 		3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */; };
-		3A9365A92C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */; };
 		3A96E37A2AED27D7001F5A52 /* AdamantPartnerQRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */; };
 		3A96E37C2AED27F8001F5A52 /* PartnerQRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */; };
 		3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F6280EADE3000ED971 /* SocketService.swift */; };
@@ -162,11 +161,7 @@
 		4184F1732A33102800D7B8B9 /* AdamantCrashlysticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */; };
 		4184F1752A33106200D7B8B9 /* CrashlysticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */; };
 		4184F1772A33173100D7B8B9 /* ContributeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1762A33173100D7B8B9 /* ContributeView.swift */; };
-		4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */; };
-		4186B332294200B4006594A3 /* BtcWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B331294200B4006594A3 /* BtcWalletService+DynamicConstants.swift */; };
 		4186B334294200C5006594A3 /* EthWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B333294200C5006594A3 /* EthWalletService+DynamicConstants.swift */; };
-		4186B338294200E8006594A3 /* DogeWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */; };
-		4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */; };
 		418FDE502A25CA340055E3CD /* ChatMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */; };
 		4193AE1629FBEFBF002F21BE /* NSAttributedText+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */; };
 		4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */; };
@@ -774,7 +769,6 @@
 		3A9015A42A614A18002A2464 /* EmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiService.swift; sourceTree = "<group>"; };
 		3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantEmojiService.swift; sourceTree = "<group>"; };
 		3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListViewModel.swift; sourceTree = "<group>"; };
-		3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KLYWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPartnerQRService.swift; sourceTree = "<group>"; };
 		3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRService.swift; sourceTree = "<group>"; };
 		3AA2D5F6280EADE3000ED971 /* SocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketService.swift; sourceTree = "<group>"; };
@@ -834,11 +828,7 @@
 		4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCrashlysticsService.swift; sourceTree = "<group>"; };
 		4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlysticsService.swift; sourceTree = "<group>"; };
 		4184F1762A33173100D7B8B9 /* ContributeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeView.swift; sourceTree = "<group>"; };
-		4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
-		4186B331294200B4006594A3 /* BtcWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BtcWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B333294200C5006594A3 /* EthWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
-		4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
-		4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMenuManager.swift; sourceTree = "<group>"; };
 		4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedText+Adamant.swift"; sourceTree = "<group>"; };
 		4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsCheckmarkView.swift; sourceTree = "<group>"; };
@@ -1434,7 +1424,6 @@
 				3A26D94E2C3D3983003AD832 /* WalletService */,
 				3A26D9362C3C1C01003AD832 /* KlyWallet.swift */,
 				3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */,
-				3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */,
 				3A26D93A2C3C1C97003AD832 /* KlyApiCore.swift */,
 				3A26D93C2C3C1CC3003AD832 /* KlyNodeApiService.swift */,
 				3A26D93E2C3C1CED003AD832 /* KlyServiceApiService.swift */,
@@ -1582,9 +1571,9 @@
 		3AFE7E502B1F6AFE00718739 /* WalletsService */ = {
 			isa = PBXGroup;
 			children = (
-				6FBA71B52D2E9DF800950481 /* WalletCoreProtocolExtension.swift */,
 				3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */,
 				E940086D2114AA2E00CD2D67 /* WalletCoreProtocol.swift */,
+				6FBA71B52D2E9DF800950481 /* WalletCoreProtocolExtension.swift */,
 				3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */,
 				3AFE7E402B18D88B00718739 /* WalletService.swift */,
 			);
@@ -1669,7 +1658,6 @@
 				6403F5E122723F7500D58779 /* DashWallet.swift */,
 				6403F5E322723F8C00D58779 /* DashWalletService.swift */,
 				93B28EC12B076D31007F268B /* DashApiService.swift */,
-				4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */,
 				A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */,
 				648CE3A5229AD1CD0070A2CC /* DashWalletService+Send.swift */,
 				648CE3A7229AD1E20070A2CC /* DashWalletService+RichMessageProvider.swift */,
@@ -1722,7 +1710,6 @@
 				64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */,
 				64E1C830222E9617006C4DA7 /* DogeWalletService.swift */,
 				93CCAE782B06D81D00EA5B94 /* DogeApiService.swift */,
-				4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */,
 				648DD7A32237DB9E00B811FD /* DogeWalletService+Send.swift */,
 				648DD7A72239147800B811FD /* DogeWalletService+RichMessageProvider.swift */,
 				648DD7A92239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift */,
@@ -2136,7 +2123,6 @@
 				93294B812AAD0BB400911109 /* BtcWalletFactory.swift */,
 				A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */,
 				93FC169A2B0197FD0062B507 /* BtcApiService.swift */,
-				4186B331294200B4006594A3 /* BtcWalletService+DynamicConstants.swift */,
 				A50A410F2822FC35006BDFE1 /* BtcWalletService+Send.swift */,
 				A50A410E2822FC35006BDFE1 /* BtcWalletService+RichMessageProvider.swift */,
 				A50A410D2822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift */,
@@ -2531,7 +2517,6 @@
 				93294B852AAD0E0A00911109 /* AdmWallet.swift */,
 				93294B862AAD0E0A00911109 /* AdmWalletService.swift */,
 				E993301F21354B1800CD5200 /* AdmWalletFactory.swift */,
-				4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */,
 				E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */,
 				E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */,
 				E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */,
@@ -3278,7 +3263,6 @@
 				E94E7B08205D4CB80042B639 /* ShareQRFactory.swift in Sources */,
 				9377FBDF296C2A2F00C9211B /* ChatTransactionContentView.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
-				4186B332294200B4006594A3 /* BtcWalletService+DynamicConstants.swift in Sources */,
 				3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */,
 				3A26D93D2C3C1CC3003AD832 /* KlyNodeApiService.swift in Sources */,
 				93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */,
@@ -3381,7 +3365,6 @@
 				E940086E2114AA2E00CD2D67 /* WalletCoreProtocol.swift in Sources */,
 				645FEB34213E72C100D6BA2D /* OnboardViewController.swift in Sources */,
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
-				4186B338294200E8006594A3 /* DogeWalletService+DynamicConstants.swift in Sources */,
 				3A96E37C2AED27F8001F5A52 /* PartnerQRService.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
 				3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */,
@@ -3476,14 +3459,12 @@
 				93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginFactory.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
-				4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */,
 				3A299C7B2B85EABB00B54C61 /* FileListContentView.swift in Sources */,
 				3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				411743042A39B257008CD98A /* ContributeViewModel.swift in Sources */,
 				411DB8332A14D01F006AB158 /* ChatKeyboardManager.swift in Sources */,
 				6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */,
-				3A9365A92C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift in Sources */,
 				93B28ECA2B076E88007F268B /* DashErrorDTO.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
 				9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */,
@@ -3550,7 +3531,6 @@
 				E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */,
 				93294B902AAD2C6B00911109 /* SwiftyOnboardOverlay.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */,
-				4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				3AE0A42E2BC6A96B00BF7125 /* IPFS+Constants.swift in Sources */,
 				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,

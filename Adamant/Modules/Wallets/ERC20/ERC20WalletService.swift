@@ -87,12 +87,12 @@ final class ERC20WalletService: WalletCoreProtocol {
         token.transferDecimals
     }
     
-    private (set) var blockchainSymbol: String = "ETH"
-    private (set) var isDynamicFee: Bool = true
-    private (set) var transactionFee: Decimal = 0.0
-    private (set) var gasPrice: BigUInt = 0
-    private (set) var gasLimit: BigUInt = 0
-    private (set) var isWarningGasPrice = false
+    private(set) var blockchainSymbol: String = "ETH"
+    private(set) var isDynamicFee: Bool = true
+    private(set) var transactionFee: Decimal = 0.0
+    private(set) var gasPrice: BigUInt = 0
+    private(set) var gasLimit: BigUInt = 0
+    private(set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
         return ethWallet?.balance ?? 0 > transactionFee
@@ -133,7 +133,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
