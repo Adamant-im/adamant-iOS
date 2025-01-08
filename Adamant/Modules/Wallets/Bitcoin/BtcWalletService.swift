@@ -72,7 +72,7 @@ extension String.adamant {
 
 final class BtcWalletService: WalletCoreProtocol {
     
-    static let dynamicWalletData: WalletDecodingModel? = WalletDataFactory.wallet(for: "BTC")
+    //static let dynamicWalletData: WalletDecodingModel? = WalletDataFactory.wallet(for: "BTC")
     
     var tokenSymbol: String {
         type(of: self).currencySymbol

@@ -265,6 +265,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
+		6FBA71B62D2E9E1A00950481 /* WalletCoreProtocolExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBA71B52D2E9DF800950481 /* WalletCoreProtocolExtension.swift */; };
 		6FC3222F2D2904FB00B02742 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = 6FC3222E2D2904FB00B02742 /* web3swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
@@ -934,6 +935,7 @@
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
+		6FBA71B52D2E9DF800950481 /* WalletCoreProtocolExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCoreProtocolExtension.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
@@ -1580,6 +1582,7 @@
 		3AFE7E502B1F6AFE00718739 /* WalletsService */ = {
 			isa = PBXGroup;
 			children = (
+				6FBA71B52D2E9DF800950481 /* WalletCoreProtocolExtension.swift */,
 				3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */,
 				E940086D2114AA2E00CD2D67 /* WalletCoreProtocol.swift */,
 				3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */,
@@ -3505,6 +3508,7 @@
 				93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */,
 				93294B882AAD0E0A00911109 /* AdmWalletService.swift in Sources */,
 				648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */,
+				6FBA71B62D2E9E1A00950481 /* WalletCoreProtocolExtension.swift in Sources */,
 				3A2478B52BB46617009D89E9 /* StorageUsageFactory.swift in Sources */,
 				3AE0A4352BC6AA1B00BF7125 /* FileManagerError.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,

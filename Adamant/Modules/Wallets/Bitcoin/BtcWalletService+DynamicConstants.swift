@@ -20,7 +20,7 @@ extension BtcWalletService {
     )
     
     static var newPendingInterval: Int {
-        dynamicWalletData?.txFetchInfo?.newPendingInterval ?? 0
+        10000
     }
     
     static var oldPendingInterval: Int {

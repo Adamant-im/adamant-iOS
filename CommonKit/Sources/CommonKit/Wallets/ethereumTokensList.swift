@@ -2,25 +2,7 @@ import Foundation
 import AdamantWalletsAssets
 
 public extension ERC20Token {
-    static var supportedTokens: [ERC20Token] {
-        cachedWalletConfigs
-    }
-    static var cachedWalletConfigs: [ERC20Token] = {
-        let jsonFiles = AssetManager.loadInfoFiles()
-        var walletConfigs: [ERC20Token] = []
-        
-        for jsonObject in jsonFiles {
-            do {
-                let data = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-                let config = try JSONDecoder().decode(ERC20Token.self, from: data)
-                walletConfigs.append(config)
-            } catch {
-                print("Failed to decode JSON to WalletConfig: \(error)")
-            }
-        }
-        print("walletConfigs: \(walletConfigs)")
-        return walletConfigs
-    }()
+    static let supportedTokens: [ERC20Token] = ERC20TokenProvider.loadTokens()
     
 //         static let supportedTokens: [ERC20Token] = [
 //            ERC20Token(symbol: "BNB",
@@ -34,7 +16,7 @@ public extension ERC20Token {
 //                       reliabilityGasLimitPercent: 10,
 //                       defaultGasPriceGwei: 10,
 //                       defaultGasLimit: 58000,
-//                       warningGasPrice Gwei: 25,
+//                       warningGasPriceGwei: 25,
 //                       transferDecimals: 6),
 //            ERC20Token(symbol: "BUSD",
 //                       name: "Binance USD",
