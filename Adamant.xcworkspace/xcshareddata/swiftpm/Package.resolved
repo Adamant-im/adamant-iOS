@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "bc268c28fb170f494de9e9927c371b8342979ece",
-          "version": "5.7.1"
+          "revision": "513364f870f6bfc468f9d2ff0a95caccc10044c5",
+          "version": "5.10.2"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/attaswift/BigInt.git",
         "state": {
           "branch": null,
-          "revision": "0ed110f7555c34ff468e72e1686e59721f2b0da6",
-          "version": "5.3.0"
+          "revision": "793a7fac0bfc318e85994bf6900652e827aef33e",
+          "version": "5.4.1"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/google/GoogleDataTransport.git",
         "state": {
           "branch": null,
-          "revision": "aae45a320fd0d11811820335b1eabc8753902a40",
-          "version": "9.2.5"
+          "revision": "a637d318ae7ae246b02d7305121275bc75ed5565",
+          "version": "9.4.0"
         }
       },
       {
@@ -114,8 +114,8 @@
         "repositoryURL": "https://github.com/google/GoogleUtilities.git",
         "state": {
           "branch": null,
-          "revision": "bc27fad73504f3d4af235de451f02ee22586ebd3",
-          "version": "7.12.1"
+          "revision": "57a1d307f42df690fdef2637f3e5b776da02aad6",
+          "version": "7.13.3"
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/nathantannar4/InputBarAccessoryView",
         "state": {
           "branch": null,
-          "revision": "17ced92a5dccb36512b408b6276353631d7cbe57",
-          "version": "6.3.0"
+          "revision": "c7acd5fa32e54cd7a44ad7eb9a7730da35b54c95",
+          "version": "6.5.1"
         }
       },
       {
@@ -159,8 +159,8 @@
         "repositoryURL": "https://github.com/firebase/leveldb.git",
         "state": {
           "branch": null,
-          "revision": "9d108e9112aa1d65ce508facf804674546116d9c",
-          "version": "1.22.3"
+          "revision": "a0bc79961d7be727d258d33d5a6b2f1023270ba1",
+          "version": "1.22.5"
         }
       },
       {
@@ -177,8 +177,8 @@
         "repositoryURL": "https://github.com/MessageKit/MessageKit.git",
         "state": {
           "branch": null,
-          "revision": "1993e8e90d4e9a61b8d9bc8ceb733964ce943376",
-          "version": "4.2.0"
+          "revision": "b024c1287ac30fb6ea2ee07169e6193efc11d972",
+          "version": "4.3.0"
         }
       },
       {
@@ -195,8 +195,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "0c70e4b7d22411a7fe3ff59b913d5b760b735ce1",
-          "version": "1.1.2100"
+          "revision": "8729614a93e6b20307db3c3359aed81f030facaa",
+          "version": "3.3.2000"
         }
       },
       {
@@ -204,7 +204,7 @@
         "repositoryURL": "https://github.com/rechsteiner/Parchment",
         "state": {
           "branch": "main",
-          "revision": "13aad3e9308e8a4e38cb579430dbf66465418777",
+          "revision": "dfb23ea5118ca8bfbc578065627fccf4ec4a362e",
           "version": null
         }
       },
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/google/promises.git",
         "state": {
           "branch": null,
-          "revision": "e70e889c0196c76d22759eb50d6a0270ca9f1d9e",
-          "version": "2.3.1"
+          "revision": "540318ecedd63d883069ae7f1ed811a2df00b6ac",
+          "version": "2.4.0"
         }
       },
       {
@@ -248,9 +248,18 @@
         "package": "RNCryptor",
         "repositoryURL": "https://github.com/RNCryptor/RNCryptor.git",
         "state": {
+          "branch": "master",
+          "revision": "09b65118da7b7f1d14032d9850c1556e0d20853a",
+          "version": null
+        }
+      },
+      {
+        "package": "secp256k1",
+        "repositoryURL": "https://github.com/GigaBitcoin/secp256k1.swift",
+        "state": {
           "branch": null,
-          "revision": "5e3bbf44f08bf90049537cb8902d8f4fa911a79a",
-          "version": "5.1.0"
+          "revision": "48fb20fce4ca3aad89180448a127d5bc16f0e44c",
+          "version": "0.10.0"
         }
       },
       {
@@ -267,8 +276,8 @@
         "repositoryURL": "https://github.com/SnapKit/SnapKit.git",
         "state": {
           "branch": null,
-          "revision": "f222cbdf325885926566172f6f5f06af95473158",
-          "version": "5.6.0"
+          "revision": "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+          "version": "5.7.1"
         }
       },
       {
@@ -276,7 +285,7 @@
         "repositoryURL": "https://github.com/socketio/socket.io-client-swift",
         "state": {
           "branch": "master",
-          "revision": "175da8b5156f6b132436f0676cc84c2f6a766b6e",
+          "revision": "42da871d9369f290d6ec4930636c40672143905b",
           "version": null
         }
       },
@@ -285,8 +294,8 @@
         "repositoryURL": "https://github.com/daltoniam/Starscream",
         "state": {
           "branch": null,
-          "revision": "ac6c0fc9da221873e01bd1a0d4818498a71eef33",
-          "version": "4.0.6"
+          "revision": "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
+          "version": "4.0.8"
         }
       },
       {
@@ -294,8 +303,8 @@
         "repositoryURL": "https://github.com/apple/swift-async-algorithms",
         "state": {
           "branch": null,
-          "revision": "5c8bd186f48c16af0775972700626f0b74588278",
-          "version": "1.0.2"
+          "revision": "4c3ea81f81f0a25d0470188459c6d4bf20cf2f97",
+          "version": "1.0.3"
         }
       },
       {
@@ -312,8 +321,8 @@
         "repositoryURL": "https://github.com/apple/swift-protobuf.git",
         "state": {
           "branch": null,
-          "revision": "07f7f26ded8df9645c072f220378879c4642e063",
-          "version": "1.25.1"
+          "revision": "ebc7251dd5b37f627c93698e4374084d98409633",
+          "version": "1.28.2"
         }
       },
       {
@@ -348,8 +357,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "8a026108ae5ff730ac83e9b574c8cf1c14413c94",
-          "version": "3.2.2"
+          "revision": "119d179305788687e80083671698b3f08c970e7f",
+          "version": "3.3.0"
         }
       }
     ]

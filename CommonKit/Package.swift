@@ -3,6 +3,8 @@
 
 import PackageDescription
 
+
+
 let package = Package(
     name: "CommonKit",
     defaultLocalization: "en",
@@ -14,45 +16,46 @@ let package = Package(
         // making them visible to other packages.
         .library(
             name: "CommonKit",
+            type: .dynamic,
             targets: ["CommonKit"]
         )
     ],
     dependencies: [
         .package(
             url: "https://github.com/krzyzanowskim/CryptoSwift.git",
-            .upToNextMinor(from: "1.5.0")
+            .upToNextMajor(from: "1.5.0") // 1.8.4
         ),
         .package(
             url: "https://github.com/SnapKit/SnapKit.git",
-            .upToNextMajor(from: "5.0.0")
+            .upToNextMajor(from: "5.0.0") // 5.7.1
         ),
         .package(
             url: "https://github.com/jedisct1/swift-sodium.git",
-            .upToNextMinor(from: "0.9.1")
+            .upToNextMajor(from: "0.9.1") // 0.9.1
         ),
         .package(
             url: "https://github.com/maniramezan/DateTools.git",
-            branch: "mani_swiftpm_5_3"
+            branch: "mani_swiftpm_5_3" // kk 5.3 swift
         ),
         .package(
             url: "https://github.com/bmoliveira/MarkdownKit.git",
-            .upToNextMinor(from: "1.7.0")
+            .upToNextMajor(from: "1.7.0") // 1.7.1 kk
         ),
         .package(
             url: "https://github.com/kishikawakatsumi/KeychainAccess.git",
-            .upToNextMinor(from: "4.2.2")
+            .upToNextMajor(from: "4.2.2") // 4.2.2
         ),
         .package(
             url: "https://github.com/RNCryptor/RNCryptor.git",
-            .upToNextMinor(from: "5.1.0")
+            branch: "master"
         ),
         .package(
             url: "https://github.com/Alamofire/Alamofire.git",
-            .upToNextMinor(from: "5.7.1")
+            .upToNextMajor(from: "5.10.0") // 5.10.1
         ),
         .package(
             url: "https://github.com/apple/swift-async-algorithms",
-            .upToNextMinor(from: "1.0.0")
+            .upToNextMajor(from: "1.0.3")
         ),
         .package(path: "../BitcoinKit")
     ],
