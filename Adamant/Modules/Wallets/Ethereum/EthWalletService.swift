@@ -67,7 +67,7 @@ extension Web3Error {
             return .internalError(message: "Unknown error \(code)", error: nil)
         case .rpcError(_):
             return .internalError(message: "Unknown error", error: nil)
-        case .revert(_, reason: let reason):
+        case .revert(_, reason: _):
             return .internalError(message: "Unknown error", error: nil)
         case .revertCustom(_, _):
             return .internalError(message: "Unknown error", error: nil)

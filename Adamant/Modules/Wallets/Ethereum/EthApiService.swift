@@ -12,6 +12,8 @@ import web3swift
 import Web3Core
 
 class EthApiService: ApiServiceProtocol {
+    static let currencySymbol = "ETH"
+    
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {

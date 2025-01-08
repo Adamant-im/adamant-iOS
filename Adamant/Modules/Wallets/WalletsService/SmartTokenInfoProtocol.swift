@@ -1,17 +1,13 @@
-//import Foundation
-//import BigInt
-//import CommonKit
 //
-//extension EthWalletService {
-//    static let currencySymbol = "ETH"
-//}
-import Foundation
+//  SmartTokenInfoProtocol.swift
+//  Adamant
+//
+//  Created by Владимир Клевцов on 9.1.25..
+//  Copyright © 2025 Adamant. All rights reserved.
+//
 import BigInt
 import CommonKit
 
-extension EthWalletService: SmartTokenInfoProtocol {
-    static let currencySymbol = "ETH"
-}
 protocol SmartTokenInfoProtocol {
     static var currencySymbol: String { get }
     
