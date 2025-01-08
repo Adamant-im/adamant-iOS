@@ -229,6 +229,7 @@ private extension KlyWalletService {
             .store(in: &subscriptions)
     }
     
+    @MainActor
     func update() async {
         guard let wallet = klyWallet else {
             return
@@ -245,13 +246,12 @@ private extension KlyWalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -275,12 +275,12 @@ private extension KlyWalletService {
         setState(.upToDate)
     }
     
-    func markBalanceAsFresh() {
-        klyWallet?.isBalanceInitialized = true
+    func markBalanceAsFresh(_ wallet: KlyWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = klyWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(

@@ -291,13 +291,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -310,12 +309,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         await calculateFee()
 	}
     
-    private func markBalanceAsFresh() {
-        ethWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: EthWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = ethWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
