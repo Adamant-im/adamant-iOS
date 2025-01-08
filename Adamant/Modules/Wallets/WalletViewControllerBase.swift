@@ -156,7 +156,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         
         balanceRow.cell.selectionStyle = .gray
         balanceRow.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
             cell.titleLabel.text = BaseRows.balance.localized
         }.onCellSelection { [weak self] (_, _) in
             guard
