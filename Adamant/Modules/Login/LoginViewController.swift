@@ -413,6 +413,17 @@ final class LoginViewController: FormViewController {
         versionFooterView.sizeToFit()
     }
     
+    // MARK: - FormViewController
+
+    override func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        let result = super.textInputShouldReturn(textInput, cell: cell)
+        if cell.row.tag == Rows.passphrase.tag, let passphrase = cell.row.value as? String {
+            loginWith(passphrase: passphrase)
+        }
+
+        return result
+    }
+
     // MARK: - Other
     
     private func setColors() {
