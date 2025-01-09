@@ -17,11 +17,7 @@ struct AdamantWalletServiceCompose: WalletServiceCompose {
     private var wallets: [String: WalletService] = [:]
     
     init(wallets: [WalletCoreProtocol], coreDataStack: CoreDataStack) {
-        let uniqueWallets = Array(Set(wallets.map { $0.dynamicRichMessageType })).compactMap { type in
-            wallets.first(where: { $0.dynamicRichMessageType == type })
-        }
-        
-        self.wallets = Dictionary(uniqueKeysWithValues: uniqueWallets.map { wallet in
+        self.wallets = Dictionary(uniqueKeysWithValues: wallets.map { wallet in
             (wallet.dynamicRichMessageType, WalletService(core: wallet, coreDataStack: coreDataStack))
         })
     }
