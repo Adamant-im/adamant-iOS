@@ -75,7 +75,8 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol {
+final class EthWalletService: WalletCoreProtocol, SmartTokenInfoProtocol {
+    static let currencySymbol = "ETH"
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
