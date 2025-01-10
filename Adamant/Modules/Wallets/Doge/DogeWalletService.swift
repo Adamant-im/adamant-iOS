@@ -47,7 +47,7 @@ struct DogeApiCommands {
     }
 }
 
-final class DogeWalletService: WalletCoreProtocol {
+final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol {
     static let currencySymbol = "DOGE"
     var wallet: WalletAccount? { return dogeWallet }
     

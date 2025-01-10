@@ -70,7 +70,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletCoreProtocol {
+final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol {
     static let currencySymbol = "BTC"
     
     var tokenSymbol: String {

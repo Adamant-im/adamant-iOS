@@ -14,7 +14,7 @@ import Combine
 import struct BigInt.BigUInt
 import LiskKit
 
-final class KlyWalletService: WalletCoreProtocol {
+final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol {
     static let currencySymbol = "KLY"
     // MARK: Dependencies
     

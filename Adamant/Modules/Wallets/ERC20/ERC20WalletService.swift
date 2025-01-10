@@ -20,10 +20,6 @@ final class ERC20WalletService: WalletCoreProtocol {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
-    static var currencySymbol: String = ""
-    static var currencyLogo: UIImage = UIImage()
-    static var qqPrefix: String = ""
-    
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
     
@@ -50,7 +46,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     var tokenContract: String {
         return token.contractAddress
     }
-   
+    
     var tokenUnicID: String {
         Self.tokenNetworkSymbol + tokenSymbol + tokenContract
     }
@@ -65,12 +61,12 @@ final class ERC20WalletService: WalletCoreProtocol {
     
     var richMessageType: String {
         return Self.richMessageType
-	}
-
+    }
+    
     var qqPrefix: String {
         return EthWalletService.qqPrefix
-	}
-
+    }
+    
     var isSupportIncreaseFee: Bool {
         return true
     }
@@ -82,7 +78,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     var nodeGroups: [NodeGroup] {
         [.eth]
     }
-
+    
     var transferDecimals: Int {
         token.transferDecimals
     }
@@ -151,13 +147,13 @@ final class ERC20WalletService: WalletCoreProtocol {
         }
     }
     
-    private (set) var ethWallet: EthWallet?
+    private(set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
-
+    
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $historyTransactions.eraseToAnyPublisher()
     }
@@ -297,9 +293,9 @@ final class ERC20WalletService: WalletCoreProtocol {
         gasLimit = gasLimitRaw == nil
         ? gasLimit
         : gasLimit + gasLimitPercent
-
+        
         var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
-
+        
         newFee = isIncreaseFeeEnabled
         ? newFee * defaultIncreaseFee
         : newFee
@@ -308,7 +304,7 @@ final class ERC20WalletService: WalletCoreProtocol {
         
         transactionFee = newFee
         let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
-                
+        
         gasPrice = isIncreaseFeeEnabled
         ? BigUInt(integerLiteral: incGasPrice)
         : price
@@ -584,7 +580,7 @@ extension ERC20WalletService {
         return trs.count
     }
     
-    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] { 
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         guard let address = wallet?.address else {
             throw WalletServiceError.accountNotFound
         }

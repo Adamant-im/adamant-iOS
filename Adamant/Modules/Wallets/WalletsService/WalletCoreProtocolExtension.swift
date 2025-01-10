@@ -8,8 +8,14 @@
 import Foundation
 import BigInt
 import CommonKit
+import UIKit
 
-extension WalletCoreProtocol {
+protocol WalletStaticCoreProtocol {
+    static var currencySymbol: String { get }
+    static var currencyLogo: UIImage { get }
+    static var qqPrefix: String { get }
+}
+extension WalletStaticCoreProtocol {
     static var coinInfo: CoinInfoDTO? {
         CoinInfoDTO.coins[currencySymbol]
     }

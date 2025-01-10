@@ -19,7 +19,7 @@ struct DashApiComand {
     static let rawTransactionMethod: String = "getrawtransaction"
 }
 
-final class DashWalletService: WalletCoreProtocol {
+final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol {
     static let currencySymbol = "DASH"
 
     var tokenSymbol: String {
