@@ -28,9 +28,9 @@ final class AddressConverterMock: AddressConverter {
     }
     
     func convert(lockingScriptPayload: Data, type: ScriptType) throws -> Address {
-        throw NSError()
+        fatalError("\(#file).\(#function) is not implemented")
     }
     func convert(publicKey: PublicKey, type: ScriptType) throws -> Address {
-        throw NSError()
+        fatalError("\(#file).\(#function) is not implemented")
     }
 }

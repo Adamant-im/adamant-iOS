@@ -35,6 +35,7 @@ final class BtcWallet: WalletAccount, @unchecked Sendable {
         self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
     }
     
+#if DEBUG
     @available(*, deprecated, message: "For testing purposes only")
     init(
         unicId: String,
@@ -46,4 +47,5 @@ final class BtcWallet: WalletAccount, @unchecked Sendable {
         self.publicKey = privateKey.publicKey()
         self.addressEntity = address
     }
+#endif
 }

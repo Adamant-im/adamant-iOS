@@ -781,12 +781,14 @@ extension BtcWalletService: PrivateKeyGenerator {
 
 // MARK: test helpers
 
+#if DEBUG
 extension BtcWalletService {
-    // do not use in production
+    @available(*, deprecated, message: "For testing purposes only")
     func setWalletForTests(_ wallet: BtcWallet?) {
         self.btcWallet = wallet
     }
 }
+#endif
 
 final class BtcTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { BtcWalletService.currencySymbol }

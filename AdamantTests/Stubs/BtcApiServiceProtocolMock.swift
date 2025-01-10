@@ -28,14 +28,14 @@ final class BtcApiServiceProtocolMock: BtcApiServiceProtocol {
     }
     
     var nodesInfo: CommonKit.NodesListInfo {
-        fatalError()
+        fatalError("\(#file).\(#function) is not implemented")
     }
     
     var nodesInfoPublisher: CommonKit.AnyObservable<CommonKit.NodesListInfo> {
-        fatalError()
+        fatalError("\(#file).\(#function) is not implemented")
     }
     
     func healthCheck() {
-        fatalError()
+        fatalError("\(#file).\(#function) is not implemented")
     }
 }
