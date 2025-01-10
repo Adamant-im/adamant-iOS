@@ -94,8 +94,13 @@ final class AccountViewController: FormViewController {
     
     private var walletModels: [String: WalletItemModel] = [:]
     
-    private var currentSelectedWalletIndex: Int = .zero
-    private var currentSelectedWalletItem: WalletItemModel?
+    private var currentWalletIndex: Int = .zero
+    private var currentSelectedWalletItem: WalletItemModel? {
+        walletModels.first{
+            $1.model.index == currentWalletIndex
+        }?.value
+    }
+    
     private var initiated = false
     
     // MARK: - Init
@@ -190,7 +195,7 @@ final class AccountViewController: FormViewController {
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
         if walletViewControllers.count > 0 {
-            pagingViewController.select(index: currentSelectedWalletIndex)
+            pagingViewController.select(index: currentWalletIndex)
         }
         
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
@@ -1004,15 +1009,11 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        var values: [NodeGroup] = []
-        
-        NodeGroup.allCases.forEach { node in
-            if apiServiceCompose.get(node)?.hasEnabledNode == false {
-                values.append(node)
-            }
+        let unavailableNodes: [NodeGroup] = NodeGroup.allCases.filter {
+            apiServiceCompose.get($0)?.hasEnabledNode == false
         }
         
-        if values.contains(where: {
+        if unavailableNodes.contains(where: {
             $0.name == currentSelectedWalletItem?.model.currencyNetwork
         }) {
             dialogService.showWarning(
@@ -1130,8 +1131,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         didSelectItem pagingItem: PagingItem
     ) {
         Task { @MainActor in
-            currentSelectedWalletIndex = pagingItem.identifier
-            updateCurrentSelectedItem()
+            currentWalletIndex = pagingItem.identifier
         }
     }
     
@@ -1208,16 +1208,8 @@ private extension AccountViewController {
                 item.balance = nil
             }
             
-            updateCurrentSelectedItem()
             let model = WalletItemModel(model: item)
             walletModels[service.tokenUnicID] = model
         }
-    }
-    
-    private func updateCurrentSelectedItem() {
-        currentSelectedWalletItem = walletModels.first(
-            where: {
-                $1.model.index == currentSelectedWalletIndex
-            })?.value
     }
 }
