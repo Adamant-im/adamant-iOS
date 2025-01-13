@@ -16,6 +16,7 @@
 		2657A0CD2C707D800021E7E6 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		2657A0CE2C707D830021E7E6 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
 		265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */; };
+		26843D6A2CDD29760010F047 /* NodeAvailabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26843D692CDD29710010F047 /* NodeAvailabilityService.swift */; };
 		269B83102C74A2FF002AA1D7 /* note.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B830F2C74A2FF002AA1D7 /* note.mp3 */; };
 		269B83112C74A34F002AA1D7 /* note.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B830F2C74A2FF002AA1D7 /* note.mp3 */; };
 		269B831E2C74B4EC002AA1D7 /* handoff.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 269B83122C74B4EA002AA1D7 /* handoff.mp3 */; };
@@ -712,6 +713,7 @@
 		2621AB382C60E7AE00046D7A /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
 		2621AB3A2C613C8100046D7A /* NotificationsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsFactory.swift; sourceTree = "<group>"; };
 		265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservation.swift; sourceTree = "<group>"; };
+		26843D692CDD29710010F047 /* NodeAvailabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeAvailabilityService.swift; sourceTree = "<group>"; };
 		269B830F2C74A2FF002AA1D7 /* note.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = note.mp3; sourceTree = "<group>"; };
 		269B83122C74B4EA002AA1D7 /* handoff.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = handoff.mp3; sourceTree = "<group>"; };
 		269B83132C74B4EA002AA1D7 /* portal.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = portal.mp3; sourceTree = "<group>"; };
@@ -2331,6 +2333,7 @@
 				3AA2D5F8280EAF49000ED971 /* SocketService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
+				26843D692CDD29710010F047 /* NodeAvailabilityService.swift */,
 				6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */,
 				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
@@ -3336,6 +3339,7 @@
 				3A26D93D2C3C1CC3003AD832 /* KlyNodeApiService.swift in Sources */,
 				93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */,
 				93760BD72C656CF8002507C3 /* DefaultNodesProvider.swift in Sources */,
+				26843D6A2CDD29760010F047 /* NodeAvailabilityService.swift in Sources */,
 				3A26D93B2C3C1C97003AD832 /* KlyApiCore.swift in Sources */,
 				2621AB372C60E74A00046D7A /* NotificationsView.swift in Sources */,
 				936658A32B0ADE4400BDB2D3 /* CoinsNodesListView+Row.swift in Sources */,

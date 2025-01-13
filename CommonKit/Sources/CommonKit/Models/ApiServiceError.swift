@@ -45,7 +45,7 @@ public enum ApiServiceError: LocalizedError, Sendable {
         case let .noEndpointsAvailable(nodeGroupName):
             return .localizedStringWithFormat(
                 .localized(
-                    "ApiService.InternalError.NoNodesAvailable",
+                    "ApiService.InternalError.NoEnabledNodesAvailable",
                     comment: "Serious internal error: No nodes available"
                 ),
                 nodeGroupName

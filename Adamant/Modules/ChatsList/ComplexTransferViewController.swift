@@ -24,6 +24,8 @@ final class ComplexTransferViewController: UIViewController {
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
     private let nodesStorage: NodesStorageProtocol
+    private let dialogService: DialogService
+    private let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -44,13 +46,17 @@ final class ComplexTransferViewController: UIViewController {
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
-        nodesStorage: NodesStorageProtocol
+        nodesStorage: NodesStorageProtocol,
+        dialogService: DialogService,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.addressBookService = addressBookService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
         self.nodesStorage = nodesStorage
+        self.dialogService = dialogService
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -144,15 +150,10 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             vc.showProgressView(animated: false)
             
             Task {
-                guard service.core.hasEnabledNode else {
-                    vc.showAlertView(
-                        message: ApiServiceError.noEndpointsAvailable(
-                            nodeGroupName: service.core.tokenName
-                        ).errorDescription ?? .adamant.sharedErrors.unknownError,
-                        animated: true
-                    )
-                    return
-                }
+                guard nodeAvailabilityService.checkNodeAvailability(
+                    in: .adm,
+                    vc: self
+                ) else { return }
                 
                 guard admService?.core.hasEnabledNode ?? false else {
                     vc.showAlertView(

@@ -293,10 +293,16 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
+"ApiService.InternalError.NoEnabledNodesAvailable" = "Unable to request new messages — No active %@ blockchain nodes. As you’ve deactivated some of them, consider reviewing the node list.";
+
+/* Serious internal error: No active nodes available */
+"ApiService.InternalError.NoActiveNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "No active ADM nodes to fetch the partner's %@ address";
+
+/* Button title for alert when all ADM nodes are inactive */
+"AlertButton.ReviewNodeList" = "Review %@ node list";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";

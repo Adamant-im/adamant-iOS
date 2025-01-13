@@ -24,7 +24,11 @@ struct ChatListFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             addressBook: assembler.resolve(AddressBookService.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, nodeAvailabilityService: NodeAvailabilityService(
+                dialogService: assembler.resolve(DialogService.self)!,
+                apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+                screensFactory: screensFactory
+            )
         )
     }
     
@@ -42,8 +46,14 @@ struct ChatListFactory {
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
+            dialogService: assembler.resolve(DialogService.self)!,
+            nodeAvailabilityService: NodeAvailabilityService(
+                dialogService: assembler.resolve(DialogService.self)!,
+                apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+                screensFactory: screensFactory
+            )
         )
     }
     

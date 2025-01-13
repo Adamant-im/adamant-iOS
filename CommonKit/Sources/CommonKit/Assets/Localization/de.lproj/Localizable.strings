@@ -296,10 +296,16 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
+"ApiService.InternalError.NoEnabledNodesAvailable" = "Neue Nachrichten können nicht angefordert werden — keine aktiven %@ Blockchain-Knoten. Da Sie einige davon deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+
+/* Serious internal error: No active nodes available */
+"ApiService.InternalError.NoActiveNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";
+
+/* Button title for alert when all ADM nodes are inactive */
+"AlertButton.ReviewNodeList" = "Überprüfe %@-Knotenliste";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";

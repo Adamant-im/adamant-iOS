@@ -67,16 +67,8 @@ extension LoginViewController {
         dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
         
         Task {
-            do {
-                let result = try await accountService.loginWithStoredAccount()
-                handleSavedAccountLoginResult(result)
-            } catch {
-                dialogService.showRichError(error: error)
-                
-                if let pinpad = presentedViewController as? PinpadViewController {
-                    pinpad.clearPin()
-                }
-            }
+            let result = await accountService.loginWithStoredAccount()
+            handleSavedAccountLoginResult(result)
         }
     }
     
@@ -104,11 +96,22 @@ extension LoginViewController {
             }
             
         case .failure(let error):
-            dialogService.showRichError(error: error)
+            handleError(error)
             
             if let pinpad = presentedViewController as? PinpadViewController {
                 pinpad.clearPin()
             }
+        }
+    }
+    
+    func handleError(_ error: AccountServiceError) {
+        guard case .apiError(let error) = error else {
+            dialogService.showRichError(error: error)
+            return
+        }
+        
+        dismiss(animated: true) { [weak self] in
+            self?.handleError(error)
         }
     }
 }

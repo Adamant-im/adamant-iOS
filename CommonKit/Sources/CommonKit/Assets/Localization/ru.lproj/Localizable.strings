@@ -293,10 +293,16 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
+"ApiService.InternalError.NoEnabledNodesAvailable" = "Не удается получить новые сообщения — нет активных узлов блокчейна %@. Поскольку вы отключили некоторые из них, посмотрите список узлов еще раз.";
+
+/* Serious internal error: No active nodes available */
+"ApiService.InternalError.NoActiveNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Нет доступных ADM нод для получения адреса партнера %@";
+
+/* Button title for alert when all ADM nodes are inactive */
+"AlertButton.ReviewNodeList" = "К списку узлов %@";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";

@@ -99,6 +99,7 @@ final class ChatViewModel: NSObject {
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
+    let presentNodeListVC = ObservableSender<NodeGroup>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -291,10 +292,15 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-            if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
-                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription))
+            guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
+                dialog.send(.noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send(.adm)
+                    }
+                ))
+                return
             }
             
             if !(filesPicked?.isEmpty ?? true) {
@@ -703,12 +709,15 @@ final class ChatViewModel: NSObject {
         }
         
         guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
+            dialog.send(.noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send(.adm)
+                    }
+                ))
             return false
         }
-        
         return true
     }
     
@@ -1071,9 +1080,15 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
         guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.ipfs.name
-            ).localizedDescription))
+             dialog.send(
+                .noActiveNodesAlert(
+                    nodeName: NodeGroup.adm.name,
+                    action: { [weak self] in
+                        guard let self = self else { return }
+                        self.presentNodeListVC.send(.ipfs)
+                    }
+                )
+            )
             return
         }
         

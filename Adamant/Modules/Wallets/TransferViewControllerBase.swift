@@ -188,6 +188,7 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let apiServiceCompose: ApiServiceComposeProtocol
+    let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: - Properties
     
@@ -319,7 +320,8 @@ class TransferViewControllerBase: FormViewController {
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -333,6 +335,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.apiServiceCompose = apiServiceCompose
+        self.nodeAvailabilityService = nodeAvailabilityService
         super.init(style: .insetGrouped)
     }
     
@@ -796,27 +799,17 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard
-            apiServiceCompose.get(.adm)?.hasEnabledNode == true || admReportRecipient == nil
-        else {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription
-            )
-            return
+        if admReportRecipient != nil || walletCore.nodeGroups == [.adm] {
+            guard nodeAvailabilityService.checkNodeAvailability(
+                in: .adm,
+                vc: self
+            )else { return }
         }
         
-        for group in walletCore.nodeGroups {
-            guard apiServiceCompose.get(group)?.hasEnabledNode == true else {
-                dialogService.showWarning(
-                    withMessage: ApiServiceError.noEndpointsAvailable(
-                        nodeGroupName: group.name
-                    ).localizedDescription
-                )
-                return
-            }
-        }
+        guard nodeAvailabilityService.checkNodeAvailability(
+            in: walletCore,
+            vc: self
+        ) else { return }
         
         let recipient: String
         if let recipientName = recipientName {

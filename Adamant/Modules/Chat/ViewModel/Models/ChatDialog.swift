@@ -36,4 +36,5 @@ enum ChatDialog {
     case dismissMenu
     case renameAlert
     case actionMenu
+    case noActiveNodesAlert(nodeName: String, action: ChatDialogManager.NoActiveNodesAction)
 }

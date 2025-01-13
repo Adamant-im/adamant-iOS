@@ -155,6 +155,7 @@ final class AccountViewController: FormViewController {
     private let languageService: LanguageStorageProtocol
     private let walletServiceCompose: WalletServiceCompose
     private let apiServiceCompose: ApiServiceComposeProtocol
+    private let nodeAvailabilityService: NodeAvailabilityProtocol
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -219,7 +220,8 @@ final class AccountViewController: FormViewController {
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
         walletServiceCompose: WalletServiceCompose,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -233,6 +235,7 @@ final class AccountViewController: FormViewController {
         self.languageService = languageService
         self.walletServiceCompose = walletServiceCompose
         self.apiServiceCompose = apiServiceCompose
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -1111,19 +1114,12 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        let disabledGroup = NodeGroup.allCases.first {
-            apiServiceCompose.get($0)?.hasEnabledNode != true
-        }
-        
-        if let disabledGroup {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: disabledGroup.name
-                ).localizedDescription
-            )
-        }
-        
-        refreshControl.endRefreshing()
+        defer {  refreshControl.endRefreshing() }
+        guard nodeAvailabilityService.checkNodeAvailability(
+            in: .adm,
+            vc: self
+        ) else { return }
+
         DispatchQueue.background.async { [accountService] in
             accountService.reloadWallets()
         }

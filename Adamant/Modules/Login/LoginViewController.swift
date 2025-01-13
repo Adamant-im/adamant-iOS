@@ -141,6 +141,7 @@ final class LoginViewController: FormViewController {
     let screensFactory: ScreensFactory
     let apiService: AdamantApiServiceProtocol
     let dialogService: DialogService
+    let nodeAvailabilityService: NodeAvailabilityProtocol
     
     // MARK: Properties
     private var hideNewPassphrase: Bool = true
@@ -160,7 +161,8 @@ final class LoginViewController: FormViewController {
         dialogService: DialogService,
         localAuth: LocalAuthentication,
         screensFactory: ScreensFactory,
-        apiService: AdamantApiServiceProtocol
+        apiService: AdamantApiServiceProtocol,
+        nodeAvailabilityService: NodeAvailabilityProtocol
     ) {
         self.accountService = accountService
         self.adamantCore = adamantCore
@@ -168,6 +170,7 @@ final class LoginViewController: FormViewController {
         self.localAuth = localAuth
         self.screensFactory = screensFactory
         self.apiService = apiService
+        self.nodeAvailabilityService = nodeAvailabilityService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -447,9 +450,21 @@ extension LoginViewController {
                 loginIntoExistingAccount(passphrase: passphrase)
                 
             case .failure(let error):
-                dialogService.showRichError(error: error)
+                handleError(error)
             }
         }
+    }
+    
+    func handleError(_ error: ApiServiceError) {
+        guard case .noEndpointsAvailable = error else {
+            dialogService.showRichError(error: error)
+            return
+        }
+        
+        guard nodeAvailabilityService.checkNodeAvailability(
+            in: .adm,
+            vc: self
+        ) else { return }
     }
     
     func generateNewPassphrase() {

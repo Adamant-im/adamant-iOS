@@ -289,16 +289,16 @@ extension AdamantAccountService {
 extension AdamantAccountService {
     // MARK: Passphrase
     @MainActor
-    func loginWith(passphrase: String) async throws -> AccountServiceResult {
+    func loginWith(passphrase: String) async -> AccountServiceResult {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            throw AccountServiceError.invalidPassphrase
+            return .failure(.invalidPassphrase)
         }
         
         guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
-            throw AccountServiceError.internalError(message: "Failed to generate keypair for passphrase", error: nil)
+            return .failure(.internalError(message: "Failed to generate keypair for passphrase", error: nil))
         }
         
-        let account = try await loginWith(keypair: keypair)
+        let account = await loginWith(keypair: keypair)
         
         // MARK: Drop saved accs
         if let storedPassphrase = self.getSavedPassphrase(),
@@ -316,32 +316,36 @@ extension AdamantAccountService {
         
         _ = await initWallets()
         
-        return .success(account: account, alert: nil)
+        return account
     }
     
     // MARK: Pincode
-    func loginWith(pincode: String) async throws -> AccountServiceResult {
+    func loginWith(pincode: String) async -> AccountServiceResult {
         guard let storePin = securedStore.get(.pin) else {
-            throw AccountServiceError.invalidPassphrase
+            return .failure(.invalidPassphrase)
         }
         
         guard storePin == pincode else {
-            throw AccountServiceError.invalidPassphrase
+            return .failure(.invalidPassphrase)
         }
         
-        return try await loginWithStoredAccount()
+        return await loginWithStoredAccount()
     }
     
     // MARK: Biometry
     @MainActor
-    func loginWithStoredAccount() async throws -> AccountServiceResult {
+    func loginWithStoredAccount() async -> AccountServiceResult {
         if let passphrase = getSavedPassphrase() {
-            let account = try await loginWith(passphrase: passphrase)
+            let account = await loginWith(passphrase: passphrase)
             return account
         }
         
         if let keypair = getSavedKeypair() {
-            let account = try await loginWith(keypair: keypair)
+            let account = await loginWith(keypair: keypair)
+            
+            guard case .success(let account, _) = account else {
+                return account
+            }
             
             let alert: (title: String, message: String)?
             if securedStore.get(.showedV12) != nil {
@@ -359,14 +363,14 @@ extension AdamantAccountService {
             return .success(account: account, alert: alert)
         }
         
-        throw AccountServiceError.invalidPassphrase
+        return .failure(.invalidPassphrase)
     }
     
     // MARK: Keypair
-    private func loginWith(keypair: Keypair) async throws -> AdamantAccount {
+    private func loginWith(keypair: Keypair) async -> AccountServiceResult {
         switch state {
         case .isLoggingIn:
-            throw AccountServiceError.internalError(message: "Service is busy", error: nil)
+            return .failure(.internalError(message: "Service is busy", error: nil))
         case .updating:
             fallthrough
             
@@ -396,19 +400,19 @@ extension AdamantAccountService {
             )
             
             self.state = .loggedIn
-            return account
+            return .success(account: account, alert: nil)
         } catch let error as ApiServiceError {
             self.state = .notLogged
             
             switch error {
             case .accountNotFound:
-                throw AccountServiceError.wrongPassphrase
+                return .failure(AccountServiceError.wrongPassphrase)
                 
             default:
-                throw AccountServiceError.apiError(error: error)
+                return .failure(AccountServiceError.apiError(error: error))
             }
         } catch {
-            throw AccountServiceError.internalError(message: error.localizedDescription, error: error)
+            return .failure(.internalError(message: error.localizedDescription, error: error))
         }
     }
     

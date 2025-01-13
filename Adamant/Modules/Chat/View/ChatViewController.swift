@@ -476,6 +476,20 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
+        viewModel.presentNodeListVC
+            .sink { [weak self] node in
+                guard let self = self else { return }
+                
+                let vc = node == .adm
+                ? screensFactory.makeNodesList()
+                : screensFactory.makeCoinsNodesList(context: .menu)
+                
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .pageSheet
+                self.present(nav, animated: true, completion: nil)
+            }
+            .store(in: &subscriptions)
     }
 }
 

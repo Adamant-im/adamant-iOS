@@ -21,7 +21,12 @@ struct LoginFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             localAuth: assembler.resolve(LocalAuthentication.self)!,
             screensFactory: screenFactory,
-            apiService: assembler.resolve(AdamantApiServiceProtocol.self)!
+            apiService: assembler.resolve(AdamantApiServiceProtocol.self)!,
+            nodeAvailabilityService: NodeAvailabilityService(
+                dialogService: assembler.resolve(DialogService.self)!,
+                apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+                screensFactory: screenFactory
+            )
         )
     }
 }

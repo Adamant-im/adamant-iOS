@@ -232,4 +232,8 @@ protocol DialogService: AnyObject {
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?)
     
     func selectAllTextFields(in alert: UIAlertController)
+    func showNoActiveNodesAlert(
+        nodeName: String,
+        completion: @escaping () -> Void
+    )
 }
