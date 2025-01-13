@@ -43,21 +43,17 @@ extension LoginViewController {
             return
         }
         
-        localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount) { result in
-            Task { @MainActor [weak self] in
-                switch result {
-                case .success:
-                    self?.loginIntoSavedAccount()
-                    
-                case .fallback:
-                    self?.loginWithPinpad()
-                    
-                case .cancel:
-                    break
-                    
-                case .failed:
-                    break
-                }
+        Task { @MainActor in
+            let result = await localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount)
+            switch result {
+            case .success:
+                self.loginIntoSavedAccount()
+                
+            case .fallback:
+                self.loginWithPinpad()
+                
+            case .cancel, .failed, .biometryLockout:
+                break
             }
         }
     }
@@ -133,15 +129,14 @@ extension LoginViewController: PinpadViewControllerDelegate {
     
     nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
         Task { @MainActor in
-            localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-                switch result {
-                case .success:
-                    self?.loginIntoSavedAccount()
-                    
-                case .fallback, .cancel, .failed:
-                    break
-                }
-            })
+            let result = await localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount)
+            switch result {
+            case .success:
+                self.loginIntoSavedAccount()
+                
+            case .fallback, .cancel, .failed, .biometryLockout:
+                break
+            }
         }
     }
     

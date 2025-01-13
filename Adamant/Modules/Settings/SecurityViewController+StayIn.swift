@@ -44,11 +44,12 @@ extension SecurityViewController {
         }
         
         let reason = enabled ? String.adamant.security.biometryOnReason : String.adamant.security.biometryOffReason
-        localAuth.authorizeUser(reason: reason) { [weak self] result in
+        Task { @MainActor in
+            let result = await localAuth.authorizeUser(reason: reason)
             switch result {
             case .success:
-                self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
-                self?.accountService.updateUseBiometry(enabled)
+                self.dialogService.showSuccess(withMessage: String.adamant.alert.done)
+                self.accountService.updateUseBiometry(enabled)
                 
             case .cancel:
                 DispatchQueue.main.async { [weak self] in
@@ -63,10 +64,10 @@ extension SecurityViewController {
                 
                 if enabled {
                     pinpad.commentLabel.text = String.adamant.security.biometryOnReason
-                    self?.pinpadRequest = .turnOnBiometry
+                    self.pinpadRequest = .turnOnBiometry
                 } else {
                     pinpad.commentLabel.text = String.adamant.security.biometryOffReason
-                    self?.pinpadRequest = .turnOffBiometry
+                    self.pinpadRequest = .turnOffBiometry
                 }
                 
                 pinpad.commentLabel.isHidden = false
@@ -74,26 +75,23 @@ extension SecurityViewController {
                 
                 DispatchQueue.main.async {
                     pinpad.modalPresentationStyle = .overFullScreen
-                    self?.present(pinpad, animated: true, completion: nil)
+                    self.present(pinpad, animated: true, completion: nil)
                 }
                 
             case .failed:
                 DispatchQueue.main.async {
-                    if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                        if let value = self?.accountService.useBiometry {
-                            row.value = value
-                        } else {
-                            row.value = false
-                        }
-                        
+                    if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
+                        row.value = self.accountService.useBiometry
                         row.updateCell()
                         row.evaluateHidden()
                     }
                     
-                    if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+                    if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
                         section.evaluateHidden()
                     }
                 }
+            case .biometryLockout:
+                break
             }
         }
     }
@@ -120,30 +118,29 @@ extension SecurityViewController: PinpadViewControllerDelegate {
                     break
                 }
                 
-                accountService.setStayLoggedIn(pin: pin) { [weak self] result in
-                    Task { @MainActor in
-                        switch result {
-                        case .success:
-                            self?.pinpadRequest = nil
-                            if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                                row.value = false
-                                row.updateCell()
-                                row.evaluateHidden()
-                            }
-                            
-                            if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
-                                section.evaluateHidden()
-                            }
-                            
-                            if let section = self?.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
-                                section.evaluateHidden()
-                            }
-                            
-                            pinpad.dismiss(animated: true, completion: nil)
-                            
-                        case .failure(let error):
-                            self?.dialogService.showRichError(error: error)
+                let result = accountService.setStayLoggedIn(pin: pin)
+                Task { @MainActor in
+                    switch result {
+                    case .success:
+                        self.pinpadRequest = nil
+                        if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
+                            row.value = false
+                            row.updateCell()
+                            row.evaluateHidden()
                         }
+                        
+                        if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
+                            section.evaluateHidden()
+                        }
+                        
+                        if let section = self.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
+                            section.evaluateHidden()
+                        }
+                        
+                        pinpad.dismiss(animated: true, completion: nil)
+                        
+                    case .failure(let error):
+                        self.dialogService.showRichError(error: error)
                     }
                 }
                 
@@ -188,38 +185,34 @@ extension SecurityViewController: PinpadViewControllerDelegate {
     }
     
     nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        MainActor.assumeIsolatedSafe {
+        Task { @MainActor in
             switch pinpadRequest {
                 
-            // MARK: User wants to turn of StayIn with his face. Or finger.
+                // MARK: User wants to turn of StayIn with his face. Or finger.
             case .turnOffPin?:
-                localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff, completion: { [weak self] result in
-                    switch result {
-                    case .success:
-                        self?.accountService.dropSavedAccount()
-                        
-                        DispatchQueue.main.async {
-                            if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                                row.value = false
-                                row.updateCell()
-                                row.evaluateHidden()
-                            }
-                            
-                            if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
-                                section.evaluateHidden()
-                            }
-                            
-                            pinpad.dismiss(animated: true, completion: nil)
+                let result = await localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff)
+                switch result {
+                case .success:
+                    self.accountService.dropSavedAccount()
+                    
+                    DispatchQueue.main.async {
+                        if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
+                            row.value = false
+                            row.updateCell()
+                            row.evaluateHidden()
                         }
                         
-                    case .cancel: break
-                    case .fallback: break
-                    case .failed: break
+                        if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
+                            section.evaluateHidden()
+                        }
+                        
+                        pinpad.dismiss(animated: true, completion: nil)
                     }
-                })
-                
+                    
+                case .cancel, .fallback, .failed, .biometryLockout: break
+                }
             default:
-                return
+                break
             }
         }
     }
