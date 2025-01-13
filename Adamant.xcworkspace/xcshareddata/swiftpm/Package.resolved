@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "AdamantWalletsAssets",
+        "repositoryURL": "https://github.com/Adamant-im/adamant-wallets.git",
+        "state": {
+          "branch": "trello.com/c/txGIRwKv/771-update-the-script-for-adamant-wallets",
+          "revision": "2084a24642998233ea4df8d7f1983324fe35f3cf",
+          "version": null
+        }
+      },
+      {
         "package": "Alamofire",
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {

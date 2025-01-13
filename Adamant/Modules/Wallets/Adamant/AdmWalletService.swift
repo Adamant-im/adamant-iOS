@@ -14,9 +14,10 @@ import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
+final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
+    static let currencySymbol = "ADM"
     
     static let currencyLogo = UIImage.asset(named: "adamant_wallet") ?? .init()
 
