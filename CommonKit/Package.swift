@@ -54,7 +54,11 @@ let package = Package(
             url: "https://github.com/apple/swift-async-algorithms",
             .upToNextMinor(from: "1.0.0")
         ),
-        .package(path: "../BitcoinKit")
+        .package(path: "../BitcoinKit"),
+        .package(
+                    url: "https://github.com/Adamant-im/adamant-wallets.git",
+                    branch: "trello.com/c/txGIRwKv/771-update-the-script-for-adamant-wallets"
+                )
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -65,6 +69,7 @@ let package = Package(
                 .product(name: "Clibsodium", package: "swift-sodium"),
                 .product(name: "DateToolsSwift", package: "DateTools"),
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+                .product(name: "AdamantWalletsAssets", package: "adamant-wallets"),
                 "CryptoSwift",
                 "SnapKit",
                 "MarkdownKit",

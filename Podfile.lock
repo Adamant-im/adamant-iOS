@@ -1,7 +1,7 @@
 PODS:
   - FreakingSimpleRoundImageView (1.3)
   - MyLittlePinpad (0.3.1)
-  - SwiftLint (0.49.1)
+  - SwiftLint (0.58.0)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -17,7 +17,7 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   MyLittlePinpad: d75682f2d817b490c49acc70a9ebd37da752281b
-  SwiftLint: 32ee33ded0636d0905ef6911b2b67bbaeeedafa5
+  SwiftLint: a733d9844f91874753069118d9736c02f1a67eba
 
 PODFILE CHECKSUM: a30619b79caa4b5a7497b0600d449f34b5620eec
 
