@@ -101,6 +101,9 @@ extension WalletStaticCoreProtocol {
     }
     
     static var explorerAddress: String {
+        coinInfo?.explorerAddress ?? ""
+    }
+    static var explorerTx: String {
         coinInfo?.explorer ?? ""
     }
     
