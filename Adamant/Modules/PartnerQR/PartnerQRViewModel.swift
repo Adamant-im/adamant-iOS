@@ -225,7 +225,7 @@ private extension PartnerQRViewModel {
         alert.addTextField { [weak self] textField in
             textField.placeholder = .adamant.chat.name
             textField.autocapitalizationType = .words
-            textField.text = self?.addressBookService.getName(for: address)
+            textField.text = self?.addressBookService.getName(for: address) ?? self?.partnerName
         }
         
         let renameAction = UIAlertAction(
