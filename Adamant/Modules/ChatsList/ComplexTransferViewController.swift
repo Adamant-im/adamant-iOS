@@ -210,7 +210,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 return WalletItemModel(model: .default)
             }
             
-            var network = ""
+            var network: String?
             if ERC20Token.supportedTokens.contains(where: { token in
                 return token.symbol == service.tokenSymbol
             }) {
@@ -222,7 +222,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 currencySymbol: service.tokenSymbol,
                 currencyImage: service.tokenLogo,
                 isBalanceInitialized: wallet.isBalanceInitialized,
-                currencyNetwork: network,
+                currencyNetwork: network ?? type(of: service).tokenNetworkSymbol,
                 balance: wallet.balance
             )
             

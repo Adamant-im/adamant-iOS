@@ -23,11 +23,11 @@ extension StoreKey {
 
 // MARK: - Currencies
 enum Currency: String, CaseIterable {
-    case RUB = "RUB"
-    case USD = "USD"
-    case EUR = "EUR"
-    case CNY = "CNY"
-    case JPY = "JPY"
+    case RUB
+    case USD
+    case EUR
+    case CNY
+    case JPY
     
     var symbol: String {
         switch self {
