@@ -189,6 +189,41 @@ final class BtcWalletServiceTests: XCTestCase {
         )
     }
     
+    func test_sendTransaction_failIfTxIdCorrupted() async throws {
+        // given
+        let txData = try XCTUnwrap(Constants.anotherTransactionId.data(using: .utf8))
+        await apiCoreMock.isolated { mock in
+            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+        }
+        
+        // when
+        let result = await Result {
+            try await self.sut.sendTransaction(BitcoinKit.Transaction.deserialize(Data(hex: Constants.transactionHex)!))
+        }
+        
+        // then
+        XCTAssertEqual(
+            result.error as? WalletServiceError,
+            WalletServiceError.remoteServiceError(message: Constants.anotherTransactionId)
+        )
+    }
+    
+    func test_sendTransaction_successIfTxIdMatches() async throws {
+        // given
+        let txData = try XCTUnwrap(Constants.transactionId.data(using: .utf8))
+        await apiCoreMock.isolated { mock in
+            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+        }
+        
+        // when
+        let result = await Result {
+            try await self.sut.sendTransaction(BitcoinKit.Transaction.deserialize(Data(hex: Constants.transactionHex)!))
+        }
+        
+        // then
+        XCTAssertNil(result.error)
+    }
+    
     private func makeWallet(address: String = Constants.btcAddress) throws -> BtcWallet {
         let privateKeyData = "my long passphrase"
             .data(using: .utf8)!
@@ -229,6 +264,12 @@ private enum Constants {
     static let lockingScript = Data([118, 169, 20, 136, 194, 210, 250, 132, 98, 130, 200, 112, 167, 108, 173, 236, 190, 69, 196, 172, 215, 43, 182, 136, 172])
     
     static let lockingScript2 = Data([118, 169, 20, 189, 45, 218, 220, 109, 190, 133, 34, 44, 61, 83, 31, 41, 204, 37, 209, 62, 168, 11, 45, 136, 172])
+    
+    static let transactionId = "8b2654793f94539e5c66b87dee6d0908fb9728eb25c90396e25286c6d4b8a371"
+    
+    static let anotherTransactionId = String("8b2654793f94539e5c66b87dee6d0908fb9728eb25c90396e25286c6d4b8a371".reversed())
+    
+    static let transactionHex = "0100000001a0d73e3bd0aa2025d91eabd8512d5e19ad80752892f415480f75b97966b06f0e010000006a473044022072c8ecd3143e663520807c496dba3dc8010478f3cae09fcb65995be29737a55702206d23617cad2f88a3bd28757be956c731dbde06615fb9bb9fabf2d55e6a8f67ba0121037ec9f6126013088b3d1e8f844f3e755144756a4e9a7da6b0094c189f55031934ffffffff0228230000000000001976a914c6251d0e16c0e1946b745b69caa3a7c36014381088ac38560200000000001976a914931ef5cbdad28723ba9596de5da1145ae969a71888ac00000000"
     
     static let expectedTransaction = BitcoinKit.Transaction(
         version: 1,

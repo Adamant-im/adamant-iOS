@@ -471,6 +471,7 @@
 		AAFB3C932D31C3DC000CCCE9 /* BitcoinKitTransactionFactoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C922D31C3CD000CCCE9 /* BitcoinKitTransactionFactoryProtocol.swift */; };
 		AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */; };
 		AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */; };
+		AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1104,6 +1105,7 @@
 		AAFB3C922D31C3CD000CCCE9 /* BitcoinKitTransactionFactoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactoryProtocol.swift; sourceTree = "<group>"; };
 		AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactoryProtocolMock.swift; sourceTree = "<group>"; };
 		AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnspentTransaction+Equatable.swift"; sourceTree = "<group>"; };
+		AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcWalletServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -2245,6 +2247,7 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */,
 				AA33BEB12D303C5F0083E59C /* BtcWalletServiceTests.swift */,
 			);
 			path = Wallets;
@@ -3856,6 +3859,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */,
+				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
 				AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
