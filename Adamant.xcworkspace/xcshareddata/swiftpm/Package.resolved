@@ -354,7 +354,7 @@
       },
       {
         "package": "Web3swift",
-        "repositoryURL": "https://github.com/skywinder/web3swift.git",
+        "repositoryURL": "https://github.com/web3swift-team/web3swift.git",
         "state": {
           "branch": null,
           "revision": "8a026108ae5ff730ac83e9b574c8cf1c14413c94",
