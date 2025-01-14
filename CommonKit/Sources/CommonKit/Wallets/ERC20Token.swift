@@ -5,7 +5,6 @@
 //  Created by Anton Boyarkin on 25/06/2019.
 //  Copyright © 2019 Adamant. All rights reserved.
 //
-
 import UIKit
 
 public struct ERC20Token: Sendable {

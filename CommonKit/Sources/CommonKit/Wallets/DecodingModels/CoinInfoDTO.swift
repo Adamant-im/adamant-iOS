@@ -5,9 +5,8 @@
 //  Created by Владимир Клевцов on 13.1.25..
 //
 import Foundation
-import AdamantWalletsAssets
 
-public struct CoinInfoDTO: Decodable {
+public struct CoinInfoDTO: Codable {
     public let name: String
     public let nameShort: String?
     public let website: String?
@@ -44,37 +43,37 @@ public struct CoinInfoDTO: Decodable {
     public let txFetchInfo: TxFetchInfo?
     public let timeout: Timeout?
 
-    public struct Node: Decodable {
+    public struct Node: Codable {
         public let url: String
         public let altIP: String?
     }
 
-    public struct NodeHealthCheck: Decodable {
+    public struct NodeHealthCheck: Codable {
         public let normalUpdateInterval: Int
         public let crucialUpdateInterval: Int
         public let onScreenUpdateInterval: Int
         public let threshold: Int?
     }
 
-    public struct Service: Decodable {
+    public struct Service: Codable {
         let description: Description
         public let list: [Node]
         public let healthCheck: NodeHealthCheck?
         let minVersion: String?
     }
     
-    public struct Description: Decodable {
+    public struct Description: Codable {
         let software: String
         let github: String
         let docs: String?
     }
 
-    public struct Services: Decodable {
+    public struct Services: Codable {
         public let infoService: Service?
         public let ipfsNode: Service?
     }
 
-    public struct Tor: Decodable {
+    public struct Tor: Codable {
         let website: String?
         let explorer: String?
         let explorerTx: String?
@@ -83,13 +82,13 @@ public struct CoinInfoDTO: Decodable {
         let services: Services?
     }
 
-    public struct Nodes: Decodable {
+    public struct Nodes: Codable {
         public let list: [Node]
         public let healthCheck: NodeHealthCheck
         public let minVersion: String?
     }
 
-    public struct TxFetchInfo: Decodable {
+    public struct TxFetchInfo: Codable {
         public let newPendingInterval: Int
         public let oldPendingInterval: Int
         public let registeredInterval: Int
@@ -97,35 +96,13 @@ public struct CoinInfoDTO: Decodable {
         public let oldPendingAttempts: Int?
     }
 
-    public struct Timeout: Decodable {
+    public struct Timeout: Codable {
         let message: Int
         let attachment: Int
     }
 
-    public struct Link: Decodable {
+    public struct Link: Codable {
         let name: String
         let url: String
     }
-}
-
-extension CoinInfoDTO {
-    public static var coins: [String: CoinInfoDTO] {
-        return cachedCoinInfo
-    }
-
-    private static var cachedCoinInfo: [String: CoinInfoDTO] = {
-        let jsonDataArray = AssetManager.loadFilesFromGeneral()
-        var decodedData = [String: CoinInfoDTO]()
-        
-        let decoder = JSONDecoder()
-        for data in jsonDataArray {
-            do {
-                let coinInfo = try decoder.decode(CoinInfoDTO.self, from: data)
-                decodedData[coinInfo.symbol] = coinInfo
-            } catch {
-                print("Failed to decode CoinInfoDTO: \(error)")
-            }
-        }
-        return decodedData
-    }()
 }

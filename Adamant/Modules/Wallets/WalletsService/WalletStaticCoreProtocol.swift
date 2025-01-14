@@ -18,7 +18,7 @@ protocol WalletStaticCoreProtocol {
 }
 extension WalletStaticCoreProtocol {
     static var coinInfo: CoinInfoDTO? {
-        CoinInfoDTO.coins[currencySymbol]
+        CoinInfoProvider.coins[currencySymbol]
     }
     
     static var fixedFee: Decimal {

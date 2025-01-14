@@ -5,8 +5,6 @@
 //  Created by Владимир Клевцов on 13.1.25..
 //  Copyright © 2025 Adamant. All rights reserved.
 //
-
-
 import BigInt
 import CommonKit
 
@@ -25,7 +23,7 @@ protocol SmartTokenInfoProtocol {
 }
 extension SmartTokenInfoProtocol {
     static var coinInfo: CoinInfoDTO? {
-        CoinInfoDTO.coins[currencySymbol]
+        CoinInfoProvider.coins[currencySymbol]
     }
     
     var reliabilityGasPricePercent: BigUInt {

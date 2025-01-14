@@ -5,7 +5,7 @@ public extension AdamantResources {
     // MARK: Nodes
     static var nodes: [Node] {
         guard
-            let admWallet = CoinInfoDTO.coins["ADM"],
+            let admWallet = CoinInfoProvider.coins["ADM"],
             let walletNodes = admWallet.nodes?.toNodes()
         else {
             print("Error: Unable to fetch wallet nodes for ADM.")
