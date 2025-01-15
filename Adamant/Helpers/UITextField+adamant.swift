@@ -153,7 +153,7 @@ extension UITextField {
         let contanerView = UIView()
         contanerView.addSubview(button)
         button.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview().inset(buttonContainerInset)
+            make.directionalEdges.equalToSuperview()
         }
         contanerView.snp.makeConstraints { make in
             make.size.equalTo(buttonContainerHeight)
@@ -165,6 +165,7 @@ extension UITextField {
     
     private func makePasswordButton() -> UIButton {
         let button = UIButton(type: .custom)
+        button.imageEdgeInsets = buttonImageEdgeInsets
         updatePasswordToggleImage(button)
         button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
         return button
@@ -189,10 +190,10 @@ extension UITextField {
         let contanerView = UIView()
         let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
         buttonStack.axis = .horizontal
-        buttonStack.spacing = 16 // to be discussed with designer
+        buttonStack.spacing = 4
         contanerView.addSubview(buttonStack)
         buttonStack.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview().inset(buttonContainerInset)
+            make.directionalEdges.equalToSuperview()
         }
         
         contanerView.snp.makeConstraints { make in
@@ -213,6 +214,7 @@ extension UITextField {
 
     private func makePasteButton() -> UIButton {
         let button = UIButton(type: .custom)
+        button.imageEdgeInsets = buttonImageEdgeInsets
         button.setImage(.asset(named: "clipboard"), for: .normal)
         button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
         return button
@@ -225,5 +227,7 @@ extension UITextField {
     }
 
     private var buttonContainerHeight: CGFloat { 28 }
-    private var buttonContainerInset: CGFloat { 3 }
+    private var buttonImageEdgeInsets: UIEdgeInsets {
+        UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
+    }
 }
