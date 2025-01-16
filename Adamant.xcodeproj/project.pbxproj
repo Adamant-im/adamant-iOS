@@ -474,6 +474,15 @@
 		AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */; };
 		AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */; };
 		AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */; };
+		AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */; };
+		AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C9C2D383F73000CCCE9 /* EthApiServiceProtocolMock.swift */; };
+		AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C9E2D3843D8000CCCE9 /* Web3ProviderMock.swift */; };
+		AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA02D384AF5000CCCE9 /* IncreaseFeeServiceMock.swift */; };
+		AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA22D384F4D000CCCE9 /* IEthMock.swift */; };
+		AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */; };
+		AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */; };
+		AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */; };
+		AAFB3CAB2D3997DD000CCCE9 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1110,6 +1119,15 @@
 		AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactoryProtocolMock.swift; sourceTree = "<group>"; };
 		AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnspentTransaction+Equatable.swift"; sourceTree = "<group>"; };
 		AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcWalletServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletServiceTests.swift; sourceTree = "<group>"; };
+		AAFB3C9C2D383F73000CCCE9 /* EthApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AAFB3C9E2D3843D8000CCCE9 /* Web3ProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Web3ProviderMock.swift; sourceTree = "<group>"; };
+		AAFB3CA02D384AF5000CCCE9 /* IncreaseFeeServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncreaseFeeServiceMock.swift; sourceTree = "<group>"; };
+		AAFB3CA22D384F4D000CCCE9 /* IEthMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEthMock.swift; sourceTree = "<group>"; };
+		AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthRequestBody.swift; sourceTree = "<group>"; };
+		AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthResponseBody.swift; sourceTree = "<group>"; };
+		AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -2262,6 +2280,7 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */,
 				AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */,
 				AA33BEB12D303C5F0083E59C /* BtcWalletServiceTests.swift */,
 			);
@@ -2271,6 +2290,12 @@
 		AA33BEB32D303CA30083E59C /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
+				AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */,
+				AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */,
+				AAFB3CA22D384F4D000CCCE9 /* IEthMock.swift */,
+				AAFB3CA02D384AF5000CCCE9 /* IncreaseFeeServiceMock.swift */,
+				AAFB3C9E2D3843D8000CCCE9 /* Web3ProviderMock.swift */,
+				AAFB3C9C2D383F73000CCCE9 /* EthApiServiceProtocolMock.swift */,
 				AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */,
 				AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */,
 				AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */,
@@ -2282,6 +2307,7 @@
 		AAFB3C892D31C0C4000CCCE9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */,
 				AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */,
 				AAFB3C902D31C140000CCCE9 /* BitcoinKitTransaction+Equatable.swift */,
 				AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */,
@@ -2640,6 +2666,7 @@
 		E94008792114ECF100CD2D67 /* Ethereum */ = {
 			isa = PBXGroup;
 			children = (
+				AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */,
 				E940087C2114EDEE00CD2D67 /* EthWallet.swift */,
 				E993302121354BC300CD5200 /* EthWalletFactory.swift */,
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
@@ -3621,6 +3648,7 @@
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				9366588D2B0AB6BD00BDB2D3 /* CoinsNodesListState.swift in Sources */,
+				AAFB3CAB2D3997DD000CCCE9 /* EthApiServiceProtocol.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
@@ -3875,16 +3903,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */,
+				AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */,
+				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
 				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
+				AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
+				AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */,
 				AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */,
+				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
+				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
 				AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */,
 				AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */,
 				AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */,
 				AAFB3C912D31C14A000CCCE9 /* BitcoinKitTransaction+Equatable.swift in Sources */,
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,
+				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
+				AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
