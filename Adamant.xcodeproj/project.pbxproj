@@ -464,6 +464,7 @@
 		AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */; };
 		AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */; };
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
+		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */; };
 		AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */; };
 		AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */; };
@@ -1098,6 +1099,7 @@
 		AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressConverterMock.swift; sourceTree = "<group>"; };
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Actor+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletServiceError+Equatable.swift"; sourceTree = "<group>"; };
@@ -2186,6 +2188,7 @@
 		A50A41022822F8CE006BDFE1 /* Bitcoin */ = {
 			isa = PBXGroup;
 			children = (
+				AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */,
 				AAFB3C922D31C3CD000CCCE9 /* BitcoinKitTransactionFactoryProtocol.swift */,
 				A5E04225282A8BC70076CD13 /* DTO */,
 				A50A41062822F8CE006BDFE1 /* BtcWallet.swift */,
@@ -3628,6 +3631,7 @@
 				A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
+				AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */,
 				648CE3A222999CE70070A2CC /* BTCRawTransaction.swift in Sources */,
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
 				3A26D9392C3C1C62003AD832 /* KlyWalletFactory.swift in Sources */,
