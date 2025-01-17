@@ -20,13 +20,13 @@ public extension ApiCommands {
 extension AdamantApiService {
     public static let KvsFee: Decimal = 0.001
     
-    public func store(_ model: KVSValueModel) async -> ApiServiceResult<UInt64> {
+    public func store(_ model: KVSValueModel, date: Date) async -> ApiServiceResult<UInt64> {
         let transaction = NormalizedTransaction(
             type: .state,
             amount: .zero,
             senderPublicKey: model.keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: nil,
             asset: TransactionAsset(state: StateAsset(
                 key: model.key,

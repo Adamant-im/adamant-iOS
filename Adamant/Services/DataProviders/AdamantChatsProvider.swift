@@ -306,20 +306,6 @@ extension AdamantChatsProvider {
         securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
         securedStore.remove(StoreKey.chatProvider.readedLastHeight)
         
-        // Drop CoreData
-//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        context.parent = stack.container.viewContext
-//
-//        let trs = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
-//
-//        if let results = try? context.fetch(trs) {
-//            for obj in results {
-//                context.delete(obj)
-//            }
-//
-//            try! context.save()
-//        }
-        
         // Set State
         setState(.empty, previous: prevState, notify: notify)
     }
@@ -1283,7 +1269,8 @@ extension AdamantChatsProvider {
             message: encodedMessage.message,
             type: type,
             nonce: encodedMessage.nonce,
-            amount: nil
+            amount: nil,
+            date: AdmWalletService.correctedDate
         )
         
         guard let signedTransaction = signedTransaction else {

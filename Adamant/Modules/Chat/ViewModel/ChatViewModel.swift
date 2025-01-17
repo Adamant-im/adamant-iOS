@@ -1424,7 +1424,9 @@ private extension ChatViewModel {
                 dialog.send(.freeTokenAlert)
                 return
             }
-        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound, .invalidTransactionStatus, .none:
+        case .serverError:
+            dialog.send(.richError(error))
+        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break
         }
     }
