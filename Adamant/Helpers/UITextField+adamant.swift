@@ -147,25 +147,30 @@ extension UITextField {
 
     // MARK: - Password toggle button
 
+    static var buttonContainerHeight: CGFloat { 28 }
+    static var buttonImageEdgeInsets: UIEdgeInsets {
+        UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
+    }
+
     func enablePasswordToggle() {
         let button = makePasswordButton()
         
-        let contanerView = UIView()
-        contanerView.addSubview(button)
+        let containerView = UIView()
+        containerView.addSubview(button)
         button.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
-        contanerView.snp.makeConstraints { make in
-            make.size.equalTo(buttonContainerHeight)
+        containerView.snp.makeConstraints { make in
+            make.size.equalTo(UITextField.buttonContainerHeight)
         }
         
-        rightView = contanerView
+        rightView = containerView
         rightViewMode = .always
     }
     
-    private func makePasswordButton() -> UIButton {
+    func makePasswordButton() -> UIButton {
         let button = UIButton(type: .custom)
-        button.imageEdgeInsets = buttonImageEdgeInsets
+        button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
         updatePasswordToggleImage(button)
         button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
         return button
@@ -179,55 +184,5 @@ extension UITextField {
     @objc private func togglePasswordView(_ sender: UIButton) {
         isSecureTextEntry.toggle()
         updatePasswordToggleImage(sender)
-    }
-
-    // MARK: - Paste button and password toggle
-
-    func enablePasteButtonAndPasswordToggle() {
-        let passwordToggleButton = makePasswordButton()
-        let pasteButton = makePasteButton()
-        
-        let contanerView = UIView()
-        let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 4
-        contanerView.addSubview(buttonStack)
-        buttonStack.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
-        
-        contanerView.snp.makeConstraints { make in
-            make.height.equalTo(buttonContainerHeight)
-        }
-        
-        pasteButton.snp.makeConstraints { make in
-            make.width.equalTo(pasteButton.snp.height)
-        }
-        
-        passwordToggleButton.snp.makeConstraints { make in
-            make.width.equalTo(passwordToggleButton.snp.height)
-        }
-        
-        rightView = contanerView
-        rightViewMode = .always
-    }
-
-    private func makePasteButton() -> UIButton {
-        let button = UIButton(type: .custom)
-        button.imageEdgeInsets = buttonImageEdgeInsets
-        button.setImage(.asset(named: "clipboard"), for: .normal)
-        button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
-        return button
-    }
-
-    @objc private func pasteFromPasteboard(_ sender: UIButton) {
-        if let pasteboardText = UIPasteboard.general.string {
-            self.text = pasteboardText
-        }
-    }
-
-    private var buttonContainerHeight: CGFloat { 28 }
-    private var buttonImageEdgeInsets: UIEdgeInsets {
-        UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
     }
 }

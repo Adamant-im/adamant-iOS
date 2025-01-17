@@ -524,3 +524,50 @@ extension LoginViewController: ButtonsStripeViewDelegate {
         }
     }
 }
+
+// MARK: UITextField + extensions
+
+fileprivate extension UITextField {
+    func enablePasteButtonAndPasswordToggle() {
+        let passwordToggleButton = makePasswordButton()
+        let pasteButton = makePasteButton()
+        
+        let containerView = UIView()
+        let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
+        buttonStack.axis = .horizontal
+        buttonStack.spacing = 4
+        containerView.addSubview(buttonStack)
+        buttonStack.snp.makeConstraints { make in
+            make.directionalEdges.equalToSuperview()
+        }
+        
+        containerView.snp.makeConstraints { make in
+            make.height.equalTo(UITextField.buttonContainerHeight)
+        }
+        
+        pasteButton.snp.makeConstraints { make in
+            make.width.equalTo(pasteButton.snp.height)
+        }
+        
+        passwordToggleButton.snp.makeConstraints { make in
+            make.width.equalTo(passwordToggleButton.snp.height)
+        }
+        
+        rightView = containerView
+        rightViewMode = .always
+    }
+    
+    private func makePasteButton() -> UIButton {
+        let button = UIButton(type: .custom)
+        button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
+        button.setImage(.asset(named: "clipboard"), for: .normal)
+        button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
+        return button
+    }
+    
+    @objc private func pasteFromPasteboard(_ sender: UIButton) {
+        if let pasteboardText = UIPasteboard.general.string {
+            self.text = pasteboardText
+        }
+    }
+}
