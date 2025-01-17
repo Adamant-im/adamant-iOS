@@ -306,6 +306,20 @@ extension AdamantChatsProvider {
         securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
         securedStore.remove(StoreKey.chatProvider.readedLastHeight)
         
+        // Drop CoreData
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+//
+//        let trs = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+//
+//        if let results = try? context.fetch(trs) {
+//            for obj in results {
+//                context.delete(obj)
+//            }
+//
+//            try! context.save()
+//        }
+        
         // Set State
         setState(.empty, previous: prevState, notify: notify)
     }
@@ -1101,10 +1115,7 @@ extension AdamantChatsProvider {
             }
             
             // MARK: 3. Prepare transaction
-            if var correctedDate = transaction.date as? Date {
-                correctedDate -= AdmWalletService.adamantTimestampCorrection
-                transaction.date = correctedDate as NSDate
-            }
+            
             transaction.statusEnum = MessageStatus.pending
             transaction.partner = context.object(with: recipientAccount.objectID) as? BaseAccount
             
