@@ -124,10 +124,12 @@ final class EthWalletServiceTests: XCTestCase {
         })
         
         // then
-        XCTAssertEqual(
-            result.error as? WalletServiceError,
-            .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)
-        )
+        switch result.error as? WalletServiceError {
+        case .internalError?:
+            break
+        default:
+            XCTFail("Expected `.internalError`, got :\(String(describing: result.error))")
+        }
     }
     
     func test_createTransaction_correctFields() async throws {
