@@ -34,13 +34,13 @@ extension IPFSApiCore: BlockchainHealthCheckableService {
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
         
-        return statusResponse.map { _ in
-            .init(
+        return statusResponse.map { data in
+            return .init(
                 ping: ping,
-                height: .zero,
+                height: data.height,
                 wsEnabled: false,
                 wsPort: nil,
-                version: nil
+                version: data.version
             )
         }
     }
