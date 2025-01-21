@@ -28,11 +28,18 @@ struct IPFSNodeStatus: Decodable {
         }
         let timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         let timeStampInSeconds = String(timestamp / 1000)
-        let subString = timeStampInSeconds[
-            timeStampInSeconds.index(timeStampInSeconds.startIndex, offsetBy: 2)..<timeStampInSeconds.endIndex
-        ]
-        let string = String(subString)
-        height = Int(string) ?? .zero
+        
+        /// Chicking the len of string representation of a timestamp in seconds
+        /// to cut first two symbols from it and convert it to height
+        if timeStampInSeconds.count >= 2 {
+            let subString = timeStampInSeconds[
+                timeStampInSeconds.index(timeStampInSeconds.startIndex, offsetBy: 2)..<timeStampInSeconds.endIndex
+            ]
+            let string = String(subString)
+            height = Int(string) ?? .zero
+        } else {
+            height = .zero
+        }
     }
 }
 
