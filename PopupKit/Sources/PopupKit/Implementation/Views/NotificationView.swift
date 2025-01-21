@@ -1,6 +1,6 @@
 //
 //  NotificationView.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //
@@ -21,7 +21,6 @@ struct NotificationView: View {
                 textStack
                 Spacer(minLength: .zero)
             }
-            
             Image(systemName: isTextLimited ? pullDownIcon : pullUpIcon)
                 .font(.title)
                 .foregroundColor(.gray)
@@ -50,7 +49,6 @@ private extension NotificationView {
                 Text(description)
                     .font(.system(size: 13))
                     .lineLimit(isTextLimited ? 3 : nil)
-               
             }
         }
     }
