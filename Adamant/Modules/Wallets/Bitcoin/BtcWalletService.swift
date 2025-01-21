@@ -12,6 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Web3Core
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000
@@ -431,7 +432,7 @@ extension BtcWalletService {
         btcWallet = nil
     }
     
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -443,7 +444,7 @@ extension BtcWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password)
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         let eWallet = try BtcWallet(
             unicId: tokenUnicID,
@@ -503,9 +504,15 @@ extension BtcWalletService {
                 throw error
             }
         }
-        
     }
-
+    
+    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data {
+        if salt.isEmpty {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+        
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english) ?? passphrase.data(using: .utf8)!.sha256()
+    }
 }
 
 // MARK: - Dependencies

@@ -128,7 +128,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let api = ExtensionsApiFactory(core: core, securedStore: keychain).make()
         
         guard let passphrase: String = keychain.get(passphraseStoreKey),
-              let keypair = core.createKeypairFor(passphrase: passphrase)
+              let keypair = core.createKeypairFor(passphrase: passphrase, password: "")
         else {
             showError()
             return
