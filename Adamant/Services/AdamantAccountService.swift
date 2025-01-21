@@ -428,7 +428,8 @@ extension AdamantAccountService {
             for wallet in walletServiceCompose.getWallets() {
                 group.addTask {
                     let result = try? await wallet.core.initWallet(
-                        withPassphrase: passphrase
+                        withPassphrase: passphrase,
+                        withPassword: ""
                     )
                     return result
                 }

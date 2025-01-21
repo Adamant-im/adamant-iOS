@@ -211,8 +211,12 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         .init(sentDate: nil, status: .notInitiated)
     }
     
-    func initWallet(withPassphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase: String, withPassword: String) async throws -> WalletAccount {
         throw InternalAPIError.unknownError
+    }
+    
+    func makeBinarySeed(withMnemonicSentence: String, withSalt: String) -> Data {
+        fatalError("Do not use this method for Ethereum")
     }
     
     func setInitiationFailed(reason: String) { }

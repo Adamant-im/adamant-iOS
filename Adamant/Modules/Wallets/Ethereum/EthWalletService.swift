@@ -391,7 +391,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService {
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
         }
@@ -408,7 +408,7 @@ extension EthWalletService {
         do {
             guard let store = try BIP32Keystore(mnemonics: passphrase,
                                                 password: EthWalletService.walletPassword,
-                                                mnemonicsPassword: "",
+                                                mnemonicsPassword: password,
                                                 language: .english,
                                                 prefixPath: EthWalletService.walletPath
             ) else {
@@ -480,6 +480,11 @@ extension EthWalletService {
                 throw error
             }
         }
+    }
+    
+    /// We don't use it here because Eth has it is own implementation
+    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data{
+        fatalError("Do not use this method for Ethereum")
     }
     
     func setInitiationFailed(reason: String) {
