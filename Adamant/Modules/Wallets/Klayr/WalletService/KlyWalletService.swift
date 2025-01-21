@@ -442,7 +442,10 @@ private extension KlyWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        guard let eWallet = self.klyWallet else {
+        guard
+            let eWallet = klyWallet,
+            let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
+        else {
             throw WalletServiceError.accountNotFound
         }
         
@@ -452,7 +455,7 @@ private extension KlyWalletService {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             
             if address != eWallet.address {
-                updateKvsAddress(eWallet.address)
+                updateKvsAddress(kvsAddressModel)
             }
             
             setState(.upToDate)
@@ -473,7 +476,7 @@ private extension KlyWalletService {
                     await update()
                 }
                 
-                updateKvsAddress(eWallet.address)
+                updateKvsAddress(kvsAddressModel)
                 
                 return eWallet
             default:
@@ -483,13 +486,13 @@ private extension KlyWalletService {
         }
     }
     
-    func updateKvsAddress(_ address: String) {
+    func updateKvsAddress(_ model: KVSValueModel) {
         Task {
             do {
-                try await save(klyAddress: address)
+                try await save(model)
             } catch {
                 kvsSaveProcessError(
-                    klyAddress: address,
+                    model,
                     error: error
                 )
             }
@@ -498,7 +501,7 @@ private extension KlyWalletService {
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     func kvsSaveProcessError(
-        klyAddress: String,
+        _ model: KVSValueModel,
         error: Error
     ) {
         guard let error = error as? WalletServiceError,
@@ -517,7 +520,7 @@ private extension KlyWalletService {
                 guard let self = self else { return }
                 
                 Task {
-                    try await self.save(klyAddress: klyAddress)
+                    try await self.save(model)
                     self.balanceObserver?.cancel()
                 }
             }
@@ -526,10 +529,8 @@ private extension KlyWalletService {
     /// - Parameters:
     ///   - klyAddress: Klayr address to save into KVS
     ///   - adamantAddress: Owner of Klayr address
-    func save(klyAddress: String) async throws {
-        guard let adamant = accountService.account,
-              let keypair = accountService.keypair
-        else {
+    func save(_ model: KVSValueModel) async throws {
+        guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -537,19 +538,23 @@ private extension KlyWalletService {
             throw WalletServiceError.notEnoughMoney
         }
         
-        let result = await apiService.store(
-            key: KlyWalletService.kvsAddress,
-            value: klyAddress,
-            type: .keyValue,
-            sender: adamant.address,
-            keypair: keypair
-        )
+        let result = await apiService.store(model)
         
         guard case .failure(let error) = result else {
             return
         }
         
         throw WalletServiceError.apiError(error)
+    }
+    
+    func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
     
     func getKlyWalletAddress(

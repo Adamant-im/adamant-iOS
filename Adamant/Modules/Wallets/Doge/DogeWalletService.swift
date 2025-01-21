@@ -326,6 +326,7 @@ extension DogeWalletService {
             addressConverter: addressConverter
         )
         self.dogeWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -342,9 +343,9 @@ extension DogeWalletService {
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
-            if address != eWallet.address {
-                service.save(dogeAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
+            if address != eWallet.address, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
             
@@ -366,9 +367,12 @@ extension DogeWalletService {
                     await service.update()
                 }
                 
-                service.save(dogeAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
+                
                 service.setState(.upToDate)
                 return eWallet
                 
@@ -455,8 +459,8 @@ extension DogeWalletService {
     ///   - dogeAddress: DOGE address to save into KVS
     ///   - adamantAddress: Owner of Doge address
     ///   - completion: success
-    private func save(dogeAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -467,13 +471,7 @@ extension DogeWalletService {
         }
         
         Task { @Sendable in
-            let result = await apiService.store(
-                key: DogeWalletService.kvsAddress,
-                value: dogeAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
+            let result = await apiService.store(model)
             
             switch result {
             case .success:
@@ -486,7 +484,7 @@ extension DogeWalletService {
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(dogeAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -505,8 +503,8 @@ extension DogeWalletService {
                         return
                     }
                     
-                    self?.save(dogeAddress: dogeAddress) { [weak self] result in
-                        self?.kvsSaveCompletionRecursion(dogeAddress: dogeAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
                 
@@ -517,6 +515,16 @@ extension DogeWalletService {
                 print("\(error.localizedDescription)")
             }
         }
+    }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
 }
 

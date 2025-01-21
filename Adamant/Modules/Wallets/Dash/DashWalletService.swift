@@ -331,6 +331,7 @@ extension DashWalletService {
         )
         
         self.dashWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -347,9 +348,9 @@ extension DashWalletService {
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             let service = self
-            if address != eWallet.address {
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+            if address != eWallet.address, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
             
@@ -371,9 +372,12 @@ extension DashWalletService {
                     await service.update()
                 }
                 
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
+                
                 service.setState(.upToDate)
                 return eWallet
                 
@@ -521,8 +525,8 @@ extension DashWalletService {
     ///   - dashAddress: DASH address to save into KVS
     ///   - adamantAddress: Owner of Dash address
     ///   - completion: success
-    private func save(dashAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -533,13 +537,7 @@ extension DashWalletService {
         }
 
         Task { @Sendable in
-            let result = await apiService.store(
-                key: DashWalletService.kvsAddress,
-                value: dashAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
+            let result = await apiService.store(model)
             
             switch result {
             case .success:
@@ -552,7 +550,7 @@ extension DashWalletService {
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(dashAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -571,8 +569,8 @@ extension DashWalletService {
                         return
                     }
 
-                    self?.save(dashAddress: dashAddress) { [weak self] result in
-                        self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
 
@@ -583,6 +581,16 @@ extension DashWalletService {
                 print("\(error.localizedDescription)")
             }
         }
+    }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
 }
 

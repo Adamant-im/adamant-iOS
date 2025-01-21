@@ -74,13 +74,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - States
     
     /// - Returns: Transaction ID
-    func store(
-        key: String,
-        value: String,
-        type: StateType,
-        sender: String,
-        keypair: Keypair
-    ) async -> ApiServiceResult<UInt64>
+    func store(_ model: KVSValueModel) async -> ApiServiceResult<UInt64>
     
     func get(
         key: String,
