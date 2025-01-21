@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CommonKit
 
-protocol AvatarService {
+protocol AvatarService: Sendable {
     func avatar(for key:String, size: Double) -> UIImage
 }
 

@@ -24,7 +24,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
             )
         }
         
-        let transaction = try await getTransaction(by: lastTransaction)
+        let transaction = try await getTransaction(by: lastTransaction, waitsForConnectivity: false)
         
         guard let confirmations = transaction.confirmations,
               confirmations >= 1
@@ -85,7 +85,9 @@ extension DashWalletService: WalletServiceTwoStepSend {
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         let txHex = transaction.serialized().hex
         
-        let response: BTCRPCServerResponce<String> = try await dashApiService.request { core, origin in
+        let response: BTCRPCServerResponce<String> = try await dashApiService.request(
+            waitsForConnectivity: false
+        ) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: .empty,

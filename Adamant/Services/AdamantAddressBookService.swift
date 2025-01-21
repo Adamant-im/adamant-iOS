@@ -37,7 +37,7 @@ final class AdamantAddressBookService: AddressBookService {
     private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: - Lifecycle
-    nonisolated init(
+    init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService,
@@ -47,10 +47,7 @@ final class AdamantAddressBookService: AddressBookService {
         self.adamantCore = adamantCore
         self.accountService = accountService
         self.dialogService = dialogService
-        
-        Task {
-            await addObservers()
-        }
+        addObservers()
     }
     
     // MARK: Observers
@@ -59,7 +56,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Update on login
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.update()
@@ -70,7 +67,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Save on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userWillLogOut)
+            .notifications(named: .AdamantAccountService.userWillLogOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userWillLogOut()
@@ -81,7 +78,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Clean on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userLoggedOut()
@@ -93,7 +90,7 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Observer Actions
     
     private func userWillLogOut() async {
-        guard hasChanges else {
+        guard hasChanges, let keypair = accountService.keypair else {
             return
         }
         
@@ -102,7 +99,7 @@ final class AdamantAddressBookService: AddressBookService {
             self.savingBookOnLogoutTaskId = .invalid
         }
         
-        _ = try? await saveAddressBook(self.addressBook)
+        _ = try? await saveAddressBook(self.addressBook, keypair: keypair)
         
         UIApplication.shared.endBackgroundTask(savingBookOnLogoutTaskId)
         savingBookOnLogoutTaskId = .invalid
@@ -163,7 +160,7 @@ final class AdamantAddressBookService: AddressBookService {
             userInfo: [AdamantUserInfoKey.AddressBook.changes: changes]
         )
         
-        await Task.sleep(interval: waitTime)
+        try? await Task.sleep(interval: waitTime)
         await saveIfNeeded()
     }
     
@@ -217,7 +214,7 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Saving
     
     func saveIfNeeded() async {
-        guard hasChanges else {
+        guard hasChanges, let keypair = accountService.keypair else {
             return
         }
         
@@ -227,7 +224,7 @@ final class AdamantAddressBookService: AddressBookService {
             self.savingBookTaskId = .invalid
         }
         
-        guard let id = try? await saveAddressBook(addressBook) else {
+        guard let id = try? await saveAddressBook(addressBook, keypair: keypair) else {
             return
         }
         
@@ -236,7 +233,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Hold updates until transaction passed on backend
         
         while !done {
-            await Task.sleep(interval: 3.0)
+            try? await Task.sleep(interval: 3.0)
             
             if let _ = try? await apiService.getTransaction(id: id) {
                 done = true
@@ -252,8 +249,8 @@ final class AdamantAddressBookService: AddressBookService {
         self.savingBookTaskId = .invalid
     }
     
-    private func saveAddressBook(_ book: [String: String]) async throws -> UInt64 {
-        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+    private func saveAddressBook(_ book: [String: String], keypair: Keypair) async throws -> UInt64 {
+        guard let loggedAccount = accountService.account else {
             throw AddressBookServiceError.notLogged
         }
         
@@ -282,22 +279,15 @@ final class AdamantAddressBookService: AddressBookService {
         // MARK: 2. Submit to KVS
         
         do {
-            let id = try await apiService.store(
+            let id = try await apiService.store(.init(
                 key: addressBookKey,
                 value: value,
-                type: .keyValue,
-                sender: address,
                 keypair: keypair
-            ).get()
+            )).get()
             
             return id
-        } catch let error as ApiServiceError {
+        } catch let error {
             throw AddressBookServiceError.apiServiceError(error: error)
-        } catch {
-            throw AddressBookServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
-            )
         }
     }
     

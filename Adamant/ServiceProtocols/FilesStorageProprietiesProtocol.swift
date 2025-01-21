@@ -7,8 +7,13 @@
 //
 
 import Foundation
+import CommonKit
 
-protocol FilesStorageProprietiesProtocol {
+@MainActor
+protocol FilesStorageProprietiesProtocol: Sendable {
+    var autoDownloadPreviewPolicyPublisher: AnyObservable<DownloadPolicy> { get }
+    var autoDownloadFullMediaPolicyPublisher: AnyObservable<DownloadPolicy> { get }
+    
     func autoDownloadPreviewPolicy() -> DownloadPolicy
     func setAutoDownloadPreview(_ value: DownloadPolicy)
     func autoDownloadFullMediaPolicy() -> DownloadPolicy

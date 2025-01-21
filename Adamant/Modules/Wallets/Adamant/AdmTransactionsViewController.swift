@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import CommonKit
 
 final class AdmTransactionsViewController: TransactionsListViewControllerBase {
@@ -140,6 +140,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             case .success:
                 refreshControl.endRefreshing()
                 tableView.reloadData()
+                emptyLabel.isHidden = transactions.count > .zero
                 
             case .failure(let error):
                 refreshControl.endRefreshing()
@@ -176,18 +177,20 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 }
                 
                 isNeedToLoadMoore = count >= transactionsPerRequest
+                emptyLabel.isHidden = transactions.count > .zero
             } catch {
                 isNeedToLoadMoore = false
+                emptyLabel.isHidden = transactions.count > .zero
                 
                 if !silent {
                     dialogService.showRichError(error: error)
+                    emptyLabel.isHidden = true
                 }
             }
             
             isBusy = false
             emptyLabel.isHidden = !transactions.isEmpty
             refreshControl.endRefreshing()
-            stopBottomIndicator()
         }.stored(in: taskManager)
     }
     

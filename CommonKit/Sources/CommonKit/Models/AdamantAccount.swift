@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct AdamantAccount {
+public struct AdamantAccount: @unchecked Sendable {
     public let address: String
     public var unconfirmedBalance: Decimal
     public var balance: Decimal

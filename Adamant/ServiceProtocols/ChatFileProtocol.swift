@@ -21,18 +21,14 @@ struct FileUpdateProperties {
     let downloadStatus: DownloadStatus?
     let uploading: Bool?
     let progress: Int?
-    let isPreviewDownloadAllowed: Bool?
-    let isFullMediaDownloadAllowed: Bool?
 }
 
-protocol ChatFileProtocol {
+@MainActor
+protocol ChatFileProtocol: Sendable {
     var downloadingFiles: [String: DownloadStatus] { get }
     var uploadingFiles: [String] { get }
     var filesLoadingProgress: [String: Int] { get }
-    
-    var updateFileFields: PassthroughSubject<FileUpdateProperties, Never> {
-        get
-    }
+    var updateFileFields: AnyObservable<FileUpdateProperties> { get }
     
     func sendFile(
         text: String?,
@@ -53,7 +49,7 @@ protocol ChatFileProtocol {
     func autoDownload(
         file: ChatFile,
         chatroom: Chatroom?,
-        havePartnerName: Bool,
+        hasPartnerName: Bool,
         previewDownloadPolicy: DownloadPolicy,
         fullMediaDownloadPolicy: DownloadPolicy,
         saveEncrypted: Bool
@@ -74,4 +70,16 @@ protocol ChatFileProtocol {
     ) async throws
     
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool
+    
+    func isPreviewAutoDownloadAllowedByPolicy(
+        hasPartnerName: Bool,
+        isFromCurrentSender: Bool,
+        downloadPolicy: DownloadPolicy
+    ) -> Bool
+    
+    func isOriginalAutoDownloadAllowedByPolicy(
+        hasPartnerName: Bool,
+        isFromCurrentSender: Bool,
+        downloadPolicy: DownloadPolicy
+    ) -> Bool
 }

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import MarkdownKit
 import Combine
 import CommonKit
@@ -28,8 +28,8 @@ actor AdamantChatsProvider: ChatsProvider {
     let stack: CoreDataStack
     
     // MARK: Properties
-    @Published private var stateNotifier: State = .empty
-    var stateObserver: Published<State>.Publisher { $stateNotifier }
+    @ObservableValue private var stateNotifier: State = .empty
+    var stateObserver: AnyObservable<State> { $stateNotifier.eraseToAnyPublisher() }
     
     private(set) var state: State = .empty
     private(set) var receivedLastHeight: Int64?
@@ -43,9 +43,9 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
-    @Published private var chatLoadingStatusDictionary: [String: ChatRoomLoadingStatus] = [:]
-    var chatLoadingStatusPublisher: Published<[String: ChatRoomLoadingStatus]>.Publisher {
-        $chatLoadingStatusDictionary
+    @ObservableValue private var chatLoadingStatusDictionary: [String: ChatRoomLoadingStatus] = [:]
+    var chatLoadingStatusPublisher: AnyObservable<[String: ChatRoomLoadingStatus]> {
+        $chatLoadingStatusDictionary.eraseToAnyPublisher()
     }
     
     var chatMaxMessages: [String : Int] = [:]
@@ -99,62 +99,39 @@ actor AdamantChatsProvider: ChatsProvider {
     }
     
     private func addObservers() {
-        Task {
-            for await notification in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedIn
-            ) {
-                userLoggedInAction(notification)
-            }
-        }
-        
-        Task {
-            for await _ in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedOut
-            ) {
-                userLogOutAction()
-            }
-        }
-        
-        Task {
-            for await notification in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.stayInChanged
-            ) {
-                stayInChangedAction(notification)
-            }
-        }
-        
-        Task {
-            for await _ in await NotificationCenter.default.notifications(
-                named: UIApplication.didBecomeActiveNotification
-            ) {
-                await didBecomeActiveAction()
-            }
-        }
-        
-        Task {
-            for await _ in await NotificationCenter.default.notifications(
-                named: UIApplication.willResignActiveNotification
-            ) {
-                willResignActiveAction()
-            }
-        }
-        
-        Task {
-            for await notification in NotificationCenter.default.notifications(
-                named: .AdamantReachabilityMonitor.reachabilityChanged
-            ) {
-                reachabilityChangedAction(notification)
-            }
-        }
+        NotificationCenter.default
+            .notifications(named: .AdamantAccountService.userLoggedIn)
+            .sink { [weak self] in await self?.userLoggedInAction($0) }
+            .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.initialSyncFinished, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { _ in
-                Task { [weak self] in
-                    await self?.getChatRooms(offset: nil)
-                }
-            }
+            .notifications(named: .AdamantAccountService.userLoggedOut)
+            .sink { [weak self] _ in await self?.userLogOutAction() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: .AdamantAccountService.stayInChanged)
+            .sink { [weak self] in await self?.stayInChangedAction($0) }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in await self?.didBecomeActiveAction() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in await self?.willResignActiveAction() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: .AdamantReachabilityMonitor.reachabilityChanged)
+            .sink { [weak self] in await self?.reachabilityChangedAction($0) }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: .AdamantTransfersProvider.initialSyncFinished)
+            .sink { [weak self] _ in await self?.getChatRooms(offset: nil) }
             .store(in: &subscriptions)
     }
     
@@ -533,12 +510,12 @@ extension AdamantChatsProvider {
                 limit: limit
             ).get()
             return chatrooms
-        } catch let error as ApiServiceError {
+        } catch let error {
             guard case .networkError = error else {
                 return nil
             }
             
-            await Task.sleep(interval: requestRepeatDelay)
+            try await Task.sleep(interval: requestRepeatDelay)
             
             return try await apiGetChatMessages(
                 address: address,
@@ -606,7 +583,8 @@ extension AdamantChatsProvider {
             senderId: address,
             privateKey: privateKey,
             height: receivedLastHeight,
-            offset: nil
+            offset: nil,
+            waitsForConnectivity: true
         )
         
         // MARK: 4. Check
@@ -1326,7 +1304,7 @@ extension AdamantChatsProvider {
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
-            transaction.statusEnum = .pending
+            transaction.statusEnum = .delivered
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
@@ -1506,7 +1484,8 @@ extension AdamantChatsProvider {
         senderId: String,
         privateKey: String,
         height: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async throws {
         if self.accountService.account == nil {
             throw ApiServiceError.accountNotFound
@@ -1516,7 +1495,8 @@ extension AdamantChatsProvider {
             let transactions = try await apiService.getMessageTransactions(
                 address: senderId,
                 height: height,
-                offset: offset
+                offset: offset,
+                waitsForConnectivity: waitsForConnectivity
             ).get()
             
             if transactions.count == 0 {
@@ -1542,7 +1522,8 @@ extension AdamantChatsProvider {
                     senderId: senderId,
                     privateKey: privateKey,
                     height: height,
-                    offset: newOffset
+                    offset: newOffset,
+                    waitsForConnectivity: waitsForConnectivity
                 )
             }
         } catch {

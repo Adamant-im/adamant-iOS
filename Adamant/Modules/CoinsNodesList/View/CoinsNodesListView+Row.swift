@@ -29,7 +29,7 @@ extension CoinsNodesListView {
                     HStack(spacing: 6) {
                         Text(model.connectionStatus).font(captionFont)
                         
-                        Text(model.description).font(subtitleFont)
+                        Text(model.subtitle).font(subtitleFont)
                             .lineLimit(1)
                             .frame(height: 10)
                     }

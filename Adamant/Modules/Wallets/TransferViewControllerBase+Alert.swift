@@ -59,7 +59,7 @@ extension TransferViewControllerBase {
     
     // MARK: - Alert view
     
-    func showAlertView(title: String?, message: String, animated: Bool) {
+    func showAlertView(message: String, animated: Bool) {
         if let progressView = progressView {
             hideView(progressView, animated: animated)
         }
@@ -68,12 +68,8 @@ extension TransferViewControllerBase {
             hideView(alertView, animated: animated)
         }
         
-        let callback = {
-            guard let alert = UINib(nibName: "FullscreenAlertView", bundle: nil).instantiate(withOwner: nil).first as? FullscreenAlertView else {
-                fatalError("Can't get FullscreenAlertView")
-            }
-            
-            alert.title = title
+        let callback: @MainActor () -> Void = {
+            let alert = FullscreenAlertView()
             alert.message = message
             
             self.view.addSubview(alert)
@@ -105,7 +101,7 @@ extension TransferViewControllerBase {
     
     // MARK: - Tools
     private func hideView(_ view: UIView, animated: Bool) {
-        let callback: () -> Void
+        let callback: @MainActor () -> Void
         
         if animated {
             callback = {

@@ -193,13 +193,19 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 forName: service.core.walletUpdatedNotification,
                 object: service.core,
                 queue: OperationQueue.main,
-                using: { [weak self] _ in self?.updateRows() }
+                using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
             )
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateRows()
-            self?.tableView.reloadData()
+        NotificationCenter.default.addObserver(
+            forName: .AdamantAccountService.userLoggedIn,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.updateRows()
+                self?.tableView.reloadData()
+            }
         }
         
         setColors()
@@ -235,19 +241,27 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
 
-            if let address = self?.service?.core.wallet?.address {
+            if let address = self?.service?.core.wallet?.address,
+               let explorerAddress = self?.service?.core.explorerAddress,
+               let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-                self?.dialogService.presentShareAlertFor(stringForPasteboard: address,
-                                                   stringForShare: encodedAddress,
-                                                   stringForQR: encodedAddress,
-                                                   types: [.copyToPasteboard,
-                                                           .share,
-                                                           .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
-                                                          ],
-                                                   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                   animated: true,
-                                                   from: cell,
-                                                   completion: completion)
+                self?.dialogService.presentShareAlertFor(
+                    stringForPasteboard: address,
+                    stringForShare: encodedAddress,
+                    stringForQR: encodedAddress,
+                    types: [.copyToPasteboard,
+                            .share,
+                            .generateQr(
+                                encodedContent: encodedAddress,
+                                sharingTip: address,
+                                withLogo: true
+                            ),
+                            .openInExplorer(url: explorerAddressUrl)
+                    ],
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: completion)
             }
         }
         return addressRow

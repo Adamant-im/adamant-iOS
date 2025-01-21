@@ -9,8 +9,8 @@
 import UIKit
 import Eureka
 import FreakingSimpleRoundImageView
-import CoreData
-import Parchment
+@preconcurrency import CoreData
+@preconcurrency import Parchment
 import SnapKit
 import CommonKit
 import Combine
@@ -154,6 +154,7 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let walletServiceCompose: WalletServiceCompose
+    private let apiServiceCompose: ApiServiceComposeProtocol
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -162,7 +163,7 @@ final class AccountViewController: FormViewController {
     // MARK: - Properties
     
     let walletCellIdentifier = "wllt"
-    private (set) var accountHeaderView: AccountHeaderView!
+    private(set) var accountHeaderView: AccountHeaderView!
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
     private var pagingViewController: PagingViewController!
@@ -217,7 +218,8 @@ final class AccountViewController: FormViewController {
         avatarService: AvatarService,
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -230,6 +232,7 @@ final class AccountViewController: FormViewController {
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
         self.walletServiceCompose = walletServiceCompose
+        self.apiServiceCompose = apiServiceCompose
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -308,7 +311,7 @@ final class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
         
-        let callback: ((Notification) -> Void) = { [weak self] data in
+        let callback: @MainActor (Notification) -> Void = { [weak self] data in
             guard let account = data.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount
             else {
                 return
@@ -327,7 +330,11 @@ final class AccountViewController: FormViewController {
                 forName: walletService.core.walletUpdatedNotification,
                 object: nil,
                 queue: OperationQueue.main,
-                using: callback
+                using: { notification in
+                    MainActor.assumeIsolatedSafe {
+                        callback(notification)
+                    }
+                }
             )
         }
         
@@ -671,10 +678,10 @@ final class AccountViewController: FormViewController {
                 style: .default
             ) { [weak self] _ in
                 guard let self = self else { return }
-                accountService.logout()
-                let vc = screensFactory.makeLogin()
+                self.accountService.logout()
+                let vc = self.screensFactory.makeLogin()
                 vc.modalPresentationStyle = .overFullScreen
-                dialogService.present(vc, animated: true, completion: nil)
+                self.dialogService.present(vc, animated: true, completion: nil)
             }
             
             alert.addAction(cancel)
@@ -852,70 +859,108 @@ final class AccountViewController: FormViewController {
     // MARK: Other
     
     func addObservers() {
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.updateAccountInfo()
-            self.tableView.setContentOffset(
-                CGPoint(
-                    x: .zero,
-                    y: -self.tableView.frame.size.height
-                ),
-                animated: false
-            )
-            
-            self.pagingViewController.reloadData()
-            self.tableView.reloadData()
-            if let vc = self.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
-                self.updateHeaderSize(with: vc, animated: false)
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.userLoggedIn,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                guard let self = self else { return }
+                
+                self.updateAccountInfo()
+                self.tableView.setContentOffset(
+                    CGPoint(
+                        x: .zero,
+                        y: -self.tableView.frame.size.height
+                    ),
+                    animated: false
+                )
+                
+                self.pagingViewController.reloadData()
+                self.tableView.reloadData()
+                if let vc = self.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
+                    self.updateHeaderSize(with: vc, animated: false)
+                }
             }
         }
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-        }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let form = self?.form, let accountService = self?.accountService else {
-                return
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.userLoggedOut,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.updateAccountInfo()
             }
-            
-            if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
-                row.value = accountService.hasStayInAccount
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.accountDataUpdated,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.updateAccountInfo()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.stayInChanged,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                guard let form = self?.form, let accountService = self?.accountService else {
+                    return
+                }
+                
+                if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
+                    row.value = accountService.hasStayInAccount
+                    row.updateCell()
+                }
+                
+                if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                    row.value = accountService.hasStayInAccount && accountService.useBiometry
+                    row.evaluateHidden()
+                    row.updateCell()
+                }
+                
+                if let row = form.rowBy(tag: Rows.notifications.tag) {
+                    row.evaluateHidden()
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            MainActor.assumeIsolatedSafe {
+                guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
+                    return
+                }
+                
+                guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
+                    return
+                }
+                
+                row.value = newMode.localized
                 row.updateCell()
             }
-            
-            if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-                row.value = accountService.hasStayInAccount && accountService.useBiometry
-                row.evaluateHidden()
-                row.updateCell()
-            }
-            
-            if let row = form.rowBy(tag: Rows.notifications.tag) {
-                row.evaluateHidden()
-            }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
-                return
-            }
-            
-            guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
-                return
-            }
-            
-            row.value = newMode.localized
-            row.updateCell()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            if let vc = notification.object as? WalletViewController,
-                let cvc = self?.pagingViewController.pageViewController.selectedViewController,
-                vc.viewController == cvc {
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.WalletViewController.heightUpdated,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            MainActor.assumeIsolatedSafe {
+                guard
+                    let vc = notification.object as? WalletViewController,
+                    let cvc = self?.pagingViewController.pageViewController.selectedViewController,
+                    vc.viewController == cvc
+                else { return }
                 
                 if let initiated = self?.initiated {
                     self?.updateHeaderSize(with: vc, animated: initiated)
@@ -925,31 +970,42 @@ final class AccountViewController: FormViewController {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.setupWalletsVC()
-            self.updatePagingItemHeight()
-            
-            self.pagingViewController.reloadData()
-            let collectionView = self.pagingViewController.collectionView
-            collectionView.reloadData()
-            self.tableView.reloadData()
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantVisibleWalletsService.visibleWallets,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                guard let self = self else { return }
+                
+                self.setupWalletsVC()
+                self.updatePagingItemHeight()
+                
+                self.pagingViewController.reloadData()
+                let collectionView = self.pagingViewController.collectionView
+                collectionView.reloadData()
+                self.tableView.reloadData()
+            }
         }
         
         for vc in walletViewControllers {
             guard let service = vc.service?.core else { return }
             let notification = service.walletUpdatedNotification
-            let callback: ((Notification) -> Void) = { [weak self] _ in
-                guard let self = self else { return }
-                let collectionView = self.pagingViewController.collectionView
-                collectionView.reloadData()
+            
+            let callback: @Sendable (Notification) -> Void = { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let self = self else { return }
+                    let collectionView = self.pagingViewController.collectionView
+                    collectionView.reloadData()
+                }
             }
 
-            NotificationCenter.default.addObserver(forName: notification,
-                                                   object: service,
-                                                   queue: OperationQueue.main,
-                                                   using: callback)
+            NotificationCenter.default.addObserver(
+                forName: notification,
+                object: service,
+                queue: OperationQueue.main,
+                using: callback
+            )
         }
     }
     
@@ -1022,8 +1078,8 @@ final class AccountViewController: FormViewController {
         accountHeaderView.addressButton.setTitle(address, for: .normal)
         
         if let publickey = accountService.keypair?.publicKey {
-            DispatchQueue.global().async {
-                let image = self.avatarService.avatar(for: publickey, size: 200)
+            DispatchQueue.global().async { [avatarService] in
+                let image = avatarService.avatar(for: publickey, size: 200)
                 DispatchQueue.main.async {
                     self.accountHeaderView.avatarImageView.image = image
                 }
@@ -1055,9 +1111,21 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        let disabledGroup = NodeGroup.allCases.first {
+            apiServiceCompose.get($0)?.hasEnabledNode != true
+        }
+        
+        if let disabledGroup {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    nodeGroupName: disabledGroup.name
+                ).localizedDescription
+            )
+        }
+        
         refreshControl.endRefreshing()
-        DispatchQueue.background.async {
-            self.accountService.reloadWallets()
+        DispatchQueue.background.async { [accountService] in
+            accountService.reloadWallets()
         }
     }
 }
@@ -1086,13 +1154,21 @@ extension AccountViewController: AccountHeaderViewDelegate {
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
-            if count > 0 {
-                alertLabel.isHidden = false
-                alertLabel.text = String(count)
-            } else {
-                alertLabel.isHidden = true
+    nonisolated func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        Task { @MainActor in
+            if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
+                if count > 0 {
+                    alertLabel.isHidden = false
+                    alertLabel.text = String(count)
+                } else {
+                    alertLabel.isHidden = true
+                }
             }
         }
     }
@@ -1100,31 +1176,54 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
-    func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
-        return walletViewControllers.count
-    }
-    
-    func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
-        return walletViewControllers[index].viewController
-    }
-
-    func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        guard let service = walletViewControllers[index].service?.core else {
-            return WalletItemModel(model: .default)
-        }
+    nonisolated func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
+        MainActor.assertIsolated()
         
-        return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
+        return DispatchQueue.onMainThreadSyncSafe {
+            walletViewControllers.count
+        }
     }
     
-    func pagingViewController(_ pagingViewController: PagingViewController, didScrollToItem pagingItem: PagingItem, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
-        guard transitionSuccessful,
-            let first = startingViewController as? WalletViewController,
-            let second = destinationViewController as? WalletViewController,
-            first.height != second.height else {
-            return
+    nonisolated func pagingViewController(
+        _ pagingViewController: PagingViewController,
+        viewControllerAt index: Int
+    ) -> UIViewController {
+        MainActor.assertIsolated()
+        
+        return DispatchQueue.onMainThreadSyncSafe {
+            walletViewControllers[index].viewController
         }
+    }
 
-        updateHeaderSize(with: second, animated: true)
+    nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
+        MainActor.assertIsolated()
+        
+        return DispatchQueue.onMainThreadSyncSafe {
+            guard let service = walletViewControllers[index].service?.core else {
+                return WalletItemModel(model: .default)
+            }
+            
+            return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
+        }
+    }
+    
+    nonisolated func pagingViewController(
+        _ pagingViewController: PagingViewController,
+        didScrollToItem pagingItem: PagingItem,
+        startingViewController: UIViewController?,
+        destinationViewController: UIViewController,
+        transitionSuccessful: Bool
+    ) {
+        DispatchQueue.onMainThreadSyncSafe {
+            guard transitionSuccessful,
+                let first = startingViewController as? WalletViewController,
+                let second = destinationViewController as? WalletViewController,
+                first.height != second.height else {
+                return
+            }
+
+            updateHeaderSize(with: second, animated: true)
+        }
     }
     
     private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {

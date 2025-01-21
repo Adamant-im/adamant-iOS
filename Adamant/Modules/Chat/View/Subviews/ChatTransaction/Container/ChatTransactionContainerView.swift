@@ -13,14 +13,12 @@ import SwiftUI
 import AdvancedContextMenuKit
 import CommonKit
 
-final class ChatTransactionContainerView: UIView, ChatModelView {
+final class ChatTransactionContainerView: UIView {
     // MARK: Dependencies
     
     var chatMessagesListViewModel: ChatMessagesListViewModel?
     
     // MARK: Proprieties
-    
-    var subscription: AnyCancellable?
     
     var model: Model = .default {
         didSet { update() }
@@ -66,11 +64,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
             $0.width.equalTo(Self.maxVStackWidth)
         }
         return stack
-    }()
-    
-    private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: self)
-        return view
     }()
     
     private lazy var ownReactionLabel: UILabel = {
@@ -153,19 +146,10 @@ extension ChatTransactionContainerView: ReusableView {
 
 private extension ChatTransactionContainerView {
     func configure() {
-        addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
-        
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-        }
-        
-        swipeView.swipeStateAction = { [actionHandler] state in
-            actionHandler(.swipeState(state: state))
         }
         
         chatMenuManager.setup(for: contentView)
@@ -180,10 +164,6 @@ private extension ChatTransactionContainerView {
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
         updateOwnReaction()
         updateOpponentReaction()
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
-        }
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -199,8 +179,8 @@ private extension ChatTransactionContainerView {
             : viewsList.reversed()
         
         guard horizontalStack.arrangedSubviews != viewsList else { return }
-        horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
-        viewsList.forEach(horizontalStack.addArrangedSubview)
+        horizontalStack.arrangedSubviews.forEach { horizontalStack.removeArrangedSubview($0) }
+        viewsList.forEach { horizontalStack.addArrangedSubview($0) }
     }
     
     @objc func onStatusButtonTap() {
@@ -261,6 +241,7 @@ private extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView.Model {
+    @MainActor
     func height(for width: CGFloat) -> CGFloat {
         content.height(for: width)
     }
@@ -270,7 +251,7 @@ private extension TransactionStatus {
     var image: UIImage {
         switch self {
         case .notInitiated: return .asset(named: "status_updating") ?? .init()
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .asset(named: "status_pending") ?? .init()
+        case .pending, .registered: return .asset(named: "status_pending") ?? .init()
         case .success: return .asset(named: "status_success") ?? .init()
         case .failed: return .asset(named: "status_failed") ?? .init()
         case .inconsistent: return .asset(named: "status_warning") ?? .init()
@@ -280,7 +261,7 @@ private extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated: return .adamant.secondary
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .adamant.primary
+        case .pending, .registered: return .adamant.primary
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.attention
         }
@@ -308,7 +289,7 @@ extension ChatTransactionContainerView {
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [actionHandler, model] in
-            actionHandler(.reply(message: model))
+            actionHandler(.reply(id: model.id))
         }
         
         return AMenuSection([reply, report, remove])

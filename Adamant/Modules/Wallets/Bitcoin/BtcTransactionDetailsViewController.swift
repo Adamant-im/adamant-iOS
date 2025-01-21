@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import Combine
 
 final class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -19,7 +20,7 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Properties
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -44,15 +45,11 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
         }
     }
     
-    deinit {
-        stopUpdate()
-    }
-    
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
-        return URL(string: "\(BtcWalletService.explorerAddress)\(id)")
+        return URL(string: "\(BtcWalletService.explorerTx)\(id)")
     }
     
     @MainActor
@@ -64,7 +61,7 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
             }
             
             do {
-                let trs = try await service.getTransaction(by: id)
+                let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 transaction = trs
                 
                 updateIncosinstentRowIfNeeded()
@@ -83,14 +80,12 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

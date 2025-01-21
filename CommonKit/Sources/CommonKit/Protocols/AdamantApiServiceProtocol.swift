@@ -29,7 +29,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?
+        limit: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     func getTransactions(
@@ -38,7 +39,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         fromHeight: Int64?,
         offset: Int?,
         limit: Int?,
-        orderByTime: Bool?
+        orderByTime: Bool?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     // MARK: - Chats Rooms
@@ -72,13 +74,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - States
     
     /// - Returns: Transaction ID
-    func store(
-        key: String,
-        value: String,
-        type: StateType,
-        sender: String,
-        keypair: Keypair
-    ) async -> ApiServiceResult<UInt64>
+    func store(_ model: KVSValueModel) async -> ApiServiceResult<UInt64>
     
     func get(
         key: String,
@@ -90,7 +86,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     func getMessageTransactions(
         address: String,
         height: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]>
     
     func sendTransaction(

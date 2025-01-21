@@ -10,28 +10,44 @@ import CommonKit
 import UIKit
 
 extension Node {
+    enum HeightType {
+        case date
+        case blocks
+    }
+    
     // swiftlint:disable switch_case_alignment
-    func statusString(showVersion: Bool, dateHeight: Bool) -> String? {
-        guard
-            isEnabled,
-            let connectionStatus = connectionStatus
-        else { return Strings.disabled }
+    func statusString(showVersion: Bool, heightType: HeightType?) -> String? {
+        guard isEnabled else { return Strings.disabled }
         
         let statusTitle = switch connectionStatus {
         case .allowed:
             pingString
-        case .synchronizing:
-            Strings.synchronizing
+        case let .synchronizing(isFinal):
+            isFinal
+                ? Strings.synchronizing
+                : Strings.updating
         case .offline:
             Strings.offline
         case .notAllowed(let reason):
             reason.text
+        case .none:
+            Strings.updating
+        }
+        
+        let heightString: String?
+        switch heightType {
+        case .date:
+            heightString = dateHeightString
+        case .blocks:
+            heightString = blocksHeightString
+        case nil:
+            heightString = nil
         }
         
         return [
             statusTitle,
             showVersion ? versionString : nil,
-            dateHeight ? dateHeightString : heightString
+            heightString
         ]
         .compactMap { $0 }
         .joined(separator: " ")
@@ -59,8 +75,10 @@ extension Node {
         switch connectionStatus {
         case .allowed:
             return .adamant.success
-        case .synchronizing:
-            return .adamant.attention
+        case let .synchronizing(isFinal):
+            return isFinal
+                ? .adamant.attention
+                : .adamant.inactive
         case .offline, .notAllowed:
             return .adamant.warning
         case .none:
@@ -70,6 +88,28 @@ extension Node {
     
     var title: String {
         mainOrigin.asString()
+    }
+    
+    var statusStringColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
+    }
+    
+    var titleColor: UIColor {
+        guard isEnabled else { return .adamant.textColor }
+        
+        return switch connectionStatus {
+        case .none:
+            .adamant.inactive
+        case .allowed, .notAllowed, .offline, .synchronizing:
+            .adamant.textColor
+        }
     }
 }
 
@@ -93,6 +133,13 @@ private extension Node {
             String.localized(
                 "NodesList.NodeCell.Synchronizing",
                 comment: "NodesList.NodeCell: Node is synchronizing"
+            )
+        }
+        
+        static var updating: String {
+            String.localized(
+                "NodesList.NodeCell.Updating",
+                comment: "NodesList.NodeCell: Node is updating"
             )
         }
         
@@ -123,7 +170,7 @@ private extension Node {
         return "\(Strings.ping): \(Int(ping * 1000)) \(Strings.milliseconds)"
     }
     
-    var heightString: String? {
+    var blocksHeightString: String? {
         height.map { " ❐ \(getFormattedHeight(from: $0))" }
     }
     

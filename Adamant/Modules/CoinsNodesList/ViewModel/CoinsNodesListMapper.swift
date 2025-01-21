@@ -10,34 +10,25 @@ import CommonKit
 import SwiftUI
 
 struct CoinsNodesListMapper {
-    let processedGroups: [NodeGroup]
-    
-    func map(items: [NodeGroup: [Node]], restNodeIds: [UUID]) -> [CoinsNodesListState.Section] {
-        processedGroups.map {
-            map(
-                group: $0,
-                nodes: items[$0] ?? .init(),
-                restNodeIds: restNodeIds
-            )
-        }.sorted { $0.title < $1.title }
-    }
-}
-
-private extension CoinsNodesListMapper {
     func map(
         group: NodeGroup,
-        nodes: [Node],
-        restNodeIds: [UUID]
+        nodesInfo: NodesListInfo
     ) -> CoinsNodesListState.Section {
         .init(
             id: group,
             title: group.name,
-            rows: nodes.map {
-                map(node: $0, group: group, isRest: restNodeIds.contains($0.id))
+            rows: nodesInfo.nodes.map { node in
+                map(
+                    node: node,
+                    group: group,
+                    isRest: nodesInfo.chosenNodeId.map { $0 == node.id } ?? false
+                )
             }
         )
     }
-    
+}
+
+private extension CoinsNodesListMapper {
     func map(
         node: Node,
         group: NodeGroup,
@@ -47,16 +38,24 @@ private extension CoinsNodesListMapper {
         var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
         indicatorAttrString.foregroundColor = .init(uiColor: node.indicatorColor)
         
+        var titleAttrString = AttributedString(stringLiteral: node.title)
+        titleAttrString.foregroundColor = .init(uiColor: node.titleColor)
+        
+        let subtitleString = node.statusString(
+            showVersion: true,
+            heightType: group.heightType
+        ) ?? .empty
+        
+        var subtitleAttrString = AttributedString(stringLiteral: subtitleString)
+        subtitleAttrString.foregroundColor = .init(uiColor: node.statusStringColor)
+        
         return .init(
             id: node.id,
             group: group,
             isEnabled: node.isEnabled,
-            title: node.title,
+            title: titleAttrString,
             connectionStatus: indicatorAttrString,
-            description: node.statusString(
-                showVersion: true,
-                dateHeight: group.useDateHeight
-            ) ?? .empty
+            subtitle: subtitleAttrString
         )
     }
 }

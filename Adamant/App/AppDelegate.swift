@@ -44,7 +44,7 @@ extension StoreKey {
 }
 
 // MARK: - Application
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var repeater: RepeaterService!
@@ -83,6 +83,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = window
         
         let rootTabBarController = UITabBarController()
+        if #available(iOS 18.0, *) {
+            rootTabBarController.mode = .tabSidebar
+            rootTabBarController.traitOverrides.horizontalSizeClass = .unspecified
+        }
         window.rootViewController = rootTabBarController
         rootTabBarController.view.backgroundColor = .adamant.backgroundColor
         window.tintColor = UIColor.adamant.primary
@@ -108,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabScreens.viewControllers.1.tabBarItem.image = .asset(named: "account-tab")
         tabScreens.viewControllers.1.tabBarItem.badgeColor = .adamant.primary
         
-        let resetScreensAction: () -> Void
+        let resetScreensAction: @MainActor () -> Void
         switch tabScreens {
         case let .splitControllers(leftController, rightController):
             resetScreensAction = {
@@ -155,6 +159,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
+            if isMacOS {
+                var size: CGSize = .init(width: 900, height: 900)
+                window.frame = .init(origin: window.frame.origin, size: size)
+                window.windowScene?.sizeRestrictions?.minimumSize = size
+                window.windowScene?.sizeRestrictions?.maximumSize = size
+                window.windowScene?.sizeRestrictions?.allowsFullScreen = false
+            }
+            
             let welcome = screensFactory.makeOnboard()
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
@@ -175,28 +187,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 repeater.pauseAll()
             }
             
-            NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
-                guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool,
-                    let repeater = self?.repeater else {
-                        return
-                }
-                
-                if connection {
-                    DispatchQueue.onMainSync {
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                object: reachability,
+                queue: OperationQueue.main
+            ) { [weak self] notification in
+                MainActor.assumeIsolatedSafe {
+                    guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool,
+                        let repeater = self?.repeater else {
+                            return
+                    }
+                    
+                    if connection {
                         self?.dialogService.dissmisNoConnectionNotification()
-                    }
-                    repeater.resumeAll()
-                } else {
-                    DispatchQueue.onMainSync {
+                        repeater.resumeAll()
+                    } else {
                         self?.dialogService.showNoConnectionNotification()
+                        repeater.pauseAll()
                     }
-                    repeater.pauseAll()
                 }
             }
         }
         
         // Setup transactions statuses observing
-        if let service = container.resolve(TransactionStatusService.self) {
+        if let service = container.resolve(TransactionsStatusServiceComposeProtocol.self) {
             Task { await service.startObserving() }
         }
         
@@ -250,7 +264,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if let currencyInfoService = container.resolve(InfoServiceProtocol.self) {
             currencyInfoService.update() // Initial update
-            repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
+            repeater.registerForegroundCall(
+                label: "currencyInfoService",
+                interval: 60,
+                queue: .global(qos: .utility)
+            ) {
+                Task {
+                    await currencyInfoService.update()
+                }
+            }
         } else {
             dialogService.showError(withMessage: "Failed to register InfoServiceProtocol autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
@@ -261,7 +283,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             object: nil,
             queue: OperationQueue.main
         ) { _ in
-            resetScreensAction()
+            MainActor.assumeIsolatedSafe {
+                resetScreensAction()
+            }
         }
         
         // MARK: 8. Welcome messages
@@ -269,7 +293,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             for await notification in NotificationCenter.default.notifications(
                 named: .AdamantChatsProvider.initiallySyncedChanged
             ) {
-                await self.handleWelcomeMessages(notification: notification)
+                await handleWelcomeMessages(notification: notification)
             }
         }
         
@@ -305,6 +329,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         repeater.resumeAll()
     }
+  
+    func application(
+        _: UIApplication,
+        shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
+    ) -> Bool {
+        switch extensionPointIdentifier {
+        case .keyboard:
+            false
+        default:
+            true
+        }
+    }
 }
 
 // MARK: - Remote notifications
@@ -334,7 +370,7 @@ extension AppDelegate {
             let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+            chatVC.messagesCollectionView.scrollToBottom(animated: true)
             return
         }
         
@@ -342,7 +378,7 @@ extension AppDelegate {
             let chatVC = chatListNav.viewControllers.last as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+            chatVC.messagesCollectionView.scrollToBottom(animated: true)
             return
         }
         
@@ -374,60 +410,67 @@ extension AppDelegate {
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        var chatListNav: UINavigationController?
-        var chatListVC: ChatListViewController?
-        
-        let userInfo = response.notification.request.content.userInfo
-        
-        guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
-              let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
-              let data = transactionRaw.data(using: .utf8),
-              let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-              let tabbar = window?.rootViewController as? UITabBarController
-        else {
-            completionHandler()
-            return
+        let completionHandler: @Sendable () -> Void = {
+            [atomicCompletionHandler = Atomic(completionHandler)] in
+            atomicCompletionHandler.isolated { $0() }
         }
         
-        if let split = tabbar.viewControllers?.first as? UISplitViewController,
-           let navigation = split.viewControllers.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatListNav = navigation
-            chatListVC = vc
-        }
-        
-        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatListNav = navigation
-            chatListVC = vc
-        }
-        
-        guard let chatListVC = chatListVC,
-              let chatListNav = chatListNav
-        else {
-            completionHandler()
-            return
-        }
-        
-        chatListVC.performOnMessagesLoaded { [weak self] in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self?.dialogService.dismissProgress()
-                self?.openDialog(
-                    chatListNav: chatListNav,
-                    tabbar: tabbar,
-                    chatListVC: chatListVC,
-                    transactionID: transactionID,
-                    senderAddress: trs.senderId
-                )
+        Task { @MainActor in
+            var chatListNav: UINavigationController?
+            var chatListVC: ChatListViewController?
+            
+            let userInfo = response.notification.request.content.userInfo
+            
+            guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+                  let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
+                  let data = transactionRaw.data(using: .utf8),
+                  let trs = try? JSONDecoder().decode(Transaction.self, from: data),
+                  let tabbar = window?.rootViewController as? UITabBarController
+            else {
+                completionHandler()
+                return
             }
+            
+            if let split = tabbar.viewControllers?.first as? UISplitViewController,
+               let navigation = split.viewControllers.first as? UINavigationController,
+               let vc = navigation.viewControllers.first as? ChatListViewController {
+                chatListNav = navigation
+                chatListVC = vc
+            }
+            
+            if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+               let vc = navigation.viewControllers.first as? ChatListViewController {
+                chatListNav = navigation
+                chatListVC = vc
+            }
+            
+            guard let chatListVC = chatListVC,
+                  let chatListNav = chatListNav
+            else {
+                completionHandler()
+                return
+            }
+            
+            chatListVC.performOnMessagesLoaded { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self?.dialogService.dismissProgress()
+                    self?.openDialog(
+                        chatListNav: chatListNav,
+                        tabbar: tabbar,
+                        chatListVC: chatListVC,
+                        transactionID: transactionID,
+                        senderAddress: trs.senderId
+                    )
+                }
+            }
+            
+            completionHandler()
         }
-        
-        completionHandler()
     }
 }
 
@@ -476,7 +519,7 @@ extension AppDelegate {
         
         return await withTaskGroup(of: FetchResult.self) { group in
             for case let service in services {
-                group.addTask {
+                group.addTask { @Sendable in
                     let result = await service.fetchBackgroundData(notificationsService: notificationsService)
                     return result
                 }
@@ -696,6 +739,7 @@ private enum TabScreens {
     }
 }
 
+@MainActor
 private func makeSplitController() -> UISplitViewController {
     let controller = UISplitViewController()
     controller.preferredDisplayMode = .oneBesideSecondary

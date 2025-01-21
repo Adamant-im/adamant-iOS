@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 
 extension ChatMediaContainerView {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let isFromCurrentSender: Bool
         let reactions: Set<Reaction>?
@@ -19,17 +19,21 @@ extension ChatMediaContainerView {
         let opponentAddress: String
         let txStatus: MessageStatus
         var status: FileMessageStatus
+        var swipeState: ChatSwipeWrapperModel.State
         
-        static let `default` = Self(
-            id: "",
-            isFromCurrentSender: true,
-            reactions: nil,
-            content: .default,
-            address: "",
-            opponentAddress: "",
-            txStatus: .failed,
-            status: .failed
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                isFromCurrentSender: true,
+                reactions: nil,
+                content: .default,
+                address: "",
+                opponentAddress: "",
+                txStatus: .failed,
+                status: .failed,
+                swipeState: .idle
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             let mediaFilesCount = content.fileModel.files.filter { file in

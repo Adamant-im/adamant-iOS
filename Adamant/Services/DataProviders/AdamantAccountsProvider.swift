@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CoreData
+@preconcurrency import CoreData
 import CommonKit
 import Combine
 
@@ -50,7 +50,7 @@ final class AdamantAccountsProvider: AccountsProvider {
     private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Lifecycle
-    nonisolated init(
+    init(
         stack: CoreDataStack,
         apiService: AdamantApiServiceProtocol,
         addressBookService: AddressBookService
@@ -94,15 +94,16 @@ final class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.adelina.name: adelina
         ]
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
-            guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
-                let viewContext = self?.stack.container.viewContext else {
-                return
-            }
-            
-            DispatchQueue.global(qos: .utility).async {
-                let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                context.parent = viewContext
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAddressBookService.addressBookUpdated,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            MainActor.assumeIsolatedSafe {
+                guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
+                    let viewContext = self?.stack.container.viewContext else {
+                    return
+                }
                 
                 let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
                 requestSingle.fetchLimit = 1
@@ -114,9 +115,10 @@ final class AdamantAccountsProvider: AccountsProvider {
                         let predicate = NSPredicate(format: "address == %@", address)
                         requestSingle.predicate = predicate
                         
-                        guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                            continue
-                        }
+                        guard
+                            let result = try? viewContext.fetch(requestSingle),
+                            let account = result.first
+                        else { continue }
                         
                         account.name = name
                         account.chatroom?.title = name
@@ -125,36 +127,30 @@ final class AdamantAccountsProvider: AccountsProvider {
                         let predicate = NSPredicate(format: "address == %@", address)
                         requestSingle.predicate = predicate
                         
-                        guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                            continue
-                        }
+                        guard
+                            let result = try? viewContext.fetch(requestSingle),
+                            let account = result.first
+                        else { continue }
                         
                         account.name = nil
                         account.chatroom?.title = nil
                     }
                 }
                 
-                if context.hasChanges {
-                    DispatchQueue.main.async {
-                        try? context.save()
-                    }
+                if viewContext.hasChanges {
+                    try? viewContext.save()
                 }
             }
         }
         
-        Task {
-            await addObservers()
-        }
+        addObservers()
     }
     
     private func addObservers() {
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                Task {
-                    await self?.updateSystemAccountsName()
-                }
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
+                await self?.updateSystemAccountsName()
             }
             .store(in: &subscriptions)
     }
@@ -181,7 +177,7 @@ final class AdamantAccountsProvider: AccountsProvider {
         if let context = context {
             // viewContext only on MainThread
             if context == stack.container.viewContext {
-                DispatchQueue.onMainSync {
+                DispatchQueue.onMainThreadSyncSafe {
                     acc = (try? context.fetch(request))?.first
                 }
             } else {
@@ -189,7 +185,7 @@ final class AdamantAccountsProvider: AccountsProvider {
             }
         } else {
             // viewContext only on MainThread
-            DispatchQueue.onMainSync {
+            DispatchQueue.onMainThreadSyncSafe {
                 acc = (try? stack.container.viewContext.fetch(request))?.first
             }
         }
@@ -269,7 +265,7 @@ extension AdamantAccountsProvider {
                 )
                 
                 return coreAccount
-            } catch let error as ApiServiceError {
+            } catch let error {
                 switch error {
                 case .accountNotFound:
                     if let dummy = dummy {
@@ -328,17 +324,15 @@ extension AdamantAccountsProvider {
         
         switch validation {
         case .valid:
-            return await withUnsafeContinuation { contituation in
-                context.safeUpdate {
-                    let account = createAndSaveCoreDataAccount(
-                        for: address,
-                        publicKey: publicKey,
-                        dummy: dummy,
-                        in: $0
-                    )
-                    
-                    contituation.resume(returning: account)
-                }
+            return await withUnsafeContinuation { @MainActor contituation in
+                let account = createAndSaveCoreDataAccount(
+                    for: address,
+                    publicKey: publicKey,
+                    dummy: dummy,
+                    in: context
+                )
+                
+                contituation.resume(returning: account)
             }
         case .system:
             let coreAccount = createCoreDataAccount(with: address, publicKey: "")
@@ -594,8 +588,7 @@ extension AdamantAccountsProvider {
             throw AccountsProviderDummyAccountError.invalidAddress(address: address)
         }
         
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = stack.container.viewContext
+        let context = stack.container.viewContext
         
         switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):

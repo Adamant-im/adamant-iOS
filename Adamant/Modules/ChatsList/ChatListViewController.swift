@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import MarkdownKit
 import MessageKit
 import Combine
@@ -62,6 +62,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var newChatButton: UIBarButtonItem!
     
+    private lazy var scrollUpButton = ChatScrollButton(position: .up)
+
     // MARK: Properties
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
@@ -187,7 +189,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
         
-        addObservers()        
+        configureScrollUpButton()
+        addObservers()
         setColors()
     }
     
@@ -259,31 +262,44 @@ final class ChatListViewController: KeyboardObservingViewController {
         tableView.tableHeaderView = UIView()
     }
     
+    func configureScrollUpButton() {
+        view.addSubview(scrollUpButton)
+        
+        scrollUpButton.isHidden = true
+        
+        scrollUpButton.action = { [weak self] in
+            self?.tableView.scrollToRow(at: IndexPath(row: .zero, section: .zero), at: .top, animated: true)
+        }
+        
+        scrollUpButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-20)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.size.equalTo(30)
+        }
+    }
+    
     // MARK: Add Observers
     
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: nil)
                 self?.areMessagesLoaded = false
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
+            .notifications(named: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
+            .sink { @MainActor notification in
                 Task { [weak self] in
                     await self?.handleInitiallySyncedNotification(notification)
                 }
@@ -291,34 +307,38 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageProprietiesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageProprietiesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
+        
+        Task {
+            let chatsProviderState = await chatsProvider.stateObserver
+            let transfersProviderState = await transfersProvider.stateObserver
+            
+            chatsProviderState
+                .combineLatest(transfersProviderState)
+                .map { $0.0.isUpdating || $0.1.isUpdating }
+                .removeDuplicates()
+                .values
+                .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
+                .store(in: &subscriptions)
+        }
     }
     
     private func closeDetailVC() {
@@ -335,20 +355,12 @@ final class ChatListViewController: KeyboardObservingViewController {
         searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
-    private func animateUpdateIfNeeded(_ notification: Notification) {
-        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
-              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
-        else {
-            return
-        }
-        
-        if case .updating = prevState {
-            updatingIndicatorView.stopAnimate()
-        }
-        
-        if case .updating = newState {
+    private func setIsStateUpdating(_ isUpdating: Bool) {
+        if isUpdating {
             updatingIndicatorView.startAnimate()
             refreshDatesIfNeeded()
+        } else {
+            updatingIndicatorView.stopAnimate()
         }
     }
     
@@ -576,6 +588,11 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
                 present(vc, animated: true)
             }
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
+        scrollUpButton.isHidden = offsetY < cellHeight * 0.75
     }
 }
 
@@ -1508,5 +1525,14 @@ extension ChatListViewController {
         ]
         commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         return commands
+    }
+}
+
+private extension State {
+    var isUpdating: Bool {
+        switch self {
+        case .updating: true
+        case .failedToUpdate, .upToDate, .empty: false
+        }
     }
 }

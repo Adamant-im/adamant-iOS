@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import Combine
 
 final class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -19,7 +20,7 @@ final class EthTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Properties
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -42,16 +43,12 @@ final class EthTransactionDetailsViewController: TransactionDetailsViewControlle
         startUpdate()
     }
     
-    deinit {
-        stopUpdate()
-    }
-    
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(EthWalletService.explorerAddress)\(id)")
+        return URL(string: "\(EthWalletService.explorerTx)\(id)")
     }
     
     @MainActor
@@ -83,14 +80,12 @@ final class EthTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true)
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
 }

@@ -28,9 +28,19 @@ final class CheckmarkRowView: UIView {
         set { titleLabel.text = newValue }
     }
     
+    var titleColor: UIColor {
+        get { titleLabel.textColor }
+        set { titleLabel.textColor = newValue }
+    }
+    
     var subtitle: String? {
         get { subtitleLabel.text }
         set { subtitleLabel.text = newValue }
+    }
+    
+    var subtitleColor: UIColor {
+        get { subtitleLabel.textColor }
+        set { subtitleLabel.textColor = newValue }
     }
     
     var caption: String? {
@@ -110,18 +120,21 @@ final class CheckmarkRowView: UIView {
     }
 }
 
+@MainActor
 private func makeTitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 17, weight: .regular)
     return label
 }
 
+@MainActor
 private func makeSubtitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .preferredFont(forTextStyle: .caption1)
     return label
 }
 
+@MainActor
 private func makeCaptionLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 12, weight: .regular)

@@ -9,38 +9,48 @@
 import Foundation
 import Combine
 import UIKit
+import AsyncAlgorithms
 
 public protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
     
+    static var noNetworkError: Self { get }
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
-open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
-    @ObservableValue public private(set) var nodes: [Node] = .init()
-    @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
+@HealthCheckActor
+open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
+    @ObservableValue private(set) var nodes: [Node] = .init()
+    @ObservableValue private var sortedAllowedNodes: [Node] = .init()
     
-    public let service: Service
-    public let isActive: Bool
-    public let name: String
+    @MainActor
+    private var _nodesInfo: ObservableValue<NodesListInfo> = .init(.default)
     
-    private let normalUpdateInterval: TimeInterval
-    private let crucialUpdateInterval: TimeInterval
-    
-    @Atomic public var fastestNodeMode = true
-    @Atomic public var healthCheckTimerSubscription: AnyCancellable?
-    @Atomic public var subscriptions: Set<AnyCancellable> = .init()
-    
-    @Atomic private var previousAppState: UIApplication.State?
-    @Atomic private var lastUpdateTime: Date?
-    
-    public var chosenFastestNodeId: UUID? {
-        fastestNodeMode
-            ? sortedAllowedNodes.first?.id
-            : nil
+    @MainActor
+    public var nodesInfoPublisher: AnyObservable<NodesListInfo> {
+        _nodesInfo.removeDuplicates().eraseToAnyPublisher()
     }
     
-    public init(
+    @MainActor
+    public var nodesInfo: NodesListInfo {
+        _nodesInfo.value
+    }
+    
+    let name: String
+    var subscriptions: Set<AnyCancellable> = .init()
+    
+    public let service: Service
+    public private(set) var fastestNodeMode = true
+    private let normalUpdateInterval: TimeInterval
+    private let crucialUpdateInterval: TimeInterval
+    private let isActive: Bool
+    private var healthCheckTimerSubscription: AnyCancellable?
+    private var healthCheckSubscriptions = Set<AnyCancellable>()
+    private var appState: AppState = .active
+    private var performHealthCheckWhenBecomeActive = false
+    private var lastUpdateTime: Date?
+    
+    public nonisolated init(
         service: Service,
         isActive: Bool,
         name: String,
@@ -55,6 +65,88 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         self.normalUpdateInterval = normalUpdateInterval
         self.crucialUpdateInterval = crucialUpdateInterval
         
+        Task { @HealthCheckActor [self] in
+            configure(nodes: nodes, connection: connection)
+        }
+    }
+    
+    public func request<Output>(
+        waitsForConnectivity: Bool,
+        _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
+    ) async -> Result<Output, Error> {
+        defer { updateSortedNodes() }
+        var usedNodesIds: Set<UUID> = .init()
+        var lastConnectionError: Error?
+        
+        while true {
+            let node = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
+                .first { !usedNodesIds.contains($0.id) }
+            
+            guard let node else { break }
+            usedNodesIds.insert(node.id)
+            let response = await requestAction(service, node.preferredOrigin)
+            
+            switch response {
+            case .success:
+                return response
+            case let .failure(error):
+                guard error.isNetworkError else { return response }
+                lastConnectionError = error
+            }
+        }
+        
+        healthCheck()
+        
+        lastConnectionError = lastConnectionError
+            ?? (nodes.contains { $0.isEnabled }
+                ? .noNetworkError
+                : .noEndpointsError(nodeGroupName: name))
+        
+        return await waitsForConnectivity
+            ? request(waitsForConnectivity: waitsForConnectivity, requestAction)
+            : .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
+    }
+    
+    public func setFastestMode(_ isOn: Bool) {
+        fastestNodeMode = isOn
+        updateSortedNodes()
+    }
+    
+    nonisolated public func healthCheck() {
+        Task { @HealthCheckActor in
+            guard canPerformHealthCheck else { return }
+            lastUpdateTime = .now
+            updateHealthCheckTimerSubscription()
+            
+            Task {
+                await healthCheckInternal()
+                guard Task.isCancelled else { return }
+                performHealthCheckWhenBecomeActive = true
+            }.store(in: &healthCheckSubscriptions)
+        }
+    }
+    
+    open func healthCheckInternal() async {}
+}
+
+private extension HealthCheckWrapper {
+    private enum AppState {
+        case active
+        case background
+    }
+    
+    var canPerformHealthCheck: Bool {
+        guard isActive else { return false }
+        
+        switch appState {
+        case .active:
+            return true
+        case .background:
+            return false
+        }
+    }
+    
+    func configure(nodes: AnyObservable<[Node]>, connection: AnyObservable<Bool>) {
         let connection = connection
             .removeDuplicates()
             .filter { $0 }
@@ -74,58 +166,20 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.didBecomeActiveAction() }
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { @HealthCheckActor [weak self] _ in self?.didBecomeActiveAction() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .sink { [weak self] _ in self?.previousAppState = .background }
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { @HealthCheckActor [weak self] _ in self?.willResignActiveAction() }
             .store(in: &subscriptions)
     }
     
-    public func request<Output>(
-        waitsForConnectivity: Bool = false,
-        _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
-    ) async -> Result<Output, Error> {
-        let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
-        
-        var lastConnectionError = nodesList.isEmpty
-            ? Error.noEndpointsError(nodeGroupName: name)
-            : nil
-        
-        for node in nodesList {
-            let response = await requestAction(service, node.preferredOrigin)
-            
-            switch response {
-            case .success:
-                return response
-            case let .failure(error):
-                guard error.isNetworkError else { return response }
-                lastConnectionError = error
-            }
-        }
-        
-        if lastConnectionError != nil { healthCheck() }
-        
-        return await waitsForConnectivity
-            ? request(waitsForConnectivity: waitsForConnectivity, requestAction)
-            : .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
-    }
-    
-    open func healthCheck() {
-        guard isActive else { return }
-        lastUpdateTime = .now
-        updateHealthCheckTimerSubscription()
-    }
-}
-
-private extension HealthCheckWrapper {
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.compactMap { [fastestNodeMode = $fastestNodeMode] in
-            guard !waitsForConnectivity || !$0.isEmpty else { return nil }
-            return fastestNodeMode.value ? $0 : $0.shuffled()
-        }.values.first { _ in true } ?? .init()
+        await $sortedAllowedNodes.values.first {
+            !waitsForConnectivity || !$0.isEmpty
+        } ?? .init()
     }
     
     func updateHealthCheckTimerSubscription() {
@@ -141,24 +195,35 @@ private extension HealthCheckWrapper {
     }
     
     func didBecomeActiveAction() {
-        defer { previousAppState = .active }
+        guard appState != .active else { return }
+        appState = .active
         
-        guard
-            previousAppState == .background,
-            let timeToUpdate = lastUpdateTime?.addingTimeInterval(normalUpdateInterval / 3),
-            Date.now > timeToUpdate
-        else { return }
+        let timeToUpdate = lastUpdateTime?.addingTimeInterval(normalUpdateInterval / 3)
+            ?? .adamantNullDate
         
+        guard performHealthCheckWhenBecomeActive || Date.now >= timeToUpdate else { return }
+        performHealthCheckWhenBecomeActive = false
         healthCheck()
+    }
+    
+    func willResignActiveAction() {
+        appState = .background
+        healthCheckSubscriptions = .init()
     }
     
     func updateNodes(_ newNodes: [Node]) {
         nodes = newNodes
-        
-        sortedAllowedNodes = newNodes.getAllowedNodes(
-            sortedBySpeedDescending: true,
+        updateSortedNodes()
+    }
+    
+    func updateSortedNodes() {
+        sortedAllowedNodes = nodes.getAllowedNodes(
+            sortedBySpeedDescending: fastestNodeMode,
             needWS: false
         )
+        
+        let newInfo = NodesListInfo(nodes: nodes, chosenNodeId: sortedAllowedNodes.first?.id)
+        Task { @MainActor in _nodesInfo.send(newInfo) }
     }
 }
 

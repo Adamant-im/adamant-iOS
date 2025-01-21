@@ -9,7 +9,7 @@
 import UIKit
 
 extension ChatMessageReplyCell {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let replyId: String
         let message: NSAttributedString
@@ -20,19 +20,23 @@ extension ChatMessageReplyCell {
         let address: String
         let opponentAddress: String
         var isHidden: Bool
+        var swipeState: ChatSwipeWrapperModel.State
         
-        static let `default` = Self(
-            id: "",
-            replyId: "",
-            message: NSAttributedString(string: ""),
-            messageReply: NSAttributedString(string: ""),
-            backgroundColor: .failed,
-            isFromCurrentSender: false,
-            reactions: nil,
-            address: "",
-            opponentAddress: "",
-            isHidden: false
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                replyId: "",
+                message: NSAttributedString(string: ""),
+                messageReply: NSAttributedString(string: ""),
+                backgroundColor: .failed,
+                isFromCurrentSender: false,
+                reactions: nil,
+                address: "",
+                opponentAddress: "",
+                isHidden: false,
+                swipeState: .idle
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             return message
@@ -41,6 +45,7 @@ extension ChatMessageReplyCell {
 }
 
 extension ChatMessageReplyCell.Model {
+    @MainActor
     func contentHeight(for width: CGFloat) -> CGFloat {
         let maxSize = CGSize(width: width, height: .infinity)
         

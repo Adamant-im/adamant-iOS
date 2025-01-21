@@ -11,6 +11,7 @@ import Combine
 import Firebase
 import CommonKit
 
+@MainActor
 final class AdamantCrashlyticsService: CrashlyticsService {
     
     // MARK: Dependencies
@@ -28,9 +29,9 @@ final class AdamantCrashlyticsService: CrashlyticsService {
         self.securedStore = securedStore
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
-                self?.userLoggedOut()
+                await self?.userLoggedOut()
             }
             .store(in: &notificationsSet)
     }
@@ -59,7 +60,6 @@ final class AdamantCrashlyticsService: CrashlyticsService {
         return result
     }
     
-    @MainActor
     func configureIfNeeded() {
         guard !isConfigured && isCrashlyticsEnabled() else { return }
         
@@ -68,9 +68,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     }
     
     private func updateCrashlyticSDK(isEnabled: Bool) {
-        Task {
-            await self.configureIfNeeded()
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
-        }
+        configureIfNeeded()
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
     }
 }

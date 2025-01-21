@@ -82,7 +82,8 @@ extension AdamantApiService {
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?
+        limit: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]> {
         await getTransactions(
             forAccount: account,
@@ -90,7 +91,8 @@ extension AdamantApiService {
             fromHeight: fromHeight,
             offset: offset,
             limit: limit,
-            orderByTime: false
+            orderByTime: false,
+            waitsForConnectivity: waitsForConnectivity
         )
     }
     
@@ -100,7 +102,8 @@ extension AdamantApiService {
         fromHeight: Int64?,
         offset: Int?,
         limit: Int?,
-        orderByTime: Bool?
+        orderByTime: Bool?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]> {
         var queryItems = [URLQueryItem(name: "inId", value: account)]
         
@@ -128,7 +131,8 @@ extension AdamantApiService {
         }
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
-        response = await request { [queryItems] core, origin in
+        response = await request(waitsForConnectivity: waitsForConnectivity) {
+            [queryItems] core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: ApiCommands.Transactions.root,

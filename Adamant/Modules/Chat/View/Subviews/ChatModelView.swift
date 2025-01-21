@@ -35,9 +35,4 @@ extension ChatModelView {
             collection?.collectionViewLayout.invalidateLayout()
         }
     }
-    
-    func prepareForReuse() {
-        model = .default
-        subscription = nil
-    }
 }

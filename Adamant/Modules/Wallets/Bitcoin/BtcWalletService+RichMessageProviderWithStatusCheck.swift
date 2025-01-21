@@ -24,7 +24,10 @@ extension BtcWalletService {
         }
         
         do {
-            let btcTransaction = try await getTransaction(by: hash)
+            let btcTransaction = try await getTransaction(
+                by: hash,
+                waitsForConnectivity: true
+            )
             
             return await .init(
                 sentDate: btcTransaction.dateValue,

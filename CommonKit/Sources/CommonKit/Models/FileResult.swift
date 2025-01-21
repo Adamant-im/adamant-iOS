@@ -7,7 +7,7 @@
 
 import UIKit
 
-public enum FileType {
+public enum FileType: Sendable {
     case image
     case video
     case other
@@ -44,7 +44,7 @@ public extension FileType {
     }
 }
 
-public struct FileResult {
+public struct FileResult: Sendable {
     public let assetId: String?
     public let url: URL
     public let type: FileType
@@ -87,5 +87,45 @@ public struct FileResult {
         self.data = data
         self.duration = duration
         self.mimeType = mimeType
+    }
+}
+
+public extension FileResult {
+    init(
+        assetId: String? = nil,
+        url: URL,
+        type: FileType,
+        preview: UIImage?,
+        previewUrl: URL?,
+        previewExtension: String?,
+        size: Int64,
+        namePossiblyWithExtension: String,
+        extenstion: String?,
+        resolution: CGSize?,
+        data: Data? = nil,
+        duration: Float64? = nil,
+        mimeType: String? = nil
+    ) {
+        let nameWithExtension = namePossiblyWithExtension.separateFileExtension()
+        
+        let name = nameWithExtension.extension == extenstion
+            ? nameWithExtension.name
+            : namePossiblyWithExtension
+        
+        self.init(
+            assetId: assetId,
+            url: url,
+            type: type,
+            preview: preview,
+            previewUrl: previewUrl,
+            previewExtension: previewExtension,
+            size: size,
+            name: name,
+            extenstion: extenstion,
+            resolution: resolution,
+            data: data,
+            duration: duration,
+            mimeType: mimeType
+        )
     }
 }

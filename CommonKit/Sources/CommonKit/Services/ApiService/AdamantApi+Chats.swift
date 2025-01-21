@@ -23,7 +23,8 @@ extension AdamantApiService {
     public func getMessageTransactions(
         address: String,
         height: Int64?,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<[Transaction]> {
         var parameters = [
             "isIn": address,
@@ -39,7 +40,8 @@ extension AdamantApiService {
         }
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
-        response = await request { [parameters] service, origin in
+        response = await request(waitsForConnectivity: waitsForConnectivity) {
+            [parameters] service, origin in
             await service.sendRequestJsonResponse(
                 origin: origin,
                 path: ApiCommands.Chats.get,

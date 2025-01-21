@@ -14,7 +14,7 @@ public extension Notification.Name {
     }
 }
 
-public enum Language: String {
+public enum Language: String, Sendable {
     case ru
     case en
     case de

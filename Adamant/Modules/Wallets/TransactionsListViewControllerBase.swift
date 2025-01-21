@@ -60,17 +60,27 @@ class TransactionsListViewControllerBase: UIViewController {
     
     var taskManager = TaskManager()
     
-    var isNeedToLoadMoore = true
+    var isNeedToLoadMoore = true {
+        didSet {
+            guard !isNeedToLoadMoore else { return }
+            stopBottomIndicator()
+        }
+    }
+    
     var isBusy = false
     
     var subscriptions = Set<AnyCancellable>()
     var transactions: [SimpleTransactionDetails] = []
     private(set) lazy var loadingView = LoadingView()
+    private lazy var bottomActivityIndicatorView = makeBottomIndicatorView()
     
     private var limit = 25
     private var offset = 0
     
-    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    private lazy var dataSource = TransactionsDiffableDataSource(
+        tableView: tableView,
+        cellProvider: { [weak self] in self?.makeCell(tableView: $0, indexPath: $1, model: $2) }
+    )
     
     var currencySymbol: String { walletService.core.tokenSymbol }
     
@@ -130,25 +140,22 @@ class TransactionsListViewControllerBase: UIViewController {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAddressBookService.addressBookUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAddressBookService.addressBookUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
@@ -160,8 +167,8 @@ class TransactionsListViewControllerBase: UIViewController {
             }
             .store(in: &subscriptions)
         
-        walletService.core.hasMoreOldTransactionsPublisher
-            .sink { [weak self] isNeedToLoadMoore in
+        walletService.core.hasMoreOldTransactionsPublisher.values
+            .sink { @MainActor [weak self] isNeedToLoadMoore in
                 self?.isNeedToLoadMoore = isNeedToLoadMoore
             }
             .store(in: &subscriptions)
@@ -272,7 +279,6 @@ class TransactionsListViewControllerBase: UIViewController {
             }
             
             isBusy = false
-            stopBottomIndicator()
             refreshControl.endRefreshing()
             updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
@@ -315,12 +321,12 @@ class TransactionsListViewControllerBase: UIViewController {
               tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
         else {
             if tableView.tableFooterView == nil, isBusy {
-                bottomIndicatorView().startAnimating()
+                bottomActivityIndicatorView.startAnimating()
             }
             return
         }
 
-        bottomIndicatorView().startAnimating()
+        bottomActivityIndicatorView.startAnimating()
         loadData(silent: true)
     }
     
@@ -337,7 +343,7 @@ class TransactionsListViewControllerBase: UIViewController {
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
 extension TransactionsListViewControllerBase: UITableViewDelegate {
-    func bottomIndicatorView() -> UIActivityIndicatorView {
+    func makeBottomIndicatorView() -> UIActivityIndicatorView {
         var activityIndicatorView = UIActivityIndicatorView()
         
         guard tableView.tableFooterView == nil else {
@@ -361,13 +367,8 @@ extension TransactionsListViewControllerBase: UITableViewDelegate {
         return activityIndicatorView
     }
     
-    func stopBottomIndicator() {
-        guard let activityIndicatorView = tableView.tableFooterView as? UIActivityIndicatorView else {
-            return
-        }
-        
-        activityIndicatorView.stopAnimating()
-        tableView.tableFooterView = nil
+    private func stopBottomIndicator() {
+        bottomActivityIndicatorView.stopAnimating()
     }
 }
 
@@ -376,7 +377,7 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed: return .adamant.warning
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered:
+        case .notInitiated, .inconsistent, .pending, .registered:
             return .adamant.attention
         case .success: return .adamant.secondary
         }

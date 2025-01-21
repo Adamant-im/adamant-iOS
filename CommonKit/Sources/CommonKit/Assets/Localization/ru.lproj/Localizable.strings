@@ -223,6 +223,9 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Валюта";
 
+/* Account tab: No enabled nodes */
+"AccountTab.Row.NoEnabledNodes" = "Ноды выключены";
+
 /* Account tab: 'Theme' row value 'Light' */
 "AccountTab.Row.Theme.Light" = "Светлая";
 
@@ -688,6 +691,9 @@
 /* NodesList.NodeCell: Node is synchronizing */
 "NodesList.NodeCell.Synchronizing" = "Синхронизируется";
 
+/* NodesList.NodeCell: Node is updating */
+"NodesList.NodeCell.Updating" = "Обновляется";
+
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Офлайн";
 
@@ -870,6 +876,9 @@
 
 /* PrivateKeyGenerator: scene title */
 "PkGeneratorScene.Title" = "Генератор Приватных ключей";
+
+/* PrivateKeyGenerator: key format */
+"PkGeneratorScene.KeyFormat" = "Формат: %@";
 
 /* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
 "PkGeneratorScene.Alert" = "В аккаунте АДАМАНТа несколько встроенных криптокошельков. Все они объединены вашей пассфразой, и только у вас есть доступ к ним. Вы можете экспортировать приватные ключи, чтобы использовать эти кошельки в других приложениях. Храните ключи в надежном месте.";

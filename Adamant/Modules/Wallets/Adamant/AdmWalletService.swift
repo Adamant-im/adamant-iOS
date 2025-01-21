@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 import Swinject
-import CoreData
+@preconcurrency import CoreData
 import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol {
+final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -56,6 +56,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         [.adm]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: AdamantApiServiceProtocol!
@@ -90,8 +94,14 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        apiService.hasActiveNode
+    @MainActor
+    var hasEnabledNode: Bool {
+        apiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        apiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -102,7 +112,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .upToDate
-    @Atomic private(set) var wallet: WalletAccount?
+    @Atomic private(set) var admWallet: AdmWallet?
+    
+    var wallet: WalletAccount? { admWallet }
     
     // MARK: - Logic
     override init() {
@@ -114,65 +126,53 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                self?.wallet = nil
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
+                self?.admWallet = nil
             }
             .store(in: &subscriptions)
     }
     
     func update() {
         guard let accountService = accountService, let account = accountService.account else {
-            wallet = nil
+            admWallet = nil
             return
         }
-                
-        let notify: Bool
         
         let isRaised: Bool
         
-        if let wallet = wallet as? AdmWallet {
+        if let wallet = admWallet {
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
-            if wallet.balance != account.balance {
-                wallet.balance = account.balance
-                notify = true
-            } else if !wallet.isBalanceInitialized {
-                notify = true
-            } else {
-                notify = false
-            }
-            wallet.isBalanceInitialized = true
+            wallet.balance = account.balance
         } else {
             let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
-            wallet.isBalanceInitialized = true
             wallet.balance = account.balance
             
-            self.wallet = wallet
-            notify = true
+            admWallet = wallet
             isRaised = false
         }
         
+        admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
+        
         if isRaised {
-            vibroService.applyVibration(.success)
+            Task { @MainActor in vibroService.applyVibration(.success) }
         }
-        if notify, let wallet = wallet {
+        
+        if let wallet = wallet {
             postUpdateNotification(with: wallet)
         }
     }

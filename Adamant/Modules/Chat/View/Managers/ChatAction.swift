@@ -12,9 +12,8 @@ import CommonKit
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
     case openTransactionDetails(id: String)
-    case reply(message: MessageModel)
+    case reply(id: String)
     case scrollTo(message: ChatMessageReplyCell.Model)
-    case swipeState(state: SwipeableView.State)
     case copy(text: String)
     case copyInPart(text:String)
     case report(id: String)
@@ -22,6 +21,6 @@ enum ChatAction {
     case react(id: String, emoji: String)
     case presentMenu(arg: ChatContextMenuArguments)
     case openFile(messageId: String, file: ChatFile)
-    case downloadContentIfNeeded(messageId: String, files: [ChatFile])
+    case autoDownloadContentIfNeeded(messageId: String, files: [ChatFile])
     case forceDownloadAllFiles(messageId: String, files: [ChatFile])
 }

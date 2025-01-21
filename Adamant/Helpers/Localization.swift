@@ -9,6 +9,7 @@
 import CommonKit
 import UIKit
 
+@MainActor
 protocol XIBLocalizable {
     var xibLocKey: String? { get set }
 }

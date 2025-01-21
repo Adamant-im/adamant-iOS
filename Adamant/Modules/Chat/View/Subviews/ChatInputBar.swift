@@ -90,7 +90,7 @@ final class ChatInputBar: InputBarAccessoryView {
 
 private extension ChatInputBar {
     func updateFeeLabel() {
-        feeLabel.setTitle(fee, for: .normal)
+        feeLabel.setTitle(fee.isEmpty ? " " : fee, for: .normal)
         feeLabel.setSize(feeLabel.titleLabel?.intrinsicContentSize ?? .zero, animated: false)
     }
     
@@ -142,6 +142,7 @@ private extension ChatInputBar {
         configureSendButton()
         configureTextView()
         updateIsEnabled()
+        updateFeeLabel()
     }
     
     func configureLayout() {

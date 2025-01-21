@@ -41,6 +41,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         senderAddressLabel.text = ""
         messageLabel.text = ""
         dateLabel.text = ""
+        
+        updateTextColors()
     }
     
     func didReceive(_ notification: UNNotification) {
@@ -81,12 +83,14 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             message = raw
         } else {
             guard let passphrase: String = keychainStore.get(passphraseStoreKey),
-                let keys = nativeCore.createKeypairFor(passphrase: passphrase),
-                let chat = transaction.asset.chat,
-                let raw = nativeCore.decodeMessage(rawMessage: chat.message,
-                                                    rawNonce: chat.ownMessage,
-                                                    senderPublicKey: transaction.senderPublicKey,
-                                                    privateKey: keys.privateKey) else {
+                  let keys = nativeCore.createKeypairFor(passphrase: passphrase),
+                  let chat = transaction.asset.chat,
+                  let raw = nativeCore.decodeMessage(
+                    rawMessage: chat.message,
+                    rawNonce: chat.ownMessage,
+                    senderPublicKey: transaction.senderPublicKey,
+                    privateKey: keys.privateKey
+                  ) else {
                 showError()
                 return
             }
@@ -158,6 +162,20 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     }
 
     // MARK: - UI
+    private func updateTextColors() {
+        if self.traitCollection.userInterfaceStyle == .dark {
+            senderNameLabel.textColor = .white
+            senderAddressLabel.textColor = .white
+            messageLabel.textColor = .white
+            dateLabel.textColor = .white
+        } else {
+            senderNameLabel.textColor = .black
+            senderAddressLabel.textColor = .black
+            messageLabel.textColor = .black
+            dateLabel.textColor = .black
+        }
+    }
+    
     private func showError(with message: String? = nil) {
         let warningView = NotificationWarningView()
         

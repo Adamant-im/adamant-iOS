@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct AdamantError: LocalizedError {
+public struct AdamantError: Error, LocalizedError {
     public let errorDescription: String?
     
     public init(message: String) {

@@ -27,7 +27,7 @@ extension String.adamant {
 
 final class VisibleWalletsViewController: KeyboardObservingViewController {
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.register(VisibleWalletsResetTableViewCell.self, forCellReuseIdentifier: cellResetIdentifier)
         tableView.rowHeight = 50
@@ -96,27 +96,41 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     private func addObservers() {
         for wallet in wallets {
             let notification = wallet.walletUpdatedNotification
-            let callback: ((Notification) -> Void) = { [weak self] _ in
-                guard let self = self else { return }
-                self.tableView.reloadData()
-            }
             
-            NotificationCenter.default.addObserver(forName: notification,
-                                                   object: wallet,
-                                                   queue: OperationQueue.main,
-                                                   using: callback)
-        }
-        
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            if let previousAppState = self?.previousAppState,
-               previousAppState == .background {
-                self?.previousAppState = .active
-                self?.updateBalances()
+            NotificationCenter.default.addObserver(
+                forName: notification,
+                object: wallet,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let self = self else { return }
+                    self.tableView.reloadData()
+                }
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.previousAppState = .background
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                if let previousAppState = self?.previousAppState,
+                   previousAppState == .background {
+                    self?.previousAppState = .active
+                    self?.updateBalances()
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.previousAppState = .background
+            }
         }
     }
     
@@ -194,13 +208,13 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return .zero
+        return cellSpacing
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         section == sectionsCount - 1
             ? UITableView.automaticDimension
-            : .zero
+            : cellSpacing
     }
     
     // MARK: Cells
@@ -337,3 +351,4 @@ extension VisibleWalletsViewController: UISearchResultsUpdating {
 }
 
 private let sectionsCount = 2
+private let cellSpacing: CGFloat = 10

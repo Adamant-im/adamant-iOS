@@ -56,6 +56,13 @@ public final class Atomic<Value>: @unchecked Sendable {
         defer { lock.unlock() }
         return mutation(&_value)
     }
+    
+    @discardableResult
+    public func isolated<T>(_ processing: (Value) -> T) -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return processing(_value)
+    }
 }
 
 /*

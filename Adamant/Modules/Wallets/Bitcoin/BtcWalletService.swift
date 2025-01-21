@@ -70,7 +70,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletCoreProtocol {
+final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -112,6 +112,10 @@ final class BtcWalletService: WalletCoreProtocol {
         [.btc]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     // MARK: RichMessageProvider properties
@@ -136,12 +140,13 @@ final class BtcWalletService: WalletCoreProtocol {
     @Atomic private(set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private var cachedWalletAddress: [String: String] = [:]
+    @Atomic private var balanceInvalidationSubscription: AnyCancellable?
     
     static let kvsAddress = "btc:address"
     private let walletPath = "m/44'/0'/21'/0/0"
     
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.brchWallet.walletUpdated")
+    let walletUpdatedNotification = Notification.Name("adamant.btcWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.btcWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
@@ -175,8 +180,14 @@ final class BtcWalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    var hasActiveNode: Bool {
-        apiService.hasActiveNode
+    @MainActor
+    var hasEnabledNode: Bool {
+        btcApiService.hasEnabledNode
+    }
+    
+    @MainActor
+    var hasEnabledNodePublisher: AnyObservable<Bool> {
+        btcApiService.hasEnabledNodePublisher
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -212,25 +223,22 @@ final class BtcWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.btcWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -239,6 +247,7 @@ final class BtcWalletService: WalletCoreProtocol {
                 self?.coinStorage.clear()
                 self?.hasMoreOldTransactions = true
                 self?.transactions = []
+                self?.balanceInvalidationSubscription = nil
             }
             .store(in: &subscriptions)
     }
@@ -257,6 +266,7 @@ final class BtcWalletService: WalletCoreProtocol {
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = btcWallet else {
             return
@@ -273,32 +283,18 @@ final class BtcWalletService: WalletCoreProtocol {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            let notification: Notification.Name?
-            
-            let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
-            
-            if wallet.balance != balance {
-                wallet.balance = balance
-                notification = walletUpdatedNotification
-            } else if !wallet.isBalanceInitialized {
-                notification = walletUpdatedNotification
-            } else {
-                notification = nil
-            }
-            
-            wallet.isBalanceInitialized = true
-            
-            if isRaised {
+            if wallet.balance < balance, wallet.isBalanceInitialized {
                 vibroService.applyVibration(.success)
             }
             
-            if let notification = notification {
-                NotificationCenter.default.post(
-                    name: notification,
-                    object: self,
-                    userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-                )
-            }
+            wallet.balance = balance
+            markBalanceAsFresh(wallet)
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
         }
         
         setState(.upToDate)
@@ -365,6 +361,22 @@ final class BtcWalletService: WalletCoreProtocol {
         }
 
         return output
+    }
+    
+    private func markBalanceAsFresh(_ wallet: BtcWallet) {
+        wallet.isBalanceInitialized = true
+        
+        balanceInvalidationSubscription = Task { [weak self] in
+            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
+            guard let self else { return }
+            wallet.isBalanceInitialized = false
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
+        }.eraseToAnyCancellable()
     }
 
     public func isValid(bitcoinAddress address: String) -> Bool {
@@ -439,6 +451,7 @@ extension BtcWalletService {
             addressConverter: addressConverter
         )
         self.btcWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -455,9 +468,9 @@ extension BtcWalletService {
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
-            if address != eWallet.address {
-                service.save(btcAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+            if address != eWallet.address, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
                 throw WalletServiceError.accountNotFound
             }
@@ -480,8 +493,10 @@ extension BtcWalletService {
                     await service.update()
                 }
                 
-                service.save(btcAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
                 
                 return eWallet
@@ -524,15 +539,15 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let response: BtcBalanceResponse = try await btcApiService.request { api, origin in
+        let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
         }.get()
-
+        
         return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
-        let response: [String: Decimal] = try await btcApiService.request { api, origin in
+        let response: [String: Decimal] = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
         }.get()
         
@@ -551,8 +566,8 @@ extension BtcWalletService {
     ///   - btcAddress: Bitcoin address to save into KVS
     ///   - adamantAddress: Owner of BTC address
     ///   - completion: success
-    private func save(btcAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -563,13 +578,7 @@ extension BtcWalletService {
         }
         
         Task {
-            let result = await apiService.store(
-                key: BtcWalletService.kvsAddress,
-                value: btcAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
+            let result = await apiService.store(model)
             
             switch result {
             case .success:
@@ -582,7 +591,7 @@ extension BtcWalletService {
     }
 
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(btcAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -601,8 +610,8 @@ extension BtcWalletService {
                         return
                     }
                     
-                    self?.save(btcAddress: btcAddress) { result in
-                        self?.kvsSaveCompletionRecursion(btcAddress: btcAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
                 
@@ -643,6 +652,16 @@ extension BtcWalletService {
             }
         }
     }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
+    }
 }
 
 // MARK: - Transactions
@@ -671,7 +690,7 @@ extension BtcWalletService {
         for address: String,
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
-        return try await btcApiService.request { api, origin in
+        return try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransactions(
@@ -682,12 +701,14 @@ extension BtcWalletService {
         }.get()
     }
 
-    func getTransaction(by hash: String) async throws -> BtcTransaction {
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BtcTransaction {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
         }
         
-        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, origin in
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request(
+            waitsForConnectivity: waitsForConnectivity
+        ) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransaction(by: hash)
@@ -740,6 +761,8 @@ extension BtcWalletService: PrivateKeyGenerator {
     var rowImage: UIImage? {
         return .asset(named: "bitcoin_wallet_row")
     }
+    
+    var keyFormat: KeyFormat { .WIF }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard

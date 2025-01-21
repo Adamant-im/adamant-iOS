@@ -9,7 +9,7 @@
 import Foundation
 
 extension ChatTransactionContainerView {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let isFromCurrentSender: Bool
         var content: ChatTransactionContentView.Model
@@ -17,16 +17,20 @@ extension ChatTransactionContainerView {
         let reactions: Set<Reaction>?
         let address: String
         let opponentAddress: String
+        var swipeState: ChatSwipeWrapperModel.State
         
-        static let `default` = Self(
-            id: "",
-            isFromCurrentSender: true,
-            content: .default,
-            status: .notInitiated,
-            reactions: nil,
-            address: "",
-            opponentAddress: ""
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                isFromCurrentSender: true,
+                content: .default,
+                status: .notInitiated,
+                reactions: nil,
+                address: "",
+                opponentAddress: "",
+                swipeState: .idle
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             let commentRaw = content.comment ?? ""

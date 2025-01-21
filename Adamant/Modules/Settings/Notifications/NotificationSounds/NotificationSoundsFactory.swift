@@ -9,6 +9,7 @@
 import Swinject
 import SwiftUI
 
+@MainActor
 struct NotificationSoundsFactory {
     private let parent: Assembler
     private let assemblies = [NotificationSoundAssembly()]
@@ -30,8 +31,8 @@ struct NotificationSoundsFactory {
     }
 }
 
-private struct NotificationSoundAssembly: Assembly {
-    func assemble(container: Container) {
+private struct NotificationSoundAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(NotificationSoundsViewModel.self) { (r, target: NotificationTarget) in
             NotificationSoundsViewModel(
                 notificationsService: r.resolve(NotificationsService.self)!,

@@ -10,20 +10,29 @@ import Foundation
 import Combine
 import CommonKit
 
-final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
+@MainActor
+final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol, Sendable {
     // MARK: Dependencies
     
     let securedStore: SecuredStore
     
     // MARK: Proprieties
     
-    @Atomic private var notificationsSet: Set<AnyCancellable> = []
-    private var autoDownloadPreviewState: DownloadPolicy = .everybody
-    private var autoDownloadFullMediaState: DownloadPolicy = .everybody
+    private var notificationsSet: Set<AnyCancellable> = []
+    @ObservableValue private var autoDownloadPreviewState: DownloadPolicy = .everybody
+    @ObservableValue private var autoDownloadFullMediaState: DownloadPolicy = .everybody
     private let autoDownloadPreviewDefaultState: DownloadPolicy = .contacts
     private let autoDownloadFullMediaDefaultState: DownloadPolicy = .contacts
     private var saveFileEncryptedValue = true
     private let saveFileEncryptedDefault = true
+    
+    var autoDownloadPreviewPolicyPublisher: AnyObservable<DownloadPolicy> {
+        $autoDownloadPreviewState.eraseToAnyPublisher()
+    }
+    
+    var autoDownloadFullMediaPolicyPublisher: AnyObservable<DownloadPolicy> {
+        $autoDownloadFullMediaState.eraseToAnyPublisher()
+    }
     
     // MARK: Lifecycle
     
@@ -31,15 +40,15 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
         self.securedStore = securedStore
                 
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn)
+            .sink { @MainActor [weak self] _ in
                 self?.userLoggedIn()
             }
             .store(in: &notificationsSet)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut)
+            .sink { @MainActor [weak self] _ in
                 self?.userLoggedOut()
             }
             .store(in: &notificationsSet)

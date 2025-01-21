@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct BlockchainHealthCheckParams {
+public struct BlockchainHealthCheckParams: Sendable {
     public let group: NodeGroup
     public let name: String
     public let normalUpdateInterval: TimeInterval

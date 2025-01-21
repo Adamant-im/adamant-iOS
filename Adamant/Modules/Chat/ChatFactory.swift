@@ -23,7 +23,7 @@ struct ChatFactory {
     let transferProvider: TransfersProvider
     let accountService: AccountService
     let accountProvider: AccountsProvider
-    let richTransactionStatusService: TransactionStatusService
+    let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let avatarService: AvatarService
@@ -37,13 +37,13 @@ struct ChatFactory {
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
    
-    nonisolated init(assembler: Assembler) {
+    init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
         transferProvider = assembler.resolve(TransfersProvider.self)!
         accountService = assembler.resolve(AccountService.self)!
         accountProvider = assembler.resolve(AccountsProvider.self)!
-        richTransactionStatusService = assembler.resolve(TransactionStatusService.self)!
+        richTransactionStatusService = assembler.resolve(TransactionsStatusServiceComposeProtocol.self)!
         addressBookService = assembler.resolve(AddressBookService.self)!
         visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
         avatarService = assembler.resolve(AvatarService.self)!
@@ -79,6 +79,7 @@ struct ChatFactory {
             storedObjects: delegates.asArray + [dialogManager],
             admWalletService: walletService,
             screensFactory: screensFactory,
+            chatSwipeManager: .init(viewModel: viewModel),
             sendTransaction: makeSendTransactionAction(
                 viewModel: viewModel,
                 screensFactory: screensFactory

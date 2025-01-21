@@ -10,6 +10,7 @@ import UIKit
 import CommonKit
 import Swinject
 
+@MainActor
 struct SettingsFactory {
     let assembler: Assembler
     
@@ -27,13 +28,6 @@ struct SettingsFactory {
         let c = QRGeneratorViewController()
         c.dialogService = assembler.resolve(DialogService.self)
         return c
-    }
-    
-    func makePKGeneratorVC() -> UIViewController {
-        PKGeneratorViewController(
-            dialogService: assembler.resolve(DialogService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
-        )
     }
     
     func makeAboutVC(screensFactory: ScreensFactory) -> UIViewController {

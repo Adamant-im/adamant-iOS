@@ -132,7 +132,9 @@ final class TransactionTableViewCell: UITableViewCell {
     }
     
     override func awakeFromNib() {
-        transactionType = .income
+        Task { @MainActor in
+            transactionType = .income
+        }
     }
     
     private func setupView() {

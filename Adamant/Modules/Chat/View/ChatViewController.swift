@@ -31,6 +31,7 @@ final class ChatViewController: MessagesViewController {
     private let walletServiceCompose: WalletServiceCompose
     private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
+    private let chatSwipeManager: ChatSwipeManager
     
     let viewModel: ChatViewModel
     
@@ -90,6 +91,7 @@ final class ChatViewController: MessagesViewController {
         storedObjects: [AnyObject],
         admWalletService: WalletService?,
         screensFactory: ScreensFactory,
+        chatSwipeManager: ChatSwipeManager,
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
@@ -98,12 +100,19 @@ final class ChatViewController: MessagesViewController {
         self.admWalletService = admWalletService
         self.screensFactory = screensFactory
         self.sendTransaction = sendTransaction
+        self.chatSwipeManager = chatSwipeManager
         super.init(nibName: nil, bundle: nil)
+        
         inputBar.onAttachmentButtonTap = { [weak self] in
             self?.viewModel.presentActionMenu()
         }
+        
         inputBar.onImagePasted = { [weak self] image in
             self?.viewModel.handlePastedImage(image)
+        }
+        
+        viewModel.indexPathsForVisibleItems = { [weak self] in
+            self?.messagesCollectionView.indexPathsForVisibleItems ?? .init()
         }
     }
     
@@ -126,6 +135,7 @@ final class ChatViewController: MessagesViewController {
         configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
+        chatSwipeManager.configure(chatView: view)
     }
     
     override func viewWillLayoutSubviews() {
@@ -231,17 +241,6 @@ extension ChatViewController {
         let velocity = panGesture.velocity(in: messagesCollectionView)
         return abs(velocity.x) > abs(velocity.y)
     }
-    
-    private func swipeStateAction(_ state: SwipeableView.State) {
-        if state == .began {
-            chatMessagesCollectionView.stopDecelerating()
-            messagesCollectionView.isScrollEnabled = false
-        }
-        
-        if state == .ended {
-            messagesCollectionView.isScrollEnabled = true
-        }
-    }
 }
 
 // MARK: Delegate Protocols
@@ -293,13 +292,13 @@ private extension ChatViewController {
     
     func setupObservers() {
         NotificationCenter.default
-            .publisher(for: UITextView.textDidChangeNotification, object: inputBar.inputTextView)
-            .sink { [weak self] _ in self?.inputTextUpdated() }
+            .notifications(named: UITextView.textDidChangeNotification, object: inputBar.inputTextView)
+            .sink { @MainActor [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in
+            .notifications(named: UIApplication.didBecomeActiveNotification)
+            .sink { @MainActor [weak self] _ in
                 guard let self = self else { return }
                 let indexes = self.messagesCollectionView.indexPathsForVisibleItems
                 self.viewModel.updatePreviewFor(indexes: indexes)
@@ -406,8 +405,8 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
-        viewModel.$swipeState
-            .sink { [weak self] in self?.swipeStateAction($0) }
+        viewModel.enableScroll
+            .sink { [weak self] in self?.enableScroll($0) }
             .store(in: &subscriptions)
         
         viewModel.$isNeedToAnimateScroll
@@ -570,7 +569,7 @@ private extension ChatViewController {
         }
         
         filesToolbarView.openFileAction = { [weak self] data in
-            self?.presentDocumentViewer(url: data.url)
+            self?.presentDocumentViewer(file: data)
         }
     }
     
@@ -594,6 +593,7 @@ private extension ChatViewController {
     }
 
     func presentMediaPicker() {
+        guard !isMacOS else { return presentDocumentPicker() }
         messageInputBar.inputTextView.resignFirstResponder()
         
         viewModel.mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
@@ -641,8 +641,8 @@ private extension ChatViewController {
         }
     }
     
-    func presentDocumentViewer(url: URL) {
-        viewModel.documentViewerService.openFile(url: url)
+    func presentDocumentViewer(file: FileResult) {
+        viewModel.documentViewerService.openFile(files: [file])
         
         let quickVC = QLPreviewController()
         quickVC.delegate = viewModel.documentViewerService
@@ -699,7 +699,6 @@ private extension ChatViewController {
     }
     
     func updateFullscreenLoadingView() {
-        guard loadingView.isHidden == viewModel.fullscreenLoading else { return }
         loadingView.isHidden = !viewModel.fullscreenLoading
         
         if viewModel.fullscreenLoading {
@@ -738,8 +737,8 @@ private extension ChatViewController {
 // MARK: Making entities
 
 private extension ChatViewController {
-    func makeScrollDownButton() -> ChatScrollDownButton {
-        let button = ChatScrollDownButton()
+    func makeScrollDownButton() -> ChatScrollButton {
+        let button = ChatScrollButton(position: .down)
         button.action = { [weak self] in
             guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
             else {
@@ -779,8 +778,17 @@ private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
         // "becomeFirstResponder()" causes content animation on start without this fix
         Task {
-            await Task.sleep(interval: .zero)
+            try await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
+        }
+    }
+    
+    func enableScroll(_ isEnabled: Bool) {
+        if isEnabled {
+            chatMessagesCollectionView.isScrollEnabled = true
+        } else {
+            chatMessagesCollectionView.stopDecelerating()
+            chatMessagesCollectionView.isScrollEnabled = false
         }
     }
     
@@ -985,7 +993,7 @@ private extension ChatViewController {
             }
             
             navigationController?.pushViewController(vc, animated: true)
-        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered:
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -1092,8 +1100,5 @@ extension ChatViewController {
 
 private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
-private var replyAction: Bool = false
-private var canReplyVibrate: Bool = true
-private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20

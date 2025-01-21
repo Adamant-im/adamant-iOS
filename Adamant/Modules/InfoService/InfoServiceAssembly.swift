@@ -9,8 +9,8 @@
 import Swinject
 import CommonKit
 
-struct InfoServiceAssembly: Assembly {
-    func assemble(container: Container) {
+struct InfoServiceAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(InfoServiceProtocol.self) { r in
             InfoService(
                 securedStore: r.resolve(SecuredStore.self)!,
@@ -20,16 +20,19 @@ struct InfoServiceAssembly: Assembly {
         }.inObjectScope(.container)
         
         container.register(InfoServiceApiServiceProtocol.self) { r in
-            InfoServiceApiService(core: .init(
-                service: .init(
-                    apiCore: r.resolve(APICoreProtocol.self)!,
-                    mapper: r.resolve(InfoServiceMapperProtocol.self)!),
-                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                isActive: true,
-                params: NodeGroup.infoService.blockchainHealthCheckParams,
-                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
-            ))
+            InfoServiceApiService(
+                core: .init(
+                    service: .init(
+                        apiCore: r.resolve(APICoreProtocol.self)!,
+                        mapper: r.resolve(InfoServiceMapperProtocol.self)!),
+                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    isActive: true,
+                    params: NodeGroup.infoService.blockchainHealthCheckParams,
+                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
+                ),
+                mapper: r.resolve(InfoServiceMapperProtocol.self)!
+            )
         }.inObjectScope(.container)
         
         container.register(InfoServiceMapperProtocol.self) { _ in

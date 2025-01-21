@@ -11,5 +11,5 @@ import Foundation
 import CoreData
 
 @objc(BaseTransaction)
-public class BaseTransaction: CoinTransaction {
+public class BaseTransaction: CoinTransaction, @unchecked Sendable {
 }

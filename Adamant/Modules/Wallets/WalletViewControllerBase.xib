@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,17 +25,16 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Adamant Wallet" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hcx-tx-ZRm">
-                    <rect key="frame" x="16" y="20" width="125.5" height="20.5"/>
+                    <rect key="frame" x="16" y="40" width="125.5" height="20.5"/>
                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                     <color key="textColor" red="0.56000000000000005" green="0.56000000000000005" blue="0.57999999999999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ds2-xE-YVe">
-                    <rect key="frame" x="0.0" y="42.5" width="375" height="187.5"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <rect key="frame" x="0.0" y="62.5" width="375" height="167.5"/>
                 </tableView>
                 <stackView hidden="YES" opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="hyi-rM-F0a">
-                    <rect key="frame" x="147" y="97" width="81.5" height="78.5"/>
+                    <rect key="frame" x="147" y="107" width="81.5" height="78.5"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="error" translatesAutoresizingMaskIntoConstraints="NO" id="fXc-4s-pCW">
                             <rect key="frame" x="12.5" y="0.0" width="56" height="50"/>
@@ -52,25 +51,25 @@
                     </constraints>
                 </stackView>
                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="c8m-4H-yMk">
-                    <rect key="frame" x="169" y="118" width="37" height="37"/>
+                    <rect key="frame" x="169" y="128" width="37" height="37"/>
                 </activityIndicatorView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="top" secondItem="Hcx-tx-ZRm" secondAttribute="bottom" constant="2" id="Alh-1J-BAu"/>
                 <constraint firstItem="hyi-rM-F0a" firstAttribute="centerY" secondItem="ds2-xE-YVe" secondAttribute="centerY" id="BK8-Ww-KtR"/>
-                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Ctj-D3-QR3"/>
                 <constraint firstItem="c8m-4H-yMk" firstAttribute="centerY" secondItem="ds2-xE-YVe" secondAttribute="centerY" id="Hs8-qI-Rr1"/>
                 <constraint firstItem="Hcx-tx-ZRm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="20" id="Vlb-if-mIc"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="Wev-Lp-6fy"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="cht-bL-gtw"/>
+                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="e9B-E5-lVw"/>
                 <constraint firstItem="hyi-rM-F0a" firstAttribute="centerX" secondItem="ds2-xE-YVe" secondAttribute="centerX" id="gQ3-p8-PMd"/>
                 <constraint firstItem="hyi-rM-F0a" firstAttribute="width" relation="lessThanOrEqual" secondItem="ds2-xE-YVe" secondAttribute="width" id="lDd-tc-whl"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="qq5-un-b6u"/>
                 <constraint firstItem="c8m-4H-yMk" firstAttribute="centerX" secondItem="ds2-xE-YVe" secondAttribute="centerX" id="tas-es-6P7"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <point key="canvasLocation" x="37.5" y="-164"/>
+            <point key="canvasLocation" x="36" y="-164.6176911544228"/>
         </view>
     </objects>
     <resources>
