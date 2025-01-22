@@ -527,7 +527,7 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 
 // MARK: UITextField + extensions
 
-fileprivate extension UITextField {
+private extension UITextField {
     func enablePasteButtonAndPasswordToggle() {
         let passwordToggleButton = makePasswordButton()
         let pasteButton = makePasteButton()
@@ -557,7 +557,7 @@ fileprivate extension UITextField {
         rightViewMode = .always
     }
     
-    private func makePasteButton() -> UIButton {
+    func makePasteButton() -> UIButton {
         let button = UIButton(type: .custom)
         button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
         button.setImage(.asset(named: "clipboard"), for: .normal)
@@ -565,7 +565,7 @@ fileprivate extension UITextField {
         return button
     }
     
-    @objc private func pasteFromPasteboard(_ sender: UIButton) {
+    @objc func pasteFromPasteboard(_ sender: UIButton) {
         if let pasteboardText = UIPasteboard.general.string {
             self.text = pasteboardText
         }
