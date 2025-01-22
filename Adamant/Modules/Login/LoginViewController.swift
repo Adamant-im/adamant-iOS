@@ -474,7 +474,7 @@ extension LoginViewController {
     private func loginIntoExistingAccount(passphrase: String) {
         Task {
             do {
-                let result = try await accountService.loginWith(passphrase: passphrase)
+                let result = try await accountService.loginWith(passphrase: passphrase, password: "")
                 
                 if let nav = navigationController {
                     nav.popViewController(animated: true)

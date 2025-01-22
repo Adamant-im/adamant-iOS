@@ -12,6 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Web3Core
 
 struct DashApiComand {
     static let networkInfoMethod: String = "getnetworkinfo"
@@ -32,7 +33,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     static var tokenNetworkSymbol: String {
         return "DASH"
     }
-   
+    
     var tokenContract: String {
         return ""
     }
@@ -43,8 +44,8 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     var richMessageType: String {
         return Self.richMessageType
-	}
-
+    }
+    
     var qqPrefix: String {
         return Self.qqPrefix
     }
@@ -148,10 +149,10 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     static let jsonDecoder = JSONDecoder()
     @Atomic private var subscriptions = Set<AnyCancellable>()
-
+    
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
-
+    
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $historyTransactions.eraseToAnyPublisher()
     }
@@ -256,7 +257,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
         
         if let balance = try? await getBalance() {
             markBalanceAsFresh()
-
+            
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 await vibroService.applyVibration(.success)
             }
@@ -309,7 +310,7 @@ extension DashWalletService {
     }
     
     @MainActor
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -321,7 +322,7 @@ extension DashWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password)
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DashWallet(
@@ -383,6 +384,14 @@ extension DashWalletService {
             }
         }
     }
+    
+    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data{
+        if salt.isEmpty {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+        
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english) ?? passphrase.data(using: .utf8)!.sha256()
+    }
 }
 
 // MARK: - Dependencies
@@ -428,7 +437,7 @@ extension DashWalletService {
             with: data,
             options: []
         ) as? [String: Any]
-
+        
         guard let object = object else {
             throw WalletServiceError.remoteServiceError(
                 message: "DASH Wallet: not valid response"
@@ -445,7 +454,7 @@ extension DashWalletService {
             throw WalletServiceError.remoteServiceError(message: "DASH Wallet: \(data)")
         }
     }
-
+    
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
@@ -526,12 +535,12 @@ extension DashWalletService {
             completion(.failure(error: .notLogged))
             return
         }
-
+        
         guard adamant.balance >= AdamantApiService.KvsFee else {
             completion(.failure(error: .notEnoughMoney))
             return
         }
-
+        
         Task { @Sendable in
             let result = await apiService.store(
                 key: DashWalletService.kvsAddress,
@@ -544,7 +553,7 @@ extension DashWalletService {
             switch result {
             case .success:
                 completion(.success)
-
+                
             case .failure(let error):
                 completion(.failure(error: .apiError(error)))
             }
@@ -557,11 +566,11 @@ extension DashWalletService {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
         }
-
+        
         switch result {
         case .success:
             break
-
+            
         case .failure(let error):
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
@@ -570,15 +579,15 @@ extension DashWalletService {
                     guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
                         return
                     }
-
+                    
                     self?.save(dashAddress: dashAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
                     }
                 }
-
+                
                 // Save referense to unregister it later
                 balanceObserver = observer
-
+                
             default:
                 print("\(error.localizedDescription)")
             }
