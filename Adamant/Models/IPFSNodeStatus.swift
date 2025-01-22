@@ -10,37 +10,8 @@ import Foundation
 import CommonKit
 
 struct IPFSNodeStatus: Decodable {
-    private enum CodingKeys: String, CodingKey {
-        case version
-        case timestamp
-    }
-    
-    let height: Int
-    let version: Version?
-    
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let versionStringValue = try container.decodeIfPresent(String.self, forKey: .version)
-        if let versions = versionStringValue?.components(separatedBy: ".").compactMap({ Int($0) }) {
-            version = .init(versions)
-        } else {
-            version = nil
-        }
-        let timestamp = try container.decode(UInt64.self, forKey: .timestamp)
-        let timeStampInSeconds = String(timestamp / 1000)
-        
-        /// Chicking the len of string representation of a timestamp in seconds
-        /// to cut first two symbols from it and convert it to height
-        if timeStampInSeconds.count >= 2 {
-            let subString = timeStampInSeconds[
-                timeStampInSeconds.index(timeStampInSeconds.startIndex, offsetBy: 2)..<timeStampInSeconds.endIndex
-            ]
-            let string = String(subString)
-            height = Int(string) ?? .zero
-        } else {
-            height = .zero
-        }
-    }
+    let timestamp: UInt64
+    let version: String
 }
 
 /* JSON
