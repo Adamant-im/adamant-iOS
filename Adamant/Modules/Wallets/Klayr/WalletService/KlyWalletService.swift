@@ -24,8 +24,9 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: Dependencies
     
     var apiService: AdamantApiServiceProtocol!
-    var klyNodeApiService: KlyNodeApiService!
+    var klyNodeApiService: KlyNodeApiServiceProtocol!
     var klyServiceApiService: KlyServiceApiService!
+    var klyTransactionFactory: KlyTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var vibroService: VibroService!
@@ -180,6 +181,7 @@ extension KlyWalletService: SwinjectDependentService {
         apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         klyServiceApiService = container.resolve(KlyServiceApiService.self)
+        klyTransactionFactory = container.resolve(KlyTransactionFactoryProtocol.self)
         klyNodeApiService = container.resolve(KlyNodeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
@@ -584,6 +586,15 @@ private extension KlyWalletService {
         }
     }
 }
+
+#if DEBUG
+extension KlyWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: KlyWallet?) {
+        self.klyWallet = wallet
+    }
+}
+#endif
 
 private extension KlyWalletService {
     func getTransactions(
