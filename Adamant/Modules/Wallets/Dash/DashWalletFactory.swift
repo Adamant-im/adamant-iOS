@@ -22,7 +22,7 @@ struct DashWalletFactory: WalletFactory {
             currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            walletServiceCompose: assembler.resolve(PublicWalletServiceCompose.self)!,
             service: service
         )
     }

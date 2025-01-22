@@ -15,7 +15,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     // MARK: Dependencies
     let securedStore: SecuredStore
     let accountService: AccountService
-    let walletsServiceCompose: WalletServiceCompose
+    let walletsServiceCompose: PublicWalletServiceCompose
     
     // MARK: Proprieties
     
@@ -39,7 +39,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     init(
         securedStore: SecuredStore,
         accountService: AccountService,
-        walletsServiceCompose: WalletServiceCompose
+        walletsServiceCompose: PublicWalletServiceCompose
     ) {
         self.securedStore = securedStore
         self.accountService = accountService

@@ -15,7 +15,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
@@ -26,7 +26,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: PublicWalletServiceCompose
     ) {
         self.coreDataStack = coreDataStack
         self.apiService = apiService

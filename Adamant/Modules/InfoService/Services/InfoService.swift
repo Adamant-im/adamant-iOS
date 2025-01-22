@@ -30,7 +30,7 @@ final class InfoService: InfoServiceProtocol {
     
     init(
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         api: InfoServiceApiServiceProtocol
     ) {
         self.securedStore = securedStore

@@ -68,7 +68,7 @@ struct AppAssembly: MainThreadAssembly {
             AdamantVisibleWalletsService(
                 securedStore: r.resolve(SecuredStore.self)!,
                 accountService: r.resolve(AccountService.self)!,
-                walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletsServiceCompose: r.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -253,7 +253,7 @@ struct AppAssembly: MainThreadAssembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!,
                 currencyInfoService: r.resolve(InfoServiceProtocol.self)!,
                 connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             )
@@ -337,7 +337,7 @@ struct AppAssembly: MainThreadAssembly {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -345,7 +345,7 @@ struct AppAssembly: MainThreadAssembly {
         container.register(ChatTransactionService.self) { r in
             AdamantChatTransactionService(
                 adamantCore: r.resolve(AdamantCore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -353,7 +353,7 @@ struct AppAssembly: MainThreadAssembly {
         container.register(TransactionsStatusServiceComposeProtocol.self) { r in
             TransactionsStatusServiceCompose(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -364,7 +364,7 @@ struct AppAssembly: MainThreadAssembly {
                 apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!, 
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -389,7 +389,7 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Wallet Service Compose
-        container.register(WalletServiceCompose.self) { r in
+        container.register(PublicWalletServiceCompose.self) { r in
             var wallets: [WalletCoreProtocol] = [
                 AdmWalletService(),
                 BtcWalletService(),
@@ -405,15 +405,23 @@ struct AppAssembly: MainThreadAssembly {
             
             wallets.append(contentsOf: erc20WalletServices)
             
-            return AdamantWalletServiceCompose(wallets: wallets)
+            return AdamantPublicWalletServiceCompose(wallets: wallets)
         }.inObjectScope(.container).initCompleted { (_, c) in
-            guard let service = c as? AdamantWalletServiceCompose else { return }
+            guard let service = c as? AdamantPublicWalletServiceCompose else { return }
             let wallets = service.getWallets().map { $0.core }
             
             for case let wallet as SwinjectDependentService in wallets {
                 wallet.injectDependencies(from: container)
             }
         }
+        
+        // MARK: SecretWalletsService
+        container.register(SecretWalletsService.self){
+            AdamantSecretWalletsService(
+                publicWallet: $0.resolve(PublicWalletServiceCompose.self)!,
+                secretWallets: [:]
+            )
+        }.inObjectScope(.container)
         
         // MARK: ApiService Compose
         container.register(ApiServiceComposeProtocol.self) {

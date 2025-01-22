@@ -44,7 +44,7 @@ final class AccountViewController: FormViewController {
     private let avatarService: AvatarService
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletService: SecretWalletsService
     private let apiServiceCompose: ApiServiceComposeProtocol
     
     let accountService: AccountService
@@ -66,6 +66,10 @@ final class AccountViewController: FormViewController {
     }
     
     private var notificationsSet: Set<AnyCancellable> = []
+    
+    private var currentWallet: WalletServiceCompose {
+        walletService.currentWallet
+    }
     
     // MARK: StayIn
     
@@ -116,7 +120,7 @@ final class AccountViewController: FormViewController {
         avatarService: AvatarService,
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
-        walletServiceCompose: WalletServiceCompose,
+        walletService: SecretWalletsService,
         apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
@@ -129,7 +133,7 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
-        self.walletServiceCompose = walletServiceCompose
+        self.walletService = walletService
         self.apiServiceCompose = apiServiceCompose
         
         super.init(nibName: nil, bundle: nil)
@@ -223,7 +227,7 @@ final class AccountViewController: FormViewController {
             self?.walletModels[account.unicId]?.model = model ?? .default
         }
         
-        for walletService in walletServiceCompose.getWallets() {
+        for walletService in currentWallet.getWallets() {
             NotificationCenter.default.addObserver(
                 forName: walletService.core.walletUpdatedNotification,
                 object: nil,

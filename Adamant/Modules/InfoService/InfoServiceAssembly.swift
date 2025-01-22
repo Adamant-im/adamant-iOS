@@ -14,7 +14,7 @@ struct InfoServiceAssembly: MainThreadAssembly {
         container.register(InfoServiceProtocol.self) { r in
             InfoService(
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                walletServiceCompose: r.resolve(PublicWalletServiceCompose.self)!,
                 api: r.resolve(InfoServiceApiServiceProtocol.self)!
             )
         }.inObjectScope(.container)

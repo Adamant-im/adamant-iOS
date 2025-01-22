@@ -50,7 +50,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     private let currencyInfoService: InfoServiceProtocol
     private let accountService: AccountService
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     let dialogService: DialogService
     let screensFactory: ScreensFactory
@@ -88,7 +88,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         currencyInfoService: InfoServiceProtocol,
         accountService: AccountService,
         screensFactory: ScreensFactory,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         service: WalletService?
     ) {
         self.dialogService = dialogService

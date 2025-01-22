@@ -28,7 +28,7 @@ final class ChatViewController: MessagesViewController {
     // MARK: Dependencies
     
     private let storedObjects: [AnyObject]
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
     private let chatSwipeManager: ChatSwipeManager
@@ -87,7 +87,7 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         storedObjects: [AnyObject],
         admWalletService: WalletService?,
         screensFactory: ScreensFactory,
