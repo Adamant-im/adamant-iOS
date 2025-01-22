@@ -50,9 +50,9 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
             .map { $0.0 && $0.1 }
             .eraseToAnyPublisher()
     }
-
+    
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
-
+    
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     @Atomic private var subscriptions = Set<AnyCancellable>()
     @Atomic private var balanceObserver: AnyCancellable?
@@ -90,9 +90,13 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: -
     
     func initWallet(
-        withPassphrase passphrase: String
+        withPassphrase passphrase: String, withPassword password: String
     ) async throws -> WalletAccount {
-        try await initWallet(passphrase: passphrase)
+        try await initWallet(passphrase: passphrase, password: password)
+    }
+    
+    func makeBinarySeed(withMnemonicSentence: String, withSalt: String) -> Data {
+        fatalError("Do not use this method for Kly")
     }
     
     func setInitiationFailed(reason: String) {
@@ -246,7 +250,7 @@ private extension KlyWalletService {
         
         if let balance = try? await getBalance() {
             markBalanceAsFresh()
-
+            
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 await vibroService.applyVibration(.success)
             }
@@ -323,7 +327,7 @@ private extension KlyWalletService {
         
         return UInt64(nonce) ?? .zero
     }
-
+    
     func getFees(comment: String) async throws -> CurrentFee {
         guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
@@ -399,7 +403,7 @@ private extension KlyWalletService {
 
 // MARK: - Init Wallet
 private extension KlyWalletService {
-    func initWallet(passphrase: String) async throws -> WalletAccount {
+    func initWallet(passphrase: String, password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -414,11 +418,11 @@ private extension KlyWalletService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: salt
+                salt: password.isEmpty ? salt : password
             )
             
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
-         
+            
             let wallet = KlyWallet(
                 unicId: tokenUnicID,
                 address: address,
