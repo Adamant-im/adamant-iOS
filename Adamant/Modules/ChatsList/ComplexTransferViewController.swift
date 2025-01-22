@@ -22,7 +22,7 @@ final class ComplexTransferViewController: UIViewController {
     private let visibleWalletsService: VisibleWalletsService
     private let addressBookService: AddressBookService
     private let screensFactory: ScreensFactory
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     private let nodesStorage: NodesStorageProtocol
     
     // MARK: - Properties
@@ -43,7 +43,7 @@ final class ComplexTransferViewController: UIViewController {
         visibleWalletsService: VisibleWalletsService,
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         nodesStorage: NodesStorageProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService

@@ -17,7 +17,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
     // MARK: Dependencies
     
     private let adamantCore: AdamantCore
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
@@ -29,7 +29,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Lifecycle
     
-    init(adamantCore: AdamantCore, walletServiceCompose: WalletServiceCompose) {
+    init(adamantCore: AdamantCore, walletServiceCompose: PublicWalletServiceCompose) {
         self.adamantCore = adamantCore
         self.walletServiceCompose = walletServiceCompose
     }

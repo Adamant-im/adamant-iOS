@@ -30,7 +30,7 @@ final class ChatViewModel: NSObject {
     private let accountProvider: AccountsProvider
     private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     private let chatCacheService: ChatCacheService
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     private let avatarService: AvatarService
     private let emojiService: EmojiService
     private let chatPreservation: ChatPreservationProtocol
@@ -161,7 +161,7 @@ final class ChatViewModel: NSObject {
         accountProvider: AccountsProvider,
         richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
         chatCacheService: ChatCacheService,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         avatarService: AvatarService,
         chatMessagesListViewModel: ChatMessagesListViewModel,
         emojiService: EmojiService,

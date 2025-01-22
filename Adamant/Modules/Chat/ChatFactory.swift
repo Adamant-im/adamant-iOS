@@ -28,7 +28,7 @@ struct ChatFactory {
     let visibleWalletService: VisibleWalletsService
     let avatarService: AvatarService
     let emojiService: EmojiService
-    let walletServiceCompose: WalletServiceCompose
+    let walletServiceCompose: PublicWalletServiceCompose
     let chatPreservation: ChatPreservationProtocol
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
@@ -48,7 +48,7 @@ struct ChatFactory {
         visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
-        walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
+        walletServiceCompose = assembler.resolve(PublicWalletServiceCompose.self)!
         chatPreservation = assembler.resolve(ChatPreservationProtocol.self)!
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!

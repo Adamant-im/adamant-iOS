@@ -13,7 +13,7 @@ import CommonKit
 import FilesStorageKit
 
 struct ChatMessageFactory: Sendable {
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -67,7 +67,7 @@ struct ChatMessageFactory: Sendable {
         ]
     )
     
-    init(walletServiceCompose: WalletServiceCompose) {
+    init(walletServiceCompose: PublicWalletServiceCompose) {
         self.walletServiceCompose = walletServiceCompose
     }
     

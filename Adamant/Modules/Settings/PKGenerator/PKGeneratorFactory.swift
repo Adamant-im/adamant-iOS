@@ -29,7 +29,7 @@ private struct PKGeneratorAssembly: Assembly {
         container.register(PKGeneratorViewModel.self) {
             .init(
                 dialogService: $0.resolve(DialogService.self)!,
-                walletServiceCompose: $0.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: $0.resolve(PublicWalletServiceCompose.self)!
             )
         }.inObjectScope(.transient)
     }

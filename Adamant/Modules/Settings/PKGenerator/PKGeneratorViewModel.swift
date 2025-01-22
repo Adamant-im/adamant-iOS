@@ -50,11 +50,11 @@ final class PKGeneratorViewModel: ObservableObject {
     @Published var state: PKGeneratorState = .default
     
     private let dialogService: DialogService
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     nonisolated init(
         dialogService: DialogService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: PublicWalletServiceCompose
     ) {
         self.dialogService = dialogService
         self.walletServiceCompose = walletServiceCompose
@@ -134,7 +134,7 @@ private extension PKGeneratorViewModel {
 
 private func generatePrivateKeys(
     passphrase: String,
-    walletServiceCompose: WalletServiceCompose
+    walletServiceCompose: PublicWalletServiceCompose
 ) throws -> [PKGeneratorState.KeyInfo] {
     guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase)
     else { throw AdamantError(message: .adamant.qrGenerator.wrongPassphraseError) }

@@ -187,6 +187,7 @@
 		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
+		48E635B72D40E27F005A3EBD /* SecretWalletsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E635B62D40E27F005A3EBD /* SecretWalletsService.swift */; };
 		4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
@@ -867,6 +868,7 @@
 		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
+		48E635B62D40E27F005A3EBD /* SecretWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsService.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -1665,6 +1667,14 @@
 				41C1698D29E7F36900FEB3CB /* AdamantRichTransactionReplyService.swift */,
 			);
 			path = RichTransactionReplyService;
+			sourceTree = "<group>";
+		};
+		48E635B82D40E285005A3EBD /* SecretWalletsService */ = {
+			isa = PBXGroup;
+			children = (
+				48E635B62D40E27F005A3EBD /* SecretWalletsService.swift */,
+			);
+			path = SecretWalletsService;
 			sourceTree = "<group>";
 		};
 		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
@@ -2544,6 +2554,7 @@
 		E940086C2114A8FD00CD2D67 /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				48E635B82D40E285005A3EBD /* SecretWalletsService */,
 				3AFE7E502B1F6AFE00718739 /* WalletsService */,
 				3A20D9392AE7F305005475A6 /* Models */,
 				3A770E4A2AE14EFD0008D98F /* Mappers */,
@@ -2873,8 +2884,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
+				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
@@ -3717,6 +3728,7 @@
 				93A2A8662CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift in Sources */,
 				A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */,
 				645938942378395E00A2BE7C /* EulaViewController.swift in Sources */,
+				48E635B72D40E27F005A3EBD /* SecretWalletsService.swift in Sources */,
 				3AA2D5FA280EAF5D000ED971 /* AdamantSocketService.swift in Sources */,
 				649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,

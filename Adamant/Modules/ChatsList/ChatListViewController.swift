@@ -56,7 +56,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private let dialogService: DialogService
     private let addressBook: AddressBookService
     private let avatarService: AvatarService
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -149,7 +149,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         dialogService: DialogService,
         addressBook: AddressBookService,
         avatarService: AvatarService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: PublicWalletServiceCompose
     ) {
         self.accountService = accountService
         self.chatsProvider = chatsProvider

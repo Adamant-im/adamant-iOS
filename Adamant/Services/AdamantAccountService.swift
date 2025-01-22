@@ -19,7 +19,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
 
     weak var notificationsService: NotificationsService?
@@ -44,7 +44,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         adamantCore: AdamantCore,
         dialogService: DialogService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose,
+        walletServiceCompose: PublicWalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
         connection: AnyObservable<Bool>
     ) {

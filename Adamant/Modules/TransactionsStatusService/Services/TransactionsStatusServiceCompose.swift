@@ -12,13 +12,13 @@ import CommonKit
 @TransactionsStatusActor
 final class TransactionsStatusServiceCompose: NSObject, TransactionsStatusServiceComposeProtocol {
     private let coreDataStack: CoreDataStack
-    private let walletServiceCompose: WalletServiceCompose
+    private let walletServiceCompose: PublicWalletServiceCompose
     private lazy var controller = getRichTransactionsController()
     private var observers = [TransferIdentifier: TxStatusServiceProtocol]()
     
     nonisolated init(
         coreDataStack: CoreDataStack,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: PublicWalletServiceCompose
     ) {
         self.coreDataStack = coreDataStack
         self.walletServiceCompose = walletServiceCompose
