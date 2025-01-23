@@ -1294,46 +1294,27 @@ extension ChatListViewController {
             title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
-            guard let alert = self?.makeRenameAlert(for: address) else { return }
-            self?.dialogService.present(alert, animated: true) {
-                self?.dialogService.selectAllTextFields(in: alert)
+            guard let self = self else { return }
+            
+            let alert = dialogService.makeRenameAlert(
+                titleFormat: String(format: .adamant.chat.actionsBody, address),
+                initialText: self.addressBook.getName(for: address),
+                needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+                url: accountService.account?.address,
+                showVC: { [weak self] in
+                    self?.presentBuyAndSell()
+                }
+            ) { newName in
+                Task {
+                    await self.addressBook.set(name: newName, for: address)
+                }
+            }
+            
+            self.dialogService.present(alert, animated: true) {
+                self.dialogService.selectAllTextFields(in: alert)
                 completion?()
             }
         }
-    }
-    
-    private func makeRenameAlert(for address: String) -> UIAlertController? {
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak self] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = self?.addressBook.getName(for: address)
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak self] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            Task {
-                await self?.addressBook.set(name: newName, for: address)
-            }
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
     }
     
     private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
@@ -1528,11 +1509,17 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension StateEnum {
     var isUpdating: Bool {
         switch self {
         case .updating: true
         case .failedToUpdate, .upToDate, .empty: false
         }
     }
+}
+private extension ChatListViewController {
+    func presentBuyAndSell() {
+            let buyAndSellVC = screensFactory.makeBuyAndSell()
+            navigationController?.pushViewController(buyAndSellVC, animated: true)
+        }
 }

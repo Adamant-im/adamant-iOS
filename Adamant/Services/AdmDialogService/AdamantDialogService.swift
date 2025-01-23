@@ -15,7 +15,6 @@ import AVFoundation
 
 @MainActor
 final class AdamantDialogService: DialogService {
-    
     // MARK: Dependencies
     private let notificationsService: NotificationsService
     private let vibroService: VibroService

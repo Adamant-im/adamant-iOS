@@ -256,7 +256,6 @@ struct AppAssembly: MainThreadAssembly {
             AdamantAccountService(
                 apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
-                dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
                 currencyInfoService: r.resolve(InfoServiceProtocol.self)!,

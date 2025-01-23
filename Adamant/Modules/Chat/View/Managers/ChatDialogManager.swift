@@ -19,6 +19,7 @@ final class ChatDialogManager {
     private let viewModel: ChatViewModel
     private let dialogService: DialogService
     private let emojiService: EmojiService?
+    private let accountService: AccountService
     
     private var subscription: AnyCancellable?
     private lazy var contextMenu = AdvancedContextMenuManager()
@@ -26,14 +27,18 @@ final class ChatDialogManager {
     typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
     typealias ContextMenuAction = ((_ messageId: String) -> Void)?
     
+    let showBuyAndSellSubject = PassthroughSubject<Void, Never>()
+    
     init(
         viewModel: ChatViewModel,
         dialogService: DialogService,
-        emojiService: EmojiService
+        emojiService: EmojiService,
+        accountService: AccountService
     ) {
         self.viewModel = viewModel
         self.dialogService = dialogService
         self.emojiService = emojiService
+        self.accountService = accountService
         subscription = viewModel.dialog.sink { [weak self] in self?.showDialog($0) }
     }
 }
@@ -186,17 +191,12 @@ private extension ChatDialogManager {
     }
     
     func showFreeTokenAlert() {
-        let alert = UIAlertController(
-            title: "",
-            message: String.adamant.chat.freeTokensMessage,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addAction(makeFreeTokensAlertAction())
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        dialogService.present(alert, animated: true, completion: nil)
+        dialogService.showFreeTokenAlert(
+            url: accountService.account?.address,
+            type: .message,
+            showVC: { [weak self] in
+                self?.showBuyAndSellSubject.send()
+            })
     }
     
     func showRemoveMessageAlert(id: String) {
@@ -251,10 +251,25 @@ private extension ChatDialogManager {
     }
     
     func showRenameAlert() {
-        guard let alert = makeRenameAlert() else { return }
+        guard let address = address else { return }
+        
+        let alert = dialogService.makeRenameAlert(
+            titleFormat:String(format: .adamant.chat.actionsBody, address),
+            initialText: viewModel.partnerName,
+            needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+            url: accountService.account?.address,
+            showVC: { [weak self] in
+                self?.showBuyAndSellSubject.send()
+            },
+            onRename: handleRename(newName:)
+        )
+        
         dialogService.present(alert, animated: true) { [weak self] in
             self?.dialogService.selectAllTextFields(in: alert)
         }
+    }
+    private func handleRename(newName: String) {
+        viewModel.setNewName(newName)
     }
 }
 
@@ -296,40 +311,6 @@ private extension ChatDialogManager {
         }
     }
     
-    func makeRenameAlert() -> UIAlertController? {
-        guard let address = address else { return nil }
-        
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak viewModel] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = viewModel?.partnerName
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak viewModel] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            viewModel?.setNewName(newName)
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
-    }
-    
     func makeShareAction(sender: UIBarButtonItem) -> UIAlertAction {
         .init(
             title: ShareType.share.localized,
@@ -361,19 +342,6 @@ private extension ChatDialogManager {
                 completion: nil,
                 didSelect: didSelect
             )
-        }
-    }
-    
-    func makeFreeTokensAlertAction() -> UIAlertAction {
-        .init(
-            title: String.adamant.chat.freeTokens,
-            style: .default
-        ) { [weak self] _ in
-            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            self.dialogService.present(safari, animated: true, completion: nil)
         }
     }
     

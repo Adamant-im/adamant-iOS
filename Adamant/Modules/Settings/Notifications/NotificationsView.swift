@@ -13,15 +13,18 @@ struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
     private let baseSoundsView: () -> AnyView
     private let reactionSoundsView: () -> AnyView
+    private let screensFactory: ScreensFactory
     
     init(
         viewModel: @escaping () -> NotificationsViewModel,
         baseSoundsView: @escaping () -> AnyView,
-        reactionSoundsView: @escaping () -> AnyView
+        reactionSoundsView: @escaping () -> AnyView,
+        screensFactory: ScreensFactory
     ) {
         _viewModel = .init(wrappedValue: viewModel())
         self.baseSoundsView = baseSoundsView
         self.reactionSoundsView = reactionSoundsView
+        self.screensFactory = screensFactory
     }
     
     var body: some View {
@@ -49,6 +52,9 @@ struct NotificationsView: View {
         })
         .fullScreenCover(isPresented: $viewModel.openSafariURL) {
             SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            buyAndSellView()
         }
     }
 }
@@ -155,6 +161,22 @@ private extension NotificationsView {
                     Spacer()
                 }
             }
+        }
+    }
+    func buyAndSellView() -> some View {
+        NavigationView {
+            BuyAndSellControllerWrapper(adamantScreenFactory: screensFactory)
+                .navigationBarTitle(AdmWalletViewController.Rows.buyTokens.localized, displayMode: .inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            viewModel.presentBuyAndSell = false
+                        }, label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 18, weight: .medium))
+                        })
+                    }
+                }
         }
     }
 }

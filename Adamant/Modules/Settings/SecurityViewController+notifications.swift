@@ -30,7 +30,7 @@ extension SecurityViewController {
                 switch error {
                 case .notEnoughMoney, .notStayedLoggedIn:
                     self?.dialogService.showRichError(error: error)
-                    
+                    print("dedied mode2")
                 case .denied:
                     DispatchQueue.main.async {
                         self?.presentNotificationsDeniedError()
