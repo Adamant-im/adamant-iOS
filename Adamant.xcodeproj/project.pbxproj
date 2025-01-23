@@ -1756,8 +1756,8 @@
 		6F1B8BC72D428589004E902F /* AlertsFactory */ = {
 			isa = PBXGroup;
 			children = (
-				6F1B8BCA2D4298BD004E902F /* FreeTokensAlertManager.swift */,
 				6F1B8BC82D4285A7004E902F /* AlertFactory.swift */,
+				6F1B8BCA2D4298BD004E902F /* FreeTokensAlertManager.swift */,
 			);
 			path = AlertsFactory;
 			sourceTree = "<group>";

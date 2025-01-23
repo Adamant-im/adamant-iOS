@@ -186,17 +186,7 @@ private extension ChatDialogManager {
     }
     
     func showFreeTokenAlert() {
-        let alert = UIAlertController(
-            title: "",
-            message: String.adamant.chat.freeTokensMessage,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addAction(makeFreeTokensAlertAction())
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        dialogService.present(alert, animated: true, completion: nil)
+        AlertFactory.freeTokenAlertIfNeed(type: .message)
     }
     
     func showRemoveMessageAlert(id: String) {
@@ -253,7 +243,7 @@ private extension ChatDialogManager {
     func showRenameAlert() {
         guard let address = address else { return }
         
-        let alert = AlertFactory().makeRenameAlert(
+        let alert = AlertFactory.makeRenameAlert(
             titleFormat: String(format: .adamant.chat.actionsBody, address),
             placeholder: .adamant.chat.name,
             initialText: viewModel.partnerName
@@ -339,18 +329,18 @@ private extension ChatDialogManager {
         }
     }
     
-    func makeFreeTokensAlertAction() -> UIAlertAction {
-        .init(
-            title: String.adamant.chat.freeTokens,
-            style: .default
-        ) { [weak self] _ in
-            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            self.dialogService.present(safari, animated: true, completion: nil)
-        }
-    }
+//    func makeFreeTokensAlertAction() -> UIAlertAction {
+//        .init(
+//            title: String.adamant.chat.freeTokens,
+//            style: .default
+//        ) { [weak self] _ in
+//            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
+//            let safari = SFSafariViewController(url: url)
+//            safari.preferredControlTintColor = UIColor.adamant.primary
+//            safari.modalPresentationStyle = .overFullScreen
+//            self.dialogService.present(safari, animated: true, completion: nil)
+//        }
+//    }
     
     func showAdmMenuAction(_ adm: AdamantAddress, partnerAddress: String) {
         let shareTypes: [AddressChatShareType] = adm.address == partnerAddress ? [.send] : [.chat, .send]

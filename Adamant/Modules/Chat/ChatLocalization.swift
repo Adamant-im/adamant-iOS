@@ -75,6 +75,12 @@ extension String.adamant {
         static var freeTokensMessage: String {
             String.localized("ChatScene.FreeTokensAlert.Message", comment: "Chat: 'Free Tokens' message")
         }
+        static var freeTokensNotification: String {
+            String.localized("ChatScene.FreeTokensAlert.Message", comment: "'Free Tokens' message")
+        }
+        static var freeTokensContacts: String {
+            String.localized("ChatScene.FreeTokensAlert.Message", comment: "'Free Tokens' message")
+        }
         static var transactionSent: String {
             String.localized("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
         }

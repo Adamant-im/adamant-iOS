@@ -10,8 +10,8 @@ import SafariServices
 import CommonKit
 
 enum FreeTokenAlert {
-    static func showFreeTokenAlert(url: String) {
-        let window = TransparentWindow(frame: UIScreen.main.bounds)
+    static func showFreeTokenAlert(type: FreeTokensAlertType, url: String) {
+        let window = UIWindow(frame: UIScreen.main.bounds)
         window.windowLevel = .alert + 1
         let rootViewController = UIViewController()
         rootViewController.view.backgroundColor = .clear
@@ -20,7 +20,7 @@ enum FreeTokenAlert {
 
         let alert = UIAlertController(
             title: "",
-            message: String.adamant.chat.freeTokensMessage,
+            message: type.alertMessage,
             preferredStyle: .alert
         )
         
@@ -61,4 +61,20 @@ enum FreeTokenAlert {
         
         return url
     }
+}
+enum FreeTokensAlertType {
+    case contacts
+    case message
+    case notification
+    
+    var alertMessage: String {
+            switch self {
+            case .contacts:
+                return String.adamant.chat.freeTokensContacts
+            case .message:
+                return String.adamant.chat.freeTokensMessage
+            case .notification:
+                return String.adamant.chat.freeTokensNotification
+            }
+        }
 }
