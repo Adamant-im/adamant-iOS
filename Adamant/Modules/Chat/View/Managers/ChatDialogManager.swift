@@ -186,7 +186,7 @@ private extension ChatDialogManager {
     }
     
     func showFreeTokenAlert() {
-        AlertFactory.freeTokenAlertIfNeed(type: .message)
+        AlertPresenter.freeTokenAlertIfNeed(type: .message)
     }
     
     func showRemoveMessageAlert(id: String) {
