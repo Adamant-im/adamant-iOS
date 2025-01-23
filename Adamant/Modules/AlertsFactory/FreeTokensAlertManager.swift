@@ -9,7 +9,16 @@ import UIKit
 import SafariServices
 import CommonKit
 
-enum FreeTokenAlert {
+enum AlertPresenter {
+    @MainActor
+    static func freeTokenAlertIfNeed(type: FreeTokensAlertType) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let accountService = appDelegate.container.resolve(AccountService.self)!
+        let currentBalance = accountService.account?.balance
+        if currentBalance ?? 0.0 < AdamantApiService.KvsFee {
+            showFreeTokenAlert(type: type, url: accountService.account?.address ?? "")
+        }
+    }
     static func showFreeTokenAlert(type: FreeTokensAlertType, url: String) {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.windowLevel = .alert + 1
@@ -41,9 +50,7 @@ enum FreeTokenAlert {
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
             
-            window.rootViewController?.present(safari, animated: true, completion: {
-                window.isHidden = true
-            })
+            window.rootViewController?.present(safari, animated: true)
         }
     }
     

@@ -119,6 +119,7 @@ final class NotificationsViewModel: ObservableObject {
                     switch error {
                     case .notEnoughMoney, .notStayedLoggedIn:
                         self?.dialogService.showRichError(error: error)
+                        AlertFactory.freeTokenAlertIfNeed(type: .notification)
                     case .denied:
                         self?.presentNotificationsDeniedError()
                     }

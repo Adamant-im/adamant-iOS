@@ -38,7 +38,7 @@ enum AlertFactory {
             else { return }
             
             onRename(newName)
-            freeTokenAlertIfNeed(type: .contacts)
+            AlertPresenter.freeTokenAlertIfNeed(type: .contacts)
         }
         
         alert.addAction(renameAction)
@@ -46,15 +46,5 @@ enum AlertFactory {
         alert.modalPresentationStyle = .overFullScreen
         print("alert created")
         return alert
-    }
-    
-    @MainActor
-    static func freeTokenAlertIfNeed(type: FreeTokensAlertType) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let accountService = appDelegate.container.resolve(AccountService.self)!
-        let currentBalance = accountService.account?.balance
-        if currentBalance ?? 0.0 < AdamantApiService.KvsFee {
-            FreeTokenAlert.showFreeTokenAlert(type: type, url: accountService.account?.address ?? "")
-        }
     }
 }
