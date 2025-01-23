@@ -230,7 +230,7 @@ final class LoginViewController: FormViewController {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
-            $0.cell.textField.enablePasswordToggle()
+            $0.cell.textField.enablePasteButtonAndPasswordToggle()
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }
             
@@ -414,6 +414,17 @@ final class LoginViewController: FormViewController {
         versionFooterView.sizeToFit()
     }
     
+    // MARK: - FormViewController
+
+    override func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        let result = super.textInputShouldReturn(textInput, cell: cell)
+        if cell.row.tag == Rows.passphrase.tag, let passphrase = cell.row.value as? String {
+            loginWith(passphrase: passphrase)
+        }
+
+        return result
+    }
+
     // MARK: - Other
     
     private func setColors() {
@@ -511,6 +522,53 @@ extension LoginViewController: ButtonsStripeViewDelegate {
             
         case .qrPhotoReader:
             loginWithQrFromLibrary()
+        }
+    }
+}
+
+// MARK: UITextField + extensions
+
+private extension UITextField {
+    func enablePasteButtonAndPasswordToggle() {
+        let passwordToggleButton = makePasswordButton()
+        let pasteButton = makePasteButton()
+        
+        let containerView = UIView()
+        let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
+        buttonStack.axis = .horizontal
+        buttonStack.spacing = 4
+        containerView.addSubview(buttonStack)
+        buttonStack.snp.makeConstraints { make in
+            make.directionalEdges.equalToSuperview()
+        }
+        
+        containerView.snp.makeConstraints { make in
+            make.height.equalTo(UITextField.buttonContainerHeight)
+        }
+        
+        pasteButton.snp.makeConstraints { make in
+            make.width.equalTo(pasteButton.snp.height)
+        }
+        
+        passwordToggleButton.snp.makeConstraints { make in
+            make.width.equalTo(passwordToggleButton.snp.height)
+        }
+        
+        rightView = containerView
+        rightViewMode = .always
+    }
+    
+    func makePasteButton() -> UIButton {
+        let button = UIButton(type: .custom)
+        button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
+        button.setImage(.asset(named: "clipboard"), for: .normal)
+        button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
+        return button
+    }
+    
+    @objc func pasteFromPasteboard(_ sender: UIButton) {
+        if let pasteboardText = UIPasteboard.general.string {
+            self.text = pasteboardText
         }
     }
 }
