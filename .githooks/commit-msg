@@ -1,0 +1,9 @@
+REG='^.trello\.com\/c\/[a-zA-Z0-9]+.*$'
+BRANCH=$(git symbolic-ref --short HEAD)
+COMMIT_MSG=`head -n1 $1`
+
+if [[ ! $COMMIT_MSG =~ $REG ]]; then 
+    cat $1
+     > .git/COMMIT_EDITMSG
+    echo "[$BRANCH] $COMMIT_MSG" >> .git/COMMIT_EDITMSG
+fi

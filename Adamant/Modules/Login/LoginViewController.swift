@@ -245,7 +245,8 @@ final class LoginViewController: FormViewController {
                 return false
             })
         }.onCellSelection { [weak self] (_, row) in
-            guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
+            guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
+                  let passphrase = row.value?.trimmingCharacters(in: .whitespaces) else {
                 return
             }
             

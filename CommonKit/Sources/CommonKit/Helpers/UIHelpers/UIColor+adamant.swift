@@ -81,6 +81,7 @@ extension UIColor {
         
         /// Default cell color
         public static var cellColor: UIColor {
+            guard !isMacOS else { return .secondarySystemGroupedBackground }
             let colorWhiteTheme  = UIColor.white
             let colorDarkTheme   = #colorLiteral(red: 0.1098039216, green: 0.1098039216, blue: 0.1137254902, alpha: 1) //1c1c1d
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
