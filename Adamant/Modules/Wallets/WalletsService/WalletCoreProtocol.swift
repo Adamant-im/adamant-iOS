@@ -309,7 +309,6 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     func getFee(comment: String) -> Decimal
-    func makeBinarySeed(withMnemonicSentence: String, withSalt: String) -> Data
     
     // MARK: Send
     

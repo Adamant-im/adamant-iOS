@@ -20,7 +20,7 @@ public extension ApiCommands {
 extension AdamantApiService {
     /// Get account by passphrase.
     public func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount> {
-        guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase, password: "") else {
+        guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase, password: String.empty) else {
             return .failure(.accountNotFound)
         }
         

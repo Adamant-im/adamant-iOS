@@ -336,7 +336,7 @@ extension AdamantAccountService {
     @MainActor
     func loginWithStoredAccount() async throws -> AccountServiceResult {
         if let passphrase = getSavedPassphrase() {
-            let account = try await loginWith(passphrase: passphrase, password: "")
+            let account = try await loginWith(passphrase: passphrase, password: String.empty)
             return account
         }
         
@@ -429,7 +429,7 @@ extension AdamantAccountService {
                 group.addTask {
                     let result = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
-                        withPassword: ""
+                        withPassword: String.empty
                     )
                     return result
                 }

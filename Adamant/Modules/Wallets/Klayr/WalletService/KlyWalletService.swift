@@ -95,10 +95,6 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
         try await initWallet(passphrase: passphrase, password: password)
     }
     
-    func makeBinarySeed(withMnemonicSentence: String, withSalt: String) -> Data {
-        fatalError("Do not use this method for Kly")
-    }
-    
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         klyWallet = nil
@@ -418,7 +414,7 @@ private extension KlyWalletService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: password.isEmpty ? salt : password
+                salt: password.isEmpty ? salt : "mnemonic\(password)"
             )
             
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)

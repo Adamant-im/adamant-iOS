@@ -69,7 +69,7 @@ class NotificationService: UNNotificationServiceExtension {
         // No passphrase - no point of trying to get and decode
         guard
             let passphrase: String = securedStore.get(passphraseStoreKey),
-            let keypair = core.createKeypairFor(passphrase: passphrase, password: ""),
+            let keypair = core.createKeypairFor(passphrase: passphrase, password: String.empty),
             AdamantUtilities.generateAddress(publicKey: keypair.publicKey) == pushRecipient
         else { return }
         

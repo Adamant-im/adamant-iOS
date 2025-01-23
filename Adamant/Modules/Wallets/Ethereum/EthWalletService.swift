@@ -482,11 +482,6 @@ extension EthWalletService {
         }
     }
     
-    /// We don't use it here because Eth has it is own implementation
-    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data{
-        fatalError("Do not use this method for Ethereum")
-    }
-    
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         ethWallet = nil

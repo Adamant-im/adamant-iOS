@@ -383,7 +383,7 @@ extension ERC20WalletService {
             guard let store = try BIP32Keystore(
                 mnemonics: passphrase,
                 password: EthWalletService.walletPassword,
-                mnemonicsPassword: "",
+                mnemonicsPassword: password,
                 language: .english,
                 prefixPath: EthWalletService.walletPath
             ) else {
@@ -433,10 +433,6 @@ extension ERC20WalletService {
         ethWallet = nil
     }
     
-    /// We don't use it here because ERC20 has it is own implementation
-    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data{
-        fatalError("Do not use this method for Ethereum")
-    }
 }
 
 // MARK: - Dependencies

@@ -215,12 +215,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         throw InternalAPIError.unknownError
     }
     
-    func makeBinarySeed(withMnemonicSentence: String, withSalt: String) -> Data {
-        fatalError("Do not use this method for Ethereum")
-    }
-    
     func setInitiationFailed(reason: String) { }
-    
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

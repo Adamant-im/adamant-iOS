@@ -444,7 +444,10 @@ extension BtcWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password)
+        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+            throw WalletServiceError.internalError(message: "BTC Wallet: failed to generate private key", error: nil)
+        }
+        
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         let eWallet = try BtcWallet(
             unicId: tokenUnicID,
@@ -506,12 +509,12 @@ extension BtcWalletService {
         }
     }
     
-    func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data {
-        if salt.isEmpty {
+    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
+        guard !salt.isEmpty else {
             return passphrase.data(using: .utf8)!.sha256()
         }
         
-        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english) ?? passphrase.data(using: .utf8)!.sha256()
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
     }
 }
 

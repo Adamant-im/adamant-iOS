@@ -83,7 +83,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             message = raw
         } else {
             guard let passphrase: String = keychainStore.get(passphraseStoreKey),
-                  let keys = nativeCore.createKeypairFor(passphrase: passphrase, password: ""),
+                  let keys = nativeCore.createKeypairFor(passphrase: passphrase, password: String.empty),
                   let chat = transaction.asset.chat,
                   let raw = nativeCore.decodeMessage(
                     rawMessage: chat.message,
@@ -116,7 +116,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             let key: Keypair?
             if let keypair = keypair {
                 key = keypair
-            } else if let passphrase: String = keychainStore.get(passphraseStoreKey), let keypair =  nativeCore.createKeypairFor(passphrase: passphrase, password: "") {
+            } else if let passphrase: String = keychainStore.get(passphraseStoreKey), let keypair =  nativeCore.createKeypairFor(passphrase: passphrase, password: String.empty) {
                 key = keypair
             } else {
                 key = nil
