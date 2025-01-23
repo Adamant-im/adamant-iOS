@@ -251,7 +251,16 @@ private extension ChatDialogManager {
     }
     
     func showRenameAlert() {
-        guard let alert = makeRenameAlert() else { return }
+        guard let address = address else { return }
+        
+        let alert = AlertFactory().makeRenameAlert(
+            titleFormat: String(format: .adamant.chat.actionsBody, address),
+            placeholder: .adamant.chat.name,
+            initialText: viewModel.partnerName
+        ) { [weak viewModel] newName in
+            viewModel?.setNewName(newName)
+        }
+        
         dialogService.present(alert, animated: true) { [weak self] in
             self?.dialogService.selectAllTextFields(in: alert)
         }
@@ -294,40 +303,6 @@ private extension ChatDialogManager {
         ) { [weak self] _ in
             self?.showRenameAlert()
         }
-    }
-    
-    func makeRenameAlert() -> UIAlertController? {
-        guard let address = address else { return nil }
-        
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak viewModel] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = viewModel?.partnerName
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak viewModel] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            viewModel?.setNewName(newName)
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
     }
     
     func makeShareAction(sender: UIBarButtonItem) -> UIAlertAction {

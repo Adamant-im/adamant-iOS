@@ -1294,46 +1294,23 @@ extension ChatListViewController {
             title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
-            guard let alert = self?.makeRenameAlert(for: address) else { return }
-            self?.dialogService.present(alert, animated: true) {
-                self?.dialogService.selectAllTextFields(in: alert)
+            guard let self = self else { return }
+            
+            let alert = AlertFactory.makeRenameAlert(
+                titleFormat: String(format: .adamant.chat.actionsBody, address),
+                placeholder: .adamant.chat.name,
+                initialText: self.addressBook.getName(for: address)
+            ) { newName in
+                Task {
+                    await self.addressBook.set(name: newName, for: address)
+                }
+            }
+            
+            self.dialogService.present(alert, animated: true) {
+                self.dialogService.selectAllTextFields(in: alert)
                 completion?()
             }
         }
-    }
-    
-    private func makeRenameAlert(for address: String) -> UIAlertController? {
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak self] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = self?.addressBook.getName(for: address)
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak self] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            Task {
-                await self?.addressBook.set(name: newName, for: address)
-            }
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
     }
     
     private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
