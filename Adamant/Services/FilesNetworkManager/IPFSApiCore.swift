@@ -34,25 +34,25 @@ extension IPFSApiCore: BlockchainHealthCheckableService {
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
         
-        return statusResponse.map { data in
-            return .init(
+        return statusResponse.map {
+            .init(
                 ping: ping,
-                height: getHeightFrom(timestamp: data.timestamp),
+                height: getHeightFrom(timestamp: $0.timestamp),
                 wsEnabled: false,
                 wsPort: nil,
-                version: getVersionFrom(stringVersion: data.version)
+                version: getVersionFrom(stringVersion: $0.version)
             )
         }
     }
     
     private func getHeightFrom(timestamp: UInt64) -> Int {
-        let timeStampInSeconds = String(timestamp / 1000)
+        let timestampInSeconds = String(timestamp / 1000)
         
         /// Chicking the len of string representation of a timestamp in seconds
         /// to cut first two symbols from it and convert it to height
-        if timeStampInSeconds.count >= 2 {
-            let subString = timeStampInSeconds[
-                timeStampInSeconds.index(timeStampInSeconds.startIndex, offsetBy: 2)..<timeStampInSeconds.endIndex
+        if timestampInSeconds.count >= 2 {
+            let subString = timestampInSeconds[
+                timestampInSeconds.index(timestampInSeconds.startIndex, offsetBy: 2)..<timestampInSeconds.endIndex
             ]
             let string = String(subString)
             return Int(string) ?? .zero
