@@ -22,6 +22,7 @@ enum BiometryType {
 
 enum AuthenticationResult {
     case success
+    case biometryLockout
     case cancel
     case fallback
     case failed
@@ -30,5 +31,5 @@ enum AuthenticationResult {
 protocol LocalAuthentication: AnyObject {
     var biometryType: BiometryType { get }
     
-    func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void)
+    func authorizeUser(reason: String) async -> AuthenticationResult
 }

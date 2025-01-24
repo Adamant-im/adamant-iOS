@@ -15,21 +15,11 @@ final class AdamantAuthentication: LocalAuthentication {
         var error: NSError?
         let available: Bool
         
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            available = true
-        } else if let errorCode = error?.code {
-            let lockoutCode = LAError.biometryLockout.rawValue
-            
-            if errorCode == lockoutCode {
-                available = true
-            } else {
-                available = false
-            }
-        } else {
-            available = false
-        }
-        
-        if available {
+        available = context.canEvaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            error: &error
+        )
+        if available || error?.code == LAError.biometryLockout.rawValue {
             switch context.biometryType {
             case .none, .opticID:
                 return .none
@@ -47,48 +37,47 @@ final class AdamantAuthentication: LocalAuthentication {
         }
     }
     
-    func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void) {
+    func authorizeUser(reason: String) async -> AuthenticationResult {
         let context = LAContext()
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { (success, error) in
-            if success {
-                completion(.success)
-                return
-            }
-            
-            guard let error = error as? LAError else {
-                completion(.failed)
-                return
-            }
-            
-            if error.code == LAError.userFallback {
-                completion(.fallback)
-                return
-            }
-            
-            if error.code == LAError.userCancel {
-                completion(.cancel)
-                return
-            }
-            
-            let tryDeviceOwner = error.code == LAError.biometryLockout
-            
-            if tryDeviceOwner {
-                context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, error) in
-                    let result: AuthenticationResult
-                    
-                    if success {
-                        result = .success
-                    } else if let error = error as? LAError, error.code == LAError.userCancel {
-                        result = .cancel
-                    } else {
-                        result = .failed
-                    }
-                    
-                    completion(result)
-                }
-            } else {
-                completion(.failed)
-            }
+        let result = await authorizeUser(
+            context: context,
+            policy: .deviceOwnerAuthenticationWithBiometrics,
+            reason: reason
+        )
+        if result == .biometryLockout {
+            return await authorizeUser(
+                context: context,
+                policy: .deviceOwnerAuthentication,
+                reason: reason
+            )
         }
+        return result
+    }
+    
+    private func authorizeUser(
+        context: LAContext,
+        policy: LAPolicy,
+        reason: String
+    ) async -> AuthenticationResult {
+        do {
+            let result = try await context.evaluatePolicy(policy, localizedReason: reason)
+            if result {
+                return .success
+            }
+        } catch let error as LAError {
+            switch error.code {
+            case .userFallback:
+                return .fallback
+            case .biometryLockout:
+                return .biometryLockout
+            case .userCancel:
+                return .cancel
+            default:
+                return .failed
+            }
+        } catch {
+            return .failed
+        }
+        return .failed
     }
 }

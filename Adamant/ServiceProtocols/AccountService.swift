@@ -185,8 +185,8 @@ protocol AccountService: AnyObject, Sendable {
     ///
     /// - Parameters:
     ///   - pin: pincode to login
-    ///   - completion: completion handler
-    func setStayLoggedIn(pin: String, completion: @escaping @Sendable (AccountServiceResult) -> Void)
+    /// - Returns:AccountServiceResult with either success or failure
+    func setStayLoggedIn(pin: String) -> AccountServiceResult
     
     /// Remove stored data
     func dropSavedAccount()
