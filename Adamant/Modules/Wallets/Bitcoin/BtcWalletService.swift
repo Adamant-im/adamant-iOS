@@ -123,7 +123,8 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var btcApiService: BtcApiService!
+    var btcApiService: BtcApiServiceProtocol!
+    var btcTransactionFactory: BitcoinKitTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -521,6 +522,7 @@ extension BtcWalletService: SwinjectDependentService {
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
         btcApiService = container.resolve(BtcApiService.self)
+        btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
@@ -778,6 +780,17 @@ extension BtcWalletService: PrivateKeyGenerator {
         return privateKey.toWIF()
     }
 }
+
+// MARK: test helpers
+
+#if DEBUG
+extension BtcWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: BtcWallet?) {
+        self.btcWallet = wallet
+    }
+}
+#endif
 
 final class BtcTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { BtcWalletService.currencySymbol }
