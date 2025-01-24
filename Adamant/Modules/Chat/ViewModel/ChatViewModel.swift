@@ -1424,8 +1424,10 @@ private extension ChatViewModel {
                 dialog.send(.freeTokenAlert)
                 return
             }
-        case .serverError:
-            dialog.send(.richError(error))
+        case let .serverError(error):
+            if case .timestampIsInTheFuture = error {
+                dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
+            }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break
         }

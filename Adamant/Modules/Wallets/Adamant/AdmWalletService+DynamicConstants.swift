@@ -18,10 +18,6 @@ extension AdmWalletService {
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
-    
-    static var adamantTimestampCorrection: TimeInterval {
-        0.5
-    }
         
     static var newPendingInterval: Int {
         4000

@@ -43,6 +43,10 @@ extension String.adamant.alert {
     static var openInExplorer: String {
         String.localized("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
     }
+    static var timeAheadError: String {
+        String.localized("Chat.Timestamp.InFuture.Error", comment: "Timestamp error. Used for chat when the user's time is in the future")
+        
+    }
 }
 
 enum AddressChatShareType {

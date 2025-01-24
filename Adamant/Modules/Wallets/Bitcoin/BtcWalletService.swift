@@ -580,7 +580,7 @@ extension BtcWalletService {
         }
         
         Task {
-            let result = await apiService.store(model)
+            let result = await apiService.store(model, date: .now)
             
             switch result {
             case .success:

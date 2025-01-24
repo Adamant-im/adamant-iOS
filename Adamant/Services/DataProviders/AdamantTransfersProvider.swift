@@ -510,7 +510,8 @@ extension AdamantTransfersProvider {
             message: encodedMessage.message,
             type: type,
             nonce: encodedMessage.nonce,
-            amount: amount
+            amount: amount,
+            date: AdmWalletService.correctedDate
         )
         
         guard let signedTransaction = signedTransaction else {
@@ -623,7 +624,8 @@ extension AdamantTransfersProvider {
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,
-            amount: amount
+            amount: amount,
+            date: AdmWalletService.correctedDate
         )
         
         guard let signedTransaction = signedTransaction else {

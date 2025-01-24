@@ -538,7 +538,7 @@ private extension KlyWalletService {
             throw WalletServiceError.notEnoughMoney
         }
         
-        let result = await apiService.store(model)
+        let result = await apiService.store(model, date: .now)
         
         guard case .failure(let error) = result else {
             return

@@ -351,7 +351,8 @@ private extension DelegatesListViewController {
             let result = await apiService.voteForDelegates(
                 from: account.address,
                 keypair: keypair,
-                votes: votes
+                votes: votes,
+                date: AdmWalletService.correctedDate
             )
             
             dialogService.dismissProgress()

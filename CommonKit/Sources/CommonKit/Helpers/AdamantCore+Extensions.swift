@@ -32,6 +32,7 @@ public extension AdamantCore {
         )
     }
     
+    /// Create transaction of the message for sending to blockchain
     func makeSendMessageTransaction(
         senderId: String,
         recipientId: String,
@@ -39,14 +40,15 @@ public extension AdamantCore {
         message: String,
         type: ChatType,
         nonce: String,
-        amount: Decimal?
+        amount: Decimal?,
+        date: Date
     ) throws -> UnregisteredTransaction {
         let normalizedTransaction = NormalizedTransaction(
             type: .chatMessage,
             amount: amount ?? .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: Date(),
+            date: date,
             recipientId: recipientId,
             asset: TransactionAsset(
                 chat: ChatAsset(message: message, ownMessage: nonce, type: type),
@@ -66,18 +68,20 @@ public extension AdamantCore {
         return transaction
     }
     
+    /// Create transaction of the transfer for sending to blockchain
     func createTransferTransaction(
         senderId: String,
         recipientId: String,
         keypair: Keypair,
-        amount: Decimal?
+        amount: Decimal?,
+        date: Date
     ) -> UnregisteredTransaction? {
         let normalizedTransaction = NormalizedTransaction(
             type: .send,
             amount: amount ?? .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: recipientId,
             asset: .init()
         )

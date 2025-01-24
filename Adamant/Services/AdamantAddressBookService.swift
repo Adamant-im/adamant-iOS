@@ -279,11 +279,14 @@ final class AdamantAddressBookService: AddressBookService {
         // MARK: 2. Submit to KVS
         
         do {
-            let id = try await apiService.store(.init(
-                key: addressBookKey,
-                value: value,
-                keypair: keypair
-            )).get()
+            let id = try await apiService.store(
+                .init(
+                    key: addressBookKey,
+                    value: value,
+                    keypair: keypair
+                ),
+                date: AdmWalletService.correctedDate
+            ).get()
             
             return id
         } catch let error {

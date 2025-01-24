@@ -64,7 +64,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         sender: String,
         recipient: String,
         amount: Decimal,
-        keypair: Keypair
+        keypair: Keypair,
+        date: Date
     ) async -> ApiServiceResult<UInt64>
 
     func transferFunds(
@@ -74,7 +75,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - States
     
     /// - Returns: Transaction ID
-    func store(_ model: KVSValueModel) async -> ApiServiceResult<UInt64>
+    func store(_ model: KVSValueModel, date: Date) async -> ApiServiceResult<UInt64>
     
     func get(
         key: String,
@@ -123,6 +124,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     func voteForDelegates(
         from address: String,
         keypair: Keypair,
-        votes: [DelegateVote]
+        votes: [DelegateVote],
+        date: Date
     ) async -> ApiServiceResult<Bool>
 }

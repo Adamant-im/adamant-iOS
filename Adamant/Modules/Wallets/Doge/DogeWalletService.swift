@@ -471,8 +471,7 @@ extension DogeWalletService {
         }
         
         Task { @Sendable in
-            let result = await apiService.store(model)
-            
+            let result = await apiService.store(model, date: .now)
             switch result {
             case .success:
                 completion(.success)
