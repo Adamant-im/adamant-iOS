@@ -187,6 +187,8 @@
 		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
+		48DA2FC62D43AD1B008F9FC1 /* AccountWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FC52D43AD1B008F9FC1 /* AccountWalletsViewModel.swift */; };
+		48DA2FC92D4781D7008F9FC1 /* AccountWalletsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FC82D4781D7008F9FC1 /* AccountWalletsState.swift */; };
 		4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
@@ -867,6 +869,8 @@
 		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
+		48DA2FC52D43AD1B008F9FC1 /* AccountWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsViewModel.swift; sourceTree = "<group>"; };
+		48DA2FC82D4781D7008F9FC1 /* AccountWalletsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsState.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -1667,6 +1671,15 @@
 			path = RichTransactionReplyService;
 			sourceTree = "<group>";
 		};
+		48DA2FC72D43AD27008F9FC1 /* AccountWallets */ = {
+			isa = PBXGroup;
+			children = (
+				48DA2FC82D4781D7008F9FC1 /* AccountWalletsState.swift */,
+				48DA2FC52D43AD1B008F9FC1 /* AccountWalletsViewModel.swift */,
+			);
+			path = AccountWallets;
+			sourceTree = "<group>";
+		};
 		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
@@ -1752,6 +1765,7 @@
 		85B405002D3012BD000AB744 /* AccountViewController */ = {
 			isa = PBXGroup;
 			children = (
+				48DA2FC72D43AD27008F9FC1 /* AccountWallets */,
 				85B405012D3012C7000AB744 /* AccountViewController+Form.swift */,
 				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
 				E908473A219707200095825D /* AccountViewController+StayIn.swift */,
@@ -2873,8 +2887,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
+				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
@@ -3459,6 +3473,7 @@
 				931224AD2C7AA67B009E0ED0 /* InfoServiceHistoryRequestDTO.swift in Sources */,
 				6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */,
 				93C794482B0778C700408826 /* DashGetBlockDTO.swift in Sources */,
+				48DA2FC92D4781D7008F9FC1 /* AccountWalletsState.swift in Sources */,
 				6449BA6D235CA0930033B936 /* ERC20TransactionsViewController.swift in Sources */,
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
 				3A299C762B84CE4100B54C61 /* FilesToolbarView.swift in Sources */,
@@ -3695,6 +3710,7 @@
 				A50A41132822FC35006BDFE1 /* BtcWalletService+Send.swift in Sources */,
 				A5E04229282A998C0076CD13 /* BtcTransactionResponse.swift in Sources */,
 				4186B334294200C5006594A3 /* EthWalletService+DynamicConstants.swift in Sources */,
+				48DA2FC62D43AD1B008F9FC1 /* AccountWalletsViewModel.swift in Sources */,
 				3A26D93F2C3C1CED003AD832 /* KlyServiceApiService.swift in Sources */,
 				93CCAE802B06E2D100EA5B94 /* ApiServiceError+Extension.swift in Sources */,
 				93294B842AAD0C8F00911109 /* Assembler+Extension.swift in Sources */,

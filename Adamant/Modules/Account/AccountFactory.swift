@@ -14,7 +14,15 @@ struct AccountFactory {
     let assembler: Assembler
     
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
-        AccountViewController(
+        let walletState = AccountWalletsState()
+        let walletsViewModel = AccountWalletsViewModel(
+            state: walletState,
+            walletServiceCompose: assembler.resolve(
+                WalletServiceCompose.self
+            )!
+        )
+        
+        return AccountViewController(
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
@@ -25,8 +33,8 @@ struct AccountFactory {
             avatarService: assembler.resolve(AvatarService.self)!,
             currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            walletsViewModel: walletsViewModel
         )
     }
 }

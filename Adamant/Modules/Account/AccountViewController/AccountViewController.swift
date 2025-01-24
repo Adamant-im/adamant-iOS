@@ -44,8 +44,8 @@ final class AccountViewController: FormViewController {
     private let avatarService: AvatarService
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
-    private let walletServiceCompose: WalletServiceCompose
     private let apiServiceCompose: ApiServiceComposeProtocol
+    private let walletsViewModel: AccountWalletsViewModel
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -92,11 +92,9 @@ final class AccountViewController: FormViewController {
         return refreshControl
     }()
     
-    private var walletModels: [String: WalletItemModel] = [:]
-    
     private var currentWalletIndex: Int = .zero
     private var currentSelectedWalletItem: WalletItemModel? {
-        walletModels.first{
+        walletsViewModel.state.walletModels.first{
             $1.model.index == currentWalletIndex
         }?.value
     }
@@ -116,8 +114,8 @@ final class AccountViewController: FormViewController {
         avatarService: AvatarService,
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
-        walletServiceCompose: WalletServiceCompose,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        walletsViewModel: AccountWalletsViewModel
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -129,8 +127,8 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
-        self.walletServiceCompose = walletServiceCompose
         self.apiServiceCompose = apiServiceCompose
+        self.walletsViewModel = walletsViewModel
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -148,6 +146,11 @@ final class AccountViewController: FormViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .never
+        
+        walletsViewModel.observeStateChanges { [weak self] in
+            guard let self = self else { return }
+            self.pagingViewController.reloadData()
+        }
         
         // MARK: Status Bar
         let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
@@ -208,34 +211,7 @@ final class AccountViewController: FormViewController {
         updatePagingItemHeight()
         
         pagingViewController.borderColor = UIColor.clear
-        
-        let callback: @MainActor (Notification) -> Void = { [weak self] data in
-            guard let account = data.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount
-            else {
-                return
-            }
-            
-            var model = self?.walletModels[account.unicId]?.model
-            model?.balance = account.balance
-            model?.isBalanceInitialized = account.isBalanceInitialized
-            model?.notifications = account.notifications
-            
-            self?.walletModels[account.unicId]?.model = model ?? .default
-        }
-        
-        for walletService in walletServiceCompose.getWallets() {
-            NotificationCenter.default.addObserver(
-                forName: walletService.core.walletUpdatedNotification,
-                object: nil,
-                queue: OperationQueue.main,
-                using: { notification in
-                    MainActor.assumeIsolatedSafe {
-                        callback(notification)
-                    }
-                }
-            )
-        }
-        
+                
         // MARK: Rows&Sections
         
         // MARK: Application
@@ -1103,7 +1079,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
                 return WalletItemModel(model: .default)
             }
             
-            return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
+            return walletsViewModel.state.walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
         }
     }
     
@@ -1209,7 +1185,7 @@ private extension AccountViewController {
             }
             
             let model = WalletItemModel(model: item)
-            walletModels[service.tokenUnicID] = model
+            walletsViewModel.updateWallet(withId: service.tokenUnicID, model: model)
         }
     }
 }
