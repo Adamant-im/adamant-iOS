@@ -138,7 +138,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Dependencies
     weak var accountService: AccountService?
     var apiService: AdamantApiServiceProtocol!
-    var ethApiService: EthApiService!
+    var ethApiService: EthApiServiceProtocol!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
@@ -580,6 +580,15 @@ extension EthWalletService {
         }
 	}
 }
+
+#if DEBUG
+extension EthWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
+    }
+}
+#endif
 
 // MARK: - KVS
 extension EthWalletService {
