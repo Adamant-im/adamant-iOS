@@ -621,7 +621,7 @@ extension AdamantChatsProvider {
                     err = .accountNotFound(address)
                     
                 case .serverError, .commonError, .noEndpointsAvailable:
-                    err = .serverError(error)
+                    err = .serverError(.init(from: error))
                     
                 case .internalError(let message, _):
                     err = .dependencyError(message)
@@ -1140,7 +1140,7 @@ extension AdamantChatsProvider {
             case .notInitiated, .dummy:
                 throw ChatsProviderError.accountNotInitiated(recipientId)
             case .serverError(let error):
-                throw ChatsProviderError.serverError(error)
+                throw ChatsProviderError.serverError(.init(from: error))
             case .networkError:
                 throw ChatsProviderError.networkError
             }
@@ -1342,17 +1342,21 @@ extension AdamantChatsProvider {
         case .notLogged:
             return ChatsProviderError.notLogged
         case .serverError(let e), .commonError(let e):
-            return ChatsProviderError.serverError(AdamantError(message: e))
+            return ChatsProviderError.serverError(
+                .init(from: AdamantError(message: e))
+            )
         case .noEndpointsAvailable:
-            return ChatsProviderError.serverError(AdamantError(
-                message: error.localizedDescription
-            ))
+            return ChatsProviderError.serverError(
+                .init(from: AdamantError(
+                    message: error.localizedDescription
+                ))
+            )
         case .internalError(let message, _):
             return ChatsProviderError.internalError(AdamantError(message: message))
         case .requestCancelled:
             return ChatsProviderError.requestCancelled
         case .none:
-            return ChatsProviderError.serverError(error)
+            return ChatsProviderError.serverError(.init(from: error))
         }
     }
 }

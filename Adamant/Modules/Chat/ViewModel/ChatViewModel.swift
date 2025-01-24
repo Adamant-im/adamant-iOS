@@ -1424,8 +1424,8 @@ private extension ChatViewModel {
                 dialog.send(.freeTokenAlert)
                 return
             }
-        case .serverError:
-            if error.localizedDescription.contains("Timestamp is in the future") {
+        case let .serverError(error):
+            if case .timestampIsInTheFuture = error {
                 dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
             }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
