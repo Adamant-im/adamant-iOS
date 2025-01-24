@@ -47,6 +47,10 @@ struct WalletItem: Equatable {
 final class WalletItemModel: ObservableObject, PagingItem, Hashable, Comparable, @unchecked Sendable {
     @Published var model: WalletItem = .default
     
+    var identifier: Int {
+        model.index
+    }
+    
     init(model: WalletItem) {
         self.model = model
     }

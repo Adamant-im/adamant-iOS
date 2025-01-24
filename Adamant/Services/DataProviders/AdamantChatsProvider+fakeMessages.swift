@@ -128,42 +128,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void) {
-        // MARK: 1. Get transaction
-        let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
-        request.predicate = NSPredicate(format: "transactionId == %@", id)
-        request.fetchLimit = 1
-        
-        guard let transaction = (try? stack.container.viewContext.fetch(request))?.first else {
-            completion(.failure(.transactionNotFound(id: id)))
-            return
-        }
-        
-        // MARK: 2. Update transaction in private context
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = stack.container.viewContext
-        
-        if let trs = privateContext.object(with: transaction.objectID) as? MessageTransaction {
-            trs.date = Date() as NSDate
-            trs.status = status.rawValue
-        } else {
-            completion(.failure(.internalError(AdamantError(message: "CoreData changed"))))
-            return
-        }
-        
-        // MARK: 3. Save changes
-        if privateContext.hasChanges {
-            do {
-                try privateContext.save()
-                completion(.success)
-            } catch {
-                completion(.failure(.internalError(error)))
-            }
-        } else {
-            completion(.success)
-        }
-    }
-    
     // MARK: - Logic
     
     private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {

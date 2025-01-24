@@ -257,9 +257,6 @@ protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)
     
-    // MARK: - Fake messages
-    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
-    
     func fakeReceived(
         message: AdamantMessage,
         senderId: String,
@@ -268,8 +265,6 @@ protocol ChatsProvider: DataProvider, Actor {
         silent: Bool,
         showsChatroom: Bool
     ) async throws -> ChatTransaction
-    
-    func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
     
     // MARK: - Search
     func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
