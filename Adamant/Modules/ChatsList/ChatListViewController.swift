@@ -1528,7 +1528,7 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension DataProviderState {
     var isUpdating: Bool {
         switch self {
         case .updating: true
