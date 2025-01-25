@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CommonKit
 
 struct IPFSNodeStatus: Decodable {
     let timestamp: UInt64
