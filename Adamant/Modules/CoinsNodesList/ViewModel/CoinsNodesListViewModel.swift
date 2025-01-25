@@ -47,6 +47,8 @@ final class CoinsNodesListViewModel: ObservableObject {
 
 private extension CoinsNodesListViewModel {
     func setup() {
+        setInitialFastestModeState()
+
         state.sections = processedGroups.compactMap {
             guard let info = apiServiceCompose.get($0)?.nodesInfo else { return nil }
             return mapper.map(group: $0, nodesInfo: info)
@@ -93,5 +95,12 @@ private extension CoinsNodesListViewModel {
         processedGroups.forEach {
             apiServiceCompose.get($0)?.healthCheck()
         }
+    }
+    
+    func setInitialFastestModeState() {
+        // We are getting any group from params storage on init, because the
+        // setting of fastest mode affects all the nodes except adamant,
+        // which are set in other ViewController
+        state.fastestNodeMode = nodesAdditionalParamsStorage.isFastestNodeMode(group: .dash)
     }
 }
