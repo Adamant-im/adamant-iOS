@@ -45,7 +45,9 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
     private let crucialUpdateInterval: TimeInterval
     private let isActive: Bool
     private var healthCheckTimerSubscription: AnyCancellable?
-    private var previousAppState: UIApplication.State?
+    private var healthCheckSubscriptions = Set<AnyCancellable>()
+    private var appState: AppState = .active
+    private var performHealthCheckWhenBecomeActive = false
     private var lastUpdateTime: Date?
     
     public nonisolated init(
@@ -112,17 +114,38 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
     
     nonisolated public func healthCheck() {
         Task { @HealthCheckActor in
-            guard isActive else { return }
+            guard canPerformHealthCheck else { return }
             lastUpdateTime = .now
             updateHealthCheckTimerSubscription()
-            healthCheckInternal()
+            
+            Task {
+                await healthCheckInternal()
+                guard Task.isCancelled else { return }
+                performHealthCheckWhenBecomeActive = true
+            }.store(in: &healthCheckSubscriptions)
         }
     }
     
-    open func healthCheckInternal() {}
+    open func healthCheckInternal() async {}
 }
 
 private extension HealthCheckWrapper {
+    private enum AppState {
+        case active
+        case background
+    }
+    
+    var canPerformHealthCheck: Bool {
+        guard isActive else { return false }
+        
+        switch appState {
+        case .active:
+            return true
+        case .background:
+            return false
+        }
+    }
+    
     func configure(nodes: AnyObservable<[Node]>, connection: AnyObservable<Bool>) {
         let connection = connection
             .removeDuplicates()
@@ -149,7 +172,7 @@ private extension HealthCheckWrapper {
         
         NotificationCenter.default
             .notifications(named: UIApplication.willResignActiveNotification, object: nil)
-            .sink { @HealthCheckActor [weak self] _ in self?.previousAppState = .background }
+            .sink { @HealthCheckActor [weak self] _ in self?.willResignActiveAction() }
             .store(in: &subscriptions)
     }
     
@@ -172,15 +195,20 @@ private extension HealthCheckWrapper {
     }
     
     func didBecomeActiveAction() {
-        defer { previousAppState = .active }
+        guard appState != .active else { return }
+        appState = .active
         
-        guard
-            previousAppState == .background,
-            let timeToUpdate = lastUpdateTime?.addingTimeInterval(normalUpdateInterval / 3),
-            Date.now > timeToUpdate
-        else { return }
+        let timeToUpdate = lastUpdateTime?.addingTimeInterval(normalUpdateInterval / 3)
+            ?? .adamantNullDate
         
+        guard performHealthCheckWhenBecomeActive || Date.now >= timeToUpdate else { return }
+        performHealthCheckWhenBecomeActive = false
         healthCheck()
+    }
+    
+    func willResignActiveAction() {
+        appState = .background
+        healthCheckSubscriptions = .init()
     }
     
     func updateNodes(_ newNodes: [Node]) {

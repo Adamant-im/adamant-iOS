@@ -465,6 +465,7 @@
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
 		A5F929B6262C858700C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B5262C858700C3E60A /* MarkdownKit */; };
 		A5F929B8262C858F00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B7262C858F00C3E60A /* MarkdownKit */; };
+		D39AA7892D42745D0069BC73 /* PinPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39AA7882D42745D0069BC73 /* PinPadView.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1108,6 +1109,7 @@
 		A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcUnspentTransactionResponse.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
+		D39AA7882D42745D0069BC73 /* PinPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinPadView.swift; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -2404,6 +2406,7 @@
 				E96D64C72295C44400CA5587 /* Data+utilites.swift */,
 				64A223D520F760BB005157CB /* Localization.swift */,
 				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
+				D39AA7882D42745D0069BC73 /* PinPadView.swift */,
 				E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */,
 				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
 				6414C18D217DF43100373FA6 /* String+adamant.swift */,
@@ -3618,6 +3621,7 @@
 				E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */,
 				E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */,
 				93294B902AAD2C6B00911109 /* SwiftyOnboardOverlay.swift in Sources */,
+				D39AA7892D42745D0069BC73 /* PinPadView.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */,
 				4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,

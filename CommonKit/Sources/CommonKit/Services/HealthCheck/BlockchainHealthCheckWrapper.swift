@@ -48,28 +48,26 @@ public final class BlockchainHealthCheckWrapper<
         }
     }
     
-    public override func healthCheckInternal() {
-        super.healthCheckInternal()
+    public override func healthCheckInternal() async {
+        await super.healthCheckInternal()
+        updateNodesAvailability(update: nil)
         
-        Task { @HealthCheckActor in
-            updateNodesAvailability(update: nil)
-            
-            await withTaskGroup(of: Void.self, returning: Void.self) { group in
-                nodes.filter { $0.isEnabled }.forEach { node in
-                    group.addTask { @HealthCheckActor [weak self] in
-                        guard let self, !currentRequests.contains(node.id) else { return }
-                        
-                        currentRequests.insert(node.id)
-                        defer { currentRequests.remove(node.id) }
-                        
-                        let update = await updateNodeStatusInfo(node: node)
-                        updateNodesAvailability(update: update)
-                    }
+        try? await withThrowingTaskGroup(of: Void.self, returning: Void.self) { group in
+            nodes.filter { $0.isEnabled }.forEach { node in
+                group.addTask { @HealthCheckActor [weak self] in
+                    guard let self, !currentRequests.contains(node.id) else { return }
+                    
+                    currentRequests.insert(node.id)
+                    defer { currentRequests.remove(node.id) }
+                    
+                    let update = await updateNodeStatusInfo(node: node)
+                    try Task.checkCancellation()
+                    updateNodesAvailability(update: update)
                 }
-                
-                await group.waitForAll()
-                healthCheckPostProcessing()
             }
+            
+            try await group.waitForAll()
+            healthCheckPostProcessing()
         }
     }
 }
