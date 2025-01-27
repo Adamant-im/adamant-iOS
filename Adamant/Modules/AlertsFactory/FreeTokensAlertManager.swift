@@ -11,15 +11,15 @@ import CommonKit
 
 enum AlertPresenter {
     @MainActor
-    static func freeTokenAlertIfNeed(type: FreeTokensAlertType) {
+    static func freeTokenAlertIfNeed() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let accountService = appDelegate.container.resolve(AccountService.self)!
         let currentBalance = accountService.account?.balance
         if currentBalance ?? 0.0 < AdamantApiService.KvsFee {
-            showFreeTokenAlert(type: type, url: accountService.account?.address ?? "")
+            showFreeTokenAlert(url: accountService.account?.address ?? "")
         }
     }
-    static func showFreeTokenAlert(type: FreeTokensAlertType, url: String) {
+    static func showFreeTokenAlert(url: String) {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.windowLevel = .alert + 1
         let rootViewController = UIViewController()
@@ -28,12 +28,13 @@ enum AlertPresenter {
         window.makeKeyAndVisible()
 
         let alert = UIAlertController(
-            title: "",
-            message: type.alertMessage,
+            title: "Чтобы начать общение, получите бесплатные монеты или пополните баланс ADM другим способом.",
+            message: /*String.adamant.chat.freeTokensMessage*/"АДАМАНТ — децентрализованный мессенджер на блокчейне. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM",
             preferredStyle: .alert
         )
         
         alert.addAction(makeFreeTokensAlertAction(url: url, window: window))
+        alert.addAction(mackBuyTokensAction())
         alert.addAction(makeCancelAction(window: window))
         alert.modalPresentationStyle = .overFullScreen
 
@@ -41,9 +42,9 @@ enum AlertPresenter {
     }
     
     private static func makeFreeTokensAlertAction(url: String, window: UIWindow) -> UIAlertAction {
-        .init(
-            title: String.adamant.chat.freeTokens,
-            style: .default
+        let action = UIAlertAction(
+            title: /*String.adamant.chat.freeTokens*/"🎁 Бесплатные монеты",
+            style: .destructive
         ) { _ in
             guard let url = freeTokensURL(url: url) else { return }
             let safari = SFSafariViewController(url: url)
@@ -52,12 +53,19 @@ enum AlertPresenter {
             
             window.rootViewController?.present(safari, animated: true)
         }
+        return action
     }
-    
+    private static func mackBuyTokensAction() -> UIAlertAction {
+        .init(
+            title: "Купить ADM",
+            style: .default
+        ) { _ in
+        }
+    }
     private static func makeCancelAction(window: UIWindow) -> UIAlertAction {
         .init(
             title: .adamant.alert.cancel,
-            style: .cancel
+            style: .default
         ) { _ in
             window.isHidden = true
         }
@@ -69,19 +77,19 @@ enum AlertPresenter {
         return url
     }
 }
-enum FreeTokensAlertType {
-    case contacts
-    case message
-    case notification
-    
-    var alertMessage: String {
-            switch self {
-            case .contacts:
-                return String.adamant.chat.freeTokensContacts
-            case .message:
-                return String.adamant.chat.freeTokensMessage
-            case .notification:
-                return String.adamant.chat.freeTokensNotification
-            }
-        }
-}
+//enum FreeTokensAlertType {
+//    case contacts
+//    case message
+//    case notification
+//    
+//    var alertMessage: String {
+//            switch self {
+//            case .contacts:
+//                return String.adamant.chat.freeTokensContacts
+//            case .message:
+//                return String.adamant.chat.freeTokensMessage
+//            case .notification:
+//                return String.adamant.chat.freeTokensNotification
+//            }
+//        }
+//}

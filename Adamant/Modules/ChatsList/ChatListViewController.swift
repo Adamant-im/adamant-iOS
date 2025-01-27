@@ -1505,7 +1505,7 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension StateEnum {
     var isUpdating: Bool {
         switch self {
         case .updating: true

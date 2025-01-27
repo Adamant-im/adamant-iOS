@@ -7,6 +7,7 @@
 //
 import UIKit
 import CommonKit
+import SafariServices
 
 enum AlertFactory {
     @MainActor
@@ -38,13 +39,12 @@ enum AlertFactory {
             else { return }
             
             onRename(newName)
-            AlertPresenter.freeTokenAlertIfNeed(type: .contacts)
+            AlertPresenter.freeTokenAlertIfNeed()
         }
         
         alert.addAction(renameAction)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.modalPresentationStyle = .overFullScreen
-        print("alert created")
         return alert
     }
 }
