@@ -376,7 +376,7 @@ final class ChatListViewController: KeyboardObservingViewController {
             return
         }
         Task {
-            await self.handleRefresh()
+            await handleRefresh()
         }
     }
     
