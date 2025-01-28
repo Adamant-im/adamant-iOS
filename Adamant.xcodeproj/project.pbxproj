@@ -264,8 +264,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
-		6F1B8BC92D4285A7004E902F /* AlertFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1B8BC82D4285A7004E902F /* AlertFactory.swift */; };
-		6F1B8BCB2D4298BD004E902F /* FreeTokensAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1B8BCA2D4298BD004E902F /* FreeTokensAlertManager.swift */; };
+		6F1B8E7E2D4575FD004E902F /* AdmDialogServiceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1B8E7D2D4575E0004E902F /* AdmDialogServiceExtension.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
@@ -944,8 +943,7 @@
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
-		6F1B8BC82D4285A7004E902F /* AlertFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertFactory.swift; sourceTree = "<group>"; };
-		6F1B8BCA2D4298BD004E902F /* FreeTokensAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeTokensAlertManager.swift; sourceTree = "<group>"; };
+		6F1B8E7D2D4575E0004E902F /* AdmDialogServiceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmDialogServiceExtension.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
@@ -1753,13 +1751,13 @@
 			path = Doge;
 			sourceTree = "<group>";
 		};
-		6F1B8BC72D428589004E902F /* AlertsFactory */ = {
+		6F1B8E7C2D4575B0004E902F /* AdmDialogService */ = {
 			isa = PBXGroup;
 			children = (
-				6F1B8BC82D4285A7004E902F /* AlertFactory.swift */,
-				6F1B8BCA2D4298BD004E902F /* FreeTokensAlertManager.swift */,
+				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				6F1B8E7D2D4575E0004E902F /* AdmDialogServiceExtension.swift */,
 			);
-			path = AlertsFactory;
+			path = AdmDialogService;
 			sourceTree = "<group>";
 		};
 		85B405002D3012BD000AB744 /* AccountViewController */ = {
@@ -2355,11 +2353,11 @@
 				41C1698A29E7F2EE00FEB3CB /* RichTransactionReplyService */,
 				3AA2D5F8280EAF49000ED971 /* SocketService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
+				6F1B8E7C2D4575B0004E902F /* AdmDialogService */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
 				6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */,
 				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
-				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
@@ -2475,7 +2473,6 @@
 		E919479920000FFD001362F8 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				6F1B8BC72D428589004E902F /* AlertsFactory */,
 				93ED21442CC3547400AA1FC8 /* TransactionsStatusService */,
 				934FD99E2C783C9500336841 /* InfoService */,
 				3A2478AF2BB45DE2009D89E9 /* StorageUsage */,
@@ -3417,6 +3414,7 @@
 				41A1995829D5733D0031AD75 /* ChatMessageCell+Model.swift in Sources */,
 				3A299C7D2B85F98700B54C61 /* ChatFile.swift in Sources */,
 				932F77592989F999006D8801 /* ChatCellManager.swift in Sources */,
+				6F1B8E7E2D4575FD004E902F /* AdmDialogServiceExtension.swift in Sources */,
 				9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */,
 				E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */,
 				9340078029AC341100A20622 /* ChatAction.swift in Sources */,
@@ -3498,7 +3496,6 @@
 				41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */,
 				93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */,
 				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
-				6F1B8BCB2D4298BD004E902F /* FreeTokensAlertManager.swift in Sources */,
 				934FD9B62C78519600336841 /* InfoServiceApiCommands.swift in Sources */,
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
@@ -3633,7 +3630,6 @@
 				E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */,
 				E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */,
 				93294B902AAD2C6B00911109 /* SwiftyOnboardOverlay.swift in Sources */,
-				6F1B8BC92D4285A7004E902F /* AlertFactory.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */,
 				4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,

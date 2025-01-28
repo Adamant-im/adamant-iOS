@@ -64,7 +64,8 @@ struct ChatFactory {
         let dialogManager = ChatDialogManager(
             viewModel: viewModel,
             dialogService: dialogService,
-            emojiService: emojiService
+            emojiService: emojiService,
+            accountService: accountService
         )
         
         let wallets = walletServiceCompose.getWallets()
@@ -83,9 +84,9 @@ struct ChatFactory {
             sendTransaction: makeSendTransactionAction(
                 viewModel: viewModel,
                 screensFactory: screensFactory
-            )
+            ),
+            dialogManager: dialogManager
         )
-        
         viewController.setupDelegates(delegates)
         delegates.cell.setupDelegate(
             collection: viewController.messagesCollectionView,

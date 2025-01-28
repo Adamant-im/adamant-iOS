@@ -19,7 +19,7 @@ struct NotificationsFactory {
     }
     
     @MainActor
-    func makeViewController() -> UIViewController {
+    func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = { assembler.resolver.resolve(NotificationsViewModel.self)! }
         
@@ -32,7 +32,8 @@ struct NotificationsFactory {
         let view = NotificationsView(
             viewModel: viewModel,
             baseSoundsView: baseSoundsView,
-            reactionSoundsView: reactionSoundsView
+            reactionSoundsView: reactionSoundsView,
+            screensFactory: screensFactory
         )
         
         return UIHostingController(
@@ -46,7 +47,8 @@ private struct NotificationsAssembly: MainThreadAssembly {
         container.register(NotificationsViewModel.self) { r in
             NotificationsViewModel(
                 dialogService: r.resolve(DialogService.self)!,
-                notificationsService: r.resolve(NotificationsService.self)!
+                notificationsService: r.resolve(NotificationsService.self)!,
+                accountService: r.resolve(AccountService.self)!
             )
         }.inObjectScope(.transient)
     }

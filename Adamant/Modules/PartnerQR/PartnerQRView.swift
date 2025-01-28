@@ -7,8 +7,10 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct PartnerQRView: View {
+    let screenFactory: ScreensFactory
     @ObservedObject var viewModel: PartnerQRViewModel
     
     var body: some View {
@@ -25,10 +27,16 @@ struct PartnerQRView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            buyAndSellView()
+        }
     }
     
-    init(viewModel: @escaping () -> PartnerQRViewModel) {
+    init(viewModel: @escaping () -> PartnerQRViewModel, screenFactory: ScreensFactory) {
         _viewModel = .init(wrappedValue: viewModel())
+        self.screenFactory = screenFactory
+        
+        print("initPQR")
     }
 }
 
@@ -108,6 +116,31 @@ private extension PartnerQRView {
             }
         }
     }
+    func buyAndSellView() -> some View {
+        NavigationView {
+            BuyAndSellControllerWrapper(adamantScreenFactory: screenFactory)
+                .navigationBarTitle(AdmWalletViewController.Rows.buyTokens.localized, displayMode: .inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            viewModel.presentBuyAndSell = false
+                        }, label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 18, weight: .medium))
+                        })
+                    }
+                }
+        }
+    }
 }
 
 private let toolbarSpace: CGFloat = 150
+
+struct BuyAndSellControllerWrapper: UIViewControllerRepresentable {
+    let adamantScreenFactory: ScreensFactory
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        return adamantScreenFactory.makeBuyAndSell()
+    }
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}

@@ -20,12 +20,14 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     @Published var renameTitle: String = ""
     @Published var includeWebAppLink = false
     @Published var includeContactsName = false
+    @Published var presentBuyAndSell = false
     
     private var partner: CoreDataAccount?
     private let dialogService: DialogService
     private let addressBookService: AddressBookService
     private let avatarService: AvatarService
     private let partnerQRService: PartnerQRService
+    private let accountService: AccountService
     private var subscriptions = Set<AnyCancellable>()
     
     let partnerImageSize: CGFloat = 25
@@ -38,8 +40,10 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         dialogService: DialogService,
         addressBookService: AddressBookService,
         avatarService: AvatarService,
-        partnerQRService: PartnerQRService
+        partnerQRService: PartnerQRService,
+        accountService: AccountService
     ) {
+        self.accountService = accountService
         self.dialogService = dialogService
         self.addressBookService = addressBookService
         self.avatarService = avatarService
@@ -53,25 +57,30 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     }
     
     func renameContact() {
-        let alert = AlertFactory.makeRenameAlert(
+        let alert = dialogService.makeRenameAlert(
             titleFormat: String(format: .adamant.chat.actionsBody, self.title),
-            placeholder: .adamant.chat.name,
-            initialText: self.addressBookService.getName(for: self.title) ?? self.partnerName
-        ) { [weak self] newName in
-            guard let self = self else { return }
-            
-            Task {
-                self.partnerName = newName
-                self.renameTitle = .adamant.alert.renameContact
-                await self.addressBookService.set(name: newName, for: self.title)
-            }
-        }
-        
+            initialText: self.addressBookService.getName(for: self.title) ?? self.partnerName,
+            needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+            url: accountService.account?.address,
+            showVC: showBuyAndSell,
+            onRename: handleRename(newName:)
+        )
         self.dialogService.present(alert, animated: true) {
             self.dialogService.selectAllTextFields(in: alert)
         }
     }
     
+    private func handleRename(newName: String) {
+        Task { [weak self] in
+            guard let self = self else { return }
+            self.partnerName = newName
+            self.renameTitle = .adamant.alert.renameContact
+            await self.addressBookService.set(name: newName, for: self.title)
+        }
+    }
+    private func showBuyAndSell() {
+        presentBuyAndSell = true
+    }
     func saveToPhotos() {
         guard let qrCode = image else { return }
         
@@ -101,10 +110,10 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
             break
         }
     }
-
+    
     func share() {
         guard let qrCode = image else { return }
-
+        
         let vc = UIActivityViewController(
             activityItems: [qrCode],
             applicationActivities: nil

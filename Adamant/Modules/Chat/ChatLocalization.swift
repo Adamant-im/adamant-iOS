@@ -72,14 +72,20 @@ extension String.adamant {
         static var freeTokens: String {
             String.localized("ChatScene.FreeTokensAlert.FreeTokens", comment: "Chat: 'Free Tokens' button")
         }
+        static var freeTokensTitleChat: String {
+            String.localized("ChatScene.FreeTokensAlert.Title.Chat", comment: "Chat: 'Free Tokens' title")
+        }
+        static var freeTokensTitleBook: String {
+            String.localized("ChatScene.FreeTokensAlert.Title.Book", comment: "Chat: 'Free Tokens' title")
+        }
+        static var freeTokensTitleNotification: String {
+            String.localized("ChatScene.FreeTokensAlert.Title.Notification", comment: "Chat: 'Free Tokens' title")
+        }
+        static var freeTokensBuyADM: String {
+            String.localized("ChatScene.FreeTokensAlert.BuyADM", comment: "Chat: 'Free Tokens' action")
+        }
         static var freeTokensMessage: String {
             String.localized("ChatScene.FreeTokensAlert.Message", comment: "Chat: 'Free Tokens' message")
-        }
-        static var freeTokensNotification: String {
-            String.localized("ChatScene.FreeTokensAlert.Message", comment: "'Free Tokens' message")
-        }
-        static var freeTokensContacts: String {
-            String.localized("ChatScene.FreeTokensAlert.Message", comment: "'Free Tokens' message")
         }
         static var transactionSent: String {
             String.localized("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
