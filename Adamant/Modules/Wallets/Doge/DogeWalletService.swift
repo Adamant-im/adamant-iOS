@@ -123,7 +123,10 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    @Atomic private(set) var dogeWallet: DogeWallet?
+    @ObservableValue private(set) var dogeWallet: DogeWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $dogeWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]

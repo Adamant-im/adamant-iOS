@@ -861,26 +861,6 @@ final class AccountViewController: FormViewController {
                 self.tableView.reloadData()
             }
         }
-        
-        for vc in walletViewControllers {
-            guard let service = vc.service?.core else { return }
-            let notification = service.walletUpdatedNotification
-            
-            let callback: @Sendable (Notification) -> Void = { [weak self] _ in
-                MainActor.assumeIsolatedSafe {
-                    guard let self = self else { return }
-                    let collectionView = self.pagingViewController.collectionView
-                    collectionView.reloadData()
-                }
-            }
-
-            NotificationCenter.default.addObserver(
-                forName: notification,
-                object: service,
-                queue: OperationQueue.main,
-                using: callback
-            )
-        }
     }
     
     private func updateUI() {

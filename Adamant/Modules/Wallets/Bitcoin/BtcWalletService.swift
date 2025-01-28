@@ -156,7 +156,11 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    @Atomic private(set) var btcWallet: BtcWallet?
+    @ObservableValue private(set) var btcWallet: BtcWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $btcWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
+
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     

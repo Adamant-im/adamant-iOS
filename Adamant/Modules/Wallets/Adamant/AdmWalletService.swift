@@ -112,7 +112,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .upToDate
-    @Atomic private(set) var admWallet: AdmWallet?
+    @ObservableValue private(set) var admWallet: AdmWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $admWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
     
     var wallet: WalletAccount? { admWallet }
     
@@ -155,12 +158,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         
         let isRaised: Bool
         
-        if let wallet = admWallet {
-            isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
-            wallet.balance = account.balance
+        if admWallet != nil {
+            isRaised = (wallet!.balance < account.balance) && admWallet!.isBalanceInitialized
+            admWallet?.balance = account.balance
         } else {
-            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
-            wallet.balance = account.balance
+            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address, balance: account.balance)
             
             admWallet = wallet
             isRaised = false
@@ -221,13 +223,13 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
 // MARK: - NSFetchedResultsControllerDelegate
 extension AdmWalletService: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        guard let newCount = controller.fetchedObjects?.count, let wallet = wallet as? AdmWallet else {
+        guard let newCount = controller.fetchedObjects?.count, admWallet != nil else {
             return
         }
         
-        if newCount != wallet.notifications {
-            wallet.notifications = newCount
-            postUpdateNotification(with: wallet)
+        if newCount != admWallet!.notifications {
+            admWallet?.notifications = newCount
+            postUpdateNotification(with: admWallet!)
         }
     }
 }

@@ -57,7 +57,10 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private var subscriptions = Set<AnyCancellable>()
     @Atomic private var balanceObserver: AnyCancellable?
     
-    @Atomic private(set) var klyWallet: KlyWallet?
+    @ObservableValue private(set) var klyWallet: KlyWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $klyWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
     @Atomic private(set) var enabled = true
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private(set) var state: WalletServiceState = .notInitiated

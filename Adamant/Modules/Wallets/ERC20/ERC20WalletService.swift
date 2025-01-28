@@ -156,7 +156,10 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    private(set) var ethWallet: EthWallet?
+    @ObservableValue private(set) var ethWallet: EthWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $ethWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     

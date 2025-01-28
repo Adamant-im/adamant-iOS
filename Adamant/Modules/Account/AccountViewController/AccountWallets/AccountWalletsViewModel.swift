@@ -23,10 +23,6 @@ final class AccountWalletsViewModel: ObservableObject {
         observeWalletUpdates()
     }
     
-    func updateWallet(withId id: String, model: WalletItemModel) {
-        self.state.walletModels[id] = model
-    }
-    
     func observeStateChanges(onChange: @escaping @MainActor () -> Void) {
         $state
             .receive(on: DispatchQueue.main)
@@ -38,29 +34,26 @@ final class AccountWalletsViewModel: ObservableObject {
     
     private func observeWalletUpdates() {
         for walletService in walletServiceCompose.getWallets() {
-            NotificationCenter.default.addObserver(
-                forName: walletService.core.walletUpdatedNotification,
-                object: nil,
-                queue: OperationQueue.main,
-                using: { [weak self] notification in
-                    MainActor.assumeIsolatedSafe {
-                        self?.handleWalletUpdate(notification)
-                    }
+            walletService.core.walletPublisher
+                .compactMap { $0 }
+                .sink { [weak self] walletAccount in
+                    self?.handleWalletUpdate(for: walletAccount)
                 }
-            )
+                .store(in: &subscriptions)
         }
     }
     
-    private func handleWalletUpdate(_ notification: Notification) {
-        guard let account = notification.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount else {
-            return
-        }
+    private func handleWalletUpdate(for newWallet: WalletAccount) {
+        var model = state.walletModels[newWallet.unicId]?.model
+        model?.balance = newWallet.balance
+        model?.isBalanceInitialized = newWallet.isBalanceInitialized
+        model?.notifications = newWallet.notifications
         
-        var model = state.walletModels[account.unicId]?.model
-        model?.balance = account.balance
-        model?.isBalanceInitialized = account.isBalanceInitialized
-        model?.notifications = account.notifications
-        
-        updateWallet(withId: account.unicId, model: WalletItemModel(model: model ?? .default))
+        let walletModel = WalletItemModel(model: model ?? .default)
+        updateWallet(withId: newWallet.unicId, model: walletModel)
+    }
+
+    func updateWallet(withId id: String, model: WalletItemModel) {
+        self.state.walletModels[id] = model
     }
 }

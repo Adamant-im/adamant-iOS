@@ -206,8 +206,11 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
-    @Atomic private(set) var ethWallet: EthWallet?
     @Atomic private var walletStorage: EthWalletStorage?
+    @ObservableValue private(set) var ethWallet: EthWallet?
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        $ethWallet.map { $0 as WalletAccount? }.eraseToAnyPublisher()
+    }
     
     var wallet: WalletAccount? { return ethWallet }
     

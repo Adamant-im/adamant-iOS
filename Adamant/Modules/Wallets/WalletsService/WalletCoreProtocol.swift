@@ -258,6 +258,10 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
         get
     }
     
+    var walletPublisher: AnyObservable<WalletAccount?> {
+        get
+    }
+    
     /// Lowercased!!
     static var richMessageType: String { get }
     
