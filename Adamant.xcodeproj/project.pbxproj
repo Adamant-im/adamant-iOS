@@ -1767,8 +1767,8 @@
 		6F1B8E7C2D4575B0004E902F /* AdmDialogService */ = {
 			isa = PBXGroup;
 			children = (
-				6F1B8E7D2D4575E0004E902F /* AdmDialogServiceExtension.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				6F1B8E7D2D4575E0004E902F /* AdmDialogServiceExtension.swift */,
 			);
 			path = AdmDialogService;
 			sourceTree = "<group>";

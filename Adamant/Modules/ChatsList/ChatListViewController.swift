@@ -1296,10 +1296,14 @@ extension ChatListViewController {
         ) { [weak self] _ in
             guard let self = self else { return }
             
-            let alert = AlertFactory.makeRenameAlert(
+            let alert = dialogService.makeRenameAlert(
                 titleFormat: String(format: .adamant.chat.actionsBody, address),
-                placeholder: .adamant.chat.name,
-                initialText: self.addressBook.getName(for: address)
+                initialText: self.addressBook.getName(for: address),
+                needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+                url: accountService.account?.address,
+                showVC: { [weak self] in
+                    self?.presentBuyAndSell()
+                }
             ) { newName in
                 Task {
                     await self.addressBook.set(name: newName, for: address)
@@ -1512,4 +1516,10 @@ private extension StateEnum {
         case .failedToUpdate, .upToDate, .empty: false
         }
     }
+}
+private extension ChatListViewController {
+    func presentBuyAndSell() {
+            let buyAndSellVC = screensFactory.makeBuyAndSell()
+            navigationController?.pushViewController(buyAndSellVC, animated: true)
+        }
 }

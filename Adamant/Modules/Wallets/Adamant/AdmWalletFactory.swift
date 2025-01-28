@@ -76,10 +76,11 @@ struct AdmWalletFactory: WalletFactory {
         return controller
     }
     
-    func makeBuyAndSellVC() -> UIViewController {
+    func makeBuyAndSellVC(screenFactory: ScreensFactory) -> UIViewController {
         let c = BuyAndSellViewController()
         c.accountService = assembler.resolve(AccountService.self)
         c.dialogService = assembler.resolve(DialogService.self)
+        c.screenFactory = screenFactory
         return c
     }
 }

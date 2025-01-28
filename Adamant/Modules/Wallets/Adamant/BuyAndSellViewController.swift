@@ -60,7 +60,7 @@ final class BuyAndSellViewController: FormViewController {
     
     var accountService: AccountService!
     var dialogService: DialogService!
-    
+    var screenFactory: ScreensFactory!
     // MARK: Init
     
     init() {
@@ -153,57 +153,62 @@ final class BuyAndSellViewController: FormViewController {
         
         return row
     }
-    
-    private func openExchangeChat() {
-        var chatList: UINavigationController?
-        var chatDetail: ChatListViewController?
-        
-        guard let tabbar = self.tabBarController else { return }
-        
-        if let split = tabbar.viewControllers?.first as? UISplitViewController,
-           let navigation = split.viewControllers.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatList = navigation
-            chatDetail = vc
-        }
-        
-        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatList = navigation
-            chatDetail = vc
-        }
 
-        let chatroom = chatDetail?.chatsController?.fetchedObjects?.first(where: { room in
-            return room.partner?.address == AdamantContacts.adamantExchange.address
-        })
-        
-        guard let chatroom = chatroom,
-              let chatDetail = chatDetail
-        else {
+    @MainActor
+    private func openExchangeChat() {
+        guard let tabBarController = findTabBarController(),
+              let chatListVC = fetchChatListViewController(from: tabBarController),
+              let chatroom = fetchExchangeChatroom(chatListVC: chatListVC) else {
+            print("Unable to find necessary components to present chatroom")
             return
         }
-        
-        chatList?.popToRootViewController(animated: false)
-        chatList?.dismiss(animated: false, completion: nil)
-        tabbar.selectedIndex = 0
-        
-        let vc = chatDetail.chatViewController(for: chatroom)
-        
-        if let split = chatDetail.splitViewController {
-            let chat = UINavigationController(rootViewController: vc)
-            split.showDetailViewController(chat, sender: self)
-        } else if let nav = chatDetail.navigationController {
-            nav.pushViewController(vc, animated: true)
-        } else {
-            vc.modalPresentationStyle = .overFullScreen
-            chatDetail.present(vc, animated: true)
-        }
+
+        tabBarController.selectedIndex = 0
+        chatListVC.navigationController?.popToRootViewController(animated: false)
+        let vc = chatViewController(for: chatroom)
+        chatListVC.navigationController?.pushViewController(vc, animated: true)
     }
-    
+
+    private func fetchChatListViewController(from tabBarController: UITabBarController) -> ChatListViewController? {
+        (tabBarController.viewControllers?.first as? UINavigationController)?
+            .viewControllers
+            .first(where: { $0 is ChatListViewController }) as? ChatListViewController
+    }
+
+    private func fetchExchangeChatroom(chatListVC: ChatListViewController) -> Chatroom? {
+        chatListVC.chatsController?.fetchedObjects?.first(where: {
+            $0.partner?.address == AdamantContacts.adamantExchange.address
+        })
+    }
+    private func chatViewController(for chatroom: Chatroom, with messageId: String? = nil) -> ChatViewController {
+        let vc = screenFactory.makeChat()
+        vc.hidesBottomBarWhenPushed = true
+        vc.viewModel.setup(
+            account: accountService.account,
+            chatroom: chatroom,
+            messageIdToShow: messageId
+        )
+        return vc
+    }
     // MARK: - Other
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+}
+
+extension UIViewController {
+    func findTabBarController() -> UITabBarController? {
+        if let tabBarController = self as? UITabBarController {
+            return tabBarController
+        }
+        if let parent = self.parent {
+            return parent.findTabBarController()
+        }
+        if let presenting = self.presentingViewController {
+            return presenting.findTabBarController()
+        }
+        return nil
     }
 }
