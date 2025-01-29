@@ -47,18 +47,10 @@ final class CoinsNodesListViewModel: ObservableObject {
 
 private extension CoinsNodesListViewModel {
     func setup() {
-        setInitialFastestModeState()
-
         state.sections = processedGroups.compactMap {
             guard let info = apiServiceCompose.get($0)?.nodesInfo else { return nil }
             return mapper.map(group: $0, nodesInfo: info)
         }
-        
-        $state
-            .map(\.fastestNodeMode)
-            .removeDuplicates()
-            .sink { [weak self] in self?.saveFastestNodeMode($0) }
-            .store(in: &subscriptions)
         
         processedGroups.forEach { group in
             apiServiceCompose.get(group)?
@@ -67,15 +59,17 @@ private extension CoinsNodesListViewModel {
                 .store(in: &subscriptions)
         }
         
-        guard let someGroup = processedGroups.first else { return }
-        state.fastestNodeMode = nodesAdditionalParamsStorage.isFastestNodeMode(group: someGroup)
+        if let someGroup = processedGroups.first {
+            state.fastestNodeMode = nodesAdditionalParamsStorage.isFastestNodeMode(group: someGroup)
+            
+            Timer
+                .publish(every: someGroup.onScreenUpdateInterval, on: .main, in: .default)
+                .autoconnect()
+                .sink { [weak self] _ in self?.healthCheck() }
+                .store(in: &subscriptions)
+        }
         
-        Timer
-            .publish(every: someGroup.onScreenUpdateInterval, on: .main, in: .default)
-            .autoconnect()
-            .sink { [weak self] _ in self?.healthCheck() }
-            .store(in: &subscriptions)
-        
+        setStateObservation()
         healthCheck()
     }
     
@@ -97,10 +91,12 @@ private extension CoinsNodesListViewModel {
         }
     }
     
-    func setInitialFastestModeState() {
-        // We are getting any group from params storage on init, because the
-        // setting of fastest mode affects all the nodes except adamant,
-        // which are set in other ViewController
-        state.fastestNodeMode = nodesAdditionalParamsStorage.isFastestNodeMode(group: .dash)
+    func setStateObservation() {
+        $state
+            .map(\.fastestNodeMode)
+            .removeDuplicates()
+            .sink { [weak self] in self?.saveFastestNodeMode($0) }
+            .store(in: &subscriptions)
+        
     }
 }
