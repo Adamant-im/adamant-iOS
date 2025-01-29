@@ -187,6 +187,7 @@
 		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
+		48DA2FCB2D49F888008F9FC1 /* BIP39+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FCA2D49F888008F9FC1 /* BIP39+Extension.swift */; };
 		4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		557AC306287B10D8004699D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 557AC305287B10D8004699D7 /* SnapKit */; };
@@ -867,6 +868,7 @@
 		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
+		48DA2FCA2D49F888008F9FC1 /* BIP39+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BIP39+Extension.swift"; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -2517,6 +2519,7 @@
 				3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */,
 				3A5DF1782C4698EC0005369D /* EdgeInsetLabel.swift */,
 				93A2A8652CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift */,
+				48DA2FCA2D49F888008F9FC1 /* BIP39+Extension.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3782,6 +3785,7 @@
 				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
 				4133AED429769EEC00F3D017 /* UpdatingIndicatorView.swift in Sources */,
 				551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */,
+				48DA2FCB2D49F888008F9FC1 /* BIP39+Extension.swift in Sources */,
 				934FD9A62C783DB700336841 /* InfoServiceStatus.swift in Sources */,
 				93B28EC52B076E2C007F268B /* DashBlockchainInfoDTO.swift in Sources */,
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,

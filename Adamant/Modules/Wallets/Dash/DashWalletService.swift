@@ -322,7 +322,7 @@ extension DashWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+        guard let privateKeyData = BIP39.makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
             throw WalletServiceError.internalError(message: "DASH Wallet: failed to generate private key", error: nil)
         }
         
@@ -390,14 +390,6 @@ extension DashWalletService {
                 throw error
             }
         }
-    }
-    
-    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
-        guard !salt.isEmpty else {
-            return passphrase.data(using: .utf8)!.sha256()
-        }
-        
-        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
     }
 }
 
