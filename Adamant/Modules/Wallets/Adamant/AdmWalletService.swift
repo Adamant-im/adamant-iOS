@@ -19,6 +19,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
     static let currencyLogo = UIImage.asset(named: "adamant_wallet") ?? .init()
+    static var correctedDate: Date {
+        Date() - 0.5
+    }
 
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -216,6 +219,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     }
     
     func setInitiationFailed(reason: String) { }
+    
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

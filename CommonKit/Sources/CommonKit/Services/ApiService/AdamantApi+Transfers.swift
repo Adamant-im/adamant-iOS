@@ -22,14 +22,15 @@ extension AdamantApiService {
         sender: String,
         recipient: String,
         amount: Decimal,
-        keypair: Keypair
+        keypair: Keypair,
+        date: Date
     ) async -> ApiServiceResult<UInt64> {
         let normalizedTransaction = NormalizedTransaction(
             type: .send,
             amount: amount,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: recipient,
             asset: .init()
         )

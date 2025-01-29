@@ -263,10 +263,10 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.networkError
                 
             case .serverError(let error):
-                throw ChatsProviderError.serverError(error)
+                throw ChatsProviderError.serverError(.init(from: error))
             }
         } catch {
-            throw ChatsProviderError.serverError(error)
+            throw ChatsProviderError.serverError(.init(from: error))
         }
     }
     

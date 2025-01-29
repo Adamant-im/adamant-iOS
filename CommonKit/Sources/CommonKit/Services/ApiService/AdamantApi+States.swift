@@ -20,27 +20,27 @@ public extension ApiCommands {
 extension AdamantApiService {
     public static let KvsFee: Decimal = 0.001
     
-    public func store(
-        key: String,
-        value: String,
-        type: StateType,
-        sender: String,
-        keypair: Keypair
-    ) async -> ApiServiceResult<UInt64> {
+    public func store(_ model: KVSValueModel, date: Date) async -> ApiServiceResult<UInt64> {
         let transaction = NormalizedTransaction(
             type: .state,
             amount: .zero,
-            senderPublicKey: keypair.publicKey,
+            senderPublicKey: model.keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: nil,
-            asset: TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
+            asset: TransactionAsset(state: StateAsset(
+                key: model.key,
+                value: model.value,
+                type: .keyValue
+            ))
         )
         
         guard let transaction = adamantCore.makeSignedTransaction(
             transaction: transaction,
-            senderId: sender,
-            keypair: keypair
+            senderId: AdamantUtilities.generateAddress(
+                publicKey: model.keypair.publicKey
+            ),
+            keypair: model.keypair
         ) else {
             return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }

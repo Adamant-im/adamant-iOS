@@ -64,7 +64,16 @@ final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
     }
 }
 
-final class BtcApiService: ApiServiceProtocol {
+protocol BtcApiServiceProtocol: ApiServiceProtocol {
+    func request<Output>(
+        waitsForConnectivity: Bool,
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
+    ) async -> WalletServiceResult<Output>
+    
+    func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo>
+}
+
+final class BtcApiService: BtcApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
 
     @MainActor

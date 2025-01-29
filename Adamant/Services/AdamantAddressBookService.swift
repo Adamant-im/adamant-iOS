@@ -90,7 +90,7 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Observer Actions
     
     private func userWillLogOut() async {
-        guard hasChanges else {
+        guard hasChanges, let keypair = accountService.keypair else {
             return
         }
         
@@ -99,7 +99,7 @@ final class AdamantAddressBookService: AddressBookService {
             self.savingBookOnLogoutTaskId = .invalid
         }
         
-        _ = try? await saveAddressBook(self.addressBook)
+        _ = try? await saveAddressBook(self.addressBook, keypair: keypair)
         
         UIApplication.shared.endBackgroundTask(savingBookOnLogoutTaskId)
         savingBookOnLogoutTaskId = .invalid
@@ -214,7 +214,7 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Saving
     
     func saveIfNeeded() async {
-        guard hasChanges else {
+        guard hasChanges, let keypair = accountService.keypair else {
             return
         }
         
@@ -224,7 +224,7 @@ final class AdamantAddressBookService: AddressBookService {
             self.savingBookTaskId = .invalid
         }
         
-        guard let id = try? await saveAddressBook(addressBook) else {
+        guard let id = try? await saveAddressBook(addressBook, keypair: keypair) else {
             return
         }
         
@@ -249,8 +249,8 @@ final class AdamantAddressBookService: AddressBookService {
         self.savingBookTaskId = .invalid
     }
     
-    private func saveAddressBook(_ book: [String: String]) async throws -> UInt64 {
-        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+    private func saveAddressBook(_ book: [String: String], keypair: Keypair) async throws -> UInt64 {
+        guard let loggedAccount = accountService.account else {
             throw AddressBookServiceError.notLogged
         }
         
@@ -280,11 +280,12 @@ final class AdamantAddressBookService: AddressBookService {
         
         do {
             let id = try await apiService.store(
-                key: addressBookKey,
-                value: value,
-                type: .keyValue,
-                sender: address,
-                keypair: keypair
+                .init(
+                    key: addressBookKey,
+                    value: value,
+                    keypair: keypair
+                ),
+                date: AdmWalletService.correctedDate
             ).get()
             
             return id

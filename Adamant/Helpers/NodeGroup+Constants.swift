@@ -152,12 +152,10 @@ extension NodeGroup {
     
     var heightType: Node.HeightType? {
         switch self {
-        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm:
+        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
             .blocks
         case .infoService:
             .date
-        case .ipfs:
-            .none
         }
     }
     
