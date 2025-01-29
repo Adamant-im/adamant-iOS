@@ -73,13 +73,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
-    private lazy var refreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = .clear
-        return refreshControl
-    }()
-    
     private lazy var markdownParser: MarkdownParser = {
         let parser = MarkdownParser(
             font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
@@ -257,7 +250,6 @@ final class ChatListViewController: KeyboardObservingViewController {
         tableView.delegate = self
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
-        tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
         tableView.tableHeaderView = UIView()
     }
@@ -383,8 +375,9 @@ final class ChatListViewController: KeyboardObservingViewController {
         else {
             return
         }
-        
-        self.handleRefresh(self.refreshControl)
+        Task {
+            await handleRefresh()
+        }
     }
     
     @MainActor private func handleInitiallySyncedNotification(_ notification: Notification) async {
@@ -464,24 +457,14 @@ final class ChatListViewController: KeyboardObservingViewController {
     }
     
     @MainActor
-    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        Task {
-            let result = await chatsProvider.update(notifyState: true)
-            
-            guard let result = result else {
-                refreshControl.endRefreshing()
-                return
-            }
-            
-            switch result {
-            case .success:
-                tableView.reloadData()
-                
-            case .failure(let error):
-                dialogService.showRichError(error: error)
-            }
-            
-            refreshControl.endRefreshing()
+    private func handleRefresh() async {
+        guard let result = await chatsProvider.update(notifyState: true) else { return }
+        
+        switch result {
+        case .success:
+            tableView.reloadData()
+        case .failure(let error):
+            dialogService.showRichError(error: error)
         }
     }
     
@@ -593,6 +576,13 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
         scrollUpButton.isHidden = offsetY < cellHeight * 0.75
+    }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard scrollView.contentOffset.y <= 0, scrollView.contentOffset.y < -100 else { return }
+        
+        Task {
+            await handleRefresh()
+        }
     }
 }
 
@@ -779,7 +769,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
             }
             
         // MARK: Unread controller
-            
         case let c where c == unreadController:
             guard let transaction = anObject as? ChatTransaction else { break }
             
