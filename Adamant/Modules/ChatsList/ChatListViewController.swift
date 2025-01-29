@@ -63,7 +63,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     @IBOutlet weak var newChatButton: UIBarButtonItem!
     
     private lazy var scrollUpButton = ChatScrollButton(position: .up)
-
+    
     // MARK: Properties
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
@@ -421,7 +421,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             chatroom: chatroom,
             messageIdToShow: messageId
         )
-
         return vc
     }
     
@@ -679,14 +678,14 @@ extension ChatListViewController {
         
         cell.accountLabel.text = chatroom.getName(addressBookService: addressBook)
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
-
+        
         if let lastTransaction = chatroom.lastTransaction {
             cell.hasUnreadMessages = lastTransaction.isUnread
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
         } else {
             cell.lastMessageLabel.text = nil
         }
-                
+        
         if let date = chatroom.updatedAt as Date?, date != .adamantNullDate {
             cell.dateLabel.text = date.humanizedDay(useTimeFormat: true)
         } else {
@@ -1015,14 +1014,14 @@ extension ChatListViewController {
             return nil
             
             /*
-            if richMessage.isOutgoing {
-                let mutable = NSMutableAttributedString(attributedString: description)
-                let prefix = NSAttributedString(string: String.adamant.chatList.sentMessagePrefix)
-                mutable.insert(prefix, at: 0)
-                return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
-            } else {
-                return description
-            }
+             if richMessage.isOutgoing {
+             let mutable = NSMutableAttributedString(attributedString: description)
+             let prefix = NSAttributedString(string: String.adamant.chatList.sentMessagePrefix)
+             mutable.insert(prefix, at: 0)
+             return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
+             } else {
+             return description
+             }
              */
             
         default:
@@ -1095,7 +1094,7 @@ extension ChatListViewController {
         }
         
         var actions: [UIContextualAction] = []
-      
+        
         let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
         actions.append(markAsRead)
         
@@ -1162,7 +1161,7 @@ extension ChatListViewController {
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
         }
-
+        
         markAsRead.backgroundColor = UIColor.adamant.contextMenuDefaultBackgroundColor
         return markAsRead
     }
@@ -1179,14 +1178,14 @@ extension ChatListViewController {
                 completionHandler(false)
                 return
             }
-
+            
             let params: [AdamantAddressParam]?
             if let name = partner.name {
                 params = [.label(name)]
             } else {
                 params = nil
             }
-
+            
             let encodedAddress = AdamantUriTools.encode(
                 request: AdamantUri.address(
                     address: address,
@@ -1200,11 +1199,11 @@ extension ChatListViewController {
                     types: [
                         .copyToPasteboard,
                         .share,
-                            .generateQr(
-                                encodedContent: encodedAddress,
-                                sharingTip: address,
-                                withLogo: true
-                            )
+                        .generateQr(
+                            encodedContent: encodedAddress,
+                            sharingTip: address,
+                            withLogo: true
+                        )
                     ],
                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                     animated: true,
@@ -1377,7 +1376,7 @@ extension ChatListViewController {
             }
             index = i
         })
-
+        
         return index
     }
     
@@ -1397,14 +1396,14 @@ extension ChatListViewController {
     
     private func chatControllerIndexPath(tableViewIndexPath: IndexPath) -> IndexPath {
         isBusy && tableViewIndexPath.row >= (lastSystemChatPositionRow ?? 0)
-            ? IndexPath(row: tableViewIndexPath.row - 1, section: 0)
-            : tableViewIndexPath
+        ? IndexPath(row: tableViewIndexPath.row - 1, section: 0)
+        : tableViewIndexPath
     }
     
     private func tableViewIndexPath(chatControllerIndexPath: IndexPath) -> IndexPath {
         isBusy && chatControllerIndexPath.row == (lastSystemChatPositionRow ?? 0)
-            ? IndexPath(row: chatControllerIndexPath.row + 1, section: 0)
-            : chatControllerIndexPath
+        ? IndexPath(row: chatControllerIndexPath.row + 1, section: 0)
+        : chatControllerIndexPath
     }
     
     private func performOnMessagesLoadedActions() {
