@@ -469,6 +469,14 @@
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
 		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
 		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
+		AA8FFFB02D497175001D8576 /* AdmWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */; };
+		AA8FFFB22D49726F001D8576 /* SecuredStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */; };
+		AA8FFFB42D497510001D8576 /* AccountServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB32D497509001D8576 /* AccountServiceMock.swift */; };
+		AA8FFFB62D4975D3001D8576 /* AccountsProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB52D4975D1001D8576 /* AccountsProviderMock.swift */; };
+		AA8FFFB82D497772001D8576 /* AdamantApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB72D49776F001D8576 /* AdamantApiServiceProtocolMock.swift */; };
+		AA8FFFBA2D4978D7001D8576 /* ChatTransactionServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB92D4978D5001D8576 /* ChatTransactionServiceMock.swift */; };
+		AA8FFFBC2D49796A001D8576 /* ChatsProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */; };
+		AA8FFFC02D4AC011001D8576 /* AdamantCoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -1136,6 +1144,14 @@
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
+		AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletServiceTests.swift; sourceTree = "<group>"; };
+		AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStoreMock.swift; sourceTree = "<group>"; };
+		AA8FFFB32D497509001D8576 /* AccountServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceMock.swift; sourceTree = "<group>"; };
+		AA8FFFB52D4975D1001D8576 /* AccountsProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProviderMock.swift; sourceTree = "<group>"; };
+		AA8FFFB72D49776F001D8576 /* AdamantApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AA8FFFB92D4978D5001D8576 /* ChatTransactionServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionServiceMock.swift; sourceTree = "<group>"; };
+		AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProviderMock.swift; sourceTree = "<group>"; };
+		AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoreMock.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2351,6 +2367,7 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */,
 				AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */,
 				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
 				AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */,
@@ -2365,6 +2382,13 @@
 		AA33BEB32D303CA30083E59C /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */,
+				AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */,
+				AA8FFFB92D4978D5001D8576 /* ChatTransactionServiceMock.swift */,
+				AA8FFFB72D49776F001D8576 /* AdamantApiServiceProtocolMock.swift */,
+				AA8FFFB52D4975D1001D8576 /* AccountsProviderMock.swift */,
+				AA8FFFB32D497509001D8576 /* AccountServiceMock.swift */,
+				AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */,
 				AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */,
 				AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */,
 				AAC641402D4049D400619DFE /* RpsRequestBody.swift */,
@@ -3996,9 +4020,11 @@
 				AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */,
 				AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */,
 				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
+				AA8FFFBC2D49796A001D8576 /* ChatsProviderMock.swift in Sources */,
 				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
 				AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */,
 				AAC6415D2D44FD5B00619DFE /* ERC20ApiServiceProtocolMock.swift in Sources */,
+				AA8FFFC02D4AC011001D8576 /* AdamantCoreMock.swift in Sources */,
 				AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
 				AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */,
@@ -4007,9 +4033,11 @@
 				AAC641352D40325400619DFE /* KlyWalletServiceTests.swift in Sources */,
 				AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */,
 				AAC641592D44F81700619DFE /* ERC20WalletServiceTests.swift in Sources */,
+				AA8FFFB62D4975D3001D8576 /* AccountsProviderMock.swift in Sources */,
 				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
 				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
 				AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */,
+				AA8FFFB42D497510001D8576 /* AccountServiceMock.swift in Sources */,
 				AAC6413B2D403C3300619DFE /* KlyTransactionFactoryProtocolMock.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
 				AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */,
@@ -4017,10 +4045,14 @@
 				AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */,
 				AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */,
 				AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */,
+				AA8FFFB22D49726F001D8576 /* SecuredStoreMock.swift in Sources */,
 				AAFB3C912D31C14A000CCCE9 /* BitcoinKitTransaction+Equatable.swift in Sources */,
+				AA8FFFBA2D4978D7001D8576 /* ChatTransactionServiceMock.swift in Sources */,
 				AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */,
+				AA8FFFB02D497175001D8576 /* AdmWalletServiceTests.swift in Sources */,
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,
 				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
+				AA8FFFB82D497772001D8576 /* AdamantApiServiceProtocolMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
 				AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */,
 				AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */,
