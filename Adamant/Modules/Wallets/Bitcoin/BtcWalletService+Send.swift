@@ -47,12 +47,13 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         
         // MARK: 4. Create local transaction
         
-        let transaction = BitcoinKit.Transaction.createNewTransaction(
+        let transaction = btcTransactionFactory.createTransaction(
             toAddress: toAddress,
             amount: rawAmount,
             fee: fee,
             changeAddress: wallet.addressEntity,
             utxos: utxos,
+            lockTime: 0,
             keys: [key]
         )
         

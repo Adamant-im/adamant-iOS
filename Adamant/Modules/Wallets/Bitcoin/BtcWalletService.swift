@@ -124,7 +124,8 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var btcApiService: BtcApiService!
+    var btcApiService: BtcApiServiceProtocol!
+    var btcTransactionFactory: BitcoinKitTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -267,6 +268,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = btcWallet else {
             return
@@ -283,13 +285,12 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            markBalanceAsFresh()
-            
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -364,12 +365,12 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         return output
     }
     
-    private func markBalanceAsFresh() {
-        btcWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: BtcWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = btcWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -455,6 +456,7 @@ extension BtcWalletService {
             addressConverter: addressConverter
         )
         self.btcWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -471,9 +473,9 @@ extension BtcWalletService {
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
-            if address != eWallet.address {
-                service.save(btcAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+            if address != eWallet.address, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
                 throw WalletServiceError.accountNotFound
             }
@@ -496,8 +498,10 @@ extension BtcWalletService {
                     await service.update()
                 }
                 
-                service.save(btcAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
                 
                 return eWallet
@@ -528,6 +532,7 @@ extension BtcWalletService: SwinjectDependentService {
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
         btcApiService = container.resolve(BtcApiService.self)
+        btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
@@ -546,16 +551,11 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        do {
-            let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
-                await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
-            }.get()
-
-            return response.value / BtcWalletService.multiplier
-        } catch {
-            print("--debug", error.localizedDescription)
-            return 0
-        }
+        let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
+        }.get()
+        
+        return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
@@ -578,8 +578,8 @@ extension BtcWalletService {
     ///   - btcAddress: Bitcoin address to save into KVS
     ///   - adamantAddress: Owner of BTC address
     ///   - completion: success
-    private func save(btcAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -590,13 +590,7 @@ extension BtcWalletService {
         }
         
         Task {
-            let result = await apiService.store(
-                key: BtcWalletService.kvsAddress,
-                value: btcAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
+            let result = await apiService.store(model, date: .now)
             
             switch result {
             case .success:
@@ -609,7 +603,7 @@ extension BtcWalletService {
     }
 
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(btcAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -628,8 +622,8 @@ extension BtcWalletService {
                         return
                     }
                     
-                    self?.save(btcAddress: btcAddress) { [weak self] result in
-                        self?.kvsSaveCompletionRecursion(btcAddress: btcAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
                 
@@ -669,6 +663,16 @@ extension BtcWalletService {
                 Task { @MainActor in dialogService.showRichError(error: error) }
             }
         }
+    }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
 }
 
@@ -786,6 +790,17 @@ extension BtcWalletService: PrivateKeyGenerator {
         return privateKey.toWIF()
     }
 }
+
+// MARK: test helpers
+
+#if DEBUG
+extension BtcWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: BtcWallet?) {
+        self.btcWallet = wallet
+    }
+}
+#endif
 
 final class BtcTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { BtcWalletService.currencySymbol }

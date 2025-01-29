@@ -18,10 +18,6 @@ extension AdmWalletService {
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
-    
-    static var adamantTimestampCorrection: TimeInterval {
-        0.5
-    }
         
     static var newPendingInterval: Int {
         4000
@@ -120,7 +116,7 @@ extension AdmWalletService {
         [
             Node.makeDefaultNode(
                 url: URL(string: "https://info.adamant.im")!,
-                altUrl: URL(string: "http://88.198.156.44:44099")!
+                altUrl: URL(string: "http://5.161.98.136:33088")!
             ),
             Node.makeDefaultNode(
                 url: URL(string: "https://info2.adm.im")!,

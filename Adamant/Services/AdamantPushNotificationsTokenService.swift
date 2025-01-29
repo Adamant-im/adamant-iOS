@@ -185,7 +185,8 @@ private extension AdamantPushNotificationsTokenService {
             message: encodedPayload.message,
             type: ChatType.signal,
             nonce: encodedPayload.nonce,
-            amount: nil
+            amount: nil,
+            date: AdmWalletService.correctedDate
         ) else { return nil }
         
         Task {

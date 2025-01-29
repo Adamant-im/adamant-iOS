@@ -49,4 +49,4 @@ private extension AutoDismissManager {
     }
 }
 
-private let autoDismissTimeInterval: TimeInterval = 4
+private let autoDismissTimeInterval: TimeInterval = 3

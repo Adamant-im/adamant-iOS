@@ -11,7 +11,7 @@ import Foundation
 import web3swift
 @preconcurrency import Web3Core
 
-class EthApiService: ApiServiceProtocol, @unchecked Sendable {
+class EthApiService: EthApiServiceProtocol, @unchecked Sendable {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {

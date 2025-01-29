@@ -173,7 +173,7 @@ extension ChatsProviderError {
             return .apiError(e)
             
         case .serverError(let e):
-            return .internalError(message: self.message, error: e)
+            return .internalError(message: self.message, error: e.wrappedError)
             
         case .accountNotFound:
             return .accountNotFound

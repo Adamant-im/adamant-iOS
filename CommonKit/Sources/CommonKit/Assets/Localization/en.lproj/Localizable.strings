@@ -1346,3 +1346,5 @@
 
 /* Chat unknown */
 "Chat.unknown.title" = "Unknown";
+
+"Chat.Timestamp.InFuture.Error" = "A network node rejected the message because the time on your device is ahead.\nCheck the device's time or try sending a message again.";

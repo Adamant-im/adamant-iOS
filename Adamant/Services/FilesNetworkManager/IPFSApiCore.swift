@@ -34,14 +34,21 @@ extension IPFSApiCore: BlockchainHealthCheckableService {
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
         
-        return statusResponse.map { _ in
+        return statusResponse.map {
             .init(
                 ping: ping,
-                height: .zero,
+                height: getHeightFrom(timestamp: $0.timestamp),
                 wsEnabled: false,
                 wsPort: nil,
-                version: nil
+                version: .init($0.version)
             )
         }
+    }
+}
+
+private extension IPFSApiCore {
+    func getHeightFrom(timestamp: UInt64) -> Int {
+        let timestampInSeconds = timestamp / 1000
+        return Int(timestampInSeconds % 100_000_000)
     }
 }

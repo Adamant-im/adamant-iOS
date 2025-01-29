@@ -173,6 +173,11 @@ struct AppAssembly: MainThreadAssembly {
             ))
         }.inObjectScope(.container)
         
+        // MARK: BitcointTransactionFactoryProtocol
+        container.register(BitcoinKitTransactionFactoryProtocol.self) { _ in
+            BitcoinKitTransactionFactory()
+        }.inObjectScope(.transient)
+        
         // MARK: DogeApiService
         container.register(DogeApiService.self) { r in
             DogeApiService(api: .init(

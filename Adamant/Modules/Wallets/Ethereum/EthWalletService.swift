@@ -138,7 +138,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Dependencies
     weak var accountService: AccountService?
     var apiService: AdamantApiServiceProtocol!
-    var ethApiService: EthApiService!
+    var ethApiService: EthApiServiceProtocol!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
@@ -291,13 +291,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
@@ -310,12 +309,12 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         await calculateFee()
 	}
     
-    private func markBalanceAsFresh() {
-        ethWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: EthWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = ethWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -429,6 +428,7 @@ extension EthWalletService {
         
         // MARK: 3. Update
         ethWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -445,9 +445,9 @@ extension EthWalletService {
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
-            if eWallet.address.caseInsensitiveCompare(address) != .orderedSame {
-                service.save(ethAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(ethAddress: eWallet.address.lowercased(), result: result)
+            if eWallet.address.caseInsensitiveCompare(address) != .orderedSame, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
             
@@ -469,8 +469,10 @@ extension EthWalletService {
                     await service.update()
                 }
                 
-                service.save(ethAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(ethAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
                 
                 return eWallet
@@ -488,7 +490,7 @@ extension EthWalletService {
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(ethAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -507,8 +509,8 @@ extension EthWalletService {
                         return
                     }
                     
-                    self?.save(ethAddress: ethAddress) { [weak self] result in
-                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
                 
@@ -579,14 +581,23 @@ extension EthWalletService {
 	}
 }
 
+#if DEBUG
+extension EthWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
+    }
+}
+#endif
+
 // MARK: - KVS
 extension EthWalletService {
     /// - Parameters:
     ///   - ethAddress: Ethereum address to save into KVS
     ///   - adamantAddress: Owner of Ethereum address
     ///   - completion: success
-    private func save(ethAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService?.account, let keypair = accountService?.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService?.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -597,13 +608,7 @@ extension EthWalletService {
         }
         
         Task {
-            let result = await apiService.store(
-                key: EthWalletService.kvsAddress,
-                value: ethAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
+            let result = await apiService.store(model, date: .now)
             
             switch result {
             case .success:
@@ -613,6 +618,16 @@ extension EthWalletService {
                 completion(.failure(error: .apiError(error)))
             }
         }
+    }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService?.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address.lowercased(),
+            keypair: keypair
+        )
     }
 }
 

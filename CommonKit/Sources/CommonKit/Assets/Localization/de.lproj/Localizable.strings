@@ -1377,3 +1377,5 @@
 
 /* Chat unknown */
 "Chat.unknown.title" = "Unbekannt";
+
+"Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";
