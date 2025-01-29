@@ -35,11 +35,20 @@ final class AccountsProviderMock: AccountsProvider {
         return stubbedGetAccountPublicKeyResult
     }
     
-    func hasAccount(address: String) async -> Bool {
-        fatalError("\(#file).\(#function) is not implemented")
-    }
+    var invokedGetDummyAccount = false
+    var invokedGetDummyAccountCount = 0
+    var invokedGetDummyAccountParameters: String?
+    var stubbedGetDummyAccountResult: Result<DummyAccount, Error>!
     
     func getDummyAccount(for address: String) async throws -> DummyAccount {
+        invokedGetDummyAccount = true
+        invokedGetDummyAccountCount += 1
+        invokedGetDummyAccountParameters = address
+        
+        return try stubbedGetDummyAccountResult.get()
+    }
+    
+    func hasAccount(address: String) async -> Bool {
         fatalError("\(#file).\(#function) is not implemented")
     }
 }
