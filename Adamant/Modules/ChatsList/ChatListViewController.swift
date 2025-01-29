@@ -421,7 +421,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             chatroom: chatroom,
             messageIdToShow: messageId
         )
-        
         return vc
     }
     
@@ -458,11 +457,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     @MainActor
     private func handleRefresh() async {
-        let result = await chatsProvider.update(notifyState: true)
-        
-        guard let result = result else {
-            return
-        }
+        guard let result = await chatsProvider.update(notifyState: true) else { return }
         
         switch result {
         case .success:
@@ -582,10 +577,10 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         scrollUpButton.isHidden = offsetY < cellHeight * 0.75
     }
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if scrollView.contentOffset.y <= 0 && scrollView.contentOffset.y < -100 {
-            Task {
-                await handleRefresh()
-            }
+        guard scrollView.contentOffset.y <= 0, scrollView.contentOffset.y < -100 else { return }
+        
+        Task {
+            await handleRefresh()
         }
     }
 }
@@ -741,7 +736,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         if isBusy { return }
         switch controller {
-            // MARK: Chats controller
+        // MARK: Chats controller
         case let c where c == chatsController:
             switch type {
             case .insert:
@@ -772,8 +767,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
                 break
             }
             
-            // MARK: Unread controller
-            
+        // MARK: Unread controller
         case let c where c == unreadController:
             guard let transaction = anObject as? ChatTransaction else { break }
             
