@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Swinject
 import CommonKit
+import Combine
 
 enum WalletServiceState: Equatable {
     case notInitiated, updating, upToDate, initiationFailed(reason: String)
@@ -275,6 +276,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
     var walletUpdatedNotification: Notification.Name { get }
     
+    
     /// Enabled state changed
     var serviceEnabledChanged: Notification.Name { get }
     
@@ -361,6 +363,11 @@ extension WalletCoreProtocol {
     var additionalFee: Decimal {
         .zero
     }
+}
+
+extension WalletCoreProtocol{
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> { Just<Void>(()).eraseToAnyPublisher() }
 }
 
 protocol SwinjectDependentService: WalletCoreProtocol {

@@ -76,6 +76,13 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
     
@@ -196,6 +203,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
+        DispatchQueue.onMainThreadSyncSafe {
+            walletUpdateSender.send()
+        }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {

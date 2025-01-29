@@ -153,6 +153,13 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: - Delayed KVS save
     @Atomic private var balanceObserver: NSObjectProtocol?
     
@@ -297,6 +304,8 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -378,6 +387,8 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 
@@ -463,6 +474,8 @@ extension BtcWalletService {
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        await walletUpdateSender.send()
         
         if !self.enabled {
             self.enabled = true

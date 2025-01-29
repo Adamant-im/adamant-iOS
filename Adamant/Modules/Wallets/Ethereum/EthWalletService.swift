@@ -150,6 +150,13 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.ethWallet.stateChanged")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
     
@@ -303,6 +310,8 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -322,6 +331,8 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
     
@@ -435,6 +446,8 @@ extension EthWalletService {
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        await walletUpdateSender.send()
         
         if !enabled {
             enabled = true

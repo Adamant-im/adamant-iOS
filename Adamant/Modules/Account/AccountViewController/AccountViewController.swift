@@ -46,6 +46,7 @@ final class AccountViewController: FormViewController {
     private let languageService: LanguageStorageProtocol
     private let walletServiceCompose: WalletServiceCompose
     private let apiServiceCompose: ApiServiceComposeProtocol
+    private lazy var viewModel: AccountWalletsViewModel = .init(compose: walletServiceCompose)
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -66,6 +67,8 @@ final class AccountViewController: FormViewController {
     }
     
     private var notificationsSet: Set<AnyCancellable> = []
+    
+    private var walletSubscriptions: Set<AnyCancellable> = []
     
     // MARK: StayIn
     
@@ -235,6 +238,16 @@ final class AccountViewController: FormViewController {
                 }
             )
         }
+        
+        viewModel.$state
+            .removeDuplicates()
+            .sink { [weak self] state in
+                // update UI (reloadData, other st)
+                
+                let collectionView = self?.pagingViewController.collectionView
+                collectionView?.reloadData()
+            }
+            .store(in: &walletSubscriptions)
         
         // MARK: Rows&Sections
         
@@ -885,26 +898,6 @@ final class AccountViewController: FormViewController {
                 self.tableView.reloadData()
             }
         }
-        
-        for vc in walletViewControllers {
-            guard let service = vc.service?.core else { return }
-            let notification = service.walletUpdatedNotification
-            
-            let callback: @Sendable (Notification) -> Void = { [weak self] _ in
-                MainActor.assumeIsolatedSafe {
-                    guard let self = self else { return }
-                    let collectionView = self.pagingViewController.collectionView
-                    collectionView.reloadData()
-                }
-            }
-
-            NotificationCenter.default.addObserver(
-                forName: notification,
-                object: service,
-                queue: OperationQueue.main,
-                using: callback
-            )
-        }
     }
     
     private func updateUI() {
@@ -1095,15 +1088,21 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         }
     }
 
+//    nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
+//        MainActor.assertIsolated()
+//        
+//        return DispatchQueue.onMainThreadSyncSafe {
+//            guard let service = walletViewControllers[index].service?.core else {
+//                return WalletItemModel(model: .default)
+//            }
+//            
+//            return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
+//        }
+//    }
+    
     nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        MainActor.assertIsolated()
-        
         return DispatchQueue.onMainThreadSyncSafe {
-            guard let service = walletViewControllers[index].service?.core else {
-                return WalletItemModel(model: .default)
-            }
-            
-            return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
+            return viewModel.state.wallets[safe: index] ?? AccountWalletsState.Page.default
         }
     }
     
@@ -1116,12 +1115,12 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
     ) {
         DispatchQueue.onMainThreadSyncSafe {
             guard transitionSuccessful,
-                let first = startingViewController as? WalletViewController,
-                let second = destinationViewController as? WalletViewController,
-                first.height != second.height else {
+                  let first = startingViewController as? WalletViewController,
+                  let second = destinationViewController as? WalletViewController,
+                  first.height != second.height else {
                 return
             }
-
+            
             updateHeaderSize(with: second, animated: true)
         }
     }
