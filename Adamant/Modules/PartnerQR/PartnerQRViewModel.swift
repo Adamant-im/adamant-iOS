@@ -70,17 +70,6 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         }
     }
     
-    private func handleRename(newName: String) {
-        Task { [weak self] in
-            guard let self = self else { return }
-            self.partnerName = newName
-            self.renameTitle = .adamant.alert.renameContact
-            await self.addressBookService.set(name: newName, for: self.title)
-        }
-    }
-    private func showBuyAndSell() {
-        presentBuyAndSell = true
-    }
     func saveToPhotos() {
         guard let qrCode = image else { return }
         
@@ -238,5 +227,16 @@ private extension PartnerQRViewModel {
     
     func makeCancelAction() -> UIAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    }
+    func handleRename(newName: String) {
+        Task { [weak self] in
+            guard let self else { return }
+            self.partnerName = newName
+            self.renameTitle = .adamant.alert.renameContact
+            await self.addressBookService.set(name: newName, for: self.title)
+        }
+    }
+    func showBuyAndSell() {
+        presentBuyAndSell = true
     }
 }

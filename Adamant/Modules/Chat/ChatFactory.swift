@@ -84,8 +84,7 @@ struct ChatFactory {
             sendTransaction: makeSendTransactionAction(
                 viewModel: viewModel,
                 screensFactory: screensFactory
-            ),
-            dialogManager: dialogManager
+            )
         )
         viewController.setupDelegates(delegates)
         delegates.cell.setupDelegate(

@@ -54,7 +54,9 @@ struct NotificationsView: View {
             SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
         }
         .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
-            buyAndSellView()
+            screensFactory.makeBuyAndSellView(action: {
+                viewModel.presentBuyAndSell = false
+            })
         }
     }
 }
@@ -161,22 +163,6 @@ private extension NotificationsView {
                     Spacer()
                 }
             }
-        }
-    }
-    func buyAndSellView() -> some View {
-        NavigationView {
-            BuyAndSellControllerWrapper(adamantScreenFactory: screensFactory)
-                .navigationBarTitle(AdmWalletViewController.Rows.buyTokens.localized, displayMode: .inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            viewModel.presentBuyAndSell = false
-                        }, label: {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .medium))
-                        })
-                    }
-                }
         }
     }
 }

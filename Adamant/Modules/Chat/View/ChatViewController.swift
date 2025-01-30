@@ -32,7 +32,6 @@ final class ChatViewController: MessagesViewController {
     private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
     private let chatSwipeManager: ChatSwipeManager
-    private let dialogManager: ChatDialogManager
     let viewModel: ChatViewModel
     
     // MARK: Properties
@@ -92,8 +91,7 @@ final class ChatViewController: MessagesViewController {
         admWalletService: WalletService?,
         screensFactory: ScreensFactory,
         chatSwipeManager: ChatSwipeManager,
-        sendTransaction: @escaping SendTransaction,
-        dialogManager: ChatDialogManager
+        sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
@@ -102,7 +100,6 @@ final class ChatViewController: MessagesViewController {
         self.screensFactory = screensFactory
         self.sendTransaction = sendTransaction
         self.chatSwipeManager = chatSwipeManager
-        self.dialogManager = dialogManager
         super.init(nibName: nil, bundle: nil)
         
         inputBar.onAttachmentButtonTap = { [weak self] in
@@ -478,7 +475,7 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
-        dialogManager.showBuyAndSellSubject
+        viewModel.showBuyAndSell
                     .sink { [weak self] in
                         self?.presentBuyAndSell()
                     }
@@ -667,6 +664,10 @@ private extension ChatViewController {
         UIView.animate(withDuration: 0.25) {
             self.chatDropView.alpha = value ? 1.0 : .zero
         }
+    }
+    func presentBuyAndSell() {
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
     }
 }
 
@@ -1104,12 +1105,7 @@ extension ChatViewController {
         viewModel.needToAnimateCellIndex = nil
     }
 }
-extension ChatViewController {
-    func presentBuyAndSell() {
-        let buyAndSellVC = screensFactory.makeBuyAndSell()
-        navigationController?.pushViewController(buyAndSellVC, animated: true)
-    }
-}
+
 private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140

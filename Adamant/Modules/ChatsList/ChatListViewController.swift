@@ -1304,14 +1304,14 @@ extension ChatListViewController {
                 showVC: { [weak self] in
                     self?.presentBuyAndSell()
                 }
-            ) { newName in
+            ) { [weak self] newName in
                 Task {
-                    await self.addressBook.set(name: newName, for: address)
+                    await self?.addressBook.set(name: newName, for: address)
                 }
             }
             
-            self.dialogService.present(alert, animated: true) {
-                self.dialogService.selectAllTextFields(in: alert)
+            dialogService.present(alert, animated: true) { [weak self] in
+                self?.dialogService.selectAllTextFields(in: alert)
                 completion?()
             }
         }
@@ -1519,7 +1519,7 @@ private extension StateEnum {
 }
 private extension ChatListViewController {
     func presentBuyAndSell() {
-            let buyAndSellVC = screensFactory.makeBuyAndSell()
-            navigationController?.pushViewController(buyAndSellVC, animated: true)
-        }
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
+    }
 }

@@ -74,7 +74,9 @@ extension AdamantDialogService {
         rootViewController.present(alert, animated: true, completion: nil)
     }
     
-    private func makeFreeTokensAlertAction(url: String?, window: UIWindow) -> UIAlertAction {
+}
+private extension AdamantDialogService {
+    func makeFreeTokensAlertAction(url: String?, window: UIWindow) -> UIAlertAction {
         let action = UIAlertAction(
             title: .adamant.chat.freeTokens,
             style: .destructive
@@ -88,7 +90,7 @@ extension AdamantDialogService {
         }
         return action
     }
-    private func mackBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
+    func mackBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
         .init(
             title: .adamant.chat.freeTokensBuyADM,
             style: .default
@@ -96,7 +98,7 @@ extension AdamantDialogService {
             action()
         }
     }
-    private func makeCancelAction(window: UIWindow) -> UIAlertAction {
+    func makeCancelAction(window: UIWindow) -> UIAlertAction {
         .init(
             title: .adamant.alert.cancel,
             style: .default
@@ -104,7 +106,7 @@ extension AdamantDialogService {
             window.isHidden = true
         }
     }
-    private func freeTokensURL(url: String?) -> URL? {
+    func freeTokensURL(url: String?) -> URL? {
         guard let url = url else {
             return nil
         }
@@ -114,7 +116,6 @@ extension AdamantDialogService {
         return tokenUrl
     }
 }
-
 enum FreeTokensAlertType {
     case contacts
     case message

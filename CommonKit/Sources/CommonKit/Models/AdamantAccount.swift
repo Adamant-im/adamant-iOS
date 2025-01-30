@@ -95,8 +95,8 @@ extension AdamantAccount: WrappableModel {
         )
     }
 }
-extension AdamantAccount {
-    public var isEnoughMoneyForTransaction: Bool {
+public extension AdamantAccount {
+    var isEnoughMoneyForTransaction: Bool {
         balance >= AdamantApiService.KvsFee
     }
 }

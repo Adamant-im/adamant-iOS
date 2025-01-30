@@ -27,8 +27,6 @@ final class ChatDialogManager {
     typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
     typealias ContextMenuAction = ((_ messageId: String) -> Void)?
     
-    let showBuyAndSellSubject = PassthroughSubject<Void, Never>()
-    
     init(
         viewModel: ChatViewModel,
         dialogService: DialogService,
@@ -195,7 +193,7 @@ private extension ChatDialogManager {
             url: accountService.account?.address,
             type: .message,
             showVC: { [weak self] in
-                self?.showBuyAndSellSubject.send()
+                self?.viewModel.showBuyAndSell.send()
             })
     }
     
@@ -259,7 +257,7 @@ private extension ChatDialogManager {
             needToPresent: accountService.account?.isEnoughMoneyForTransaction,
             url: accountService.account?.address,
             showVC: { [weak self] in
-                self?.showBuyAndSellSubject.send()
+                self?.viewModel.showBuyAndSell.send()
             },
             onRename: handleRename(newName:)
         )

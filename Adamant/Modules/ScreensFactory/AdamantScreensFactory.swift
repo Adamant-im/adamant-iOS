@@ -97,7 +97,9 @@ struct AdamantScreensFactory: ScreensFactory {
     func makeBuyAndSell() -> UIViewController {
         admWalletFactory.makeBuyAndSellVC(screenFactory: self)
     }
-    
+    func makeBuyAndSellView(action: @escaping () -> Void) -> AnyView {
+        admWalletFactory.makeBuyAndSellView(screenFactory: self, action: action)
+    }
     func makeChatList() -> UIViewController {
         chatListFactory.makeChatListVC(screensFactory: self)
     }
