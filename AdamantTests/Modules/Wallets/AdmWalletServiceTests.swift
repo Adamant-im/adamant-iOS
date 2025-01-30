@@ -566,8 +566,10 @@ final class AdmWalletServiceTests: XCTestCase {
         XCTAssertEqual(transaction.statusEnum, .pending)
         XCTAssertEqual(transaction.chatRoom?.objectID, room.objectID)
     }
-    
-    private func makeAccount() -> AdamantAccount {
+}
+
+private extension AdmWalletServiceTests {
+    func makeAccount() -> AdamantAccount {
         return AdamantAccount(
             address: Constants.accountAddress,
             unconfirmedBalance: Constants.unconfirmedBalance,
@@ -582,7 +584,7 @@ final class AdmWalletServiceTests: XCTestCase {
         )
     }
     
-    private func setupCoreDataEntities(accountPublicKey: String? = nil) -> (Chatroom, CoreDataAccount) {
+    func setupCoreDataEntities(accountPublicKey: String? = nil) -> (Chatroom, CoreDataAccount) {
         let account = createCoreDataAccount(publicKey: accountPublicKey)
         let room = createChatroom()
         account.chatroom = room
@@ -590,7 +592,7 @@ final class AdmWalletServiceTests: XCTestCase {
         return (room, account)
     }
     
-    private func createCoreDataAccount(publicKey: String? = nil) -> CoreDataAccount {
+    func createCoreDataAccount(publicKey: String? = nil) -> CoreDataAccount {
         let account = CoreDataAccount(context: stack.container.viewContext)
         
         account.address = Constants.recipientAddress
@@ -599,13 +601,13 @@ final class AdmWalletServiceTests: XCTestCase {
         return account
     }
     
-    private func createChatroom() -> Chatroom {
+    func createChatroom() -> Chatroom {
         let room = Chatroom(context: stack.container.viewContext)
         
         return room
     }
     
-    private func makeKeypair(passphrase: String) -> Keypair? {
+    func makeKeypair(passphrase: String) -> Keypair? {
         NativeAdamantCore().createKeypairFor(passphrase: passphrase)
     }
 }

@@ -477,6 +477,7 @@
 		AA8FFFBA2D4978D7001D8576 /* ChatTransactionServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB92D4978D5001D8576 /* ChatTransactionServiceMock.swift */; };
 		AA8FFFBC2D49796A001D8576 /* ChatsProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */; };
 		AA8FFFC02D4AC011001D8576 /* AdamantCoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */; };
+		AA8FFFC42D4C1174001D8576 /* NativeAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -1152,6 +1153,7 @@
 		AA8FFFB92D4978D5001D8576 /* ChatTransactionServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionServiceMock.swift; sourceTree = "<group>"; };
 		AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProviderMock.swift; sourceTree = "<group>"; };
 		AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoreMock.swift; sourceTree = "<group>"; };
+		AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCoreTests.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2367,6 +2369,7 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */,
 				AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */,
 				AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */,
 				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
@@ -4027,6 +4030,7 @@
 				AA8FFFC02D4AC011001D8576 /* AdamantCoreMock.swift in Sources */,
 				AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
+				AA8FFFC42D4C1174001D8576 /* NativeAdamantCoreTests.swift in Sources */,
 				AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */,
 				AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */,
 				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
