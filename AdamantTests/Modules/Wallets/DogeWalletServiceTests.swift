@@ -202,8 +202,12 @@ final class DogeWalletServiceTests: XCTestCase {
         // then
         XCTAssertNil(result.error)
     }
-    
-    private func makeWallet(address: String = Constants.dogeAddress) throws -> DogeWallet {
+}
+
+// MARK: Private
+
+private extension DogeWalletServiceTests {
+    func makeWallet(address: String = Constants.dogeAddress) throws -> DogeWallet {
         let privateKeyData = "my long passphrase"
             .data(using: .utf8)!
             .sha256()
@@ -220,13 +224,13 @@ final class DogeWalletServiceTests: XCTestCase {
         )
     }
     
-    private func makeDefaultAddress(address: String = Constants.dogeAddress) throws -> Address {
+    func makeDefaultAddress(address: String = Constants.dogeAddress) throws -> Address {
         try AddressConverterFactory()
             .make(network: DogeMainnet())
             .convert(address: address)
     }
     
-    private func assertAddressesEqual(_ lhs: Address, _ rhs: Address, file: StaticString = #file, line: UInt = #line) {
+    func assertAddressesEqual(_ lhs: Address, _ rhs: Address, file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(lhs.lockingScript, rhs.lockingScript, file: file, line: line)
         XCTAssertEqual(lhs.stringValue, rhs.stringValue, file: file, line: line)
         XCTAssertEqual(lhs.lockingScriptPayload, rhs.lockingScriptPayload, file: file, line: line)

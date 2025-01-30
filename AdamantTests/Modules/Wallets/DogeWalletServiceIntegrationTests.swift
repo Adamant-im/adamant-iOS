@@ -76,8 +76,10 @@ final class DogeWalletServiceIntegrationTests: XCTestCase {
             XCTAssertEqual(mock.invokedSendRequestBasicGenericCount, 2)
         }
     }
-    
-    private func makeWallet() throws -> DogeWallet {
+}
+
+private extension DogeWalletServiceIntegrationTests {
+    func makeWallet() throws -> DogeWallet {
         let privateKeyData = Constants.passphrase
             .data(using: .utf8)!
             .sha256()
