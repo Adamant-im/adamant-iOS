@@ -199,8 +199,8 @@ private extension ChatDialogManager {
             .init(
                 title: .adamant.chat.reviewNodesList,
                 style: .default,
-                handler: { _ in
-                    self.viewModel.didTapAdmNodesList.send(())
+                handler: { [weak self] _ in
+                    self?.viewModel.didTapAdmNodesList.send(())
                 }
             )
         )
