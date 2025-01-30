@@ -99,6 +99,7 @@ final class ChatViewModel: NSObject {
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
+    let showBuyAndSell = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false

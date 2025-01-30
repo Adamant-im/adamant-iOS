@@ -476,6 +476,11 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        viewModel.showBuyAndSell
+                    .sink { [weak self] in
+                        self?.presentBuyAndSell()
+                    }
+                    .store(in: &subscriptions)
     }
 }
 
@@ -660,6 +665,10 @@ private extension ChatViewController {
         UIView.animate(withDuration: 0.25) {
             self.chatDropView.alpha = value ? 1.0 : .zero
         }
+    }
+    func presentBuyAndSell() {
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
     }
 }
 

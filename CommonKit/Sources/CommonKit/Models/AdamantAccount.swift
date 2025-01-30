@@ -95,7 +95,11 @@ extension AdamantAccount: WrappableModel {
         )
     }
 }
-
+public extension AdamantAccount {
+    var isEnoughMoneyForTransaction: Bool {
+        balance >= AdamantApiService.KvsFee
+    }
+}
 // MARK: - JSON
 /*
 {

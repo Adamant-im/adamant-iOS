@@ -449,10 +449,17 @@
 "ChatScene.Actions.NamePlaceholder" = "Name";
 
 /* Chat: 'Free Tokens' button */
-"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Free tokens";
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Welcome coins";
 
+"ChatScene.FreeTokensAlert.Title.Chat" = "To start messaging now, claim free welcome coins or top up your ADM balance in another way";
+
+"ChatScene.FreeTokensAlert.Title.Book" = "To save contacts, claim free welcome coins or top up your ADM balance in another way";
+
+"ChatScene.FreeTokensAlert.Title.Notification" = "To enable push notifications, claim free welcome coins or top up your ADM balance in another way";
+
+"ChatScene.FreeTokensAlert.BuyADM" = "Buy ADM";
 /* Chat: 'Free Tokens' message */
-"ChatScene.FreeTokensAlert.Message" = "ADAMANT is a unique Blockchain messenger that is independent from government, corporations and even its developers. It is possible due to a decentralized network, fully open source and run by users. That's why every action, including messaging or saving new contacts, has a network fee of 0.001 ADM. To start messaging now, get your free welcoming tokens.";
+"ChatScene.FreeTokensAlert.Message" = "ADAMANT is a decentralized blockchain messenger. Therefore, every action, including messaging or saving new contacts, incurs a network fee of 0.001 ADM.";
 
 /* Chat: warning message for opening email link without mail app configurated on device */
 "ChatScene.Warning.NoMailApp" = "Can't send email. Check Mail app configurations.";
