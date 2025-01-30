@@ -159,8 +159,12 @@ final class ERC20WalletServiceTests: XCTestCase {
         XCTAssertEqual(transaction.gasPrice, BigUInt(clamping: 11).toWei())
         XCTAssertEqual(transaction.hashForSignature(), Constants.expectedHashForSignature)
     }
-    
-    private func makeDecimalsMock(_ onCall: @escaping () -> Void) {
+}
+
+// MARK: Private
+
+private extension ERC20WalletServiceTests {
+    func makeDecimalsMock(_ onCall: @escaping () -> Void) {
         let prevHandler = MockURLProtocol.requestHandler
         MockURLProtocol.requestHandler = MockURLProtocol.combineHandlers(
             prevHandler
@@ -178,7 +182,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         }
     }
     
-    private func makeTransactionsCountMock() {
+    func makeTransactionsCountMock() {
         let prevHandler = MockURLProtocol.requestHandler
         MockURLProtocol.requestHandler = MockURLProtocol.combineHandlers(
             prevHandler
@@ -195,7 +199,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         }
     }
     
-    private func makeResponseAndMockData<T: Codable>(
+    func makeResponseAndMockData<T: Codable>(
         url: URL,
         ethResponse: EthAPIResponse<T>
     ) throws -> (HTTPURLResponse, Data) {
@@ -210,7 +214,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         return (response, mockData)
     }
     
-    private func makeSession() -> URLSession {
+    func makeSession() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         return URLSession(configuration: config)
