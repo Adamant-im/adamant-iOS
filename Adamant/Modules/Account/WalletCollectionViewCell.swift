@@ -18,35 +18,20 @@ class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var accessoryContainerView: AccessoryContainerView!
     
-    private var cancellables = Set<AnyCancellable>()
-    
-    override func prepareForReuse() {
-        cancellables.removeAll()
-    }
-    
     override func setPagingItem(
         _ pagingItem: PagingItem,
         selected: Bool,
         options: PagingOptions
     ) {
-        guard let item = pagingItem as? WalletItemModel else {
+        guard let item = pagingItem as? WalletCollectionViewCell.Model else {
             return
         }
-        update(item: item.model)
-        
-        cancellables.removeAll()
-        
-        item.$model
-            .removeDuplicates()
-            .sink { [weak self] item in
-                self?.update(item: item)
-            }
-            .store(in: &cancellables)
+        update(item: item)
     }
 }
 
 private extension WalletCollectionViewCell {
-    func update(item: WalletItem) {
+    func update(item: WalletCollectionViewCell.Model) {
         currencyImageView.image = item.currencyImage
         if item.currencyNetwork.isEmpty {
             currencySymbolLabel.text = item.currencySymbol
@@ -72,8 +57,8 @@ private extension WalletCollectionViewCell {
             balanceLabel.text = String.adamant.account.updatingBalance
         }
         
-        if item.notifications > 0 {
-            accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)
+        if item.notificationBadgeCount > 0 {
+            accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notificationBadgeCount)), at: .topRight)
         } else {
             accessoryContainerView.setAccessory(nil, at: .topRight)
         }

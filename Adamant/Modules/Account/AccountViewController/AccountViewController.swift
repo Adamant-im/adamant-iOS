@@ -44,9 +44,8 @@ final class AccountViewController: FormViewController {
     private let avatarService: AvatarService
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
-    private let walletServiceCompose: WalletServiceCompose
     private let apiServiceCompose: ApiServiceComposeProtocol
-    private lazy var viewModel: AccountWalletsViewModel = .init(compose: walletServiceCompose)
+    private lazy var viewModel: AccountWalletsViewModel = .init(walletsService: visibleWalletsService, screensFactory: screensFactory)
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -59,13 +58,7 @@ final class AccountViewController: FormViewController {
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
     private var pagingViewController: PagingViewController!
-    
-    private var walletViewControllers: [WalletViewController] = [] {
-        didSet {
-            makeWalletModels()
-        }
-    }
-    
+        
     private var notificationsSet: Set<AnyCancellable> = []
     
     private var walletSubscriptions: Set<AnyCancellable> = []
@@ -95,13 +88,11 @@ final class AccountViewController: FormViewController {
         return refreshControl
     }()
     
-    private var walletModels: [String: WalletItemModel] = [:]
-    
     private var currentWalletIndex: Int = .zero
-    private var currentSelectedWalletItem: WalletItemModel? {
-        walletModels.first{
-            $1.model.index == currentWalletIndex
-        }?.value
+    private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
+        viewModel.state.wallets.first { wallet in
+            wallet.index == currentWalletIndex
+        }
     }
     
     private var initiated = false
@@ -132,7 +123,6 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
-        self.walletServiceCompose = walletServiceCompose
         self.apiServiceCompose = apiServiceCompose
         
         super.init(nibName: nil, bundle: nil)
@@ -188,18 +178,14 @@ final class AccountViewController: FormViewController {
         tableView.tableFooterView = footerView
         
         // MARK: Wallet pages
-        setupWalletsVC()
         
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletItemModel.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletCollectionViewCell.Model.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        if walletViewControllers.count > 0 {
-            pagingViewController.select(index: currentWalletIndex)
-        }
         
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
@@ -212,40 +198,14 @@ final class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
         
-        let callback: @MainActor (Notification) -> Void = { [weak self] data in
-            guard let account = data.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount
-            else {
-                return
-            }
-            
-            var model = self?.walletModels[account.unicId]?.model
-            model?.balance = account.balance
-            model?.isBalanceInitialized = account.isBalanceInitialized
-            model?.notifications = account.notifications
-            
-            self?.walletModels[account.unicId]?.model = model ?? .default
-        }
-        
-        for walletService in walletServiceCompose.getWallets() {
-            NotificationCenter.default.addObserver(
-                forName: walletService.core.walletUpdatedNotification,
-                object: nil,
-                queue: OperationQueue.main,
-                using: { notification in
-                    MainActor.assumeIsolatedSafe {
-                        callback(notification)
-                    }
-                }
-            )
-        }
-        
         viewModel.$state
-            .removeDuplicates()
             .sink { [weak self] state in
-                // update UI (reloadData, other st)
-                
-                let collectionView = self?.pagingViewController.collectionView
-                collectionView?.reloadData()
+                //TODO: Wrong impl
+                MainActor.assumeIsolatedSafe {
+                    self?.pagingViewController.reloadData()
+                    self?.pagingViewController.collectionView.reloadData()
+                    self?.tableView.reloadData()
+                }
             }
             .store(in: &walletSubscriptions)
         
@@ -752,7 +712,7 @@ final class AccountViewController: FormViewController {
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
-
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -889,7 +849,6 @@ final class AccountViewController: FormViewController {
             MainActor.assumeIsolatedSafe {
                 guard let self = self else { return }
                 
-                self.setupWalletsVC()
                 self.updatePagingItemHeight()
                 
                 self.pagingViewController.reloadData()
@@ -903,7 +862,7 @@ final class AccountViewController: FormViewController {
     private func updateUI() {
         let appSection = form.sectionBy(tag: Sections.application.tag)
         appSection?.header?.title = Sections.application.localized
-
+        
         let walletSection = form.sectionBy(tag: Sections.wallet.tag)
         walletSection?.header?.title = Sections.wallet.localized
         
@@ -929,16 +888,8 @@ final class AccountViewController: FormViewController {
         }
     }
     
-    private func setupWalletsVC() {
-        walletViewControllers.removeAll()
-        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
-        availableServices.forEach { walletService in
-            walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
-        }
-    }
-    
     private func updatePagingItemHeight() {
-        if walletViewControllers.count > 0 {
+        if viewModel.state.wallets.count > 0 {
             pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         } else {
             pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
@@ -981,16 +932,16 @@ final class AccountViewController: FormViewController {
     func layoutTableHeaderView() {
         guard let view = tableView.tableHeaderView else { return }
         var frame = view.frame
-
+        
         frame.size.height = 300
         view.frame = frame
-
+        
         self.tableView.tableHeaderView = view
     }
     
     private func deselectWalletViewControllers() {
-        for controller in walletViewControllers {
-            guard let vc = controller.viewController as? WalletViewControllerBase else {
+        for controller in viewModel.walletControllers.values {
+            guard let vc = controller as? WalletViewControllerBase else {
                 continue
             }
             
@@ -1007,11 +958,11 @@ final class AccountViewController: FormViewController {
         }
         
         if unavailableNodes.contains(where: {
-            $0.name == currentSelectedWalletItem?.model.currencyNetwork
+            $0.name == currentSelectedWalletItem?.currencyNetwork
         }) {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: currentSelectedWalletItem?.model.currencyNetwork ?? ""
+                    nodeGroupName: currentSelectedWalletItem?.currencyNetwork ?? ""
                 ).localizedDescription
             )
         }
@@ -1037,7 +988,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
                                            types: [.copyToPasteboard,
                                                    .share,
                                                    .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
-                                                  ],
+                                           ],
                                            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                            animated: true,
                                            from: from,
@@ -1073,7 +1024,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         MainActor.assertIsolated()
         
         return DispatchQueue.onMainThreadSyncSafe {
-            walletViewControllers.count
+            return viewModel.state.wallets.count
         }
     }
     
@@ -1084,25 +1035,15 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         MainActor.assertIsolated()
         
         return DispatchQueue.onMainThreadSyncSafe {
-            walletViewControllers[index].viewController
+            (viewModel.getWalletViewController(forIndex: index)?.viewController)! //TODO: Remove force-unwrap
         }
     }
-
-//    nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-//        MainActor.assertIsolated()
-//        
-//        return DispatchQueue.onMainThreadSyncSafe {
-//            guard let service = walletViewControllers[index].service?.core else {
-//                return WalletItemModel(model: .default)
-//            }
-//            
-//            return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
-//        }
-//    }
     
     nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
+        MainActor.assertIsolated()
+        
         return DispatchQueue.onMainThreadSyncSafe {
-            return viewModel.state.wallets[safe: index] ?? AccountWalletsState.Page.default
+            return viewModel.state.wallets[safe: index] ?? WalletCollectionViewCell.Model.default
         }
     }
     
@@ -1165,8 +1106,8 @@ extension AccountViewController: WalletViewControllerDelegate {
             tableView.deselectRow(at: indexPath, animated: true)
         }
         
-        for controller in walletViewControllers {
-            guard controller.viewController != viewController, let vc = controller.viewController as? WalletViewControllerBase else {
+        for controller in viewModel.walletControllers.values {
+            guard let vc = controller as? WalletViewControllerBase, vc != viewController else {
                 continue
             }
             
@@ -1174,41 +1115,6 @@ extension AccountViewController: WalletViewControllerDelegate {
             if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
-        }
-    }
-}
-
-private extension AccountViewController {
-    func makeWalletModels() {
-        for (index, wallet) in walletViewControllers.enumerated() {
-            guard let service = wallet.service?.core else {
-                continue
-            }
-            
-            var network: String?
-            if ERC20Token.supportedTokens.contains(where: { token in
-                return token.symbol == service.tokenSymbol
-            }) {
-                network = type(of: service).tokenNetworkSymbol
-            }
-            
-            var item = WalletItem(
-                index: index,
-                currencySymbol: service.tokenSymbol,
-                currencyImage: service.tokenLogo,
-                isBalanceInitialized: service.wallet?.isBalanceInitialized,
-                currencyNetwork: network ?? type(of: service).tokenNetworkSymbol
-            )
-            
-            if let wallet = service.wallet {
-                item.balance = wallet.balance
-                item.notifications = wallet.notifications
-            } else {
-                item.balance = nil
-            }
-            
-            let model = WalletItemModel(model: item)
-            walletModels[service.tokenUnicID] = model
         }
     }
 }

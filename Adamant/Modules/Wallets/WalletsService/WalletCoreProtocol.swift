@@ -295,6 +295,9 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
     
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> { get }
+    
     func update()
     
     // MARK: Tools
@@ -364,12 +367,6 @@ extension WalletCoreProtocol {
         .zero
     }
 }
-
-extension WalletCoreProtocol{
-    @MainActor
-    var walletUpdatePublisher: AnyObservable<Void> { Just<Void>(()).eraseToAnyPublisher() }
-}
-
 protocol SwinjectDependentService: WalletCoreProtocol {
     @MainActor
     func injectDependencies(from container: Container)
