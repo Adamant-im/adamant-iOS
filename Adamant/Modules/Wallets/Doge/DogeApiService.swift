@@ -45,19 +45,23 @@ final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
     }
 }
 
-final class DogeApiService: ApiServiceProtocol {
-    let api: BlockchainHealthCheckWrapper<DogeApiCore>
+final class DogeApiService: DogeApiServiceProtocol {
+    var api: DogeInternalApiProtocol {
+        _api
+    }
+    
+    let _api: BlockchainHealthCheckWrapper<DogeApiCore>
     
     @MainActor
-    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { _api.nodesInfoPublisher }
     
     @MainActor
-    var nodesInfo: NodesListInfo { api.nodesInfo }
+    var nodesInfo: NodesListInfo { _api.nodesInfo }
     
-    func healthCheck() { api.healthCheck() }
+    func healthCheck() { _api.healthCheck() }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
-        self.api = api
+        self._api = api
     }
     
     func request<Output>(
@@ -75,3 +79,5 @@ final class DogeApiService: ApiServiceProtocol {
         }
     }
 }
+
+extension BlockchainHealthCheckWrapper: DogeInternalApiProtocol where Service == DogeApiCore {}
