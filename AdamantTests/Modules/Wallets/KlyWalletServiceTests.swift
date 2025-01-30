@@ -130,18 +130,22 @@ final class KlyWalletServiceTests: XCTestCase {
         XCTAssertNil(result2.error)
         XCTAssertTrue(calledCompletion)
     }
-    
-    private static func applyURLSessionSwizzling() {
+}
+
+// MARK: Private
+
+private extension KlyWalletServiceTests {
+    static func applyURLSessionSwizzling() {
         URLSession.swizzleInitializer()
     }
     
-    private static func makeSessionConfig() -> URLSessionConfiguration {
+    static func makeSessionConfig() -> URLSessionConfiguration {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         return config
     }
     
-    private func makeKlySendMock(expectedHash: String, _ onCall: @escaping () -> Void) {
+    func makeKlySendMock(expectedHash: String, _ onCall: @escaping () -> Void) {
         let prevHandler = MockURLProtocol.requestHandler
         MockURLProtocol.requestHandler = MockURLProtocol.combineHandlers(
             prevHandler
@@ -159,7 +163,7 @@ final class KlyWalletServiceTests: XCTestCase {
         }
     }
     
-    private func makeResponseAndMockData(
+    func makeResponseAndMockData(
         url: URL,
         klyResponse: KlyTransactionSubmitModel
     ) throws -> (HTTPURLResponse, Data) {
@@ -174,7 +178,7 @@ final class KlyWalletServiceTests: XCTestCase {
         return (response, mockData)
     }
     
-    private func makeWallet() throws -> KlyWallet {
+    func makeWallet() throws -> KlyWallet {
         let keyPair = try LiskKit.Crypto.keyPair(
             fromPassphrase: Constants.passphrase,
             salt: sut.salt
@@ -191,7 +195,7 @@ final class KlyWalletServiceTests: XCTestCase {
         )
     }
     
-    private func checkMakeTransactionParameters(
+    func checkMakeTransactionParameters(
         nonce: UInt64,
         file: StaticString = #file,
         line: UInt = #line
@@ -220,7 +224,7 @@ final class KlyWalletServiceTests: XCTestCase {
         )
     }
     
-    private func checkTransaction(
+    func checkTransaction(
         transaction: TransactionEntity,
         file: StaticString = #file,
         line: UInt = #line
