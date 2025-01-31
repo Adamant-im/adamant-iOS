@@ -65,9 +65,10 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var dashApiService: DashApiService!
+    var dashApiService: DashApiServiceProtocol!
     var accountService: AccountService!
-    var securedStore: SecuredStore!
+    var lastTransactionStorage: DashLastTransactionStorageProtocol!
+    var transactionFactory: BitcoinKitTransactionFactoryProtocol!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
     var coreDataStack: CoreDataStack!
@@ -90,32 +91,10 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     var lastTransactionId: String? {
         get {
-            guard
-                let hash: String = self.securedStore.get("lastDashTransactionId"),
-                let timestampString: String = self.securedStore.get("lastDashTransactionTime"),
-                let timestamp = Double(string: timestampString)
-            else { return nil }
-            
-            let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
-            let timeAgo = -1 * date.timeIntervalSinceNow
-            
-            if timeAgo > 10 * 60 { // 10m waiting for transaction complete
-                self.securedStore.remove("lastDashTransactionTime")
-                self.securedStore.remove("lastDashTransactionId")
-                return nil
-            } else {
-                return hash
-            }
+            lastTransactionStorage.getLastTransactionId()
         }
         set {
-            if let value = newValue {
-                let timestamp = Date().timeIntervalSince1970
-                self.securedStore.set("\(timestamp)", for: "lastDashTransactionTime")
-                self.securedStore.set(value, for: "lastDashTransactionId")
-            } else {
-                self.securedStore.remove("lastDashTransactionTime")
-                self.securedStore.remove("lastDashTransactionId")
-            }
+            lastTransactionStorage.setLastTransactionId(newValue)
         }
     }
     
@@ -407,7 +386,8 @@ extension DashWalletService: SwinjectDependentService {
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(AdamantApiServiceProtocol.self)
-        securedStore = container.resolve(SecuredStore.self)
+        lastTransactionStorage = container.resolve(DashLastTransactionStorageProtocol.self)
+        transactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
@@ -604,6 +584,15 @@ extension DashWalletService {
         )
     }
 }
+
+#if DEBUG
+extension DashWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: DashWallet?) {
+        self.dashWallet = wallet
+    }
+}
+#endif
 
 // MARK: - PrivateKey generator
 extension DashWalletService: PrivateKeyGenerator {
