@@ -135,6 +135,13 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     let serviceStateChanged = Notification.Name("adamant.dashWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: - Delayed KVS save
     @Atomic private var balanceObserver: NSObjectProtocol?
     
@@ -269,6 +276,8 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -298,6 +307,8 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -342,6 +353,8 @@ extension DashWalletService {
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        self.walletUpdateSender.send()
         
         if !self.enabled {
             self.enabled = true

@@ -83,6 +83,13 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     let transactionFeeUpdated = Notification.Name("adamant.klyWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.klyWallet.stateChanged")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     init() {
         addObservers()
     }
@@ -258,6 +265,8 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         if let nonce = try? await getNonce(address: wallet.address) {
@@ -288,6 +297,8 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -433,6 +444,8 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await walletUpdateSender.send()
         } catch {
             throw WalletServiceError.accountNotFound
         }

@@ -1467,7 +1467,7 @@ private extension ChatViewModel {
     
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
-            .map { visibleWalletService.isInvisible($0.core) }
+            .map { visibleWalletService.isInvisible($0.core.tokenUnicID) }
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible
