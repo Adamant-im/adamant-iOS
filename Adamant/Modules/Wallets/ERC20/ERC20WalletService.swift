@@ -360,7 +360,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService {
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
         setState(.notInitiated)
@@ -373,7 +373,13 @@ extension ERC20WalletService {
         // MARK: 2. Create keys and addresses
         let keystore: BIP32Keystore
         do {
-            guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
+            guard let store = try BIP32Keystore(
+                mnemonics: passphrase,
+                password: EthWalletService.walletPassword,
+                mnemonicsPassword: password,
+                language: .english,
+                prefixPath: EthWalletService.walletPath
+            ) else {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             

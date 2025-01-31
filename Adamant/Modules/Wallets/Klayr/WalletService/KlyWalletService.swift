@@ -90,9 +90,9 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: -
     
     func initWallet(
-        withPassphrase passphrase: String
+        withPassphrase passphrase: String, withPassword password: String
     ) async throws -> WalletAccount {
-        try await initWallet(passphrase: passphrase)
+        try await initWallet(passphrase: passphrase, password: password)
     }
     
     func setInitiationFailed(reason: String) {
@@ -399,7 +399,7 @@ private extension KlyWalletService {
 
 // MARK: - Init Wallet
 private extension KlyWalletService {
-    func initWallet(passphrase: String) async throws -> WalletAccount {
+    func initWallet(passphrase: String, password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -414,7 +414,7 @@ private extension KlyWalletService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: salt
+                salt: password.isEmpty ? salt : "mnemonic\(password)"
             )
             
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
