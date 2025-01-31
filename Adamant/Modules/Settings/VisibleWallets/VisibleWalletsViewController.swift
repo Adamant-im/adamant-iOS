@@ -96,6 +96,20 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func addObservers() {
+        for wallet in wallets {
+            let notification = wallet.walletUpdatedNotification
+            
+            NotificationCenter.default.addObserver(
+                forName: notification,
+                object: wallet,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let self = self else { return }
+                    self.tableView.reloadData()
+                }
+            }
+        }
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
