@@ -226,6 +226,10 @@ struct AppAssembly: MainThreadAssembly {
             ))
         }.inObjectScope(.container)
         
+        container.register(KlyTransactionFactoryProtocol.self) { r in
+            KlyTransactionFactory()
+        }.inObjectScope(.container)
+        
         // MARK: EthApiService
         container.register(EthApiService.self) { r in
             r.resolve(ERC20ApiService.self)!
