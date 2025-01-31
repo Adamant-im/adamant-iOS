@@ -79,7 +79,9 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
-    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         loadWallets()
