@@ -15,10 +15,10 @@ actor EthBIP32Service: EthBIP32ServiceProtocol {
     private var passphrase: String = ""
     private var keystore: BIP32Keystore?
     
-    private var erc20ApiService: EthApiServiceProtocol
+    private var ethApiService: EthApiServiceProtocol
     
     init(erc20ApiService: EthApiServiceProtocol) {
-        self.erc20ApiService = erc20ApiService
+        self.ethApiService = erc20ApiService
     }
     func keyStore(passphrase: String) async throws -> BIP32Keystore {
         if let keystore = self.keystore, passphrase == self.passphrase {
@@ -34,7 +34,7 @@ actor EthBIP32Service: EthBIP32ServiceProtocol {
             }
             self.passphrase = passphrase
             self.keystore = store
-            await erc20ApiService.setKeystoreManager(.init([store]))
+            await ethApiService.setKeystoreManager(.init([store]))
             return store
         }
     }

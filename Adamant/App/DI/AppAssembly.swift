@@ -447,6 +447,6 @@ struct AppAssembly: MainThreadAssembly {
         
         container.register(EthBIP32ServiceProtocol.self) { r in
             EthBIP32Service(erc20ApiService: r.resolve(ERC20ApiService.self)!)
-        }
+        }.inObjectScope(.container)
     }
 }
