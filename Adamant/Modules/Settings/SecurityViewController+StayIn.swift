@@ -19,21 +19,21 @@ extension SecurityViewController {
         
         if enabled { // Create pin and turn on Stay In
             pinpadRequest = .createPin
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-            pinpad.commentLabel.text = String.adamant.pinpad.createPin
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
+            let pinpad = adamantPinpad(biometryButton: .none)
+//            pinpad.commentLabel.text = String.adamant.pinpad.createPin
+//            pinpad.commentLabel.isHidden = false
+//            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
-            present(pinpad, animated: true, completion: nil)
+//            present(pinpad, animated: true, completion: nil)
         } else { // Validate pin and turn off Stay In
             pinpadRequest = .turnOffPin
-            let biometryButton: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
-            pinpad.commentLabel.text = String.adamant.security.stayInTurnOff
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
+            let biometryButton: BiometryType = accountService.useBiometry ? localAuth.biometryType : .none
+            let pinpad = adamantPinpad(biometryButton: biometryButton)
+//            pinpad.commentLabel.text = String.adamant.security.stayInTurnOff
+//            pinpad.commentLabel.isHidden = false
+//            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
-            present(pinpad, animated: true, completion: nil)
+//            present(pinpad, animated: true, completion: nil)
         }
     }
     
@@ -60,23 +60,23 @@ extension SecurityViewController {
                 }
                 
             case .fallback:
-                let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+                let pinpad = adamantPinpad(biometryButton: .none)
                 
                 if enabled {
-                    pinpad.commentLabel.text = String.adamant.security.biometryOnReason
+//                    pinpad.commentLabel.text = String.adamant.security.biometryOnReason
                     self.pinpadRequest = .turnOnBiometry
                 } else {
-                    pinpad.commentLabel.text = String.adamant.security.biometryOffReason
+//                    pinpad.commentLabel.text = String.adamant.security.biometryOffReason
                     self.pinpadRequest = .turnOffBiometry
                 }
                 
-                pinpad.commentLabel.isHidden = false
-                pinpad.delegate = self
+//                pinpad.commentLabel.isHidden = false
+//                pinpad.delegate = self
                 
-                DispatchQueue.main.async {
+//                DispatchQueue.main.async {
                     pinpad.modalPresentationStyle = .overFullScreen
-                    self.present(pinpad, animated: true, completion: nil)
-                }
+//                    self.present(pinpad, animated: true, completion: nil)
+//                }
                 
             case .failed:
                 DispatchQueue.main.async {

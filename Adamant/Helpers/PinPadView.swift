@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct PinPadViewRepresentable: UIViewRepresentable {
-    @Binding var enteredPin: String
     let pinLength: Int
     let validatePin: (String) -> Bool
     let onSuccess: () -> Void
@@ -18,7 +17,6 @@ struct PinPadViewRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let hostingController = UIHostingController(
             rootView: PinPadView(
-                enteredPin: $enteredPin,
                 pinLength: pinLength,
                 validatePin: validatePin,
                 onSuccess: onSuccess,
@@ -35,7 +33,7 @@ struct PinPadViewRepresentable: UIViewRepresentable {
 
 // swiftlint:disable multiple_closures_with_trailing_closure
 struct PinPadView: View {
-    @Binding var enteredPin: String
+    @State var enteredPin: String = ""
     @State var isPinpadVisible: Bool = true
     let pinLength: Int
     let validatePin: (String) -> Bool
@@ -137,14 +135,8 @@ struct PinPadView: View {
 }
 
 #if DEBUG
-
-private struct Placeholder {
-    @State var enteredPin: String = ""
-}
-
 #Preview {
     PinPadView(
-        enteredPin: Placeholder().$enteredPin,
         pinLength: 6
     ) { _ in
             true
@@ -154,5 +146,4 @@ private struct Placeholder {
             
         }
 }
-
 #endif

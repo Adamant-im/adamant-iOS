@@ -8,7 +8,7 @@
 
 import Foundation
 import Eureka
-import MyLittlePinpad
+//import MyLittlePinpad
 import CommonKit
 
 extension AccountViewController {
@@ -19,24 +19,24 @@ extension AccountViewController {
         
         if enabled { // Create pin and turn on Stay In
             pinpadRequest = .createPin
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-            pinpad.commentLabel.text = String.adamant.pinpad.createPin
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
+            let pinpad = adamantPinpad(biometryButton: .none)
+//            pinpad.commentLabel.text = String.adamant.pinpad.createPin
+//            pinpad.commentLabel.isHidden = false
+//            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
-            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
-            setColors(for: pinpad)
-            present(pinpad, animated: true, completion: nil)
+//            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+//            setColors(for: pinpad)
+//            present(pinpad, animated: true, completion: nil)
         } else { // Validate pin and turn off Stay In
             pinpadRequest = .turnOffPin
-            let biometryButton: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
-            pinpad.commentLabel.text = String.adamant.security.stayInTurnOff
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
+            let biometryButton: BiometryType = accountService.useBiometry ? localAuth.biometryType : .none
+            let pinpad = adamantPinpad(biometryButton: biometryButton)
+//            pinpad.commentLabel.text = String.adamant.security.stayInTurnOff
+//            pinpad.commentLabel.isHidden = false
+//            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
-            setColors(for: pinpad)
-            present(pinpad, animated: true, completion: nil)
+//            setColors(for: pinpad)
+//            present(pinpad, animated: true, completion: nil)
         }
     }
     
@@ -45,7 +45,6 @@ extension AccountViewController {
         guard showLoggedInOptions, accountService.hasStayInAccount, accountService.useBiometry != enabled else {
             return
         }
-        
         
         Task { @MainActor [weak self] in
             guard let self else { return }
@@ -64,21 +63,21 @@ extension AccountViewController {
                     }
                     
                 case .fallback:
-                    let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+                    let pinpad = adamantPinpad(biometryButton: .none)
                     
                     if enabled {
-                        pinpad.commentLabel.text = String.adamant.security.biometryOnReason
+//                        pinpad.commentLabel.text = String.adamant.security.biometryOnReason
                         self.pinpadRequest = .turnOnBiometry
                     } else {
-                        pinpad.commentLabel.text = String.adamant.security.biometryOffReason
+//                        pinpad.commentLabel.text = String.adamant.security.biometryOffReason
                         self.pinpadRequest = .turnOffBiometry
                     }
                     
-                    pinpad.commentLabel.isHidden = false
-                    pinpad.delegate = self
+//                    pinpad.commentLabel.isHidden = false
+//                    pinpad.delegate = self
                     pinpad.modalPresentationStyle = .overFullScreen
-                    self.setColors(for: pinpad)
-                    self.present(pinpad, animated: true, completion: nil)
+//                    self.setColors(for: pinpad)
+//                    self.present(pinpad, animated: true, completion: nil)
                     
                 case .failed:
                     if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
