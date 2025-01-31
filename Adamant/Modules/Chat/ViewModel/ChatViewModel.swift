@@ -86,6 +86,7 @@ final class ChatViewModel: NSObject {
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
+    let didTapAdmNodesList = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
@@ -292,9 +293,7 @@ final class ChatViewModel: NSObject {
         
         Task {
             if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
-                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription))
+                dialog.send(.noActiveNodesAlert)
             }
             
             if !(filesPicked?.isEmpty ?? true) {
@@ -703,9 +702,7 @@ final class ChatViewModel: NSObject {
         }
         
         guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
+            dialog.send(.noActiveNodesAlert)
             return false
         }
         

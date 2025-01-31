@@ -1378,4 +1378,10 @@
 /* Chat unknown */
 "Chat.unknown.title" = "Unbekannt";
 
+/* No active nodes */
+"Chat.Alert.NoActiveNodes" = "Es können keine neuen Nachrichten angefordert werden - Keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+
+/* Review Nodes List */
+"Chat.Alert.ReviewNodesList" = "ADM-Knotenliste überprüfen";
+
 "Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";

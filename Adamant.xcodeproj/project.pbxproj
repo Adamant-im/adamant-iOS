@@ -466,6 +466,11 @@
 		AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */; };
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
+		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
+		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
+		AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB22D3AF0AE007D6BF4 /* DogeApiServiceProtocolMock.swift */; };
+		AAB01CB52D3AF27E007D6BF4 /* DogeInternalApiProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB42D3AF278007D6BF4 /* DogeInternalApiProtocol.swift */; };
+		AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */; };
 		AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */; };
 		AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */; };
 		AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */; };
@@ -1111,6 +1116,11 @@
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
+		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
+		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
+		AAB01CB22D3AF0AE007D6BF4 /* DogeApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AAB01CB42D3AF278007D6BF4 /* DogeInternalApiProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeInternalApiProtocol.swift; sourceTree = "<group>"; };
+		AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Actor+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletServiceError+Equatable.swift"; sourceTree = "<group>"; };
@@ -1759,6 +1769,8 @@
 				64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */,
 				64E1C830222E9617006C4DA7 /* DogeWalletService.swift */,
 				93CCAE782B06D81D00EA5B94 /* DogeApiService.swift */,
+				AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */,
+				AAB01CB42D3AF278007D6BF4 /* DogeInternalApiProtocol.swift */,
 				4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */,
 				648DD7A32237DB9E00B811FD /* DogeWalletService+Send.swift */,
 				648DD7A72239147800B811FD /* DogeWalletService+RichMessageProvider.swift */,
@@ -2280,6 +2292,8 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
+				AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */,
 				AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */,
 				AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */,
 				AA33BEB12D303C5F0083E59C /* BtcWalletServiceTests.swift */,
@@ -2298,6 +2312,7 @@
 				AAFB3C9C2D383F73000CCCE9 /* EthApiServiceProtocolMock.swift */,
 				AAFB3C942D31C587000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift */,
 				AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */,
+				AAB01CB22D3AF0AE007D6BF4 /* DogeApiServiceProtocolMock.swift */,
 				AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */,
 				AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */,
 			);
@@ -3435,6 +3450,7 @@
 				6403F5E222723F7500D58779 /* DashWallet.swift in Sources */,
 				26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */,
 				93294B822AAD0BB400911109 /* BtcWalletFactory.swift in Sources */,
+				AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */,
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				93294B7D2AAD067000911109 /* AppContainer.swift in Sources */,
 				93ED214C2CC3561800AA1FC8 /* TransactionsStatusServiceComposeProtocol.swift in Sources */,
@@ -3820,6 +3836,7 @@
 				64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */,
 				3A9015A52A614A18002A2464 /* EmojiService.swift in Sources */,
 				9322E875297042F000B8357C /* ChatSender.swift in Sources */,
+				AAB01CB52D3AF27E007D6BF4 /* DogeInternalApiProtocol.swift in Sources */,
 				93ED214F2CC3567600AA1FC8 /* TransactionsStatusServiceCompose.swift in Sources */,
 				E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */,
 				3A26D9432C3C2E19003AD832 /* KlyWalletService+StatusCheck.swift in Sources */,
@@ -3912,9 +3929,12 @@
 				AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */,
 				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
 				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
+				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
+				AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */,
 				AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */,
 				AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */,
+				AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */,
 				AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */,
 				AAFB3C912D31C14A000CCCE9 /* BitcoinKitTransaction+Equatable.swift in Sources */,
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,

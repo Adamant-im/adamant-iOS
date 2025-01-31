@@ -49,4 +49,18 @@ final class DogeWallet: WalletAccount, @unchecked Sendable {
         self.publicKey = privateKey.publicKey()
         self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
     }
+    
+#if DEBUG
+    @available(*, deprecated, message: "For testing purposes only")
+    init(
+        unicId: String,
+        privateKey: PrivateKey,
+        addressEntity: Address
+    ) {
+        self.unicId = unicId
+        self.privateKey = privateKey
+        self.publicKey = privateKey.publicKey()
+        self.addressEntity = addressEntity
+    }
+#endif
 }

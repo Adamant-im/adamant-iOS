@@ -56,7 +56,8 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var dogeApiService: DogeApiService!
+    var dogeApiService: DogeApiServiceProtocol!
+    var btcTransactionFactory: BitcoinKitTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
@@ -402,6 +403,7 @@ extension DogeWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
+        btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
         dogeApiService = container.resolve(DogeApiService.self)
@@ -700,6 +702,15 @@ extension DogeWalletService {
         coinStorage.updateStatus(for: id, status: status)
     }
 }
+
+#if DEBUG
+extension DogeWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: DogeWallet?) {
+        self.dogeWallet = wallet
+    }
+}
+#endif
 
 // MARK: - PrivateKey generator
 extension DogeWalletService: PrivateKeyGenerator {

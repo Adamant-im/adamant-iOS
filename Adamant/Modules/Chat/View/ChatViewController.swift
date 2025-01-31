@@ -305,6 +305,12 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
+        viewModel.didTapAdmNodesList
+            .sink { [weak self] in
+                self?.didTapReviewAdmNodes()
+            }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -960,6 +966,11 @@ private extension ChatViewController {
         default:
             return
         }
+    }
+    
+    func didTapReviewAdmNodes() {
+        let vc = screensFactory.makeNodesList()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
