@@ -224,11 +224,34 @@ public final class NativeAdamantCore: AdamantCore {
 
 public extension String {
     func hexBytes() -> [UInt8] {
-        return (0..<count/2).reduce([]) { res, i in
-            let indexStart = index(startIndex, offsetBy: i * 2)
-            let indexEnd = index(indexStart, offsetBy: 2)
-            let substring = self[indexStart..<indexEnd]
-            return res + [UInt8(substring, radix: 16) ?? 0]
+        let utf8CString = self.utf8CString
+        let length = utf8CString.count - 1 // utf8CString includes a null terminator
+        
+        var bytes = [UInt8]()
+        bytes.reserveCapacity(length / 2)
+        
+        for i in stride(from: 0, to: length, by: 2) {
+            if let highValue = hexCharToUInt8(utf8CString[i]),
+               let lowValue = hexCharToUInt8(utf8CString[i + 1]) {
+                bytes.append((highValue << 4) | lowValue)
+            } else {
+                bytes.append(0)
+            }
+        }
+        
+        return bytes
+    }
+    
+    private func hexCharToUInt8(_ char: CChar) -> UInt8? {
+        switch char {
+        case 48...57:   // '0'-'9'
+            return UInt8(char - 48)
+        case 65...70:   // 'A'-'F'
+            return UInt8(char - 55)
+        case 97...102:  // 'a'-'f'
+            return UInt8(char - 87)
+        default:
+            return nil
         }
     }
     

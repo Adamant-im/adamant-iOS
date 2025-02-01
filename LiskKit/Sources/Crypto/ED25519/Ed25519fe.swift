@@ -446,18 +446,23 @@ struct fe: CustomDebugStringConvertible {
     static func reduce_mul(_ r: inout fe) {
         var t: UInt32
         var s: UInt32
-        for _ in 0..<2 {
+        var i = 0
+        while i < 2 {
             // use q = 2^(31*8)*(2^7) - 19
             t = r.v[31] >> 7
             r.v[31] &= 0x7f
             t = times19(t)
             r.v[0] += t
             // move up
-            for i in 0..<31 {
-                s = r.v[i] >> 8
-                r.v[i+1] += s
-                r.v[i] &= 0xff
+            var j = 0
+            while j < 31 {
+                s = r.v[j] >> 8
+                r.v[j+1] += s
+                r.v[j] &= 0xff
+                j += 1
             }
+            
+            i += 1
         }
     }
 
@@ -569,8 +574,10 @@ struct fe: CustomDebugStringConvertible {
 
     /// r = x + y
     static func fe25519_add(_ r: inout fe, _ x: fe, _ y: fe) {
-        for i in 0..<32 {
+        var i = 0
+        while i<32 {
             r.v[i] = x.v[i] + y.v[i]
+            i += 1
         }
         fe.reduce_add_sub(&r)
     }
@@ -587,28 +594,36 @@ struct fe: CustomDebugStringConvertible {
         // t = 2 * q + x
         var t = [UInt32](repeating: 0, count: 32)
         t[0] = x.v[0] + 0x1da    // LSB
-        for i in 1..<31 { t[i] = x.v[i] + 0x1fe }
+        var i = 1
+        while i < 31 { t[i] = x.v[i] + 0x1fe; i += 1 }
         t[31] = x.v[31] + 0xfe    // MSB
         // r = t - y
-        for i in 0..<32 { r.v[i] = t[i] - y.v[i] }
+        i = 0
+        while i < 32 { r.v[i] = t[i] - y.v[i]; i += 1 }
         fe.reduce_add_sub(&r)
     }
 
     /// r = x * y
     static func fe25519_mul(_ r: inout fe, _ x: fe, _ y: fe) {
         var t = [UInt32](repeating: 0, count: 63)
-
-        for i in 0..<32 {
-            for j in 0..<32 {
+        var i = 0
+        var j = 0
+        while i < 32 {
+            while j < 32 {
                 t[i+j] += x.v[i] * y.v[j]
+                j += 1
             }
+            i += 1
         }
 
         // 2q = 2^256 - 2*19
         // so 2^256 = 2*19
-        for i in 32..<63 {
+        i = 32
+        while i < 63 {
             r.v[i-32] = t[i-32] + fe.times38(t[i])
+            i += 1
         }
+    
         r.v[31] = t[31] /* result now in r[0]...r[31] */
 
         fe.reduce_mul(&r)
