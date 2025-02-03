@@ -474,6 +474,15 @@
 		AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB22D3AF0AE007D6BF4 /* DogeApiServiceProtocolMock.swift */; };
 		AAB01CB52D3AF27E007D6BF4 /* DogeInternalApiProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB42D3AF278007D6BF4 /* DogeInternalApiProtocol.swift */; };
 		AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */; };
+		AAC641352D40325400619DFE /* KlyWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */; };
+		AAC641372D40393400619DFE /* KlyTransactionFactoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641362D40392800619DFE /* KlyTransactionFactoryProtocol.swift */; };
+		AAC641392D4039ED00619DFE /* KlyTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641382D4039E700619DFE /* KlyTransactionFactory.swift */; };
+		AAC6413B2D403C3300619DFE /* KlyTransactionFactoryProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6413A2D403C3000619DFE /* KlyTransactionFactoryProtocolMock.swift */; };
+		AAC6413D2D40456700619DFE /* KlyNodeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6413C2D40456100619DFE /* KlyNodeApiServiceProtocol.swift */; };
+		AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */; };
+		AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641402D4049D400619DFE /* RpsRequestBody.swift */; };
+		AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */; };
+		AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */; };
 		AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */; };
 		AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */; };
 		AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */; };
@@ -1126,6 +1135,15 @@
 		AAB01CB22D3AF0AE007D6BF4 /* DogeApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AAB01CB42D3AF278007D6BF4 /* DogeInternalApiProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeInternalApiProtocol.swift; sourceTree = "<group>"; };
 		AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWalletServiceTests.swift; sourceTree = "<group>"; };
+		AAC641362D40392800619DFE /* KlyTransactionFactoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionFactoryProtocol.swift; sourceTree = "<group>"; };
+		AAC641382D4039E700619DFE /* KlyTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionFactory.swift; sourceTree = "<group>"; };
+		AAC6413A2D403C3000619DFE /* KlyTransactionFactoryProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionFactoryProtocolMock.swift; sourceTree = "<group>"; };
+		AAC6413C2D40456100619DFE /* KlyNodeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyNodeApiServiceProtocol.swift; sourceTree = "<group>"; };
+		AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyNodeApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AAC641402D4049D400619DFE /* RpsRequestBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RpsRequestBody.swift; sourceTree = "<group>"; };
+		AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionSubmitModel.swift; sourceTree = "<group>"; };
+		AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionSwizzlingMock.swift; sourceTree = "<group>"; };
 		AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Actor+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletServiceError+Equatable.swift"; sourceTree = "<group>"; };
@@ -1483,6 +1501,7 @@
 		3A26D9312C3C1B55003AD832 /* Klayr */ = {
 			isa = PBXGroup;
 			children = (
+				AAC6413C2D40456100619DFE /* KlyNodeApiServiceProtocol.swift */,
 				3A26D94E2C3D3983003AD832 /* WalletService */,
 				3A26D9362C3C1C01003AD832 /* KlyWallet.swift */,
 				3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */,
@@ -1501,6 +1520,8 @@
 		3A26D94E2C3D3983003AD832 /* WalletService */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641382D4039E700619DFE /* KlyTransactionFactory.swift */,
+				AAC641362D40392800619DFE /* KlyTransactionFactoryProtocol.swift */,
 				3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */,
 				3A26D94F2C3D3A5A003AD832 /* KlyWalletService+WalletCore.swift */,
 				3A26D9402C3C2DC4003AD832 /* KlyWalletService+Send.swift */,
@@ -2306,6 +2327,7 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */,
 				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
 				AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */,
 				AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */,
@@ -2318,6 +2340,10 @@
 		AA33BEB32D303CA30083E59C /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */,
+				AAC641402D4049D400619DFE /* RpsRequestBody.swift */,
+				AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */,
+				AAC6413A2D403C3000619DFE /* KlyTransactionFactoryProtocolMock.swift */,
 				AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */,
 				AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */,
 				AAFB3CA22D384F4D000CCCE9 /* IEthMock.swift */,
@@ -2336,6 +2362,7 @@
 		AAFB3C892D31C0C4000CCCE9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */,
 				AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */,
 				AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */,
 				AAFB3C902D31C140000CCCE9 /* BitcoinKitTransaction+Equatable.swift */,
@@ -3511,6 +3538,7 @@
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				41A1995829D5733D0031AD75 /* ChatMessageCell+Model.swift in Sources */,
 				3A299C7D2B85F98700B54C61 /* ChatFile.swift in Sources */,
+				AAC6413D2D40456700619DFE /* KlyNodeApiServiceProtocol.swift in Sources */,
 				932F77592989F999006D8801 /* ChatCellManager.swift in Sources */,
 				9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */,
 				E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */,
@@ -3775,6 +3803,7 @@
 				93C7944A2B077A1C00408826 /* DashGetUnspentTransactionsDTO.swift in Sources */,
 				E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */,
 				648C697122915CB8006645F5 /* BTCRPCServerResponce.swift in Sources */,
+				AAC641372D40393400619DFE /* KlyTransactionFactoryProtocol.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
 				3AE0A4332BC6A9EB00BF7125 /* FileApiServiceProtocol.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
@@ -3903,6 +3932,7 @@
 				648DD7A22237D9A000B811FD /* DogeTransaction.swift in Sources */,
 				E90847372196FEA80095825D /* Chatroom+CoreDataProperties.swift in Sources */,
 				648CE3A8229AD1E20070A2CC /* DashWalletService+RichMessageProvider.swift in Sources */,
+				AAC641392D4039ED00619DFE /* KlyTransactionFactory.swift in Sources */,
 				9332C3A52C76C4EC00164B80 /* ApiServiceCompose.swift in Sources */,
 				E90055FB20ECE78A00D0CB2D /* SecurityViewController+notifications.swift in Sources */,
 				938F7D662955C966001915CA /* ChatInputBar.swift in Sources */,
@@ -3940,12 +3970,17 @@
 				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
 				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
 				AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */,
+				AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
 				AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */,
 				AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */,
 				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
+				AAC641352D40325400619DFE /* KlyWalletServiceTests.swift in Sources */,
+				AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */,
 				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
 				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
+				AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */,
+				AAC6413B2D403C3300619DFE /* KlyTransactionFactoryProtocolMock.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
 				AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */,
 				AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */,
@@ -3953,6 +3988,7 @@
 				AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */,
 				AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */,
 				AAFB3C912D31C14A000CCCE9 /* BitcoinKitTransaction+Equatable.swift in Sources */,
+				AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */,
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,
 				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
