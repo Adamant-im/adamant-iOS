@@ -111,7 +111,7 @@ final class DashWalletServiceTests: XCTestCase {
     func test_createTransaction_badUnspentTransactionResponseDataThrowsError() async throws {
         // given
         sut.setWalletForTests(try makeWallet())
-        let data = Constants.unspentTranscationsCorruptedData
+        let data = Constants.unspentTransactionsCorruptedData
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
         }
@@ -268,64 +268,23 @@ private enum Constants {
     
     static let lastTransactionId = "lastTransactionId"
     
-    static let getTransactionZeroConfirmationsData = getTransactionZeroConfirmationsJSON.data(using: .utf8)!
-    
     // RPCResponseModel with BTCRawTransaction inside data
-    static let getTransactionZeroConfirmationsJSON = """
-{
-    "id": "some id",
-    "result": {
-      "txid": "some txid",
-      "confirmations": 0,
-      "hash": "some hash",
-      "valueIn": 1,
-      "valueOut": 0.95,
-      "vin": [],
-      "vout": []
-    }
-}
-"""
+    static let getTransactionZeroConfirmationsData = Data.readResource(
+        name: "dash_unverified_unspent_transactions",
+        withExtension: "json"
+    )!
     
-    static let unspentTranscationsData = unspentTranscationsRawJSON.data(using: .utf8)!
+    static let unspentTranscationsData = Data.readResource(
+        name: "dash_unspent_transaction_unit_test",
+        withExtension: "json"
+    )!
     
-    static let unspentTranscationsCorruptedData = Data(unspentTranscationsData.shuffled())
+    static let unspentTransactionsCorruptedData = Data()
     
-    static let unspentTranscationsRawJSON: String = """
-{
-"result": [
-  {
-    "txid": "1",
-    "script": "some script",
-    "address": "some address",
-    "outputIndex": 1,
-    "satoshis": 30,
-    "height": 1,
-    "status": {
-        "confirmed": true
-    }
-  },
-  {
-    "txid": "1",
-    "script": "some script",
-    "address": "some address",
-    "outputIndex": 2,
-    "satoshis": 20,
-    "height": 1,
-    "status": {
-        "confirmed": true
-    }
-  }
-]
-}
-"""
-    
-    static let sendTransactionResponseData = sendTransactionResponseRawJSON.data(using: .utf8)!
-    
-    static let sendTransactionResponseRawJSON: String = """
-{
-  "result": "txid"
-}
-"""
+    static let sendTransactionResponseData = Data.readResource(
+        name: "dash_send_transaction_unit_response",
+        withExtension: "json"
+    )!
     
     static let expectedUnspentTransactions = [
         UnspentTransaction(
