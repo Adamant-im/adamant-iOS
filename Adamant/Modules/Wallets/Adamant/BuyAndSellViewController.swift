@@ -160,7 +160,6 @@ final class BuyAndSellViewController: FormViewController {
     @MainActor
     private func openExchangeChat() async {
         guard let chatroom = await chatsProvider.getChatroom(for: AdamantContacts.adamantExchange.address) else {
-            print("Unable to find necessary components to present chatroom")
             return
         }
         
