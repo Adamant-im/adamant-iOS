@@ -64,10 +64,11 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     
     private let cellIdentifier = "cell"
     private let cellResetIdentifier = "cellReset"
+    private let taskManager = TaskManager()
     private var filteredWallets: [WalletCoreProtocol]?
     private var wallets: [WalletCoreProtocol] = []
     private var previousAppState: UIApplication.State?
-    
+    private var lastUpdateRequestTime: Date?
     // MARK: - Lifecycle
     
     init(visibleWalletsService: VisibleWalletsService, accountService: AccountService) {
@@ -104,10 +105,21 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
                 object: wallet,
                 queue: OperationQueue.main
             ) { [weak self] _ in
-                MainActor.assumeIsolatedSafe {
-                    guard let self = self else { return }
-                    self.tableView.reloadData()
-                }
+                guard let self = self else { return }
+                
+                taskManager.clean()
+                lastUpdateRequestTime = Date()
+                
+                Task {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    
+                    if let lastUpdate = await self.lastUpdateRequestTime,
+                       Date().timeIntervalSince(lastUpdate) >= 1.0 {
+                        await MainActor.run {
+                            self.tableView.reloadData()
+                        }
+                    }
+                }.stored(in: taskManager)
             }
         }
         NotificationCenter.default.addObserver(
