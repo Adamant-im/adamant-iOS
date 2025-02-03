@@ -10,7 +10,7 @@ import web3swift
 @preconcurrency import Web3Core
 import CommonKit
 
-final class ERC20ApiService: EthApiService, @unchecked Sendable {
+final class ERC20ApiService: EthApiService, ERC20ApiServiceProtocol, @unchecked Sendable {
     func requestERC20<Output>(
         token: ERC20Token,
         _ body: @Sendable @escaping (ERC20) async throws -> Output

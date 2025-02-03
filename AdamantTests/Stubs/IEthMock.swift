@@ -25,8 +25,14 @@ final class IEthMock: IEth {
     
     var ethDefault: EthDefault = EthDefault()
     
+    var invokedCallTransaction: Bool = false
+    var invokedCallTransactionParameters: CodableTransaction?
+    
     func callTransaction(_ transaction: CodableTransaction) async throws -> Data {
-        fatalError("\(#file).\(#function) is not implemented")
+        invokedCallTransaction = true
+        invokedCallTransactionParameters = transaction
+        
+        return try await ethDefault.callTransaction(transaction)
     }
     
     func send(_ transaction: CodableTransaction) async throws -> TransactionSendingResult {
