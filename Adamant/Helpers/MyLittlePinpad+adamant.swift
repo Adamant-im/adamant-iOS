@@ -52,7 +52,7 @@ extension String.adamant {
 //}
 
 extension UIViewController {
-    func adamantPinpad(biometryButton: BiometryType, onSuccess: (String) -> UIViewController {
+    func adamantPinpad(biometryButton: BiometryType, onSuccess: (String) -> Void) -> UIViewController {
         let pinPadView = PinPadViewRepresentable(
                     pinLength: 6,
                     validatePin: { $0 == "123456" },
