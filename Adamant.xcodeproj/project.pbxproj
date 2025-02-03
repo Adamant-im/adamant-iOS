@@ -189,7 +189,7 @@
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
 		48DA2FCF2D4A0519008F9FC1 /* AccountWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */; };
 		48DA2FD12D4A054E008F9FC1 /* AccountWalletsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */; };
-		48DA2FD62D4A58D8008F9FC1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD52D4A58D8008F9FC1 /* Model.swift */; };
+		48DA2FD62D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */; };
 		4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		557AC306287B10D8004699D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 557AC305287B10D8004699D7 /* SnapKit */; };
@@ -885,7 +885,7 @@
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
 		48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsViewModel.swift; sourceTree = "<group>"; };
 		48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsState.swift; sourceTree = "<group>"; };
-		48DA2FD52D4A58D8008F9FC1 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletCollectionViewCell+Model.swift"; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -2938,7 +2938,7 @@
 				E983AE2C20E6720D00497E1A /* AccountFooter.xib */,
 				E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */,
 				E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */,
-				48DA2FD52D4A58D8008F9FC1 /* Model.swift */,
+				48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -3719,7 +3719,7 @@
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletFactory.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
-				48DA2FD62D4A58D8008F9FC1 /* Model.swift in Sources */,
+				48DA2FD62D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift in Sources */,
 				3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */,
 				3AF9DF0D2C049161009A43A8 /* CircularProgressView.swift in Sources */,
 				9306E0932CF8C50E00A99BA4 /* PKGeneratorView.swift in Sources */,

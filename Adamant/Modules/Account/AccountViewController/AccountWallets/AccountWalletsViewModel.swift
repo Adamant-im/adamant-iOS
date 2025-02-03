@@ -42,22 +42,21 @@ private extension AccountWalletsViewModel {
     }
 
     func updateInfo(for wallet: WalletService) {
-        if let index = state.wallets.firstIndex(where: { $0.coinID == wallet.core.tokenUnicID }) {
-            state.wallets[index].balance = wallet.core.wallet?.balance ?? 0
-            state.wallets[index].isBalanceInitialized = wallet.core.wallet?.isBalanceInitialized ?? false
-            state.wallets[index].notificationBadgeCount = wallet.core.wallet?.notifications ?? 0
+        let coreService = wallet.core
+        if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUnicID }) {
+            state.wallets[index].balance = coreService.wallet?.balance ?? 0
+            state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
+            state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
-            let service = wallet.core
-            
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
-                coinID: service.tokenUnicID,
-                currencySymbol: service.tokenSymbol,
-                currencyImage: service.tokenLogo,
-                currencyNetwork: type(of: service).tokenNetworkSymbol,
-                isBalanceInitialized: service.wallet?.isBalanceInitialized ?? false,
-                balance: service.wallet?.balance ?? 0,
-                notificationBadgeCount: service.wallet?.notifications ?? 0
+                coinID: coreService.tokenUnicID,
+                currencySymbol: coreService.tokenSymbol,
+                currencyImage: coreService.tokenLogo,
+                currencyNetwork: type(of: coreService).tokenNetworkSymbol,
+                isBalanceInitialized: coreService.wallet?.isBalanceInitialized ?? false,
+                balance: coreService.wallet?.balance ?? 0,
+                notificationBadgeCount: coreService.wallet?.notifications ?? 0
             )
             
             state.wallets.append(model)
@@ -65,7 +64,7 @@ private extension AccountWalletsViewModel {
     }
 }
 
-extension AccountWalletsViewModel{
+extension AccountWalletsViewModel {
     func updateState() {
         subscriptions.removeAll()
         state.wallets.removeAll()

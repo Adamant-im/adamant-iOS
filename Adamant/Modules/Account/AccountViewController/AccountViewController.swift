@@ -203,14 +203,11 @@ final class AccountViewController: FormViewController {
         pagingViewController.borderColor = UIColor.clear
         
         viewModel.$state
-            .removeDuplicates(by: { old, new in
-                old.wallets == new.wallets
-            })
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                MainActor.assumeIsolatedSafe {
-                    guard let self = self else { return }
-                    self.pagingViewController.reloadMenu()
-                }
+                guard let self = self else { return }
+                self.pagingViewController.reloadMenu()
             }
             .store(in: &notificationsSet)
         
