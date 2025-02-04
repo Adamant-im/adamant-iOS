@@ -185,8 +185,8 @@ public final class NativeAdamantCore: AdamantCore {
     
     // MARK: - Passphrases
     
-    public func createKeypairFor(passphrase: String) -> Keypair? {
-        guard let hash = createRawHashFor(passphrase: passphrase) else {
+    public func createKeypairFor(passphrase: String, password: String) -> Keypair? {
+        guard let hash = createSeedFor(passphrase: passphrase, password: password) else {
             print("Unable create hash from passphrase")
             return nil
         }
@@ -199,17 +199,8 @@ public final class NativeAdamantCore: AdamantCore {
         return Keypair(publicKey: keypair.publicKey.hexString(), privateKey: keypair.privateKey.hexString())
     }
     
-    public func createHashFor(passphrase: String) -> String? {
-        guard let hash = createRawHashFor(passphrase: passphrase) else {
-            print("Unable create hash from passphrase")
-            return nil
-        }
-        
-        return hash.hexString()
-    }
-    
-    private func createRawHashFor(passphrase: String) -> [UInt8]? {
-        guard let seed = Mnemonic.seed(passphrase: passphrase) else {
+    public func createSeedFor(passphrase: String, password: String) -> [UInt8]? {
+        guard let seed = Mnemonic.seed(passphrase: passphrase, salt: "mnemonic\(password)") else {
             print("FAIL to create Seed from passphrase bytes")
             return nil
         }

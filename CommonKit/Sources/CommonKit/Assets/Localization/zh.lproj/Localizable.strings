@@ -1345,4 +1345,10 @@
 /* Chat unknown */
 "Chat.unknown.title" = "未知";
 
-"Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息.\n请检查设备的时间或再次尝试发送信息.";
+/* No active nodes */
+"Chat.Alert.NoActiveNodes" = "无法请求新消息 - 没有活动的 ADM 区块链节点。由于您已停用部分节点，请考虑查看节点列表。";
+
+/* Review Nodes List */
+"Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
+
+"Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";

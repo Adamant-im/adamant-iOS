@@ -1354,4 +1354,10 @@
 /* Chat unknown */
 "Chat.unknown.title" = "Unknown";
 
+/* No active nodes */
+"Chat.Alert.NoActiveNodes" = "Unable to request new messages — No active ADM blockchain nodes. As you’ve deactivated some of them, consider reviewing the node list.";
+
+/* Review Nodes List */
+"Chat.Alert.ReviewNodesList" = "Review ADM node list";
+
 "Chat.Timestamp.InFuture.Error" = "A network node rejected the message because the time on your device is ahead.\nCheck the device's time or try sending a message again.";

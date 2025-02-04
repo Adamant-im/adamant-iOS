@@ -75,6 +75,8 @@ private extension ChatDialogManager {
             showMenu(sender: sender)
         case .freeTokenAlert:
             showFreeTokenAlert()
+        case .noActiveNodesAlert:
+            showNoActiveNodesAlert()
         case let .removeMessageAlert(id):
             showRemoveMessageAlert(id: id)
         case let .reportMessageAlert(id):
@@ -186,6 +188,28 @@ private extension ChatDialogManager {
             completion: nil,
             didSelect: didSelect
         )
+    }
+    
+    func showNoActiveNodesAlert() {
+        let alert = UIAlertController(
+            title: "",
+            message: .adamant.chat.noActiveNodes,
+            preferredStyleSafe: .alert,
+            source: nil
+        )
+        
+        alert.addAction(
+            .init(
+                title: .adamant.chat.reviewNodesList,
+                style: .default,
+                handler: { [weak self] _ in
+                    self?.viewModel.didTapAdmNodesList.send(())
+                }
+            )
+        )
+        alert.addAction(.init(title: .adamant.alert.cancel, style: .cancel))
+        alert.modalPresentationStyle = .overFullScreen
+        dialogService.present(alert, animated: true, completion: nil)
     }
     
     func showFreeTokenAlert() {

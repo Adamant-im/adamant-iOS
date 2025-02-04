@@ -12,6 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Web3Core
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -55,7 +56,8 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var dogeApiService: DogeApiService!
+    var dogeApiService: DogeApiServiceProtocol!
+    var btcTransactionFactory: BitcoinKitTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
@@ -305,7 +307,7 @@ extension DogeWalletService {
         dogeWallet = nil
     }
     
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -317,7 +319,10 @@ extension DogeWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+            throw WalletServiceError.internalError(message: "DOGE Wallet: failed to generate private key", error: nil)
+        }
+        
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DogeWallet(
@@ -382,6 +387,14 @@ extension DogeWalletService {
             }
         }
     }
+    
+    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
+        guard !salt.isEmpty else {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+        
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
+    }
 }
 
 // MARK: - Dependencies
@@ -390,6 +403,7 @@ extension DogeWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
+        btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
         dogeApiService = container.resolve(DogeApiService.self)
@@ -688,6 +702,15 @@ extension DogeWalletService {
         coinStorage.updateStatus(for: id, status: status)
     }
 }
+
+#if DEBUG
+extension DogeWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: DogeWallet?) {
+        self.dogeWallet = wallet
+    }
+}
+#endif
 
 // MARK: - PrivateKey generator
 extension DogeWalletService: PrivateKeyGenerator {

@@ -226,6 +226,10 @@ struct AppAssembly: MainThreadAssembly {
             ))
         }.inObjectScope(.container)
         
+        container.register(KlyTransactionFactoryProtocol.self) { r in
+            KlyTransactionFactory()
+        }.inObjectScope(.container)
+        
         // MARK: EthApiService
         container.register(EthApiService.self) { r in
             r.resolve(ERC20ApiService.self)!
@@ -443,5 +447,9 @@ struct AppAssembly: MainThreadAssembly {
         container.register(DefaultNodesProvider.self) { _ in
             DefaultNodesProvider()
         }.inObjectScope(.transient)
+        
+        container.register(EthBIP32ServiceProtocol.self) { r in
+            EthBIP32Service(ethApiService: r.resolve(ERC20ApiService.self)!)
+        }.inObjectScope(.container)
     }
 }

@@ -49,9 +49,9 @@ public enum AdamantContacts: CaseIterable {
     
     public var isSystem: Bool {
         switch self {
-        case .adamantExchange, .betOnBitcoin, .adelina:
+        case .adamantExchange, .betOnBitcoin, .adelina, .donate:
             return false
-        case .adamantWelcomeWallet, .adamantSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .donate, .pwaBountyBot:
+        case .adamantWelcomeWallet, .adamantSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .pwaBountyBot:
             return true
         }
     }

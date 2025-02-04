@@ -37,7 +37,6 @@ struct NotificationPresenterView: View {
                     Color.clear
                         .onAppear {
                             notificationHeight = geometry.size.height
-                            print("onappier")
                         }
                         .onChange(of: geometry.size.height) { newValue in
                             notificationHeight = newValue
