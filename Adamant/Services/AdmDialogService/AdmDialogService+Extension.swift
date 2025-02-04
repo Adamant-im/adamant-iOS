@@ -13,7 +13,7 @@ extension AdamantDialogService {
     func makeRenameAlert(
         titleFormat: String,
         initialText: String?,
-        needToPresent: Bool?,
+                isEnoughMoney: Bool?,
         url: String?,
         showVC: @escaping () -> Void,
         onRename: @escaping (String) -> Void
@@ -40,7 +40,7 @@ extension AdamantDialogService {
             else { return }
             
             onRename(newName)
-            if !(needToPresent ?? true) {
+            if !(isEnoughMoney ?? true) {
                 self.showFreeTokenAlert(url: url, type: .contacts, showVC: showVC)
             }
         }

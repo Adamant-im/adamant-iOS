@@ -60,7 +60,7 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         let alert = dialogService.makeRenameAlert(
             titleFormat: String(format: .adamant.chat.actionsBody, self.title),
             initialText: self.addressBookService.getName(for: self.title) ?? self.partnerName,
-            needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+            isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction,
             url: accountService.account?.address,
             showVC: showBuyAndSell,
             onRename: handleRename(newName:)

@@ -1302,7 +1302,7 @@ extension ChatListViewController {
             let alert = dialogService.makeRenameAlert(
                 titleFormat: String(format: .adamant.chat.actionsBody, address),
                 initialText: self.addressBook.getName(for: address),
-                needToPresent: accountService.account?.isEnoughMoneyForTransaction,
+                isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction,
                 url: accountService.account?.address,
                 showVC: { [weak self] in
                     self?.presentBuyAndSell()
