@@ -462,8 +462,10 @@
 		AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */; };
 		AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */; };
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
-		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
 		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
+		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
+		AA8FFFE32D513681001D8576 /* CustomFieldRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */; };
+		AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -1128,6 +1130,8 @@
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
+		AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFieldRow.swift; sourceTree = "<group>"; };
+		AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeInsetTextField.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2545,6 +2549,8 @@
 		E913C9101FFFAA4B001A83F7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */,
+				AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */,
 				93775E452A674FA9009061AC /* Markdown+Adamant.swift */,
 				E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */,
 				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
@@ -3532,6 +3538,7 @@
 				3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */,
 				9306E0982CF8C67B00A99BA4 /* AdamantSecureField.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
+				AA8FFFE32D513681001D8576 /* CustomFieldRow.swift in Sources */,
 				3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
@@ -3570,6 +3577,7 @@
 				3AA388052B67F4DD00125684 /* BtcBlockchainInfoDTO.swift in Sources */,
 				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
+				AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */,
 				3AE0A42A2BC6A64900BF7125 /* FilesNetworkManager.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
 				3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */,
