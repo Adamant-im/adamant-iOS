@@ -97,7 +97,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func addObservers() {
-        let publisher = wallets
+        wallets
             .map { NotificationCenter.default.publisher(for: $0.walletUpdatedNotification, object: $0) }
             .publisher
             .flatMap { $0 }
@@ -106,8 +106,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
             }
-        
-        subscriptions.insert(publisher)
+            .store(in: &subscriptions)
         
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
