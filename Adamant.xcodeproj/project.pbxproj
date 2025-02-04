@@ -449,10 +449,6 @@
 		A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = A5C99E0D262C9E3A00F7B1B7 /* Reachability */; };
 		A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5D87BA2262CA01D00DC28F0 /* ProcedureKit */; };
 		A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* Clibsodium */; };
-		A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBADB262C729B004AC028 /* CryptoSwift */; };
-		A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE2262C72B0004AC028 /* CryptoSwift */; };
-		A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE4262C72B7004AC028 /* CryptoSwift */; };
-		A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE6262C72BD004AC028 /* CryptoSwift */; };
 		A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAED262C72EF004AC028 /* BitcoinKit */; };
 		A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAEF262C72EF004AC028 /* LiskKit */; };
 		A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */; };
@@ -468,6 +464,8 @@
 		AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */; };
 		AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */; };
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
+		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
+		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -483,6 +481,9 @@
 		AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641402D4049D400619DFE /* RpsRequestBody.swift */; };
 		AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */; };
 		AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */; };
+		AAC641592D44F81700619DFE /* ERC20WalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641582D44F81000619DFE /* ERC20WalletServiceTests.swift */; };
+		AAC6415B2D44FB0100619DFE /* ERC20ApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */; };
+		AAC6415D2D44FD5B00619DFE /* ERC20ApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */; };
 		AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */; };
 		AAFB3C8D2D31C0EE000CCCE9 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */; };
 		AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */; };
@@ -1129,6 +1130,7 @@
 		AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressConverterMock.swift; sourceTree = "<group>"; };
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -1144,6 +1146,9 @@
 		AAC641402D4049D400619DFE /* RpsRequestBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RpsRequestBody.swift; sourceTree = "<group>"; };
 		AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionSubmitModel.swift; sourceTree = "<group>"; };
 		AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionSwizzlingMock.swift; sourceTree = "<group>"; };
+		AAC641582D44F81000619DFE /* ERC20WalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20WalletServiceTests.swift; sourceTree = "<group>"; };
+		AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20ApiServiceProtocol.swift; sourceTree = "<group>"; };
+		AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20ApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AAFB3C8A2D31C0D0000CCCE9 /* Actor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Actor+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8C2D31C0EA000CCCE9 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		AAFB3C8E2D31C110000CCCE9 /* WalletServiceError+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletServiceError+Equatable.swift"; sourceTree = "<group>"; };
@@ -1367,7 +1372,6 @@
 			files = (
 				E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */,
 				E9079A7C229DEF9C0022CA0D /* UserNotifications.framework in Frameworks */,
-				A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */,
 				A5F929B8262C858F00C3E60A /* MarkdownKit in Frameworks */,
 				A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */,
 				937751A92A68B3400054BD65 /* CommonKit in Frameworks */,
@@ -1397,10 +1401,10 @@
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
 				A530B0D82842110D003F0210 /* (null) in Frameworks */,
-				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
 				4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
+				AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */,
 				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
 				93FA403629401BFC00D20DB6 /* PopupKit in Frameworks */,
 				4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */,
@@ -1416,7 +1420,6 @@
 			files = (
 				E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */,
 				E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */,
-				A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */,
 				A5F929B6262C858700C3E60A /* MarkdownKit in Frameworks */,
 				A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */,
 				937751A72A68B33A0054BD65 /* CommonKit in Frameworks */,
@@ -1432,7 +1435,6 @@
 				937751A52A68B3320054BD65 /* CommonKit in Frameworks */,
 				A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */,
 				A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */,
-				A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */,
 				A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1766,6 +1768,7 @@
 		6449BA5D235CA0930033B936 /* ERC20 */ = {
 			isa = PBXGroup;
 			children = (
+				AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */,
 				6449BA66235CA0930033B936 /* ERC20WalletFactory.swift */,
 				6449BA60235CA0930033B936 /* ERC20Wallet.swift */,
 				6449BA5E235CA0930033B936 /* ERC20WalletService.swift */,
@@ -2330,6 +2333,7 @@
 				AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */,
 				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
 				AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */,
+				AAC641582D44F81000619DFE /* ERC20WalletServiceTests.swift */,
 				AAFB3C9A2D383BA9000CCCE9 /* EthWalletServiceTests.swift */,
 				AAFB3C982D357E16000CCCE9 /* BtcWalletServiceIntegrationTests.swift */,
 				AA33BEB12D303C5F0083E59C /* BtcWalletServiceTests.swift */,
@@ -2340,6 +2344,7 @@
 		AA33BEB32D303CA30083E59C /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
+				AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */,
 				AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */,
 				AAC641402D4049D400619DFE /* RpsRequestBody.swift */,
 				AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */,
@@ -2362,6 +2367,7 @@
 		AAFB3C892D31C0C4000CCCE9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */,
 				AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */,
 				AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */,
 				AAFB3C962D31CB6B000CCCE9 /* UnspentTransaction+Equatable.swift */,
@@ -2998,7 +3004,6 @@
 			);
 			name = MessageNotificationContentExtension;
 			packageProductDependencies = (
-				A5DBBAE6262C72BD004AC028 /* CryptoSwift */,
 				A5F929B7262C858F00C3E60A /* MarkdownKit */,
 				A57282D4262C94E500C96FA8 /* DateToolsSwift */,
 				A5241B76262DEDEF009FA43E /* Clibsodium */,
@@ -3034,7 +3039,6 @@
 			packageProductDependencies = (
 				A5785ADE262C63580001BC66 /* web3swift */,
 				A5DBBABC262C7221004AC028 /* Clibsodium */,
-				A5DBBADB262C729B004AC028 /* CryptoSwift */,
 				A5DBBAED262C72EF004AC028 /* BitcoinKit */,
 				A5DBBAEF262C72EF004AC028 /* LiskKit */,
 				A50AEB03262C815200B37C22 /* EFQRCode */,
@@ -3057,6 +3061,7 @@
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
 				3A075C9D2B98A3B100714E3B /* FilesPickerKit */,
 				3A833C3F2B99CDA000238F6A /* FilesStorageKit */,
+				AA8FFFC92D4E6435001D8576 /* CryptoSwift */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -3076,7 +3081,6 @@
 			);
 			name = TransferNotificationContentExtension;
 			packageProductDependencies = (
-				A5DBBAE4262C72B7004AC028 /* CryptoSwift */,
 				A5F929B5262C858700C3E60A /* MarkdownKit */,
 				A57282D2262C94DF00C96FA8 /* DateToolsSwift */,
 				A5241B6F262DEDE1009FA43E /* Clibsodium */,
@@ -3101,7 +3105,6 @@
 			);
 			name = NotificationServiceExtension;
 			packageProductDependencies = (
-				A5DBBAE2262C72B0004AC028 /* CryptoSwift */,
 				A5F929AE262C857D00C3E60A /* MarkdownKit */,
 				A57282D0262C94DA00C96FA8 /* DateToolsSwift */,
 				A5241B7D262DEDFE009FA43E /* Clibsodium */,
@@ -3205,7 +3208,6 @@
 			packageReferences = (
 				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
 				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
-				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */,
 				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */,
 				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */,
@@ -3221,6 +3223,7 @@
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
+				AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -3855,6 +3858,7 @@
 				934FD9B42C78514E00336841 /* InfoServiceApiCore.swift in Sources */,
 				3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */,
 				411743002A39B1D2008CD98A /* ContributeFactory.swift in Sources */,
+				AAC6415B2D44FB0100619DFE /* ERC20ApiServiceProtocol.swift in Sources */,
 				93A2A8662CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift in Sources */,
 				A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */,
 				645938942378395E00A2BE7C /* EulaViewController.swift in Sources */,
@@ -3970,6 +3974,7 @@
 				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
 				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
 				AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */,
+				AAC6415D2D44FD5B00619DFE /* ERC20ApiServiceProtocolMock.swift in Sources */,
 				AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */,
 				AAFB3C8F2D31C119000CCCE9 /* WalletServiceError+Equatable.swift in Sources */,
 				AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */,
@@ -3977,6 +3982,7 @@
 				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
 				AAC641352D40325400619DFE /* KlyWalletServiceTests.swift in Sources */,
 				AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */,
+				AAC641592D44F81700619DFE /* ERC20WalletServiceTests.swift in Sources */,
 				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
 				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
 				AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */,
@@ -3993,6 +3999,7 @@
 				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
 				AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */,
+				AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4670,14 +4677,6 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
-			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 1.5.0;
-			};
-		};
 		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
@@ -4692,6 +4691,14 @@
 			requirement = {
 				kind = upToNextMinorVersion;
 				minimumVersion = 1.7.0;
+			};
+		};
+		AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChrisBenua/CryptoSwift";
+			requirement = {
+				kind = revision;
+				revision = f0ea2cac7983c4a808cade78743b391726ecc0ea;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -4844,26 +4851,6 @@
 			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
-		A5DBBADB262C729B004AC028 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
-		A5DBBAE2262C72B0004AC028 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
-		A5DBBAE4262C72B7004AC028 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
-		A5DBBAE6262C72BD004AC028 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
 		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BitcoinKit;
@@ -4896,6 +4883,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
+		};
+		AA8FFFC92D4E6435001D8576 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 

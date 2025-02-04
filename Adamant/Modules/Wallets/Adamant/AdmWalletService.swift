@@ -203,7 +203,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
-        DispatchQueue.onMainThreadSyncSafe {
+        Task{ @MainActor in
             walletUpdateSender.send()
         }
     }

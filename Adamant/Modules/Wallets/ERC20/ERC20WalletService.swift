@@ -111,7 +111,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Dependencies
     weak var accountService: AccountService?
     var apiService: AdamantApiServiceProtocol!
-    var erc20ApiService: ERC20ApiService!
+    var erc20ApiService: ERC20ApiServiceProtocol!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
@@ -571,6 +571,15 @@ extension ERC20WalletService {
         return result
     }
 }
+
+#if DEBUG
+extension ERC20WalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
+    }
+}
+#endif
 
 extension ERC20WalletService {
     func getTransactionsHistory(
