@@ -1817,6 +1817,7 @@
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				6F1B8E7D2D4575E0004E902F /* AdmDialogService+Extension.swift */,
 			);
+            };
 			path = AdmDialogService;
 		6F030E1D2D4CE9600077ACA2 /* EthBIP32Service */ = {
 			isa = PBXGroup;
