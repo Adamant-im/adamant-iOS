@@ -48,7 +48,7 @@ private enum Constants {
     static let transaction = NormalizedTransaction(
         type: .chatMessage,
         amount: 0,
-        senderPublicKey: "fdfa0ad06afc6445c8d2c63078cba7f6d079ee0367e764cf286f42ab955a4d67",
+        senderPublicKey: Constants.senderPublicKey,
         requesterPublicKey: nil,
         date: Date(timeIntervalSince1970: 1738267672),
         recipientId: "U3716604363012166999",
