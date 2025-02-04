@@ -260,6 +260,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
+		6F030E1C2D4C0E950077ACA2 /* EthBIP32Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
@@ -957,6 +958,7 @@
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
+		6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthBIP32Service.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
@@ -1805,6 +1807,14 @@
 				648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */,
 			);
 			path = Doge;
+			sourceTree = "<group>";
+		};
+		6F030E1D2D4CE9600077ACA2 /* EthBIP32Service */ = {
+			isa = PBXGroup;
+			children = (
+				6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */,
+			);
+			path = EthBIP32Service;
 			sourceTree = "<group>";
 		};
 		85B405002D3012BD000AB744 /* AccountViewController */ = {
@@ -2687,6 +2697,7 @@
 				3AFE7E502B1F6AFE00718739 /* WalletsService */,
 				3A20D9392AE7F305005475A6 /* Models */,
 				3A770E4A2AE14EFD0008D98F /* Mappers */,
+				6F030E1D2D4CE9600077ACA2 /* EthBIP32Service */,
 				93A18C872AAEAE5600D0AB98 /* DI */,
 				A50A41022822F8CE006BDFE1 /* Bitcoin */,
 				E94008902119D22400CD2D67 /* Adamant */,
@@ -3724,6 +3735,7 @@
 				3A26D9392C3C1C62003AD832 /* KlyWalletFactory.swift in Sources */,
 				3A299C6B2B838F2300B54C61 /* ChatMediaContainerView.swift in Sources */,
 				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,
+				6F030E1C2D4C0E950077ACA2 /* EthBIP32Service.swift in Sources */,
 				938F7D612955C92B001915CA /* ChatDataSourceManager.swift in Sources */,
 				E96D64C82295C44400CA5587 /* Data+utilites.swift in Sources */,
 				64E1C82D222E95E2006C4DA7 /* DogeWalletFactory.swift in Sources */,

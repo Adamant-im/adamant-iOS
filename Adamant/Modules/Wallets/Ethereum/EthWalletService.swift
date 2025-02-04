@@ -143,6 +143,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
+    var ethBIP32Service: EthBIP32ServiceProtocol!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
@@ -404,21 +405,11 @@ extension EthWalletService {
         }
         
         // MARK: 2. Create keys and addresses
-        do {
-            guard let store = try BIP32Keystore(mnemonics: passphrase,
-                                                password: EthWalletService.walletPassword,
-                                                mnemonicsPassword: password,
-                                                language: .english,
-                                                prefixPath: EthWalletService.walletPath
-            ) else {
-                throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
-            }
-            
-            walletStorage = .init(keystore: store, unicId: tokenUnicID)
-            await ethApiService.setKeystoreManager(.init([store]))
-        } catch {
-            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
-        }
+        
+        let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
+        walletStorage = .init(keystore: store, unicId: tokenUnicID)
+        
+
         
         let eWallet = walletStorage?.getWallet()
         
@@ -535,6 +526,7 @@ extension EthWalletService: SwinjectDependentService {
         ethApiService = container.resolve(EthApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
         
         addTransactionObserver()
     }
