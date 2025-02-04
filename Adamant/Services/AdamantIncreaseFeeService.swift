@@ -54,13 +54,13 @@ final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
     
     // MARK: Check
     
-    func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool {
-        return increaseFeeData[tokenUnicID] ?? false
+    func isIncreaseFeeEnabled(for tokenUniqueID: String) -> Bool {
+        return increaseFeeData[tokenUniqueID] ?? false
     }
     
-    func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool) {
+    func setIncreaseFeeEnabled(for tokenUniqueID: String, value: Bool) {
         $increaseFeeData.mutate {
-            $0[tokenUnicID] = value
+            $0[tokenUniqueID] = value
             securedStore.set($0, for: StoreKey.increaseFee.increaseFee)
         }
     }

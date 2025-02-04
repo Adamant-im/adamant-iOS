@@ -89,7 +89,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -106,7 +106,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -200,7 +200,7 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -462,7 +462,7 @@ extension BtcWalletService {
         
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         let eWallet = try BtcWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             privateKey: privateKey,
             addressConverter: addressConverter
         )

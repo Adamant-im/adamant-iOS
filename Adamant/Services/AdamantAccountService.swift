@@ -274,7 +274,7 @@ extension AdamantAccountService {
         }
         
         if updateOnlyVisible {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet.tokenUnicID) ?? false) {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet.tokenUniqueID) ?? false) {
                 wallet.update()
             }
         } else {

@@ -36,7 +36,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         let ethAddress = try XCTUnwrap(keystore.addresses?.first)
         
         let eWallet = EthWallet(
-            unicId: Constants.tokenUnicID,
+            unicId: Constants.tokenUniqueID,
             address: ethAddress.address,
             ethAddress: ethAddress,
             keystore: keystore
@@ -225,7 +225,7 @@ private enum Constants {
     
     static let passphrase = "village lunch say patrol glow first hurt shiver name method dolphin sample"
     
-    static let tokenUnicID = "ERC20\(token.symbol)\(token.contractAddress)"
+    static let tokenUniqueID = "ERC20\(token.symbol)\(token.contractAddress)"
     
     static let token = ERC20Token(
         symbol: "BNB",

@@ -94,7 +94,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -111,7 +111,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -189,7 +189,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -425,7 +425,7 @@ extension EthWalletService {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             
-            walletStorage = .init(keystore: store, unicId: tokenUnicID)
+            walletStorage = .init(keystore: store, unicId: tokenUniqueID)
             await ethApiService.setKeystoreManager(.init([store]))
         } catch {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)

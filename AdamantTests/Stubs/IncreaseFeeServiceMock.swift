@@ -11,9 +11,9 @@
 final class IncreaseFeeServiceMock: IncreaseFeeService {
     
     var stubbedIncreaseFeeEnabled: Bool = false
-    func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool {
+    func isIncreaseFeeEnabled(for tokenUniqueID: String) -> Bool {
         return stubbedIncreaseFeeEnabled
     }
     
-    func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool) {}
+    func setIncreaseFeeEnabled(for tokenUniqueID: String, value: Bool) {}
 }

@@ -51,7 +51,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         return token.contractAddress
     }
    
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol + tokenContract
     }
     
@@ -76,7 +76,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -189,7 +189,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: dynamicRichMessageType
     )
@@ -407,7 +407,7 @@ extension ERC20WalletService {
         
         // MARK: 3. Update
         let eWallet = EthWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             address: ethAddress.address,
             ethAddress: ethAddress,
             keystore: keystore
