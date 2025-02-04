@@ -12,13 +12,13 @@ protocol EthBIP32ServiceProtocol {
 }
 
 actor EthBIP32Service: EthBIP32ServiceProtocol {
-    private var passphrase: String = ""
+    private var passphrase: String?
     private var keystore: BIP32Keystore?
     
     private var ethApiService: EthApiServiceProtocol
     
-    init(erc20ApiService: EthApiServiceProtocol) {
-        self.ethApiService = erc20ApiService
+    init(ethApiService: EthApiServiceProtocol) {
+        self.ethApiService = ethApiService
     }
     func keyStore(passphrase: String) async throws -> BIP32Keystore {
         if let keystore = self.keystore, passphrase == self.passphrase {
