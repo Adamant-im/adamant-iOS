@@ -31,6 +31,10 @@ final class AccountServiceMock: AccountService {
         fatalError("\(#file).\(#function) is not implemented")
     }
     
+    func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult {
+        fatalError("\(#file).\(#function) is not implemented")
+    }
+    
     func loginWithStoredAccount() async throws -> AccountServiceResult {
         fatalError("\(#file).\(#function) is not implemented")
     }

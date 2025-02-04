@@ -12,12 +12,12 @@ import CommonKit
 final class AdamantCoreMock: AdamantCore {
     
     // MARK: - Keys
-
-    func createHashFor(passphrase: String) -> String? {
+    
+    func createSeedFor(passphrase: String, password: String) -> [UInt8]? {
         fatalError("\(#file).\(#function) is not implemented")
     }
     
-    func createKeypairFor(passphrase: String) -> Keypair? {
+    func createKeypairFor(passphrase: String, password: String) -> CommonKit.Keypair? {
         fatalError("\(#file).\(#function) is not implemented")
     }
     

@@ -608,7 +608,7 @@ private extension AdmWalletServiceTests {
     }
     
     func makeKeypair(passphrase: String) -> Keypair? {
-        NativeAdamantCore().createKeypairFor(passphrase: passphrase)
+        NativeAdamantCore().createKeypairFor(passphrase: passphrase, password: "")
     }
 }
 
