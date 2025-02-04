@@ -10,7 +10,7 @@ import LiskKit
 import Foundation
 import CommonKit
 
-final class KlyNodeApiService: ApiServiceProtocol {
+final class KlyNodeApiService: KlyNodeApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
     
     @MainActor

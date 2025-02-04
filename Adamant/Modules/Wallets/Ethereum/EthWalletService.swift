@@ -391,7 +391,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService {
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
         }
@@ -409,6 +409,7 @@ extension EthWalletService {
         let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
         walletStorage = .init(keystore: store, unicId: tokenUnicID)
         
+
         
         let eWallet = walletStorage?.getWallet()
         

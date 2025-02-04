@@ -12,6 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Web3Core
 
 struct DashApiComand {
     static let networkInfoMethod: String = "getnetworkinfo"
@@ -309,7 +310,7 @@ extension DashWalletService {
     }
     
     @MainActor
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -321,7 +322,10 @@ extension DashWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+            throw WalletServiceError.internalError(message: "DASH Wallet: failed to generate private key", error: nil)
+        }
+        
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DashWallet(
@@ -386,6 +390,14 @@ extension DashWalletService {
                 throw error
             }
         }
+    }
+    
+    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
+        guard !salt.isEmpty else {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+        
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
     }
 }
 

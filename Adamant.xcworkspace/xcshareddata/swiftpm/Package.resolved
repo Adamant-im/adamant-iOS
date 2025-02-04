@@ -39,11 +39,11 @@
       },
       {
         "package": "CryptoSwift",
-        "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift.git",
+        "repositoryURL": "https://github.com/ChrisBenua/CryptoSwift",
         "state": {
           "branch": null,
-          "revision": "039f56c5d7960f277087a0be51f5eb04ed0ec073",
-          "version": "1.5.1"
+          "revision": "f0ea2cac7983c4a808cade78743b391726ecc0ea",
+          "version": null
         }
       },
       {

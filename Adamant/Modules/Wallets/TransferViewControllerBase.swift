@@ -818,11 +818,10 @@ class TransferViewControllerBase: FormViewController {
             }
         }
         
-        let recipient: String
-        if let recipientName = recipientName {
+        var recipient: String = recipientAddress
+        
+        if let recipientName, recipientName != recipientAddress {
             recipient = "\(recipientName) \(recipientAddress)"
-        } else {
-            recipient = recipientAddress
         }
         
         let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!

@@ -111,7 +111,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Dependencies
     weak var accountService: AccountService?
     var apiService: AdamantApiServiceProtocol!
-    var erc20ApiService: ERC20ApiService!
+    var erc20ApiService: ERC20ApiServiceProtocol!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
@@ -361,7 +361,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService {
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
         setState(.notInitiated)
@@ -372,6 +372,7 @@ extension ERC20WalletService {
         }
 
         let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase)
+
         
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
@@ -542,6 +543,15 @@ extension ERC20WalletService {
         return result
     }
 }
+
+#if DEBUG
+extension ERC20WalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
+    }
+}
+#endif
 
 extension ERC20WalletService {
     func getTransactionsHistory(
