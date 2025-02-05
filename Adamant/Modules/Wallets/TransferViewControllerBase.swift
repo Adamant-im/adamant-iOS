@@ -1146,7 +1146,7 @@ extension TransferViewControllerBase {
                 ? self?.activeBaseColor
                 : self?.inactiveBaseColor
             }.onChange { [weak self] row in
-                guard let id = self?.walletCore.tokenUnicID,
+                guard let id = self?.walletCore.tokenUniqueID,
                       let value = row.value
                 else {
                     return

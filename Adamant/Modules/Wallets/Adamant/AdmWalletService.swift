@@ -43,7 +43,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -115,7 +115,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -169,7 +169,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             wallet.balance = account.balance
         } else {
-            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
+            let wallet = AdmWallet(unicId: tokenUniqueID, address: account.address)
             wallet.balance = account.balance
             
             admWallet = wallet

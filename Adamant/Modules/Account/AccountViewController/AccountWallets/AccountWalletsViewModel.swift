@@ -43,14 +43,14 @@ private extension AccountWalletsViewModel {
 
     func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
-        if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUnicID }) {
+        if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUniqueID }) {
             state.wallets[index].balance = coreService.wallet?.balance ?? 0
             state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
-                coinID: coreService.tokenUnicID,
+                coinID: coreService.tokenUniqueID,
                 currencySymbol: coreService.tokenSymbol,
                 currencyImage: coreService.tokenLogo,
                 currencyNetwork: type(of: coreService).tokenNetworkSymbol,

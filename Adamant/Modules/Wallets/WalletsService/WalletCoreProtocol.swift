@@ -236,7 +236,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
-    var tokenUnicID: String { get }
+    var tokenUniqueID: String { get }
     static var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
     var tokenContract: String { get }

@@ -219,7 +219,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             
             let item = WalletCollectionViewCell.Model(
                 index: index,
-                coinID: service.tokenUnicID,
+                coinID: service.tokenUniqueID,
                 currencySymbol: service.tokenSymbol,
                 currencyImage: service.tokenLogo,
                 currencyNetwork: network ?? type(of: service).tokenNetworkSymbol,

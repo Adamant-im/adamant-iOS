@@ -94,7 +94,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -111,7 +111,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -190,7 +190,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -418,7 +418,7 @@ extension EthWalletService {
         // MARK: 2. Create keys and addresses
         
         let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
-        walletStorage = .init(keystore: store, unicId: tokenUnicID)
+        walletStorage = .init(keystore: store, unicId: tokenUniqueID)
         
 
         

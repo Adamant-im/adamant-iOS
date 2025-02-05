@@ -70,7 +70,7 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -433,7 +433,7 @@ private extension KlyWalletService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
          
             let wallet = KlyWallet(
-                unicId: tokenUnicID,
+                unicId: tokenUniqueID,
                 address: address,
                 keyPair: keyPair,
                 nonce: .zero,

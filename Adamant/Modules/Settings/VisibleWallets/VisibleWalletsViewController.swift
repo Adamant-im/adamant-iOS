@@ -161,8 +161,8 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
         }
     }
     
-    private func isInvisible(_ walletTokenUnicID: String) -> Bool {
-        return visibleWalletsService.isInvisible(walletTokenUnicID)
+    private func isInvisible(_ walletTokenUniqueID: String) -> Bool {
+        return visibleWalletsService.isInvisible(walletTokenUniqueID)
     }
     
     private func resetWalletsAction() {
@@ -254,8 +254,8 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         cell.logoImage = wallet.tokenLogo
         cell.balance = wallet.wallet?.balance
         cell.delegate = self
-        cell.isChecked = !isInvisible(wallet.tokenUnicID)
-        cell.unicId = wallet.tokenUnicID
+        cell.isChecked = !isInvisible(wallet.tokenUniqueID)
+        cell.unicId = wallet.tokenUniqueID
         
         return cell
     }
@@ -268,7 +268,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
             return
         }
         let wallet = wallets[indexPath.row]
-        delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet.tokenUnicID))
+        delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet.tokenUniqueID))
         tableView.reloadRows(at: [indexPath], with: .none)
     }
     
@@ -298,9 +298,9 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         guard destinationIndexPath.section == 0 else { return }
         let wallet = wallets.remove(at: sourceIndexPath.row)
         wallets.insert(wallet, at: destinationIndexPath.row)
-        let walletsTokenUnicID = wallets.map { $0.tokenUnicID }
-        visibleWalletsService.setIndexPositionWallets(walletsTokenUnicID, includeInvisible: true)
-        visibleWalletsService.setIndexPositionWallets(walletsTokenUnicID, includeInvisible: false)
+        let walletsTokenUniqueID = wallets.map { $0.tokenUniqueID }
+        visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: true)
+        visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: false)
         NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
     
@@ -320,19 +320,19 @@ extension VisibleWalletsViewController: AdamantVisibleWalletsCellDelegate {
         didChangeCheckedStateTo state: Bool
     ) {
         let wallet = wallets.first(where: {
-            $0.tokenUnicID == cell.unicId
+            $0.tokenUniqueID == cell.unicId
         })
         
-        guard let tokenUnicID = wallet?.tokenUnicID else { return }
+        guard let tokenUniqueID = wallet?.tokenUniqueID else { return }
         
-        if !isInvisible(tokenUnicID) {
-            visibleWalletsService.addToInvisibleWallets(tokenUnicID)
+        if !isInvisible(tokenUniqueID) {
+            visibleWalletsService.addToInvisibleWallets(tokenUniqueID)
         } else {
-            visibleWalletsService.removeFromInvisibleWallets(tokenUnicID)
+            visibleWalletsService.removeFromInvisibleWallets(tokenUniqueID)
         }
-        let walletsTokenUnicID = wallets.map { $0.tokenUnicID }
-        visibleWalletsService.setIndexPositionWallets(walletsTokenUnicID, includeInvisible: true)
-        visibleWalletsService.setIndexPositionWallets(walletsTokenUnicID, includeInvisible: false)
+        let walletsTokenUniqueID = wallets.map { $0.tokenUniqueID }
+        visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: true)
+        visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: false)
         NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
 }

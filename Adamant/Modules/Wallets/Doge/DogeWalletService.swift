@@ -86,7 +86,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -168,7 +168,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -337,7 +337,7 @@ extension DogeWalletService {
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DogeWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             privateKey: privateKey,
             addressConverter: addressConverter
         )
