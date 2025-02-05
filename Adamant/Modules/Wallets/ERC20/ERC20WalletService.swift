@@ -124,6 +124,13 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     let transactionFeeUpdated: Notification.Name
     let serviceStateChanged: Notification.Name
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: RichMessageProvider properties
     static let richMessageType = "erc20_transaction"
     var dynamicRichMessageType: String {
@@ -268,6 +275,8 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -355,6 +364,8 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -397,6 +408,8 @@ extension ERC20WalletService {
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        await walletUpdateSender.send()
         
         self.setState(.upToDate, silent: true)
         Task {

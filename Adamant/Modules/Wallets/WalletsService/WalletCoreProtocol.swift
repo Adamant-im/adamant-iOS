@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Swinject
 import CommonKit
+import Combine
 
 enum WalletServiceState: Equatable {
     case notInitiated, updating, upToDate, initiationFailed(reason: String)
@@ -292,6 +293,9 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
+    
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> { get }
     
     func update()
     
