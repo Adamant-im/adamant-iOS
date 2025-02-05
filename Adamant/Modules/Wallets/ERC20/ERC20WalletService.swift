@@ -116,6 +116,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
+    var ethBIP32Service: EthBIP32ServiceProtocol!
     
     // MARK: - Notifications
     let walletUpdatedNotification: Notification.Name
@@ -380,26 +381,9 @@ extension ERC20WalletService {
             enabled = false
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-        
-        // MARK: 2. Create keys and addresses
-        let keystore: BIP32Keystore
-        do {
-            guard let store = try BIP32Keystore(
-                mnemonics: passphrase,
-                password: EthWalletService.walletPassword,
-                mnemonicsPassword: password,
-                language: .english,
-                prefixPath: EthWalletService.walletPath
-            ) else {
-                throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
-            }
-            
-            keystore = store
-        } catch {
-            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
-        }
-        
-        await erc20ApiService.setKeystoreManager(.init([keystore]))
+
+        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase)
+
         
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
@@ -451,6 +435,7 @@ extension ERC20WalletService: SwinjectDependentService {
         erc20ApiService = container.resolve(ERC20ApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
         
         addTransactionObserver()
     }
