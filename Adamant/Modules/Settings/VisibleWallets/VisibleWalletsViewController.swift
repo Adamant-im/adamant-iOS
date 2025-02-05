@@ -97,10 +97,10 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func addObservers() {
-        wallets
-            .map { NotificationCenter.default.publisher(for: $0.walletUpdatedNotification, object: $0) }
-            .publisher
-            .flatMap { $0 }
+        wallets.publisher
+            .flatMap { wallet in
+                NotificationCenter.default.publisher(for: wallet.walletUpdatedNotification, object: wallet)
+            }
             .receive(on: DispatchQueue.main)
             .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
