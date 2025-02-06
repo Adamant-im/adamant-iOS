@@ -20,9 +20,10 @@ public extension ApiCommands {
 extension AdamantApiService {
     public func sendTransaction(
         path: String,
-        transaction: UnregisteredTransaction
+        transaction: UnregisteredTransaction,
+        timeout: TimeInterval? = nil
     ) async -> ApiServiceResult<UInt64> {
-        let response: ApiServiceResult<TransactionIdResponse> = await request { core, origin in
+        let response: ApiServiceResult<TransactionIdResponse> = await request(timeout: timeout) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: path,

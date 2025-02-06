@@ -60,6 +60,9 @@ public extension String.adamant {
         public static var networkError: String {
             String.localized("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         }
+        public static var timeoutError: String {
+            String.localized("Error.TimeOut", comment: "Shared error: Timeout Problem. In most cases - no connection")
+        }
         public static var requestCancelled: String {
             String.localized("Error.RequestCancelled", comment: "Shared error: Request cancelled")
         }

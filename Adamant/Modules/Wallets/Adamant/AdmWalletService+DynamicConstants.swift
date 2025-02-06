@@ -31,6 +31,10 @@ extension AdmWalletService {
         4000
     }
         
+    static var timeouts: MessageTimeouts {
+        MessageTimeouts(message: 300, attachment: 300)
+    }
+        
     var tokenName: String {
         "ADAMANT Messenger"
     }
