@@ -13,7 +13,7 @@ extension AdamantDialogService {
     func makeRenameAlert(
         titleFormat: String,
         initialText: String?,
-                isEnoughMoney: Bool?,
+        isEnoughMoney: Bool?,
         url: String?,
         showVC: @escaping () -> Void,
         onRename: @escaping (String) -> Void
@@ -67,7 +67,7 @@ extension AdamantDialogService {
         )
         
         alert.addAction(makeFreeTokensAlertAction(url: url, window: window))
-        alert.addAction(mackBuyTokensAction(action: showVC))
+        alert.addAction(makeBuyTokensAction(action: showVC))
         alert.addAction(makeCancelAction(window: window))
         alert.modalPresentationStyle = .overFullScreen
         
@@ -90,7 +90,7 @@ private extension AdamantDialogService {
         }
         return action
     }
-    func mackBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
+    func makeBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
         .init(
             title: .adamant.chat.freeTokensBuyADM,
             style: .default
