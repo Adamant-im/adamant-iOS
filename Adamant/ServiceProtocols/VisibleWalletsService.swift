@@ -17,7 +17,7 @@ extension Notification.Name {
     }
 }
 protocol VisibleWalletsService: AnyObject, Sendable {
-    func addToInvisibleWallets(_ wallet: §)
+    func addToInvisibleWallets(_ wallet: WalletCoreProtocol)
     func removeFromInvisibleWallets(_ wallet: WalletCoreProtocol)
     func getInvisibleWallets() -> [String]
     func isInvisible(_ wallet: WalletCoreProtocol) -> Bool
