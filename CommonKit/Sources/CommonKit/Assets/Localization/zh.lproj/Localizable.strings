@@ -562,6 +562,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "无连接";
 
+/* Shared error: Timeout Problem. In most cases - no connection */
+"Error.TimeOut" = "超过响应等待时间";
+
 /* Shared error: Request cancelled */
 "Error.RequestCancelled" = "请求已取消";
 

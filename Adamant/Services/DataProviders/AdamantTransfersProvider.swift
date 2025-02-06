@@ -522,7 +522,10 @@ extension AdamantTransfersProvider {
         }
         
         do {
-            let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
+            let id = try await apiService.sendMessageTransaction(
+                transaction: signedTransaction,
+                timeout: nil
+            ).get()
             transaction.transactionId = String(id)
             await chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
             

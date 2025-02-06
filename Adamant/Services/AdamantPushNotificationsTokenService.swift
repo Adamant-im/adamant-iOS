@@ -190,7 +190,7 @@ private extension AdamantPushNotificationsTokenService {
         ) else { return nil }
         
         Task {
-            switch await apiService.sendMessageTransaction(transaction: messageTransaction) {
+            switch await apiService.sendMessageTransaction(transaction: messageTransaction, timeout: nil) {
             case .success:
                 completion(true)
             case .failure:

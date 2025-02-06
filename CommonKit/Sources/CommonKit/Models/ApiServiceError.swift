@@ -85,7 +85,7 @@ extension ApiServiceError: Equatable {
     }
 }
 
-extension ApiServiceError: HealthCheckableError {
+extension ApiServiceError: HealthCheckableTimeoutableError {
     public var isNetworkError: Bool {
         switch self {
         case .networkError:
@@ -97,6 +97,10 @@ extension ApiServiceError: HealthCheckableError {
     
     public static var noNetworkError: ApiServiceError {
         .networkError(error: AdamantError(message: .adamant.sharedErrors.networkError))
+    }
+    
+    public static var timeoutError: ApiServiceError {
+        .networkError(error: AdamantError(message: .adamant.sharedErrors.timeoutError))
     }
     
     public static func noEndpointsError(nodeGroupName: String) -> ApiServiceError {

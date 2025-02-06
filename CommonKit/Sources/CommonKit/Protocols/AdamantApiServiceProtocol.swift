@@ -93,11 +93,13 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     
     func sendTransaction(
         path: String,
-        transaction: UnregisteredTransaction
+        transaction: UnregisteredTransaction,
+        timeout: TimeInterval?
     ) async -> ApiServiceResult<UInt64>
 
     func sendMessageTransaction(
-        transaction: UnregisteredTransaction
+        transaction: UnregisteredTransaction,
+        timeout: TimeInterval?
     ) async -> ApiServiceResult<UInt64>
     
     // MARK: - Delegates

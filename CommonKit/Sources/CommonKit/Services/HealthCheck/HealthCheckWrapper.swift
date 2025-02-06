@@ -18,6 +18,10 @@ public protocol HealthCheckableError: Error {
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
+public protocol HealthCheckableTimeoutableError: HealthCheckableError {
+    static var timeoutError: Self { get }
+}
+
 @HealthCheckActor
 open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: Sendable {
     @ObservableValue private(set) var nodes: [Node] = .init()
@@ -127,6 +131,29 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
     }
     
     open func healthCheckInternal() async {}
+}
+
+public extension HealthCheckWrapper where Error: HealthCheckableTimeoutableError {
+    func request<Output>(
+        waitsForConnectivity: Bool,
+        timeout: TimeInterval,
+        _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
+    ) async -> Result<Output, Error> {
+        let startTime = CACurrentMediaTime()
+        
+        do {
+            let result = try await deadline(until: startTime + timeout) {
+                await self.request(waitsForConnectivity: waitsForConnectivity, requestAction)
+            }
+            return result
+        } catch _ as DeadlineExceededError {
+            return .failure(.timeoutError)
+        } catch let error as Error {
+            return .failure(error)
+        } catch {
+            return .failure(.noNetworkError)
+        }
+    }
 }
 
 private extension HealthCheckWrapper {
