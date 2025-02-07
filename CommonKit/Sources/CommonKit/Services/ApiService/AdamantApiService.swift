@@ -22,13 +22,32 @@ public final class AdamantApiService {
     
     public func request<Output>(
         waitsForConnectivity: Bool = false,
+        timeout: TimeInterval? = nil,
         _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
-        await service.request(
-            waitsForConnectivity: waitsForConnectivity
-        ) { admApiCore, origin in
-            await request(admApiCore.apiCore, origin)
+        if let timeout {
+            await service.request(
+                waitsForConnectivity: waitsForConnectivity,
+                timeout: timeout
+            ) { admApiCore, origin in
+                await request(admApiCore.apiCore, origin)
+            }
+        } else {
+            await service.request(
+                waitsForConnectivity: waitsForConnectivity
+            ) { admApiCore, origin in
+                await request(admApiCore.apiCore, origin)
+            }
         }
+    }
+}
+
+extension AdamantApiServiceProtocol {
+    public func sendTransaction(
+        path: String,
+        transaction: UnregisteredTransaction
+    ) async -> ApiServiceResult<UInt64> {
+        await sendTransaction(path: path, transaction: transaction, timeout: nil)
     }
 }
 

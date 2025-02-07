@@ -174,6 +174,17 @@ class Coins
         oldPendingAttempts = txFetchInfo["oldPendingAttempts"]
         end
 
+        # timeouts
+        timeouts = json["timeout"]
+                
+        messageTimeout = nil
+        attachmentTimeout = nil
+
+        if !timeouts.nil?
+            messageTimeout = timeouts["message"] / 1000
+            attachmentTimeout = timeouts["attachment"] / 1000
+        end
+
         # Gas for eth
         reliabilityGasPricePercent = json["reliabilityGasPricePercent"]
         reliabilityGasLimitPercent = json["reliabilityGasLimitPercent"]
@@ -227,6 +238,15 @@ extension #{symbol.capitalize}WalletService {
     createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int", true) :
     emptyText
     }
+
+#{timeouts ?
+    createSwiftVariable(
+        "timeouts",
+        "MessageTimeouts(message: #{messageTimeout}, attachment: #{attachmentTimeout})", 
+        "MessageTimeouts",
+        true
+    ) : emptyText
+}
 
 #{reliabilityGasPricePercent ?
     createSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent, "BigUInt", false) :

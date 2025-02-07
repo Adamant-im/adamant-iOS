@@ -346,7 +346,8 @@ struct AppAssembly: MainThreadAssembly {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                timeouts: AdmWalletService.timeouts
             )
         }.inObjectScope(.container)
         

@@ -20,6 +20,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private let adamantCore: AdamantCore
     private let transactionService: ChatTransactionService
     private let walletServiceCompose: WalletServiceCompose
+    private let timeouts: AdmWalletService.MessageTimeouts
     
     let accountService: AccountService
     let accountsProvider: AccountsProvider
@@ -80,7 +81,8 @@ actor AdamantChatsProvider: ChatsProvider {
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        timeouts: AdmWalletService.MessageTimeouts
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -91,6 +93,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.transactionService = transactionService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
+        self.timeouts = timeouts
         
         Task {
             await setupSecuredStore()
@@ -1286,7 +1289,12 @@ extension AdamantChatsProvider {
             transaction.transactionId = locallyID
             transaction.chatMessageId = locallyID
             
-            let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
+            let id = try await apiService.sendMessageTransaction(
+                transaction: signedTransaction,
+                timeout: transaction.isFileTransfer
+                    ? timeouts.attachment
+                    : timeouts.message
+            ).get()
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
@@ -1959,6 +1967,12 @@ extension AdamantChatsProvider {
     private func onConnectionToTheInternetRestored() {
         onConnectionToTheInternetRestoredTasks.forEach { $0() }
         onConnectionToTheInternetRestoredTasks = []
+    }
+}
+
+extension ChatTransaction {
+    var isFileTransfer: Bool {
+        (self as? RichMessageTransaction)?.additionalType == RichAdditionalType.file
     }
 }
 
