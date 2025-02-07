@@ -43,7 +43,8 @@ struct SettingsFactory {
     func makeVisibleWalletsVC() -> UIViewController {
         VisibleWalletsViewController(
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
-            accountService: assembler.resolve(AccountService.self)!
+            accountService: assembler.resolve(AccountService.self)!,
+            walletsStoreService: assembler.resolve(WalletsStoreService.self)!
         )
     }
 }

@@ -72,6 +72,14 @@ struct AppAssembly: MainThreadAssembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: VisibleWalletsService
+        container.register(WalletsStoreService.self) { r in
+            AdamantWalletsStoreService(
+                visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
+                walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
@@ -270,7 +278,7 @@ struct AppAssembly: MainThreadAssembly {
             guard let service = c as? AdamantAccountService else { return }
             service.notificationsService = r.resolve(NotificationsService.self)!
             service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
+            service.walletsStoreService = r.resolve(WalletsStoreService.self)!
         }
         
         // MARK: AddressBookServeice

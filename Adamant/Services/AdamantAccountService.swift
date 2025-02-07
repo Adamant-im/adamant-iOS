@@ -24,7 +24,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
 
     weak var notificationsService: NotificationsService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
-    weak var visibleWalletService: VisibleWalletsService?
+    weak var walletsStoreService: WalletsStoreService?
     
     // MARK: Properties
     
@@ -239,7 +239,7 @@ extension AdamantAccountService {
             return
         }
         
-        let wallets = walletServiceCompose.getWallets().map { $0.core }
+        let wallets = walletServiceCompose.getWallets()
         
         Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
@@ -263,8 +263,8 @@ extension AdamantAccountService {
                 state = .loggedIn
                 completion?(.success(account: account, alert: nil))
                 
-                if let adm = wallets.first(where: { $0 is AdmWalletService }) {
-                    adm.update()
+                if let adm = wallets.first(where: { $0.core is AdmWalletService }) {
+                    adm.core.update()
                 }
                 
             case .failure(let error):
@@ -274,12 +274,12 @@ extension AdamantAccountService {
         }
         
         if updateOnlyVisible {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet.tokenUniqueID) ?? false) {
-                wallet.update()
+            for wallet in wallets.filter({ !($0.core is AdmWalletService) }) where !(walletsStoreService?.isInvisible(wallet) ?? false) {
+                wallet.core.update()
             }
         } else {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-                wallet.update()
+            for wallet in wallets.filter({ !($0.core is AdmWalletService) }) {
+                wallet.core.update()
             }
         }
     }

@@ -14,11 +14,11 @@ import Combine
 final class AccountWalletsViewModel {
     @ObservableValue var state: AccountWalletsState = .default
     
-    private let walletsService: VisibleWalletsService
+    private let walletsStoreService: WalletsStoreService
     private var subscriptions = Set<AnyCancellable>()
     
-    init(walletsService: VisibleWalletsService) {
-        self.walletsService = walletsService
+    init(walletsStoreService: WalletsStoreService) {
+        self.walletsStoreService = walletsStoreService
         setup()
     }
 }
@@ -29,7 +29,7 @@ private extension AccountWalletsViewModel {
     }
     
     func addObservers() {
-        for wallet in walletsService.sorted(includeInvisible: false) {
+        for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
                 .sink(
