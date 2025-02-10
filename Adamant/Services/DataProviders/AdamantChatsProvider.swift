@@ -28,10 +28,10 @@ actor AdamantChatsProvider: ChatsProvider {
     let stack: CoreDataStack
     
     // MARK: Properties
-    @ObservableValue private var stateNotifier: StateEnum = .empty
-    var stateObserver: AnyObservable<StateEnum> { $stateNotifier.eraseToAnyPublisher() }
+    @ObservableValue private var stateNotifier: DataProviderState = .empty
+    var stateObserver: AnyObservable<DataProviderState> { $stateNotifier.eraseToAnyPublisher() }
     
-    private(set) var state: StateEnum = .empty
+    private(set) var state: DataProviderState = .empty
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
@@ -228,7 +228,7 @@ actor AdamantChatsProvider: ChatsProvider {
     
     // MARK: Tools
     /// Free stateSemaphore before calling this method, or you will deadlock.
-    private func setState(_ state: StateEnum, previous prevState: StateEnum, notify: Bool = true) {
+    private func setState(_ state: DataProviderState, previous prevState: DataProviderState, notify: Bool = true) {
         self.state = state
         
         guard notify else { return }
