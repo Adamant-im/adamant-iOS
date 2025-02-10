@@ -112,11 +112,11 @@ final class NotificationsViewModel: ObservableObject {
             return
         }
         
-        notificationsMode = mode
         notificationsService.setNotificationsMode(mode) { [weak self] result in
             DispatchQueue.onMainAsync {
                 switch result {
                 case .success:
+                    self?.notificationsMode = mode
                     return
                 case .failure(let error):
                     switch error {

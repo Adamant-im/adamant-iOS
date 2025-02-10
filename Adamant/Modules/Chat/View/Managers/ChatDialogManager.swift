@@ -278,7 +278,7 @@ private extension ChatDialogManager {
         let alert = dialogService.makeRenameAlert(
             titleFormat:String(format: .adamant.chat.actionsBody, address),
             initialText: viewModel.partnerName,
-            isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction,
+            isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction ?? false,
             url: accountService.account?.address,
             showVC: { [weak self] in
                 self?.viewModel.showBuyAndSell.send()
