@@ -13,15 +13,18 @@ struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
     private let baseSoundsView: () -> AnyView
     private let reactionSoundsView: () -> AnyView
+    private let screensFactory: ScreensFactory
     
     init(
         viewModel: @escaping () -> NotificationsViewModel,
         baseSoundsView: @escaping () -> AnyView,
-        reactionSoundsView: @escaping () -> AnyView
+        reactionSoundsView: @escaping () -> AnyView,
+        screensFactory: ScreensFactory
     ) {
         _viewModel = .init(wrappedValue: viewModel())
         self.baseSoundsView = baseSoundsView
         self.reactionSoundsView = reactionSoundsView
+        self.screensFactory = screensFactory
     }
     
     var body: some View {
@@ -49,6 +52,11 @@ struct NotificationsView: View {
         })
         .fullScreenCover(isPresented: $viewModel.openSafariURL) {
             SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            screensFactory.makeBuyAndSellView(action: {
+                viewModel.presentBuyAndSell = false
+            })
         }
     }
 }

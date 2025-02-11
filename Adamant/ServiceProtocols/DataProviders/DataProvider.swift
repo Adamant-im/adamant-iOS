@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-enum State {
+enum DataProviderState {
     case empty
     case updating
     case upToDate
@@ -17,8 +17,8 @@ enum State {
 }
 
 protocol DataProvider: AnyObject, Actor {
-    var state: State { get }
-    var stateObserver: AnyObservable<State> { get }
+    var state: DataProviderState { get }
+    var stateObserver: AnyObservable<DataProviderState> { get }
     var isInitiallySynced: Bool { get }
     
     func reload() async
@@ -26,10 +26,10 @@ protocol DataProvider: AnyObject, Actor {
 }
 
 // MARK: - Status Equatable
-extension State: Equatable {
+extension DataProviderState: Equatable {
     
     /// Simple equatable function. Does not checks associated values.
-    static func ==(lhs: State, rhs: State) -> Bool {
+    static func ==(lhs: DataProviderState, rhs: DataProviderState) -> Bool {
         switch (lhs, rhs) {
         case (.empty, .empty): return true
         case (.updating, .updating): return true

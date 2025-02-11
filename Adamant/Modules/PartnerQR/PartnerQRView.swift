@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct PartnerQRView: View {
+    let screenFactory: ScreensFactory
     @ObservedObject var viewModel: PartnerQRViewModel
     
     var body: some View {
@@ -25,10 +26,16 @@ struct PartnerQRView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            screenFactory.makeBuyAndSellView(action: {
+                viewModel.presentBuyAndSell = false
+            })
+        }
     }
     
-    init(viewModel: @escaping () -> PartnerQRViewModel) {
+    init(viewModel: @escaping () -> PartnerQRViewModel, screenFactory: ScreensFactory) {
         _viewModel = .init(wrappedValue: viewModel())
+        self.screenFactory = screenFactory
     }
 }
 
