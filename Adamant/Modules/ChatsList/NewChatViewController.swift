@@ -247,7 +247,7 @@ final class NewChatViewController: FormViewController {
     
     // MARK: - IBActions
     
-    @IBAction func done(_ sender: Any) {
+    @IBAction func done() {
         guard let row: TextRow = form.rowBy(tag: Rows.addressField.tag), let nums = row.value, nums.count > 0 else {
             dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
             return
@@ -348,6 +348,36 @@ final class NewChatViewController: FormViewController {
         default:
             return false
         }
+    }
+    
+    // MARK: - FormViewController
+    
+    override func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        let result = super.textInputShouldReturn(textInput, cell: cell)
+        if cell.row.tag == Rows.addressField.tag {
+            done()
+        }
+        
+        return result
+    }
+}
+
+// MARK: - Hardware keyboard handling
+
+extension NewChatViewController {
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        for press in presses {
+            guard let key = press.key else { continue }
+            if key.keyCode == UIKeyboardHIDUsage.keyboardReturnOrEnter {
+                return done()
+            }
+        }
+        
+        super.pressesBegan(presses, with: event)
     }
 }
 
