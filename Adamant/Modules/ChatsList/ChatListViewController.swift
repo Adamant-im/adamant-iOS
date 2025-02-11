@@ -412,14 +412,16 @@ final class ChatListViewController: KeyboardObservingViewController {
     // MARK: Helpers
     func chatViewController(
         for chatroom: Chatroom,
-        with messageId: String? = nil
+        with messageId: String? = nil,
+        newChat: Bool = false
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageIdToShow: messageId
+            messageIdToShow: messageId,
+            isNewChat: newChat
         )
 
         return vc
@@ -830,7 +832,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
         }
         
         DispatchQueue.main.async { [self] in
-            let vc = chatViewController(for: chatroom)
+            let vc = chatViewController(for: chatroom, newChat: true)
             
             if let split = splitViewController {
                 let nav = UINavigationController(rootViewController: vc)
@@ -852,7 +854,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 vc.viewModel.inputText = preMessage
             }
         }
-        
         // Select row after awhile
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
             if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
