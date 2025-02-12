@@ -172,6 +172,16 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        if viewAppeared {
+            for indexPath in visibleIndexPaths {
+                if let unreadSections = viewModel.unReadMesaggesIndexes,
+                   unreadSections.contains(indexPath.section) {
+                    
+                    viewModel.messageWasRead(index: indexPath.section)
+                }
+            }
+        }
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
@@ -200,7 +210,6 @@ final class ChatViewController: MessagesViewController {
             cell.isSelected = false
             viewModel.needToAnimateCellIndex = nil
         }
-        
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
@@ -215,13 +224,22 @@ final class ChatViewController: MessagesViewController {
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        if viewAppeared {
+            for indexPath in visibleIndexPaths {
+                if let unreadSections = viewModel.unReadMesaggesIndexes,
+                   unreadSections.contains(indexPath.section) {
+                    
+                    viewModel.messageWasRead(index: indexPath.section)
+                }
+            }
+        }
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
         
         if scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating {
             updateDateHeaderIfNeeded()
         }
-        
         guard
             viewAppeared,
             scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
@@ -427,10 +445,6 @@ private extension ChatViewController {
         viewModel.$dateHeaderHidden
             .removeDuplicates()
             .sink { [weak self] in self?.dateHeaderLabel.isHidden = $0 }
-            .store(in: &subscriptions)
-        
-        viewModel.updateChatRead
-            .sink { [weak self] in self?.checkIsChatWasRead() }
             .store(in: &subscriptions)
         
         viewModel.commitVibro
@@ -690,11 +704,9 @@ private extension ChatViewController {
         isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
         
         guard oldValue != isScrollPositionNearlyTheBottom else { return }
-        checkIsChatWasRead()
     }
     
     func updateMessages() {
-        defer { checkIsChatWasRead() }
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
@@ -809,11 +821,6 @@ private extension ChatViewController {
         dismiss(animated: true)
         guard let detailsViewController = viewController else { return }
         navigationController?.pushViewController(detailsViewController, animated: true)
-    }
-    
-    func checkIsChatWasRead() {
-        guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
-        viewModel.entireChatWasRead()
     }
     
     @MainActor
