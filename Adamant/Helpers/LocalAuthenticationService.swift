@@ -8,13 +8,15 @@
 
 import UIKit
 
-protocol LocalAuthenticationHandler {
+protocol LocalAuthenticationService {
     func didEnter(pin: String, viewController: UIViewController)
     func didTapBiometryButton(viewController: UIViewController)
     func didTapCancel(viewController: UIViewController)
 }
 
-final class LocalAuthenticationHandlerImpl: LocalAuthenticationHandler {
+final class LocalAuthenticationHandlerImpl: LocalAuthenticationService {
+    
+    
     func didEnter(pin: String, viewController: UIViewController) {
         switch pinpadRequest {
             

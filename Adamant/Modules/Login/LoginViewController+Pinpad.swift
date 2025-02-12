@@ -17,7 +17,7 @@ extension LoginViewController {
         
 //        DispatchQueue.main.async { [weak self] in
 //            guard let self else { return }
-            let pinpad = adamantPinpad(biometryButton: button)
+        let pinpad = adamantPinpad(biometryButton: button) { _ in }
 //            pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
 //            pinpad.commentLabel.isHidden = false
 //            pinpad.delegate = self

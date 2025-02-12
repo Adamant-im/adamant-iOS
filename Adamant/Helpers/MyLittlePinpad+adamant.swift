@@ -54,25 +54,25 @@ extension String.adamant {
 extension UIViewController {
     func adamantPinpad(biometryButton: BiometryType, onSuccess: (String) -> Void) -> UIViewController {
         let pinPadView = PinPadViewRepresentable(
-                    pinLength: 6,
-                    validatePin: { $0 == "123456" },
-                    onSuccess: { print("Pin validated!") },
-                    onCancel: { print("Pin entry canceled.") }
-                )
-
-                let hostingController = UIHostingController(rootView: pinPadView)
-                addChild(hostingController)
-                hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-                view.addSubview(hostingController.view)
-                
-                NSLayoutConstraint.activate([
-                    hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                    hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                    hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-                    hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-                ])
-
-                hostingController.didMove(toParent: self)
+            pinLength: 6,
+            validatePin: { $0 == "123456" },
+            onSuccess: { print("Pin validated!") },
+            onCancel: { print("Pin entry canceled.") }
+        )
+        
+        let hostingController = UIHostingController(rootView: pinPadView)
+        addChild(hostingController)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(hostingController.view)
+        
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        hostingController.didMove(toParent: self)
         return hostingController
 //        let pinpad = PinpadViewController.instantiateFromResourceNib()
 //        
