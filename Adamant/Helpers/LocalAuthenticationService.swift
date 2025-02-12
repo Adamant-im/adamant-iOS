@@ -9,26 +9,31 @@
 import UIKit
 
 protocol LocalAuthenticationService {
-    func didEnter(pin: String, viewController: UIViewController)
+    func didEnter(pin: String, pinpadRequest: inout SecurityViewController.PinpadRequest, viewController: UIViewController)
     func didTapBiometryButton(viewController: UIViewController)
     func didTapCancel(viewController: UIViewController)
 }
 
-final class LocalAuthenticationHandlerImpl: LocalAuthenticationService {
+final class LocalAuthenticationServiceImpl: LocalAuthenticationService {
     
+    let accountService: AccountService
     
-    func didEnter(pin: String, viewController: UIViewController) {
+    init(accountService: AccountService) {
+        self.accountService = accountService
+    }
+    
+    func didEnter(pin: String, pinpadRequest: inout SecurityViewController.PinpadRequest, viewController: UIViewController) {
         switch pinpadRequest {
             
         // MARK: User has entered new pin first time. Request re-enter pin
-        case .createPin?:
+        case .createPin:
             pinpadRequest = .reenterPin(pin: pin)
             pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
             pinpad.clearPin()
             return
             
         // MARK: User has reentered pin. Save pin.
-        case .reenterPin(let pinToVerify)?:
+        case .reenterPin(let pinToVerify):
             guard pin == pinToVerify else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
@@ -62,7 +67,7 @@ final class LocalAuthenticationHandlerImpl: LocalAuthenticationService {
             }
             
         // MARK: Users want to turn off the pin. Validate and turn off.
-        case .turnOffPin?:
+        case .turnOffPin:
             guard accountService.validatePin(pin) else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
@@ -74,7 +79,7 @@ final class LocalAuthenticationHandlerImpl: LocalAuthenticationService {
             pinpad.dismiss(animated: true, completion: nil)
             
         // MARK: User wants to turn on biometry
-        case .turnOnBiometry?:
+        case .turnOnBiometry:
             guard accountService.validatePin(pin) else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
@@ -85,7 +90,7 @@ final class LocalAuthenticationHandlerImpl: LocalAuthenticationService {
             pinpad.dismiss(animated: true, completion: nil)
             
         // MARK: User wants to turn off biometry
-        case .turnOffBiometry?:
+        case .turnOffBiometry:
             guard accountService.validatePin(pin) else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
