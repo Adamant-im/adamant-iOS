@@ -48,12 +48,17 @@ private extension AccountWalletsViewModel {
             state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
+            let network = if ERC20Token.supportedTokens.contains(where: { $0.symbol == coreService.tokenSymbol }) {
+                type(of: coreService).tokenNetworkSymbol
+            } else {
+                ""
+            }
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,
                 currencySymbol: coreService.tokenSymbol,
                 currencyImage: coreService.tokenLogo,
-                currencyNetwork: type(of: coreService).tokenNetworkSymbol,
+                currencyNetwork: network,
                 isBalanceInitialized: coreService.wallet?.isBalanceInitialized ?? false,
                 balance: coreService.wallet?.balance ?? 0,
                 notificationBadgeCount: coreService.wallet?.notifications ?? 0
