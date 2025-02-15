@@ -17,10 +17,13 @@ struct PinPadViewRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let hostingController = UIHostingController(
             rootView: PinPadView(
-                pinLength: pinLength,
-                validatePin: validatePin,
-                onSuccess: onSuccess,
-                onCancel: onCancel
+                viewModel:
+                    PinPadViewModel(
+                        pinLength: pinLength,
+                        validatePin: validatePin,
+                        onSuccess: onSuccess,
+                        onCancel: onCancel
+                    )
             )
         )
         return hostingController.view
@@ -31,14 +34,42 @@ struct PinPadViewRepresentable: UIViewRepresentable {
     }
 }
 
-// swiftlint:disable multiple_closures_with_trailing_closure
-struct PinPadView: View {
-    @State var enteredPin: String = ""
-    @State var isPinpadVisible: Bool = true
+class PinPadViewModel: ObservableObject {
+    @Published var enteredPin: String = ""
     let pinLength: Int
     let validatePin: (String) -> Bool
     let onSuccess: () -> Void
     let onCancel: () -> Void
+    
+    init(
+        pinLength: Int,
+        validatePin: @escaping (String) -> Bool,
+        onSuccess: @escaping () -> Void,
+        onCancel: @escaping () -> Void
+    ) {
+        self.pinLength = pinLength
+        self.validatePin = validatePin
+        self.onSuccess = onSuccess
+        self.onCancel = onCancel
+    }
+    
+    func append(_ text: String) {
+        enteredPin.append(text)
+    }
+}
+
+// swiftlint:disable multiple_closures_with_trailing_closure
+struct PinPadView: View {
+    
+    enum PinPadViewMode {
+        case createPin
+        case reenterPin(pin: String)
+        case turnOffPin
+        case turnOnBiometry
+        case turnOffBiometry
+    }
+    
+    @StateObject var viewModel: PinPadViewModel
     
     var body: some View {
         VStack {
@@ -50,10 +81,10 @@ struct PinPadView: View {
                 .padding(.top, 30)
             
             HStack(spacing: 10) {
-                ForEach(0..<pinLength, id: \.self) { index in
+                ForEach(0..<viewModel.pinLength, id: \.self) { index in
                     Circle()
                         .frame(width: 15, height: 15)
-                        .foregroundColor(index < enteredPin.count ? .white : .gray)
+                        .foregroundColor(index < viewModel.enteredPin.count ? .white : .gray)
                 }
             }
             .padding(.vertical, 20)
@@ -66,9 +97,8 @@ struct PinPadView: View {
                 row(from: 0, to: 0, showsDeleteButton: true)
             }
             Spacer()
-            Button(String.adamant.alert.cancel) {
-                onCancel()
-                isPinpadVisible = false
+            Button("Cancel") {
+                viewModel.onCancel()
             }
             .foregroundColor(.white)
             .padding(.top, 20)
@@ -116,34 +146,38 @@ struct PinPadView: View {
     }
     
     private func handlePinInput(_ digit: String) {
-        guard enteredPin.count < pinLength else { return }
-        enteredPin.append(digit)
-        if enteredPin.count == pinLength {
-            if validatePin(enteredPin) {
-                onSuccess()
-                isPinpadVisible = false
+        guard viewModel.enteredPin.count < viewModel.pinLength else { return }
+        viewModel.enteredPin.append(digit)
+        if viewModel.enteredPin.count == viewModel.pinLength {
+            if viewModel.validatePin(viewModel.enteredPin) {
+                viewModel.onSuccess()
             } else {
-                enteredPin.removeAll()
+                viewModel.enteredPin.removeAll()
             }
         }
     }
 
     private func deleteLastDigit() {
-        guard !enteredPin.isEmpty else { return }
-        enteredPin.removeLast()
+        guard !viewModel.enteredPin.isEmpty else { return }
+        viewModel.enteredPin.removeLast()
     }
 }
 
 #if DEBUG
 #Preview {
     PinPadView(
-        pinLength: 6
-    ) { _ in
-            true
-        } onSuccess: {
-            
-        } onCancel: {
-            
-        }
+        viewModel:
+            PinPadViewModel(
+                pinLength: 6,
+                validatePin:
+                    { _ in
+                        true
+                    }, onSuccess: {
+                        
+                    }, onCancel: {
+                        
+                    }
+            )
+    )
 }
 #endif
