@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PinPadViewRepresentable: UIViewRepresentable {
     let pinLength: Int
+    let mode: PinPadViewModel.Mode
     let validatePin: (String) -> Bool
     let onSuccess: () -> Void
     let onCancel: () -> Void
@@ -20,6 +21,7 @@ struct PinPadViewRepresentable: UIViewRepresentable {
                 viewModel:
                     PinPadViewModel(
                         pinLength: pinLength,
+                        mode: mode,
                         validatePin: validatePin,
                         onSuccess: onSuccess,
                         onCancel: onCancel
@@ -85,13 +87,13 @@ class PinPadViewModel: ObservableObject {
         let titleColor: Color
         switch mode {
         case .createPin:
-            title = "Create new PIN"
+            title = String.adamant.pinpad.createPin
             titleColor = .white
         case .enterPin:
             title = "Login into ADAMANT"
             titleColor = .white
         case .reenterPin:
-            title = "Re-enter new PIN"
+            title = String.adamant.pinpad.reenterPin
             titleColor = .white
         case .wrongPinEntered:
             title = "Wrong PIN entered!"
@@ -105,8 +107,14 @@ class PinPadViewModel: ObservableObject {
         case .pinCreated:
             title = "PIN created!"
             titleColor = .green
-        case .turnOffBiometry, .turnOffPin, .turnOnBiometry:
-            title = ""
+        case .turnOffPin:
+            title = String.adamant.security.stayInTurnOff
+            titleColor = .white
+        case .turnOffBiometry:
+            title = String.adamant.security.biometryOffReason
+            titleColor = .white
+        case .turnOnBiometry:
+            title = String.adamant.security.biometryOnReason
             titleColor = .white
         }
         self.title = title
@@ -191,7 +199,7 @@ struct PinPadView: View {
                 ForEach(0..<viewModel.pinLength, id: \.self) { index in
                     Circle()
                         .frame(width: 15, height: 15)
-                        .foregroundColor(viewModel.hasNumber(at: index) ? .white : .gray)
+                        .foregroundColor(viewModel.hasNumber(at: index) ? Color(UIColor.adamant.pinpadHighlightButton) : .gray)
                 }
             }
             .padding(.vertical, 20)
@@ -204,14 +212,14 @@ struct PinPadView: View {
                 row(from: 0, to: 0, showsDeleteButton: true)
             }
             Spacer()
-            Button("Cancel") {
+            Button(String.adamant.alert.cancel) {
                 viewModel.onCancel()
             }
             .foregroundColor(.white)
             .padding(.top, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(Color(UIColor.adamant.backgroundColor).edgesIgnoringSafeArea(.all))
     }
     
     private func row(from: Int, to: Int, showsDeleteButton: Bool = false) -> some View {
@@ -229,11 +237,12 @@ struct PinPadView: View {
                         .frame(width: 75, height: 75)
                         .overlay(
                             Text("\(number)")
-                                .foregroundColor(.white)
-                                .font(.title)
+                                .foregroundColor(Color(UIColor.adamant.primary))
+                                .font(Font(UIFont.adamantPrimary(ofSize: 35, weight: .light)))
+                            
                         )
                         .foregroundColor(.clear)
-                        .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                        .overlay(Circle().stroke(Color(UIColor.adamant.secondary), lineWidth: 1))
                 }
             }
             if showsDeleteButton {

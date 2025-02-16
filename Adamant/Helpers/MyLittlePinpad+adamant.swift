@@ -55,6 +55,7 @@ extension UIViewController {
     func adamantPinpad(biometryButton: BiometryType, onSuccess: (String) -> Void) -> UIViewController {
         let pinPadView = PinPadViewRepresentable(
             pinLength: 6,
+            mode: .createPin,
             validatePin: { $0 == "123456" },
             onSuccess: { print("Pin validated!") },
             onCancel: { print("Pin entry canceled.") }
