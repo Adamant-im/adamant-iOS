@@ -60,7 +60,8 @@ final class BuyAndSellViewController: FormViewController {
     
     var accountService: AccountService!
     var dialogService: DialogService!
-    
+    var screenFactory: ScreensFactory!
+    var chatsProvider: ChatsProvider!
     // MARK: Init
     
     init() {
@@ -137,7 +138,9 @@ final class BuyAndSellViewController: FormViewController {
         }.onCellSelection { [weak self] (_, row) in
             row.deselect()
             if tag == Rows.adamantMessage.tag {
-                self?.openExchangeChat()
+                Task {
+                    await self?.openExchangeChat()
+                }
                 return
             }
             guard let url = URL(string: urlRaw) else {
@@ -153,53 +156,33 @@ final class BuyAndSellViewController: FormViewController {
         
         return row
     }
-    
-    private func openExchangeChat() {
-        var chatList: UINavigationController?
-        var chatDetail: ChatListViewController?
-        
-        guard let tabbar = self.tabBarController else { return }
-        
-        if let split = tabbar.viewControllers?.first as? UISplitViewController,
-           let navigation = split.viewControllers.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatList = navigation
-            chatDetail = vc
-        }
-        
-        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
-           let vc = navigation.viewControllers.first as? ChatListViewController {
-            chatList = navigation
-            chatDetail = vc
-        }
 
-        let chatroom = chatDetail?.chatsController?.fetchedObjects?.first(where: { room in
-            return room.partner?.address == AdamantContacts.adamantExchange.address
-        })
-        
-        guard let chatroom = chatroom,
-              let chatDetail = chatDetail
-        else {
+    @MainActor
+    private func openExchangeChat() async {
+        guard let chatroom = await chatsProvider.getChatroom(for: AdamantContacts.adamantExchange.address) else {
             return
         }
         
-        chatList?.popToRootViewController(animated: false)
-        chatList?.dismiss(animated: false, completion: nil)
-        tabbar.selectedIndex = 0
+        let vc = chatViewController(for: chatroom)
         
-        let vc = chatDetail.chatViewController(for: chatroom)
-        
-        if let split = chatDetail.splitViewController {
-            let chat = UINavigationController(rootViewController: vc)
-            split.showDetailViewController(chat, sender: self)
-        } else if let nav = chatDetail.navigationController {
-            nav.pushViewController(vc, animated: true)
+        if let navigationController = navigationController {
+            navigationController.pushViewController(vc, animated: true)
         } else {
-            vc.modalPresentationStyle = .overFullScreen
-            chatDetail.present(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true)
         }
     }
-    
+
+    private func chatViewController(for chatroom: Chatroom, with messageId: String? = nil) -> ChatViewController {
+        let vc = screenFactory.makeChat()
+        vc.hidesBottomBarWhenPushed = true
+        vc.viewModel.setup(
+            account: accountService.account,
+            chatroom: chatroom,
+            messageIdToShow: messageId
+        )
+        return vc
+    }
     // MARK: - Other
     
     private func setColors() {

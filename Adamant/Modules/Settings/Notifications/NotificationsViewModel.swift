@@ -24,6 +24,7 @@ final class NotificationsViewModel: ObservableObject {
     @Published var inAppSounds: Bool = false
     @Published var inAppVibrate: Bool = true
     @Published var inAppToasts: Bool = true
+    @Published var presentBuyAndSell: Bool = false
     
     let notificationsTitle: String = .localized("SecurityPage.Row.Notifications")
     let safariURL = URL(string: "https://github.com/Adamant-im")!
@@ -32,6 +33,7 @@ final class NotificationsViewModel: ObservableObject {
     
     private let dialogService: DialogService
     private let notificationsService: NotificationsService
+    private let accountService: AccountService
     
     private var subscriptions = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
@@ -43,9 +45,10 @@ final class NotificationsViewModel: ObservableObject {
         return AttributedString(attributedString)
     }
     
-    init(dialogService: DialogService, notificationsService: NotificationsService) {
+    init(dialogService: DialogService, notificationsService: NotificationsService, accountService: AccountService) {
         self.dialogService = dialogService
         self.notificationsService = notificationsService
+        self.accountService = accountService
         configure()
         addObservers()
     }
@@ -109,16 +112,19 @@ final class NotificationsViewModel: ObservableObject {
             return
         }
         
-        notificationsMode = mode
         notificationsService.setNotificationsMode(mode) { [weak self] result in
             DispatchQueue.onMainAsync {
                 switch result {
                 case .success:
+                    self?.notificationsMode = mode
                     return
                 case .failure(let error):
                     switch error {
                     case .notEnoughMoney, .notStayedLoggedIn:
-                        self?.dialogService.showRichError(error: error)
+                        self?.dialogService.showFreeTokenAlert(url: self?.accountService.account?.address,
+                                                               type: .notification,
+                                                               showVC: { self?.presentBuyAndSell = true })
+                        
                     case .denied:
                         self?.presentNotificationsDeniedError()
                     }

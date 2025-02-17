@@ -7,7 +7,7 @@
 //
 
 import Swinject
-import UIKit
+import SwiftUI
 import CommonKit
 
 struct AdmWalletFactory: WalletFactory {
@@ -76,11 +76,31 @@ struct AdmWalletFactory: WalletFactory {
         return controller
     }
     
-    func makeBuyAndSellVC() -> UIViewController {
+    func makeBuyAndSellVC(screenFactory: ScreensFactory) -> UIViewController {
         let c = BuyAndSellViewController()
         c.accountService = assembler.resolve(AccountService.self)
         c.dialogService = assembler.resolve(DialogService.self)
+        c.chatsProvider = assembler.resolve(ChatsProvider.self)
+        c.screenFactory = screenFactory
         return c
+    }
+    func makeBuyAndSellView(screenFactory: ScreensFactory, action: @escaping () -> Void) -> AnyView {
+        AnyView(
+            NavigationView {
+                UIViewControllerWrapper(screenFactory.makeBuyAndSell())
+                    .navigationBarTitle(AdmWalletViewController.Rows.buyTokens.localized, displayMode: .inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                action()
+                            }, label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 18, weight: .medium))
+                            })
+                        }
+                    }
+            }
+        )
     }
 }
 

@@ -64,7 +64,8 @@ struct ChatFactory {
         let dialogManager = ChatDialogManager(
             viewModel: viewModel,
             dialogService: dialogService,
-            emojiService: emojiService
+            emojiService: emojiService,
+            accountService: accountService
         )
         
         let wallets = walletServiceCompose.getWallets()

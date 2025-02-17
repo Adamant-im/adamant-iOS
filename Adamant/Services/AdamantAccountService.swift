@@ -17,7 +17,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
-    private let dialogService: DialogService
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
@@ -42,7 +41,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
-        dialogService: DialogService,
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
@@ -50,7 +48,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
-        self.dialogService = dialogService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
         self.currencyInfoService = currencyInfoService

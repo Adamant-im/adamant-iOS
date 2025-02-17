@@ -412,14 +412,16 @@ final class ChatListViewController: KeyboardObservingViewController {
     // MARK: Helpers
     func chatViewController(
         for chatroom: Chatroom,
-        with messageId: String? = nil
+        with messageId: String? = nil,
+        newChat: Bool = false
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageIdToShow: messageId
+            messageIdToShow: messageId,
+            isNewChat: newChat
         )
 
         return vc
@@ -830,7 +832,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
         }
         
         DispatchQueue.main.async { [self] in
-            let vc = chatViewController(for: chatroom)
+            let vc = chatViewController(for: chatroom, newChat: true)
             
             if let split = splitViewController {
                 let nav = UINavigationController(rootViewController: vc)
@@ -852,7 +854,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 vc.viewModel.inputText = preMessage
             }
         }
-        
         // Select row after awhile
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
             if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
@@ -934,7 +935,10 @@ extension ChatListViewController {
             }
         }
     }
-    
+    private func presentBuyAndSell() {
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
+    }
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
@@ -1284,46 +1288,27 @@ extension ChatListViewController {
             title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
-            guard let alert = self?.makeRenameAlert(for: address) else { return }
-            self?.dialogService.present(alert, animated: true) {
+            guard let self = self else { return }
+            
+            let alert = dialogService.makeRenameAlert(
+                titleFormat: String(format: .adamant.chat.actionsBody, address),
+                initialText: self.addressBook.getName(for: address),
+                isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction ?? false,
+                url: accountService.account?.address,
+                showVC: { [weak self] in
+                    self?.presentBuyAndSell()
+                }
+            ) { [weak self] newName in
+                Task {
+                    await self?.addressBook.set(name: newName, for: address)
+                }
+            }
+            
+            dialogService.present(alert, animated: true) { [weak self] in
                 self?.dialogService.selectAllTextFields(in: alert)
                 completion?()
             }
         }
-    }
-    
-    private func makeRenameAlert(for address: String) -> UIAlertController? {
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak self] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = self?.addressBook.getName(for: address)
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak self] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            Task {
-                await self?.addressBook.set(name: newName, for: address)
-            }
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
     }
     
     private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
@@ -1518,7 +1503,7 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension DataProviderState {
     var isUpdating: Bool {
         switch self {
         case .updating: true
