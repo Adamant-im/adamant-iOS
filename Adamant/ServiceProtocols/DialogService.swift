@@ -43,6 +43,10 @@ extension String.adamant.alert {
     static var openInExplorer: String {
         String.localized("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
     }
+    static var timeAheadError: String {
+        String.localized("Chat.Timestamp.InFuture.Error", comment: "Timestamp error. Used for chat when the user's time is in the future")
+        
+    }
 }
 
 enum AddressChatShareType {
@@ -230,6 +234,7 @@ protocol DialogService: AnyObject {
     // MARK: - Alerts
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?)
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?)
-    
+    func makeRenameAlert(titleFormat: String, initialText: String?, isEnoughMoney: Bool, url: String?, showVC: @escaping () -> Void, onRename: @escaping (String) -> Void) -> UIAlertController
     func selectAllTextFields(in alert: UIAlertController)
+    func showFreeTokenAlert(url: String?, type: FreeTokensAlertType, showVC: @escaping () -> Void)
 }

@@ -33,7 +33,7 @@ enum ChatsProviderError: Error {
     case messageNotValid(ValidateMessageResult)
     case notEnoughMoneyToSend
     case networkError
-    case serverError(Error)
+    case serverError(ServerError)
     case accountNotFound(String)
     case accountNotInitiated(String)
     case dependencyError(String)
@@ -41,6 +41,39 @@ enum ChatsProviderError: Error {
     case internalError(Error)
     case requestCancelled
     case invalidTransactionStatus
+}
+
+extension ChatsProviderError {
+    enum ServerError {
+        case timestampIsInTheFuture
+        case unknown(Error)
+        
+        var wrappedError: Error? {
+            switch self {
+            case let .unknown(error): error
+            default: nil
+            }
+        }
+        
+        var localizedDescription: String {
+            switch self {
+            case .timestampIsInTheFuture:
+                .adamant.alert.timeAheadError
+            case let .unknown(error):
+                error.localizedDescription
+            }
+        }
+        
+        init(from error: Error) {
+            switch error.localizedDescription {
+            case error.localizedDescription where error.localizedDescription.contains(
+                "Timestamp is in the future"
+            ): self = .timestampIsInTheFuture
+                
+            default: self = .unknown(error)
+            }
+        }
+    }
 }
 
 extension ChatsProviderError: RichError {
@@ -87,8 +120,11 @@ extension ChatsProviderError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .internalError(let error), .serverError(let error):
+        case .internalError(let error):
             return error
+        
+        case .serverError(let error):
+            return error.wrappedError
             
         default:
             return nil

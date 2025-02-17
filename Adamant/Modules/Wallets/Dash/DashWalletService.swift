@@ -12,6 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Web3Core
 
 struct DashApiComand {
     static let networkInfoMethod: String = "getnetworkinfo"
@@ -37,7 +38,7 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -134,6 +135,13 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     let serviceStateChanged = Notification.Name("adamant.dashWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     // MARK: - Delayed KVS save
     @Atomic private var balanceObserver: NSObjectProtocol?
     
@@ -161,7 +169,7 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -239,6 +247,7 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = dashWallet else {
             return
@@ -255,19 +264,20 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -284,12 +294,12 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         }
     }
     
-    private func markBalanceAsFresh() {
-        dashWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: DashWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = dashWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -297,6 +307,8 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -309,7 +321,7 @@ extension DashWalletService {
     }
     
     @MainActor
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -321,22 +333,28 @@ extension DashWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+            throw WalletServiceError.internalError(message: "DASH Wallet: failed to generate private key", error: nil)
+        }
+        
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DashWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             privateKey: privateKey,
             addressConverter: addressConverter
         )
         
         self.dashWallet = eWallet
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        self.walletUpdateSender.send()
         
         if !self.enabled {
             self.enabled = true
@@ -347,9 +365,9 @@ extension DashWalletService {
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             let service = self
-            if address != eWallet.address {
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+            if address != eWallet.address, let kvsAddressModel {
+                service.save(kvsAddressModel) { result in
+                    service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
             
@@ -371,9 +389,12 @@ extension DashWalletService {
                     await service.update()
                 }
                 
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+                if let kvsAddressModel {
+                    service.save(kvsAddressModel) { result in
+                        service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
+                    }
                 }
+                
                 service.setState(.upToDate)
                 return eWallet
                 
@@ -382,6 +403,14 @@ extension DashWalletService {
                 throw error
             }
         }
+    }
+    
+    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
+        guard !salt.isEmpty else {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+        
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
     }
 }
 
@@ -521,8 +550,8 @@ extension DashWalletService {
     ///   - dashAddress: DASH address to save into KVS
     ///   - adamantAddress: Owner of Dash address
     ///   - completion: success
-    private func save(dashAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+    private func save(_ model: KVSValueModel, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -533,14 +562,7 @@ extension DashWalletService {
         }
 
         Task { @Sendable in
-            let result = await apiService.store(
-                key: DashWalletService.kvsAddress,
-                value: dashAddress,
-                type: .keyValue,
-                sender: adamant.address,
-                keypair: keypair
-            )
-            
+            let result = await apiService.store(model, date: .now)
             switch result {
             case .success:
                 completion(.success)
@@ -552,7 +574,7 @@ extension DashWalletService {
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
-    private func kvsSaveCompletionRecursion(dashAddress: String, result: WalletServiceSimpleResult) {
+    private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
@@ -571,8 +593,8 @@ extension DashWalletService {
                         return
                     }
 
-                    self?.save(dashAddress: dashAddress) { [weak self] result in
-                        self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
+                    self?.save(model) { [weak self] result in
+                        self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
 
@@ -583,6 +605,16 @@ extension DashWalletService {
                 print("\(error.localizedDescription)")
             }
         }
+    }
+    
+    private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
 }
 

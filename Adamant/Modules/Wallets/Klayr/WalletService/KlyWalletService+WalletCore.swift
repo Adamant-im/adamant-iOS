@@ -31,7 +31,7 @@ extension KlyWalletService {
         .empty
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     

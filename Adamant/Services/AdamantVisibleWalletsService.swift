@@ -88,15 +88,15 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     
     // MARK: Visible
     
-    func addToInvisibleWallets(_ wallet: WalletCoreProtocol) {
+    func addToInvisibleWallets(_ walletTokenUniqueID: String) {
         var wallets = getInvisibleWallets()
-        wallets.append(wallet.tokenUnicID)
+        wallets.append(walletTokenUniqueID)
         setInvisibleWallets(wallets)
     }
     
-    func removeFromInvisibleWallets(_ wallet: WalletCoreProtocol) {
+    func removeFromInvisibleWallets(_ walletTokenUniqueID: String) {
         var wallets = getInvisibleWallets()
-        guard let index = wallets.firstIndex(of: wallet.tokenUnicID) else { return }
+        guard let index = wallets.firstIndex(of: walletTokenUniqueID) else { return }
         wallets.remove(at: index)
         setInvisibleWallets(wallets)
     }
@@ -105,7 +105,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
         guard isUseCustomFilter(for: .visibility) else {
             let wallets = walletsServiceCompose.getWallets()
                 .filter { $0.core.defaultVisibility != true }
-                .map { $0.core.tokenUnicID }
+                .map { $0.core.tokenUniqueID }
             return wallets
         }
         
@@ -115,8 +115,8 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
         return wallets
     }
     
-    func isInvisible(_ wallet: WalletCoreProtocol) -> Bool {
-        return invisibleWallets.contains(wallet.tokenUnicID)
+    func isInvisible(_ walletTokenUniqueID: String) -> Bool {
+        invisibleWallets.contains(walletTokenUniqueID)
     }
     
     private func setInvisibleWallets(_ wallets: [String]) {
@@ -127,8 +127,8 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     
     // MARK: Index Positions
     
-    func getIndexPosition(for wallet: WalletCoreProtocol) -> Int? {
-        return indexesWallets.firstIndex(of: wallet.tokenUnicID)
+    func getIndexPosition(for walletTokenUniqueID: String) -> Int? {
+        return indexesWallets.firstIndex(of: walletTokenUniqueID)
     }
     
     func getSortedWallets(includeInvisible: Bool) -> [String] {
@@ -149,7 +149,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
             
             walletsWithIndexes.append(contentsOf: walletsWithNoIndexes)
 
-            return walletsWithIndexes.map { $0.tokenUnicID }
+            return walletsWithIndexes.map { $0.tokenUniqueID }
         }
         
         let path = !includeInvisible
@@ -170,16 +170,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
         securedStore.set(wallets, for: path)
         indexesWallets = getSortedWallets(includeInvisible: false)
         setUseCustomFilter(for: .indexes, value: true)
-    }
-    
-    func setIndexPositionWallets(_ wallets: [WalletCoreProtocol], includeInvisible: Bool) {
-        let wallets = includeInvisible
-        ? wallets
-        : wallets.filter { !isInvisible($0) }
         
-        let walletsUnicsId = wallets.map { $0.tokenUnicID }
-
-        setIndexPositionWallets(walletsUnicsId, includeInvisible: includeInvisible)
     }
     
     func reset() {
@@ -212,11 +203,11 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
         let wallets = walletsServiceCompose.getWallets()
         var availableServices = includeInvisible
         ? wallets
-        : wallets.filter { !isInvisible($0.core) }
+        : wallets.filter { !isInvisible($0.core.tokenUniqueID) }
         
-        for (newIndex, tokenUnicID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
+        for (newIndex, tokenUniqueID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
             guard let index = availableServices.firstIndex(
-                where: { $0.core.tokenUnicID == tokenUnicID }
+                where: { $0.core.tokenUniqueID == tokenUniqueID }
             ) else {
                 continue
             }

@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Swinject
 import CommonKit
+import Combine
 
 enum WalletServiceState: Equatable {
     case notInitiated, updating, upToDate, initiationFailed(reason: String)
@@ -173,7 +174,7 @@ extension ChatsProviderError {
             return .apiError(e)
             
         case .serverError(let e):
-            return .internalError(message: self.message, error: e)
+            return .internalError(message: self.message, error: e.wrappedError)
             
         case .accountNotFound:
             return .accountNotFound
@@ -231,7 +232,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
-    var tokenUnicID: String { get }
+    var tokenUniqueID: String { get }
     static var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
     var tokenContract: String { get }
@@ -289,6 +290,9 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
     
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> { get }
+    
     func update()
     
     // MARK: Tools
@@ -301,7 +305,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     func updateStatus(for id: String, status: TransactionStatus?)
     func isExist(address: String) async throws -> Bool
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
-    func initWallet(withPassphrase: String) async throws -> WalletAccount
+    func initWallet(withPassphrase: String, withPassword: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     func getFee(comment: String) -> Decimal

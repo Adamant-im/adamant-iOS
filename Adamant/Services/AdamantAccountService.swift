@@ -17,7 +17,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
-    private let dialogService: DialogService
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
@@ -42,7 +41,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
-        dialogService: DialogService,
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
@@ -50,7 +48,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
-        self.dialogService = dialogService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
         self.currencyInfoService = currencyInfoService
@@ -274,7 +271,7 @@ extension AdamantAccountService {
         }
         
         if updateOnlyVisible {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet) ?? false) {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet.tokenUniqueID) ?? false) {
                 wallet.update()
             }
         } else {
@@ -289,12 +286,12 @@ extension AdamantAccountService {
 extension AdamantAccountService {
     // MARK: Passphrase
     @MainActor
-    func loginWith(passphrase: String) async throws -> AccountServiceResult {
+    func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             throw AccountServiceError.invalidPassphrase
         }
         
-        guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
+        guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase, password: password) else {
             throw AccountServiceError.internalError(message: "Failed to generate keypair for passphrase", error: nil)
         }
         
@@ -336,7 +333,7 @@ extension AdamantAccountService {
     @MainActor
     func loginWithStoredAccount() async throws -> AccountServiceResult {
         if let passphrase = getSavedPassphrase() {
-            let account = try await loginWith(passphrase: passphrase)
+            let account = try await loginWith(passphrase: passphrase, password: .empty)
             return account
         }
         
@@ -428,7 +425,8 @@ extension AdamantAccountService {
             for wallet in walletServiceCompose.getWallets() {
                 group.addTask {
                     let result = try? await wallet.core.initWallet(
-                        withPassphrase: passphrase
+                        withPassphrase: passphrase,
+                        withPassword: .empty
                     )
                     return result
                 }

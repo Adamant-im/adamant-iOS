@@ -452,7 +452,7 @@
 "ChatScene.FreeTokensAlert.FreeTokens" = "🎁 免费代币";
 
 /* Chat: 'Free Tokens' message */
-"ChatScene.FreeTokensAlert.Message" = "ADAMANT是一个独特的区块链信使，独立于政府、企业甚至其开发者。这是可能的，因为它是一个去中心化的网络，完全开源，由用户运行。这就是为什么每一个动作，包括发消息或保存新联系人，都要收取0.001 ADM.的网络费。要立即开始发消息，请获得免费的欢迎令牌。";
+"ChatScene.FreeTokensAlert.Message" = "ADAMANT 是一个去中心化的区块链消息应用。因此，每次操作，包括发送消息或保存新联系人，都会产生 0.001 ADM 的网络费用。";
 
 /* Chat: warning message for opening email link without mail app configurated on device */
 "ChatScene.Warning.NoMailApp" = "无法发送电子邮件。请检查邮件应用程序配置。";
@@ -1344,3 +1344,11 @@
 
 /* Chat unknown */
 "Chat.unknown.title" = "未知";
+
+/* No active nodes */
+"Chat.Alert.NoActiveNodes" = "无法请求新消息 - 没有活动的 ADM 区块链节点。由于您已停用部分节点，请考虑查看节点列表。";
+
+/* Review Nodes List */
+"Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
+
+"Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";

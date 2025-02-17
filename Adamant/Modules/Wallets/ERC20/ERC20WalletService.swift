@@ -47,7 +47,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         return token.contractAddress
     }
    
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol + tokenContract
     }
     
@@ -72,7 +72,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -107,17 +107,25 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Dependencies
     weak var accountService: AccountService?
     var apiService: AdamantApiServiceProtocol!
-    var erc20ApiService: ERC20ApiService!
+    var erc20ApiService: ERC20ApiServiceProtocol!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
+    var ethBIP32Service: EthBIP32ServiceProtocol!
     
     // MARK: - Notifications
     let walletUpdatedNotification: Notification.Name
     let serviceEnabledChanged: Notification.Name
     let transactionFeeUpdated: Notification.Name
     let serviceStateChanged: Notification.Name
+    
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "erc20_transaction"
@@ -178,7 +186,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: dynamicRichMessageType
     )
@@ -199,13 +207,6 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     func addObservers() {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
-            .sink { @MainActor [weak self] _ in
-                self?.update()
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
             .sink { @MainActor [weak self] _ in
                 self?.update()
             }
@@ -241,6 +242,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         }
     }
     
+    @MainActor
     func update() async {
         guard let wallet = ethWallet else {
             return
@@ -257,19 +259,20 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            markBalanceAsFresh()
-            
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         setState(.upToDate)
@@ -344,12 +347,12 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         }.get()
     }
     
-    private func markBalanceAsFresh() {
-        ethWallet?.isBalanceInitialized = true
+    private func markBalanceAsFresh(_ wallet: EthWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = ethWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -357,13 +360,15 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService {
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
         setState(.notInitiated)
@@ -372,20 +377,9 @@ extension ERC20WalletService {
             enabled = false
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-        
-        // MARK: 2. Create keys and addresses
-        let keystore: BIP32Keystore
-        do {
-            guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
-                throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
-            }
-            
-            keystore = store
-        } catch {
-            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
-        }
-        
-        await erc20ApiService.setKeystoreManager(.init([keystore]))
+
+        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase)
+
         
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
@@ -393,7 +387,7 @@ extension ERC20WalletService {
         
         // MARK: 3. Update
         let eWallet = EthWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             address: ethAddress.address,
             ethAddress: ethAddress,
             keystore: keystore
@@ -410,6 +404,8 @@ extension ERC20WalletService {
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
+        
+        await walletUpdateSender.send()
         
         self.setState(.upToDate, silent: true)
         Task {
@@ -435,6 +431,7 @@ extension ERC20WalletService: SwinjectDependentService {
         erc20ApiService = container.resolve(ERC20ApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
         
         addTransactionObserver()
     }
@@ -555,6 +552,15 @@ extension ERC20WalletService {
         return result
     }
 }
+
+#if DEBUG
+extension ERC20WalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
+    }
+}
+#endif
 
 extension ERC20WalletService {
     func getTransactionsHistory(

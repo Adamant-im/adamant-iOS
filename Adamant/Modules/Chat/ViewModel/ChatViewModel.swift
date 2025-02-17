@@ -86,6 +86,7 @@ final class ChatViewModel: NSObject {
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
+    let didTapAdmNodesList = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
@@ -99,6 +100,7 @@ final class ChatViewModel: NSObject {
     let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
+    let showBuyAndSell = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -202,7 +204,8 @@ final class ChatViewModel: NSObject {
     func setup(
         account: AdamantAccount?,
         chatroom: Chatroom,
-        messageIdToShow: String?
+        messageIdToShow: String?,
+        isNewChat: Bool = false
     ) {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
@@ -233,6 +236,9 @@ final class ChatViewModel: NSObject {
                 for: partnerAddress,
                 thenRemoveIt: true
             )
+        }
+        if isNewChat && !(accountService.account?.isEnoughMoneyForTransaction ?? false) {
+            dialog.send(.freeTokenAlert)
         }
     }
     
@@ -292,9 +298,7 @@ final class ChatViewModel: NSObject {
         
         Task {
             if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
-                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription))
+                dialog.send(.noActiveNodesAlert)
             }
             
             if !(filesPicked?.isEmpty ?? true) {
@@ -703,9 +707,7 @@ final class ChatViewModel: NSObject {
         }
         
         guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.adm.name
-            ).localizedDescription))
+            dialog.send(.noActiveNodesAlert)
             return false
         }
         
@@ -1424,8 +1426,10 @@ private extension ChatViewModel {
                 dialog.send(.freeTokenAlert)
                 return
             }
-        case .serverError:
-            dialog.send(.richError(error))
+        case let .serverError(error):
+            if case .timestampIsInTheFuture = error {
+                dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
+            }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break
         }
@@ -1468,7 +1472,7 @@ private extension ChatViewModel {
     
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
-            .map { visibleWalletService.isInvisible($0.core) }
+            .map { visibleWalletService.isInvisible($0.core.tokenUniqueID) }
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible

@@ -25,8 +25,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
-    @ObservableValue private(set) var state: State = .empty
-    var stateObserver: AnyObservable<State> { $state.eraseToAnyPublisher() }
+    @ObservableValue private(set) var state: DataProviderState = .empty
+    var stateObserver: AnyObservable<DataProviderState> { $state.eraseToAnyPublisher() }
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -41,7 +41,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     // MARK: Tools
     
     /// Free stateSemaphore before calling this method, or you will deadlock.
-    private func setState(_ state: State, previous prevState: State, notify: Bool = false) {
+    private func setState(_ state: DataProviderState, previous prevState: DataProviderState, notify: Bool = false) {
         self.state = state
         
         if notify {
@@ -510,7 +510,8 @@ extension AdamantTransfersProvider {
             message: encodedMessage.message,
             type: type,
             nonce: encodedMessage.nonce,
-            amount: amount
+            amount: amount,
+            date: AdmWalletService.correctedDate
         )
         
         guard let signedTransaction = signedTransaction else {
@@ -623,7 +624,8 @@ extension AdamantTransfersProvider {
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,
-            amount: amount
+            amount: amount,
+            date: AdmWalletService.correctedDate
         )
         
         guard let signedTransaction = signedTransaction else {

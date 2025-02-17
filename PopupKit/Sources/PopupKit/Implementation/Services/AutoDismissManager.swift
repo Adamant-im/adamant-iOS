@@ -43,10 +43,10 @@ final class AutoDismissManager {
 
 private extension AutoDismissManager {
     func setTimer(handler: @escaping () -> Void) -> AnyCancellable {
-        Timer.publish(every: autoDismissTimeInterval, on: .main, in: .common)
-            .autoconnect()
+        Just(())
+            .delay(for: .seconds(autoDismissTimeInterval), scheduler: DispatchQueue.main)
             .sink { _ in handler() }
     }
 }
 
-private let autoDismissTimeInterval: TimeInterval = 4
+private let autoDismissTimeInterval: TimeInterval = 3

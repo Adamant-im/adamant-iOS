@@ -20,6 +20,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
     static let currencyLogo = UIImage.asset(named: "adamant_wallet") ?? .init()
+    static var correctedDate: Date {
+        Date() - 0.5
+    }
 
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -41,7 +44,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
         return ""
     }
     
-    var tokenUnicID: String {
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
     
@@ -73,6 +76,13 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
+    
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
@@ -106,7 +116,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -160,7 +170,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             wallet.balance = account.balance
         } else {
-            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
+            let wallet = AdmWallet(unicId: tokenUniqueID, address: account.address)
             wallet.balance = account.balance
             
             admWallet = wallet
@@ -194,6 +204,9 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
+        Task{ @MainActor in
+            walletUpdateSender.send()
+        }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -212,12 +225,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
         .init(sentDate: nil, status: .notInitiated)
     }
     
-    func initWallet(withPassphrase: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase: String, withPassword: String) async throws -> WalletAccount {
         throw InternalAPIError.unknownError
     }
     
     func setInitiationFailed(reason: String) { }
-    
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

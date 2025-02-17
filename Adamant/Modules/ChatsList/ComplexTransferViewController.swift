@@ -68,7 +68,7 @@ final class ComplexTransferViewController: UIViewController {
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletItemModel.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletCollectionViewCell.Model.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
@@ -207,7 +207,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             let service = services[index].core
             
             guard let wallet = service.wallet else {
-                return WalletItemModel(model: .default)
+                return WalletCollectionViewCell.Model.default
             }
             
             var network: String?
@@ -217,16 +217,18 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 network = type(of: service).tokenNetworkSymbol
             }
             
-            let item = WalletItem(
+            let item = WalletCollectionViewCell.Model(
                 index: index,
+                coinID: service.tokenUniqueID,
                 currencySymbol: service.tokenSymbol,
                 currencyImage: service.tokenLogo,
-                isBalanceInitialized: wallet.isBalanceInitialized,
                 currencyNetwork: network ?? type(of: service).tokenNetworkSymbol,
-                balance: wallet.balance
+                isBalanceInitialized: wallet.isBalanceInitialized,
+                balance: wallet.balance,
+                notificationBadgeCount: 0
             )
             
-            return WalletItemModel(model: item)
+            return item
         }
 	}
 }

@@ -21,17 +21,19 @@ extension KlyWalletService: WalletServiceTwoStepSend {
         comment: String?
     ) async throws -> TransactionEntity {
         // MARK: 1. Prepare
-        guard let wallet = klyWallet,
-                let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient)
-        else {
+        guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
+        }
+        
+        guard let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient) else {
+            throw WalletServiceError.accountNotFound
         }
         
         let keys = wallet.keyPair
         
         // MARK: 2. Create local transaction
         
-        let transaction = TransactionEntity().createTx(
+        let transaction = klyTransactionFactory.createTx(
             amount: amount,
             fee: fee,
             nonce: wallet.nonce,

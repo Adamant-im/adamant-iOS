@@ -305,6 +305,12 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
+        viewModel.didTapAdmNodesList
+            .sink { [weak self] in
+                self?.didTapReviewAdmNodes()
+            }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -476,6 +482,11 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        viewModel.showBuyAndSell
+                    .sink { [weak self] in
+                        self?.presentBuyAndSell()
+                    }
+                    .store(in: &subscriptions)
     }
 }
 
@@ -660,6 +671,10 @@ private extension ChatViewController {
         UIView.animate(withDuration: 0.25) {
             self.chatDropView.alpha = value ? 1.0 : .zero
         }
+    }
+    func presentBuyAndSell() {
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
     }
 }
 
@@ -960,6 +975,11 @@ private extension ChatViewController {
         default:
             return
         }
+    }
+    
+    func didTapReviewAdmNodes() {
+        let vc = screensFactory.makeNodesList()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {

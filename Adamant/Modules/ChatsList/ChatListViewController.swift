@@ -73,13 +73,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
-    private lazy var refreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        return refreshControl
-    }()
-    
     private lazy var markdownParser: MarkdownParser = {
         let parser = MarkdownParser(
             font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
@@ -257,7 +250,6 @@ final class ChatListViewController: KeyboardObservingViewController {
         tableView.delegate = self
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
-        tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
         tableView.tableHeaderView = UIView()
     }
@@ -383,8 +375,9 @@ final class ChatListViewController: KeyboardObservingViewController {
         else {
             return
         }
-        
-        self.handleRefresh(self.refreshControl)
+        Task {
+            await handleRefresh()
+        }
     }
     
     @MainActor private func handleInitiallySyncedNotification(_ notification: Notification) async {
@@ -419,14 +412,16 @@ final class ChatListViewController: KeyboardObservingViewController {
     // MARK: Helpers
     func chatViewController(
         for chatroom: Chatroom,
-        with messageId: String? = nil
+        with messageId: String? = nil,
+        newChat: Bool = false
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageIdToShow: messageId
+            messageIdToShow: messageId,
+            isNewChat: newChat
         )
 
         return vc
@@ -464,24 +459,14 @@ final class ChatListViewController: KeyboardObservingViewController {
     }
     
     @MainActor
-    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        Task {
-            let result = await chatsProvider.update(notifyState: true)
-            
-            guard let result = result else {
-                refreshControl.endRefreshing()
-                return
-            }
-            
-            switch result {
-            case .success:
-                tableView.reloadData()
-                
-            case .failure(let error):
-                dialogService.showRichError(error: error)
-            }
-            
-            refreshControl.endRefreshing()
+    private func handleRefresh() async {
+        guard let result = await chatsProvider.update(notifyState: true) else { return }
+        
+        switch result {
+        case .success:
+            tableView.reloadData()
+        case .failure(let error):
+            dialogService.showRichError(error: error)
         }
     }
     
@@ -593,6 +578,13 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
         scrollUpButton.isHidden = offsetY < cellHeight * 0.75
+    }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard scrollView.contentOffset.y <= 0, scrollView.contentOffset.y < -100 else { return }
+        
+        Task {
+            await handleRefresh()
+        }
     }
 }
 
@@ -840,7 +832,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
         }
         
         DispatchQueue.main.async { [self] in
-            let vc = chatViewController(for: chatroom)
+            let vc = chatViewController(for: chatroom, newChat: true)
             
             if let split = splitViewController {
                 let nav = UINavigationController(rootViewController: vc)
@@ -862,7 +854,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 vc.viewModel.inputText = preMessage
             }
         }
-        
         // Select row after awhile
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
             if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
@@ -944,7 +935,10 @@ extension ChatListViewController {
             }
         }
     }
-    
+    private func presentBuyAndSell() {
+        let buyAndSellVC = screensFactory.makeBuyAndSell()
+        navigationController?.pushViewController(buyAndSellVC, animated: true)
+    }
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
@@ -1294,46 +1288,27 @@ extension ChatListViewController {
             title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
-            guard let alert = self?.makeRenameAlert(for: address) else { return }
-            self?.dialogService.present(alert, animated: true) {
+            guard let self = self else { return }
+            
+            let alert = dialogService.makeRenameAlert(
+                titleFormat: String(format: .adamant.chat.actionsBody, address),
+                initialText: self.addressBook.getName(for: address),
+                isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction ?? false,
+                url: accountService.account?.address,
+                showVC: { [weak self] in
+                    self?.presentBuyAndSell()
+                }
+            ) { [weak self] newName in
+                Task {
+                    await self?.addressBook.set(name: newName, for: address)
+                }
+            }
+            
+            dialogService.present(alert, animated: true) { [weak self] in
                 self?.dialogService.selectAllTextFields(in: alert)
                 completion?()
             }
         }
-    }
-    
-    private func makeRenameAlert(for address: String) -> UIAlertController? {
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak self] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = self?.addressBook.getName(for: address)
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak self] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            Task {
-                await self?.addressBook.set(name: newName, for: address)
-            }
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
     }
     
     private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
@@ -1528,7 +1503,7 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension DataProviderState {
     var isUpdating: Bool {
         switch self {
         case .updating: true

@@ -25,8 +25,9 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     // MARK: Dependencies
     
     var apiService: AdamantApiServiceProtocol!
-    var klyNodeApiService: KlyNodeApiService!
+    var klyNodeApiService: KlyNodeApiServiceProtocol!
     var klyServiceApiService: KlyServiceApiService!
+    var klyTransactionFactory: KlyTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var vibroService: VibroService!
@@ -70,7 +71,7 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -84,6 +85,13 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     let transactionFeeUpdated = Notification.Name("adamant.klyWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.klyWallet.stateChanged")
     
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+    
     init() {
         addObservers()
     }
@@ -91,9 +99,9 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     // MARK: -
     
     func initWallet(
-        withPassphrase passphrase: String
+        withPassphrase passphrase: String, withPassword password: String
     ) async throws -> WalletAccount {
-        try await initWallet(passphrase: passphrase)
+        try await initWallet(passphrase: passphrase, password: password)
     }
     
     func setInitiationFailed(reason: String) {
@@ -181,6 +189,7 @@ extension KlyWalletService: SwinjectDependentService {
         apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         klyServiceApiService = container.resolve(KlyServiceApiService.self)
+        klyTransactionFactory = container.resolve(KlyTransactionFactoryProtocol.self)
         klyNodeApiService = container.resolve(KlyNodeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
@@ -230,6 +239,7 @@ private extension KlyWalletService {
             .store(in: &subscriptions)
     }
     
+    @MainActor
     func update() async {
         guard let wallet = klyWallet else {
             return
@@ -246,19 +256,20 @@ private extension KlyWalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            markBalanceAsFresh()
-
             if wallet.balance < balance, wallet.isBalanceInitialized {
-                await vibroService.applyVibration(.success)
+                vibroService.applyVibration(.success)
             }
             
             wallet.balance = balance
+            markBalanceAsFresh(wallet)
             
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            walletUpdateSender.send()
         }
         
         if let nonce = try? await getNonce(address: wallet.address) {
@@ -276,12 +287,12 @@ private extension KlyWalletService {
         setState(.upToDate)
     }
     
-    func markBalanceAsFresh() {
-        klyWallet?.isBalanceInitialized = true
+    func markBalanceAsFresh(_ wallet: KlyWallet) {
+        wallet.isBalanceInitialized = true
         
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self, let wallet = klyWallet else { return }
+            guard let self else { return }
             wallet.isBalanceInitialized = false
             
             NotificationCenter.default.post(
@@ -289,6 +300,8 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -400,7 +413,7 @@ private extension KlyWalletService {
 
 // MARK: - Init Wallet
 private extension KlyWalletService {
-    func initWallet(passphrase: String) async throws -> WalletAccount {
+    func initWallet(passphrase: String, password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -415,13 +428,13 @@ private extension KlyWalletService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: salt
+                salt: password.isEmpty ? salt : "mnemonic\(password)"
             )
             
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
          
             let wallet = KlyWallet(
-                unicId: tokenUnicID,
+                unicId: tokenUniqueID,
                 address: address,
                 keyPair: keyPair,
                 nonce: .zero,
@@ -434,6 +447,8 @@ private extension KlyWalletService {
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+            
+            await walletUpdateSender.send()
         } catch {
             throw WalletServiceError.accountNotFound
         }
@@ -443,7 +458,10 @@ private extension KlyWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        guard let eWallet = self.klyWallet else {
+        guard
+            let eWallet = klyWallet,
+            let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
+        else {
             throw WalletServiceError.accountNotFound
         }
         
@@ -453,7 +471,7 @@ private extension KlyWalletService {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             
             if address != eWallet.address {
-                updateKvsAddress(eWallet.address)
+                updateKvsAddress(kvsAddressModel)
             }
             
             setState(.upToDate)
@@ -474,7 +492,7 @@ private extension KlyWalletService {
                     await update()
                 }
                 
-                updateKvsAddress(eWallet.address)
+                updateKvsAddress(kvsAddressModel)
                 
                 return eWallet
             default:
@@ -484,13 +502,13 @@ private extension KlyWalletService {
         }
     }
     
-    func updateKvsAddress(_ address: String) {
+    func updateKvsAddress(_ model: KVSValueModel) {
         Task {
             do {
-                try await save(klyAddress: address)
+                try await save(model)
             } catch {
                 kvsSaveProcessError(
-                    klyAddress: address,
+                    model,
                     error: error
                 )
             }
@@ -499,7 +517,7 @@ private extension KlyWalletService {
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     func kvsSaveProcessError(
-        klyAddress: String,
+        _ model: KVSValueModel,
         error: Error
     ) {
         guard let error = error as? WalletServiceError,
@@ -518,7 +536,7 @@ private extension KlyWalletService {
                 guard let self = self else { return }
                 
                 Task {
-                    try await self.save(klyAddress: klyAddress)
+                    try await self.save(model)
                     self.balanceObserver?.cancel()
                 }
             }
@@ -527,10 +545,8 @@ private extension KlyWalletService {
     /// - Parameters:
     ///   - klyAddress: Klayr address to save into KVS
     ///   - adamantAddress: Owner of Klayr address
-    func save(klyAddress: String) async throws {
-        guard let adamant = accountService.account,
-              let keypair = accountService.keypair
-        else {
+    func save(_ model: KVSValueModel) async throws {
+        guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -538,19 +554,23 @@ private extension KlyWalletService {
             throw WalletServiceError.notEnoughMoney
         }
         
-        let result = await apiService.store(
-            key: KlyWalletService.kvsAddress,
-            value: klyAddress,
-            type: .keyValue,
-            sender: adamant.address,
-            keypair: keypair
-        )
+        let result = await apiService.store(model, date: .now)
         
         guard case .failure(let error) = result else {
             return
         }
         
         throw WalletServiceError.apiError(error)
+    }
+    
+    func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
+        guard let keypair = accountService.keypair else { return nil }
+        
+        return .init(
+            key: Self.kvsAddress,
+            value: wallet.address,
+            keypair: keypair
+        )
     }
     
     func getKlyWalletAddress(
@@ -580,6 +600,15 @@ private extension KlyWalletService {
         }
     }
 }
+
+#if DEBUG
+extension KlyWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: KlyWallet?) {
+        self.klyWallet = wallet
+    }
+}
+#endif
 
 private extension KlyWalletService {
     func getTransactions(

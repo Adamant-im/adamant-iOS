@@ -10,8 +10,8 @@ import Foundation
 
 public protocol AdamantCore: AnyObject, Sendable {
     // MARK: - Keys
-    func createHashFor(passphrase: String) -> String?
-    func createKeypairFor(passphrase: String) -> Keypair?
+    func createSeedFor(passphrase: String, password: String) -> [UInt8]?
+    func createKeypairFor(passphrase: String, password: String) -> Keypair?
     
     // MARK: - Signing transactions
     func sign(transaction: SignableTransaction, senderId: String, keypair: Keypair) -> String?

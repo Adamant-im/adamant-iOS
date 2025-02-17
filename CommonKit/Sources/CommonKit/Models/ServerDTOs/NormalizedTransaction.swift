@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Used to make a KVC transactions into the blockchain
 public struct NormalizedTransaction: SignableTransaction {
     public let type: TransactionType
     public let amount: Decimal
@@ -16,24 +17,6 @@ public struct NormalizedTransaction: SignableTransaction {
     public let timestamp: UInt64
     public let recipientId: String?
     public let asset: TransactionAsset
-    
-    init(
-        type: TransactionType,
-        amount: Decimal,
-        senderPublicKey: String,
-        requesterPublicKey: String?,
-        timestamp: UInt64,
-        recipientId: String?,
-        asset: TransactionAsset
-    ) {
-        self.type = type
-        self.amount = amount
-        self.senderPublicKey = senderPublicKey
-        self.requesterPublicKey = requesterPublicKey
-        self.timestamp = timestamp
-        self.recipientId = recipientId
-        self.asset = asset
-    }
 }
 
 public extension NormalizedTransaction {

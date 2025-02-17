@@ -818,11 +818,10 @@ class TransferViewControllerBase: FormViewController {
             }
         }
         
-        let recipient: String
-        if let recipientName = recipientName {
+        var recipient: String = recipientAddress
+        
+        if let recipientName, recipientName != recipientAddress {
             recipient = "\(recipientName) \(recipientAddress)"
-        } else {
-            recipient = recipientAddress
         }
         
         let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
@@ -1147,7 +1146,7 @@ extension TransferViewControllerBase {
                 ? self?.activeBaseColor
                 : self?.inactiveBaseColor
             }.onChange { [weak self] row in
-                guard let id = self?.walletCore.tokenUnicID,
+                guard let id = self?.walletCore.tokenUniqueID,
                       let value = row.value
                 else {
                     return

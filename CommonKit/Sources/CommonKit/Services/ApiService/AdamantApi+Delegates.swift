@@ -141,7 +141,8 @@ extension AdamantApiService {
     public func voteForDelegates(
         from address: String,
         keypair: Keypair,
-        votes: [DelegateVote]
+        votes: [DelegateVote],
+        date: Date
     ) async -> ApiServiceResult<Bool> {
         // MARK: 0. Prepare
         var votesOrdered = votes
@@ -160,7 +161,7 @@ extension AdamantApiService {
             amount: .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: address,
             asset: TransactionAsset(votes: votesAsset)
         )
