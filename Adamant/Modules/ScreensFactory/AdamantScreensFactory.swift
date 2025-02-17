@@ -95,7 +95,10 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeBuyAndSell() -> UIViewController {
-        admWalletFactory.makeBuyAndSellVC()
+        admWalletFactory.makeBuyAndSellVC(screenFactory: self)
+    }
+    func makeBuyAndSellView(action: @escaping () -> Void) -> AnyView {
+        admWalletFactory.makeBuyAndSellView(screenFactory: self, action: action)
     }
     
     func makeChatList() -> UIViewController {
@@ -167,7 +170,7 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeNotifications() -> UIViewController {
-        notificationsFactory.makeViewController()
+        notificationsFactory.makeViewController(screensFactory: self)
     }
     
     func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView {
@@ -195,7 +198,7 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController {
-        partnerQRFactory.makeViewController(partner: partner)
+        partnerQRFactory.makeViewController(partner: partner, screenFactory: self)
     }
     
     func makeCoinsNodesList(context: CoinsNodesListContext) -> UIViewController {

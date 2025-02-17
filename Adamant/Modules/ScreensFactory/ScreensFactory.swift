@@ -6,7 +6,6 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import SwiftUI
 
 @MainActor
@@ -65,4 +64,5 @@ protocol ScreensFactory {
     func makeVibrationSelection() -> UIViewController
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController
     func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView
+    func makeBuyAndSellView(action: @escaping () -> Void) -> AnyView
 }

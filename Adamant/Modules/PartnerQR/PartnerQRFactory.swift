@@ -20,7 +20,7 @@ struct PartnerQRFactory {
     }
     
     @MainActor
-    func makeViewController(partner: CoreDataAccount) -> UIViewController {
+    func makeViewController(partner: CoreDataAccount, screenFactory: ScreensFactory) -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         
         let viewModel = {
@@ -29,7 +29,7 @@ struct PartnerQRFactory {
             return viewModel
         }
         
-        return UIHostingController(rootView: PartnerQRView(viewModel: viewModel))
+        return UIHostingController(rootView: PartnerQRView(viewModel: viewModel, screenFactory: screenFactory))
     }
 }
 
@@ -46,7 +46,8 @@ private struct PartnerQRAssembly: MainThreadAssembly {
                 dialogService: $0.resolve(DialogService.self)!,
                 addressBookService: $0.resolve(AddressBookService.self)!,
                 avatarService: $0.resolve(AvatarService.self)!,
-                partnerQRService: $0.resolve(PartnerQRService.self)!
+                partnerQRService: $0.resolve(PartnerQRService.self)!,
+                accountService: $0.resolve(AccountService.self)!
             )
         }.inObjectScope(.transient)
     }
