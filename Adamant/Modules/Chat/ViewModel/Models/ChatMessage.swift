@@ -22,6 +22,7 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
     let topSpinnerOn: Bool
     let dateHeaderIsHidden: Bool
     var isUnread: Bool
+    var unreadMode: UnreadMode?
     
     static var `default`: Self {
         Self(
@@ -35,7 +36,8 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
             dateHeader: nil,
             topSpinnerOn: false,
             dateHeaderIsHidden: true,
-            isUnread: true
+            isUnread: true,
+            unreadMode: .top
         )
     }
 }
@@ -96,4 +98,8 @@ extension MessageType {
             return .default
         }
     }
+}
+enum UnreadMode {
+    case top
+    case bottom
 }

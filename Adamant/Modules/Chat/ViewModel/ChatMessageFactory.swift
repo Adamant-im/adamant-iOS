@@ -114,7 +114,8 @@ struct ChatMessageFactory: Sendable {
             dateHeader: makeDateHeader(sentDate: sentDate),
             topSpinnerOn: topSpinnerOn, 
             dateHeaderIsHidden: !dateHeaderOn,
-            isUnread: checkTransactionForUnreadReaction(transaction: transaction)
+            isUnread: checkTransactionForUnreadReaction(transaction: transaction),
+            unreadMode: unreadMode(transaction: transaction)
         )
     }
 }
@@ -556,6 +557,15 @@ private extension ChatMessageFactory {
         }
         
         return transaction.isUnread
+    }
+    func unreadMode(transaction: ChatTransaction) -> UnreadMode? {
+        if transaction.isUnread {
+            return .top
+        } else if checkTransactionForUnreadReaction(transaction: transaction) {
+            return .bottom
+        } else {
+            return nil
+        }
     }
 }
 

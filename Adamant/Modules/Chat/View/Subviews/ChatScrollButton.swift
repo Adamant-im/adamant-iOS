@@ -12,6 +12,7 @@ import SnapKit
 enum Position {
     case up
     case down
+    case reaction
 }
 
 final class ChatScrollButton: UIView {
@@ -22,14 +23,38 @@ final class ChatScrollButton: UIView {
         case .up:
             button.setImage(.asset(named: "scrollUp"), for: .normal)
         case .down:
-            button.setImage(.asset(named: "ScrollDown"), for: .normal)
+            let config = UIImage.SymbolConfiguration.init(paletteColors: [.lightGray, .gray])
+            let image = UIImage(systemName: "chevron.down.circle.fill")?.withConfiguration(config)
+            button.setImage(image, for: .normal)
+            button.imageView?.contentMode = .scaleAspectFit
+            button.contentVerticalAlignment = .fill
+            button.contentHorizontalAlignment = .fill
+        case .reaction:
+            let config = UIImage.SymbolConfiguration.init(paletteColors: [.lightGray, .gray])
+            let image = UIImage(systemName: "heart.circle.fill")?.withConfiguration(config)
+            button.setImage(image, for: .normal)
+            button.imageView?.contentMode = .scaleAspectFit
+            button.contentVerticalAlignment = .fill
+            button.contentHorizontalAlignment = .fill
         }
+        
         button.addTarget(self, action: #selector(onTap), for: .touchUpInside)
         return button
     }()
     
-    private let position: Position
+    private lazy var counterLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .lightGray
+        label.font = .boldSystemFont(ofSize: 10)
+        label.textAlignment = .center
+        label.backgroundColor = UIColor.adamant.active
+        label.layer.cornerRadius = 9
+        label.layer.masksToBounds = true
+        label.isHidden = true
+        return label
+    }()
     
+    private let position: Position
     var action: (() -> Void)?
     
     init(frame: CGRect = .zero, position: Position) {
@@ -43,6 +68,11 @@ final class ChatScrollButton: UIView {
         super.init(coder: coder)
         configure()
     }
+    
+    func updateCounter(_ count: Int) {
+        counterLabel.text = count > 99 ? "99+" : "\(count)"
+        counterLabel.isHidden = count == 0
+    }
 }
 
 private extension ChatScrollButton {
@@ -50,6 +80,15 @@ private extension ChatScrollButton {
         addSubview(button)
         button.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
+        }
+        
+        if position == .reaction || position == .down {
+            addSubview(counterLabel)
+            counterLabel.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.top.equalToSuperview().offset(-9)
+                $0.width.height.equalTo(18)
+            }
         }
     }
     

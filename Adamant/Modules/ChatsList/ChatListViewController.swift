@@ -70,7 +70,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     var searchController: UISearchController?
     
     private var transactionsRequiringBalanceUpdate: [String] = []
-    private lazy var chatsManuallyMarkedAsUnread: Set<Int> = Set() {
+    private var chatsManuallyMarkedAsUnread: Set<Int> = Set() {
         didSet {
             setBadgeValue(unreadController?.fetchedObjects?.count)
         }

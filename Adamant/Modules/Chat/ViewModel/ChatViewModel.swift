@@ -104,7 +104,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
-    @ObservableValue private(set) var unReadMesaggesIndexes: [Int]?
+    @ObservableValue private(set) var unReadMesaggesIndexes: [Int: UnreadMode]?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
@@ -1097,9 +1097,12 @@ private extension ChatViewModel {
             .map { messages in
                 messages.enumerated()
                     .filter { $0.element.isUnread }
-                    .map { $0.offset }
+                    .reduce(into: [Int: UnreadMode]()) { result, item in
+                        let (index, message) = item
+                        result[index] = message.unreadMode
+                    }
             }
-            .removeDuplicates()
+            .removeDuplicates { $0 == $1 }
             .sink { [weak self] unreadIndexes in
                 self?.unReadMesaggesIndexes = unreadIndexes
             }
