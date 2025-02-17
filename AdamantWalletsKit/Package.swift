@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/Adamant-im/adamant-wallets.git",
-            branch: "trello.com/c/txGIRwKv"
+            branch: "dev"
         )
     ],
     targets: [
