@@ -26,7 +26,7 @@ struct CoinsNodesListView: View {
             isPresented: $viewModel.state.isAlertShown
         ) {
             Button(String.adamant.alert.cancel, role: .cancel) {}
-            Button(String.adamant.coinsNodesList.reset) { viewModel.reset() }
+            Button(String.adamant.coinsNodesList.reset, role: .destructive) { viewModel.reset() }
         }
         .navigationTitle(String.adamant.coinsNodesList.title)
     }
