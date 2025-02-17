@@ -526,6 +526,27 @@ extension LoginViewController: ButtonsStripeViewDelegate {
     }
 }
 
+// MARK: - Hardware keyboard handling
+
+extension LoginViewController {
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        for press in presses {
+            guard let key = press.key else { continue }
+            if key.keyCode == UIKeyboardHIDUsage.keyboardReturnOrEnter {
+                if let passphrase = (form.rowBy(tag: Rows.passphrase.tag) as? PasswordRow)?.value {
+                    return loginWith(passphrase: passphrase)
+                }
+            }
+        }
+
+        super.pressesBegan(presses, with: event)
+    }
+}
+
 // MARK: UITextField + extensions
 
 private extension UITextField {
