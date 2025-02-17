@@ -162,11 +162,11 @@ final actor ChatsProviderMock: ChatsProvider {
         fatalError("\(#file).\(#function) is not implemented")
     }
     
-    var state: State {
+    var state: DataProviderState {
         fatalError("\(#file).\(#function) is not implemented")
     }
     
-    var stateObserver: AnyObservable<State> {
+    var stateObserver: AnyObservable<DataProviderState> {
         fatalError("\(#file).\(#function) is not implemented")
     }
     
