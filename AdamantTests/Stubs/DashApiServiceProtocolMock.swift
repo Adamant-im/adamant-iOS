@@ -1,8 +1,8 @@
 //
-//  BtcApiServiceProtocol.swift
+//  DashApiServiceProtocolMock.swift
 //  Adamant
 //
-//  Created by Christian Benua on 09.01.2025.
+//  Created by Christian Benua on 23.01.2025.
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
@@ -10,9 +10,8 @@
 import CommonKit
 import Foundation
 
-final class BtcApiServiceProtocolMock: BtcApiServiceProtocol {
-    
-    var api: BtcApiCore!
+final class DashApiServiceProtocolMock: DashApiServiceProtocol {
+    var api: DashApiCore!
     
     func request<Output>(
         waitsForConnectivity: Bool,

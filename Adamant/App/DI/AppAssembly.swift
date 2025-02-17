@@ -202,6 +202,12 @@ struct AppAssembly: MainThreadAssembly {
             ))
         }.inObjectScope(.container)
         
+        
+        // MARK: DashLastTransactionStorage
+        container.register(DashLastTransactionStorageProtocol.self) { r in
+            DashLastTransactionStorage(securedStore: r.resolve(SecuredStore.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: LskNodeApiService
         container.register(KlyNodeApiService.self) { r in
             KlyNodeApiService(api: .init(

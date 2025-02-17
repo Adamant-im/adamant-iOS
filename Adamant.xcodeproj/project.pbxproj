@@ -469,6 +469,12 @@
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
 		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
 		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
+		AA8FFFD52D50DCEF001D8576 /* dash_send_transation_response.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD42D50DCE4001D8576 /* dash_send_transation_response.json */; };
+		AA8FFFD72D50DD0E001D8576 /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFD62D50DD07001D8576 /* Data+Extensions.swift */; };
+		AA8FFFD82D50DF63001D8576 /* dash_unspent_transaction_intergration_test.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */; };
+		AA8FFFDA2D50DFB2001D8576 /* dash_unspent_transaction_unit_test.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD92D50DFA3001D8576 /* dash_unspent_transaction_unit_test.json */; };
+		AA8FFFDC2D50E079001D8576 /* dash_unverified_unspent_transactions.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFDB2D50E063001D8576 /* dash_unverified_unspent_transactions.json */; };
+		AA8FFFE12D50E175001D8576 /* dash_send_transaction_unit_response.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFDF2D50E13F001D8576 /* dash_send_transaction_unit_response.json */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -484,6 +490,13 @@
 		AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641402D4049D400619DFE /* RpsRequestBody.swift */; };
 		AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */; };
 		AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */; };
+		AAC641492D417B0D00619DFE /* DashLastTransactionStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641482D417AF400619DFE /* DashLastTransactionStorageProtocol.swift */; };
+		AAC6414B2D417B5300619DFE /* DashLastTransactionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414A2D417B4D00619DFE /* DashLastTransactionStorage.swift */; };
+		AAC6414D2D4180B600619DFE /* DashLastTransactionStorageProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */; };
+		AAC6414F2D41829900619DFE /* DashWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414E2D41829300619DFE /* DashWalletServiceTests.swift */; };
+		AAC641512D42D67B00619DFE /* DashApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641502D42D67700619DFE /* DashApiServiceProtocol.swift */; };
+		AAC641532D42D70100619DFE /* DashApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */; };
+		AAC641572D42F9E200619DFE /* DashWalletServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641562D42F9DA00619DFE /* DashWalletServiceIntegrationTests.swift */; };
 		AAC641592D44F81700619DFE /* ERC20WalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641582D44F81000619DFE /* ERC20WalletServiceTests.swift */; };
 		AAC6415B2D44FB0100619DFE /* ERC20ApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */; };
 		AAC6415D2D44FD5B00619DFE /* ERC20ApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */; };
@@ -1136,6 +1149,12 @@
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
 		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
+		AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unspent_transaction_intergration_test.json; sourceTree = "<group>"; };
+		AA8FFFD42D50DCE4001D8576 /* dash_send_transation_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_send_transation_response.json; sourceTree = "<group>"; };
+		AA8FFFD62D50DD07001D8576 /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
+		AA8FFFD92D50DFA3001D8576 /* dash_unspent_transaction_unit_test.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unspent_transaction_unit_test.json; sourceTree = "<group>"; };
+		AA8FFFDB2D50E063001D8576 /* dash_unverified_unspent_transactions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unverified_unspent_transactions.json; sourceTree = "<group>"; };
+		AA8FFFDF2D50E13F001D8576 /* dash_send_transaction_unit_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_send_transaction_unit_response.json; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -1151,6 +1170,13 @@
 		AAC641402D4049D400619DFE /* RpsRequestBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RpsRequestBody.swift; sourceTree = "<group>"; };
 		AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionSubmitModel.swift; sourceTree = "<group>"; };
 		AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionSwizzlingMock.swift; sourceTree = "<group>"; };
+		AAC641482D417AF400619DFE /* DashLastTransactionStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorageProtocol.swift; sourceTree = "<group>"; };
+		AAC6414A2D417B4D00619DFE /* DashLastTransactionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorage.swift; sourceTree = "<group>"; };
+		AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorageProtocolMock.swift; sourceTree = "<group>"; };
+		AAC6414E2D41829300619DFE /* DashWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletServiceTests.swift; sourceTree = "<group>"; };
+		AAC641502D42D67700619DFE /* DashApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashApiServiceProtocol.swift; sourceTree = "<group>"; };
+		AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashApiServiceProtocolMock.swift; sourceTree = "<group>"; };
+		AAC641562D42F9DA00619DFE /* DashWalletServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		AAC641582D44F81000619DFE /* ERC20WalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20WalletServiceTests.swift; sourceTree = "<group>"; };
 		AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20ApiServiceProtocol.swift; sourceTree = "<group>"; };
 		AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20ApiServiceProtocolMock.swift; sourceTree = "<group>"; };
@@ -1752,10 +1778,13 @@
 			children = (
 				93B28EC32B076DFD007F268B /* DTO */,
 				6403F5DD22723C6800D58779 /* DashMainnet.swift */,
+				AAC641482D417AF400619DFE /* DashLastTransactionStorageProtocol.swift */,
+				AAC6414A2D417B4D00619DFE /* DashLastTransactionStorage.swift */,
 				6403F5DF22723F6400D58779 /* DashWalletFactory.swift */,
 				6403F5E122723F7500D58779 /* DashWallet.swift */,
 				6403F5E322723F8C00D58779 /* DashWalletService.swift */,
 				93B28EC12B076D31007F268B /* DashApiService.swift */,
+				AAC641502D42D67700619DFE /* DashApiServiceProtocol.swift */,
 				4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */,
 				A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */,
 				648CE3A5229AD1CD0070A2CC /* DashWalletService+Send.swift */,
@@ -2351,6 +2380,8 @@
 		AA33BEB02D303C470083E59C /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				AAC641562D42F9DA00619DFE /* DashWalletServiceIntegrationTests.swift */,
+				AAC6414E2D41829300619DFE /* DashWalletServiceTests.swift */,
 				AAC641342D40324D00619DFE /* KlyWalletServiceTests.swift */,
 				AAC641322D3ED1B200619DFE /* DogeWalletServiceIntegrationTests.swift */,
 				AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */,
@@ -2365,7 +2396,10 @@
 		AA33BEB32D303CA30083E59C /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFD12D50DBF2001D8576 /* RequestStubs */,
 				AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */,
+				AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */,
+				AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */,
 				AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */,
 				AAC641402D4049D400619DFE /* RpsRequestBody.swift */,
 				AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */,
@@ -2385,9 +2419,22 @@
 			path = Stubs;
 			sourceTree = "<group>";
 		};
+		AA8FFFD12D50DBF2001D8576 /* RequestStubs */ = {
+			isa = PBXGroup;
+			children = (
+				AA8FFFDF2D50E13F001D8576 /* dash_send_transaction_unit_response.json */,
+				AA8FFFDB2D50E063001D8576 /* dash_unverified_unspent_transactions.json */,
+				AA8FFFD92D50DFA3001D8576 /* dash_unspent_transaction_unit_test.json */,
+				AA8FFFD42D50DCE4001D8576 /* dash_send_transation_response.json */,
+				AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */,
+			);
+			path = RequestStubs;
+			sourceTree = "<group>";
+		};
 		AAFB3C892D31C0C4000CCCE9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AA8FFFD62D50DD07001D8576 /* Data+Extensions.swift */,
 				AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */,
 				AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */,
 				AAFB3CA42D3854B7000CCCE9 /* MockURLProtocol.swift */,
@@ -3383,6 +3430,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA8FFFE12D50E175001D8576 /* dash_send_transaction_unit_response.json in Resources */,
+				AA8FFFD82D50DF63001D8576 /* dash_unspent_transaction_intergration_test.json in Resources */,
+				AA8FFFDC2D50E079001D8576 /* dash_unverified_unspent_transactions.json in Resources */,
+				AA8FFFD52D50DCEF001D8576 /* dash_send_transation_response.json in Resources */,
+				AA8FFFDA2D50DFB2001D8576 /* dash_unspent_transaction_unit_test.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3515,6 +3567,7 @@
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
 				934FD9B02C78481500336841 /* InfoServiceApiError.swift in Sources */,
 				6403F5E222723F7500D58779 /* DashWallet.swift in Sources */,
+				AAC641492D417B0D00619DFE /* DashLastTransactionStorageProtocol.swift in Sources */,
 				26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */,
 				93294B822AAD0BB400911109 /* BtcWalletFactory.swift in Sources */,
 				AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */,
@@ -3535,6 +3588,7 @@
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				E993301E212EF39700CD5200 /* EthTransferViewController.swift in Sources */,
 				648CE3A42299A94D0070A2CC /* DashTransactionDetailsViewController.swift in Sources */,
+				AAC641512D42D67B00619DFE /* DashApiServiceProtocol.swift in Sources */,
 				934FD9AC2C78443600336841 /* InfoServiceHistoryItemDTO.swift in Sources */,
 				E90847362196FEA80095825D /* Chatroom+CoreDataClass.swift in Sources */,
 				3A4068342ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift in Sources */,
@@ -3546,6 +3600,7 @@
 				649D6BF221C27D5C009E727B /* SearchResultsViewController.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				3ACD30802BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift in Sources */,
+				AAC6414B2D417B5300619DFE /* DashLastTransactionStorage.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities+extended.swift in Sources */,
 				3A2478B32BB461A7009D89E9 /* StorageUsageViewModel.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
@@ -3993,10 +4048,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA8FFFD72D50DD0E001D8576 /* Data+Extensions.swift in Sources */,
 				AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */,
 				AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */,
+				AAC6414F2D41829900619DFE /* DashWalletServiceTests.swift in Sources */,
 				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
 				AAFB3C992D357E1D000CCCE9 /* BtcWalletServiceIntegrationTests.swift in Sources */,
+				AAC641532D42D70100619DFE /* DashApiServiceProtocolMock.swift in Sources */,
 				AAFB3C9F2D3843E0000CCCE9 /* Web3ProviderMock.swift in Sources */,
 				AAC6415D2D44FD5B00619DFE /* ERC20ApiServiceProtocolMock.swift in Sources */,
 				AAC6413F2D40466B00619DFE /* KlyNodeApiServiceProtocolMock.swift in Sources */,
@@ -4011,6 +4069,7 @@
 				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
 				AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */,
 				AAC6413B2D403C3300619DFE /* KlyTransactionFactoryProtocolMock.swift in Sources */,
+				AAC641572D42F9E200619DFE /* DashWalletServiceIntegrationTests.swift in Sources */,
 				AA33BEB22D303C730083E59C /* BtcWalletServiceTests.swift in Sources */,
 				AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */,
 				AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */,
@@ -4022,6 +4081,7 @@
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,
 				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
+				AAC6414D2D4180B600619DFE /* DashLastTransactionStorageProtocolMock.swift in Sources */,
 				AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */,
 				AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */,
 			);
