@@ -1,0 +1,21 @@
+{
+  "name": "Ethereum Name Service",
+  "website": "https://ens.domains",
+  "description": "Ethereum Name Service is a distributed, open, and extensible naming system based on the Ethereum blockchain",
+  "symbol": "ENS",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/ensdomains"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/ensdomains"
+    }
+  ]
+}

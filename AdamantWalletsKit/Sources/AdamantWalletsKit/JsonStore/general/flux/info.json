@@ -1,0 +1,29 @@
+{
+  "name": "Flux",
+  "website": "https://runonflux.io",
+  "description": "Flux is the cryptocurrency that powers the Flux ecosystem.",
+  "symbol": "FLUX",
+  "type": "token",
+  "decimals": 8,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/RunOnFlux"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/RunOnFlux"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/Flux_Official"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://whitepaper.app.runonflux.io"
+    }
+  ]
+}

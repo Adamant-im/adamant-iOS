@@ -1,0 +1,9 @@
+{
+  "name": "Storj",
+  "symbol": "STORJ",
+  "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 105,
+  "contractId": "0xb64ef51c888972c908cfacf59b47c1afbc0ab8ac",
+  "decimals": 8
+}

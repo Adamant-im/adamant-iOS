@@ -1,0 +1,29 @@
+{
+  "name": "Decentraland",
+  "website": "https://decentraland.org",
+  "description": "Decentraland is a decentralized virtual reality world that is powered by the Ethereum blockchain",
+  "symbol": "MANA",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/decentraland"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/decentraland"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/decentraland"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://decentraland.org/whitepaper.pdf"
+    }
+  ]
+}

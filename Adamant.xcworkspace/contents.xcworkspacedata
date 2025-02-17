@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:AdamantWalletsKit">
+   </FileRef>
+   <FileRef
       location = "group:FilesStorageKit">
    </FileRef>
    <FileRef

@@ -1,0 +1,21 @@
+{
+  "name": "Binance USD",
+  "website": "https://www.binance.com/en/busd",
+  "description": "A regulated, fiat-backed stablecoin pegged to the US dollar",
+  "symbol": "BUSD",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/PaxosGlobal"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/paxosglobal/busd-contract"
+    }
+  ]
+}

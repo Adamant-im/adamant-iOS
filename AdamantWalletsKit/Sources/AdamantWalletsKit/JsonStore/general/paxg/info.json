@@ -1,0 +1,25 @@
+{
+  "name": "PAX Gold",
+  "website": "https://paxos.com/paxgold",
+  "description": "PAXG is an ERC-20 stablecoin backed by physical gold reserves, held in custody by the Paxos Trust Company",
+  "symbol": "PAXG",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/PaxosGlobal"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/paxosglobal/paxos-gold-contract"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://paxos.com/wp-content/uploads/2019/09/PAX-Gold-Whitepaper.pdf"
+    }
+  ]
+}

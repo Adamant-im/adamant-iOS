@@ -1,0 +1,15 @@
+{
+  "originHash" : "22b99c97c41e38d7663700742fb99cde21e53fe7d3be857f47cb1069b71247d4",
+  "pins" : [
+    {
+      "identity" : "adamant-wallets",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Adamant-im/adamant-wallets.git",
+      "state" : {
+        "branch" : "trello.com/c/txGIRwKv",
+        "revision" : "e759fd5b7b9d8ac6c9274e7d89453281aed3ef1d"
+      }
+    }
+  ],
+  "version" : 3
+}

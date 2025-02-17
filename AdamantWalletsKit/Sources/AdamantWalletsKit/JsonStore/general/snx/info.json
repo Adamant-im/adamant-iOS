@@ -1,0 +1,25 @@
+{
+  "name": "Synthetix Network",
+  "website": "https://www.synthetix.io",
+  "description": "Synthetix is an Ethereum-based protocol that tokenizes underlying assets ranging from commodities to fiat money",
+  "symbol": "SNX",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/synthetix_io"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/synthetix_io"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/Synthetixio/synthetix"
+    }
+  ]
+}

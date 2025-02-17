@@ -1,0 +1,29 @@
+{
+  "name": "Verse",
+  "website": "https://www.getverse.com",
+  "description": "VERSE is the reward and utility token for the Bitcoin.com ecosystem",
+  "symbol": "VERSE",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/BitcoinCom"
+    },
+    {
+      "name": "medium",
+      "url": "https://blog.bitcoin.com"
+    },
+    {
+      "name": "telegram",
+      "url": "https://t.me/GetVerse"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://www.getverse.com/verse-whitepaper.pdf"
+    }
+  ]
+}
