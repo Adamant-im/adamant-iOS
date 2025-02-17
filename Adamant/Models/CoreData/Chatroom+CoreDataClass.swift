@@ -15,7 +15,7 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
     static let entityName = "Chatroom"
     
     var hasUnread: Bool {
-        return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
+        return hasUnreadMessages
     }
     
     func markAsReaded() {
@@ -24,12 +24,31 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
         if let trs = transactions as? Set<ChatTransaction> {
             trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
         }
-        lastTransaction?.isUnread = false
     }
-    
+    func markMessageAsReaded(chatMessageId: String, stack: CoreDataStack) {
+        guard let trs = transactions as? Set<ChatTransaction>,
+              let message = trs.first(where: { $0.chatMessageId == chatMessageId }) else {
+            return
+        }
+        message.isUnread = false
+        
+        if let messageTransaction = message as? MessageTransaction {
+            messageTransaction.richMessageTransactions?.forEach { $0.isUnread = false }
+            
+            if let context = messageTransaction.managedObjectContext, context.hasChanges {
+                try? context.save()
+            }
+        } else if let transferTransaction = message as? TransferTransaction {
+            transferTransaction.richMessageTransactions?.forEach { $0.isUnread = false }
+            
+            if let context = transferTransaction.managedObjectContext, context.hasChanges {
+                try? context.save()
+            }
+        }
+        updateLastTransaction()
+    }
     func markAsUnread() {
         hasUnreadMessages = true
-        lastTransaction?.isUnread = true
     }
     
     func getFirstUnread() -> ChatTransaction? {
@@ -73,15 +92,11 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
         if let transactions = transactions?.filtered(
             using: NSPredicate(format: "isHidden == false")
         ) as? Set<ChatTransaction> {
+            
             if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
-                guard let l = lhs.date as Date? else {
-                    return true
-                }
-                
-                guard let r = rhs.date as Date? else {
-                    return false
-                }
-                
+                guard let l = lhs.date as Date? else { return true }
+                guard let r = rhs.date as Date? else { return false }
+
                 switch l.compare(r) {
                 case .orderedAscending:
                     return true
@@ -102,6 +117,9 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
                 lastTransaction = nil
                 updatedAt = nil
             }
+            
+            let hasUnreadTransactions = transactions.contains { $0.isUnread }
+            hasUnreadMessages = hasUnreadTransactions
         }
     }
 }

@@ -20,6 +20,8 @@ final class InMemoryCoreDataStack: CoreDataStack {
         
         let description = NSPersistentStoreDescription()
         description.type = NSInMemoryStoreType
+        description.shouldMigrateStoreAutomatically = true
+        description.shouldInferMappingModelAutomatically = true
         
         container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
         container.persistentStoreDescriptions = [description]
