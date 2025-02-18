@@ -88,7 +88,6 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let didTapAdmNodesList = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
-    let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
     let presentKeyboard = ObservableSender<Void>()
@@ -106,6 +105,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
+    @ObservableValue private(set) var unReadMesaggesIndexes: [Int: UnreadMode]?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
@@ -209,6 +209,7 @@ final class ChatViewModel: NSObject {
     ) {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
+        self.chatroom?.updateLastTransaction()
         self.messageIdToShow = messageIdToShow
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
@@ -405,18 +406,15 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
-    
-    func entireChatWasRead() {
+    func messageWasRead(index: Int) {
+        guard _messages.wrappedValue.indices.contains(index) else { return }
+        guard let chatroom else { return }
+
+        let message = _messages.wrappedValue[index]
         Task {
-            guard
-                let chatroom = chatroom,
-                chatroom.hasUnreadMessages == true || chatroom.lastTransaction?.isUnread == true
-            else { return }
-            
-            await chatsProvider.markChatAsRead(chatroom: chatroom)
+            await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
         }
     }
-    
     func hideMessage(id: String) {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
@@ -1100,6 +1098,21 @@ private extension ChatViewModel {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
+        $messages
+            .map { messages in
+                messages.enumerated()
+                    .filter { $0.element.isUnread }
+                    .reduce(into: [Int: UnreadMode]()) { result, item in
+                        let (index, message) = item
+                        result[index] = message.unreadMode
+                    }
+            }
+            .removeDuplicates { $0 == $1 }
+            .sink { [weak self] unreadIndexes in
+                self?.unReadMesaggesIndexes = unreadIndexes
+            }
+            .store(in: &subscriptions)
+        
         chatFileService.updateFileFields
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
@@ -1250,12 +1263,6 @@ private extension ChatViewModel {
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
-            
-            // The 'makeMessages' method doesn't include reactions.
-            // If the message count is different from the number of transactions, update the chat read status if necessary.
-            if messages.count != chatTransactions.count {
-                updateChatRead.send()
-            }
         }
     }
     

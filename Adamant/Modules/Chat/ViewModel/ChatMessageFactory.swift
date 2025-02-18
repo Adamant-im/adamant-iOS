@@ -113,7 +113,9 @@ struct ChatMessageFactory: Sendable {
             ).map { .init(string: $0) },
             dateHeader: makeDateHeader(sentDate: sentDate),
             topSpinnerOn: topSpinnerOn, 
-            dateHeaderIsHidden: !dateHeaderOn
+            dateHeaderIsHidden: !dateHeaderOn,
+            isUnread: checkTransactionForUnreadReaction(transaction: transaction),
+            unreadMode: unreadMode(transaction: transaction)
         )
     }
 }
@@ -540,6 +542,30 @@ private extension ChatMessageFactory {
                 .foregroundColor: UIColor.adamant.secondary
             ]
         ))
+    }
+    func checkTransactionForUnreadReaction(transaction: ChatTransaction) -> Bool {
+        if let messageTransaction = transaction as? MessageTransaction,
+           let richTransactions = messageTransaction.richMessageTransactions,
+           !richTransactions.isEmpty {
+            return richTransactions.contains { $0.isUnread }
+        }
+        
+        if let transferTransaction = transaction as? TransferTransaction,
+           let richTransactions = transferTransaction.richMessageTransactions,
+           !richTransactions.isEmpty {
+            return richTransactions.contains { $0.isUnread }
+        }
+        
+        return transaction.isUnread
+    }
+    func unreadMode(transaction: ChatTransaction) -> UnreadMode? {
+        if transaction.isUnread {
+            return .top
+        } else if checkTransactionForUnreadReaction(transaction: transaction) {
+            return .bottom
+        } else {
+            return nil
+        }
     }
 }
 
