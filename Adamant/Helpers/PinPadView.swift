@@ -88,13 +88,13 @@ class PinPadViewModel: ObservableObject {
         switch mode {
         case .createPin:
             title = String.adamant.pinpad.createPin
-            titleColor = .white
+            titleColor = .primary
         case .enterPin:
             title = "Login into ADAMANT"
-            titleColor = .white
+            titleColor = .primary
         case .reenterPin:
             title = String.adamant.pinpad.reenterPin
-            titleColor = .white
+            titleColor = .primary
         case .wrongPinEntered:
             title = "Wrong PIN entered!"
             titleColor = .red
@@ -109,13 +109,13 @@ class PinPadViewModel: ObservableObject {
             titleColor = .green
         case .turnOffPin:
             title = String.adamant.security.stayInTurnOff
-            titleColor = .white
+            titleColor = .primary
         case .turnOffBiometry:
             title = String.adamant.security.biometryOffReason
-            titleColor = .white
+            titleColor = .primary
         case .turnOnBiometry:
             title = String.adamant.security.biometryOnReason
-            titleColor = .white
+            titleColor = .primary
         }
         self.title = title
         self.titleColor = titleColor
@@ -195,16 +195,17 @@ struct PinPadView: View {
                 .font(.body)
                 .padding(.top, 30)
             
-            HStack(spacing: 10) {
+            HStack(spacing: 18) {
                 ForEach(0..<viewModel.pinLength, id: \.self) { index in
                     Circle()
                         .frame(width: 15, height: 15)
-                        .foregroundColor(viewModel.hasNumber(at: index) ? Color(UIColor.adamant.pinpadHighlightButton) : .gray)
+                        .foregroundColor(viewModel.hasNumber(at: index) ? Color(UIColor.adamant.pinpadHighlightButton) : .clear)
+                        .overlay(Circle().stroke(Color(UIColor.adamant.secondary), lineWidth: 0.5))
                 }
             }
-            .padding(.vertical, 20)
+            .padding(.vertical, 18)
             Spacer()
-                .frame(height: 20)
+                .frame(height: 25)
             VStack(alignment: .center) {
                 row(from: 1, to: 3)
                 row(from: 4, to: 6)
@@ -215,18 +216,19 @@ struct PinPadView: View {
             Button(String.adamant.alert.cancel) {
                 viewModel.onCancel()
             }
-            .foregroundColor(.white)
-            .padding(.top, 20)
+            .foregroundColor(.primary)
+            .padding(.top, 0)
+            .padding(.bottom, 50)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(UIColor.adamant.backgroundColor).edgesIgnoringSafeArea(.all))
     }
     
     private func row(from: Int, to: Int, showsDeleteButton: Bool = false) -> some View {
-        HStack {
+        HStack(spacing: 25) {
             if showsDeleteButton {
                 Circle()
-                    .frame(width: 75, height: 75)
+                    .frame(width: 80, height: 80)
                     .foregroundColor(.clear)
             }
             ForEach(from...to, id: \.self) { number in
@@ -234,31 +236,31 @@ struct PinPadView: View {
                     handlePinInput("\(number)")
                 }) {
                     Circle()
-                        .frame(width: 75, height: 75)
+                        .frame(width: 80, height: 80)
                         .overlay(
                             Text("\(number)")
                                 .foregroundColor(Color(UIColor.adamant.primary))
                                 .font(Font(UIFont.adamantPrimary(ofSize: 35, weight: .light)))
-                            
                         )
                         .foregroundColor(.clear)
-                        .overlay(Circle().stroke(Color(UIColor.adamant.secondary), lineWidth: 1))
+                        .overlay(Circle().stroke(Color(UIColor.adamant.secondary), lineWidth: 0.5))
                 }
             }
             if showsDeleteButton {
                 Button(action: deleteLastDigit) {
                     Circle()
-                        .frame(width: 75, height: 75)
+                        .frame(width: 80, height: 80)
                         .overlay(
                             Image(systemName: "delete.left")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(UIColor.adamant.primary))
                                 .font(.title)
                         )
                         .foregroundColor(.clear)
-                        .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                        .overlay(Circle().stroke(Color(UIColor.adamant.secondary), lineWidth: 0.5))
                 }
             }
         }
+        .frame(height: 90)
     }
     
     private func handlePinInput(_ digit: String) {
