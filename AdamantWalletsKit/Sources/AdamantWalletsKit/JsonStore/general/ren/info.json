@@ -1,0 +1,25 @@
+{
+  "name": "Ren",
+  "website": "https://renproject.io",
+  "description": "Ren is an open and community-driven protocol that enables the movement of value between blockchains",
+  "symbol": "REN",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/renprotocol"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/RenProject"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/renproject"
+    }
+  ]
+}

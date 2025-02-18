@@ -1,0 +1,29 @@
+{
+  "name": "Dai",
+  "website": "https://makerdao.com",
+  "description": "A decentralized, unbiased, collateral-backed cryptocurrency soft-pegged to the US Dollar",
+  "symbol": "DAI",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/MakerDAO"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/MakerDAO"
+    },
+    {
+      "name": "github",
+      "url": "https://etherscan.io/token/github.com/makerdao"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://makerdao.com/en/whitepaper"
+    }
+  ]
+}

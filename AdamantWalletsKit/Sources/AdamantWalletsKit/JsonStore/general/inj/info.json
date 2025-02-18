@@ -1,0 +1,32 @@
+{
+  "name": "Injective",
+  "website": "https://injective.com",
+  "description": "An open, interoperable smart contract platform optimized for DeFi applications",
+  "explorer": "https://explorer.injective.network",
+  "explorerTx": "https://explorer.injective.network/transaction/${ID}",
+  "explorerAddress": "https://explorer.injective.network/account/${ID}",
+  "explorerContract": "https://explorer.injective.network/contract/${ID}",
+  "regexAddress": "^(inj)[a-zA-HJ-NP-Z0-9]{25,39}$",
+  "symbol": "INJ",
+  "type": "coin",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "consensus": "PoS",
+  "blockTimeFixed": 1100,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/Injective_"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/injective"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/InjectiveLabs"
+    }
+  ]
+}

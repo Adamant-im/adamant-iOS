@@ -14,7 +14,8 @@ import Combine
 @preconcurrency import struct BigInt.BigUInt
 @preconcurrency import LiskKit
 
-final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
+final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
+    static let currencySymbol = "KLY"
     struct CurrentFee: Sendable {
         let fee: BigUInt
         let lastHeight: UInt64

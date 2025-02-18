@@ -1,0 +1,9 @@
+{
+  "name": "Gate",
+  "symbol": "GT",
+  "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 115,
+  "contractId": "0xe66747a101bff2dba3697199dcce5b743b454759",
+  "decimals": 18
+}

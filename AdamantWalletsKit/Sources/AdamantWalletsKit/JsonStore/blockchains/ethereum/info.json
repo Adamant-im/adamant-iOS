@@ -1,0 +1,7 @@
+{
+  "blockchain": "Ethereum",
+  "type": "ERC20",
+  "mainCoin": "ethereum",
+  "fees": "ethereum",
+  "defaultGasLimit": 58000
+}

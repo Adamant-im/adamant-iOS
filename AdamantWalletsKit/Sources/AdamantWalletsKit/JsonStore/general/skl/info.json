@@ -1,0 +1,29 @@
+{
+  "name": "SKALE",
+  "website": "https://skale.space",
+  "description": "SKALE is a Layer-2 Ethereum sidechain network that creates a high-throughput, low-latency, low-cost environment for decentralized app development",
+  "symbol": "SKL",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/SkaleNetwork"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/SKALEnetwork"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/skalenetwork"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://skale.space/whitepaper"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Uniswap",
+  "website": "https://uniswap.org",
+  "description": "Uniswap is a decentralized cryptocurrency exchange that uses a set of smart contracts to execute trades on its exchange",
+  "symbol": "UNI",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/uniswap"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/UniSwap"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/Uniswap"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://uniswap.org/whitepaper-v3.pdf"
+    }
+  ]
+}
