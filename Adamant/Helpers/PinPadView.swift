@@ -273,28 +273,28 @@ struct PinPadView: View {
                     viewModel.onSuccess()
                 } else {
                     viewModel.update(mode: .wrongPinEntered)
-                    Task.detached { @MainActor in
+                    Task { @MainActor in
                         viewModel.update(mode: .enterPin)
                         viewModel.updateCache(mode: .enterPin)
                     }
                 }
             case .createPin:
                 viewModel.update(mode: .reenterPin)
-                Task.detached { @MainActor in
+                Task { @MainActor in
                     try await Task.sleep(nanoseconds: 300_000_000)
                     viewModel.updateCache(mode: .reenterPin)
                 }
             case .reenterPin:
                 if viewModel.isValid(mode: .reenterPin) {
                     viewModel.update(mode: .pinCreated)
-                    Task.detached { @MainActor in
+                    Task { @MainActor in
                         try await Task.sleep(nanoseconds: 100_000_000)
                         viewModel.updateCache(mode: .pinCreated)
                         viewModel.onSuccess()
                     }
                 } else {
                     viewModel.update(mode: .pinNotMatching)
-                    Task.detached { @MainActor in
+                    Task { @MainActor in
                         try await Task.sleep(nanoseconds: 500_000_000)
                         viewModel.update(mode: .createPin)
                         viewModel.updateCache(mode: .createPin)
