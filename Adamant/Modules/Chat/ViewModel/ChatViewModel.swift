@@ -410,10 +410,19 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let chatroom = chatroom,
-                chatroom.hasUnreadMessages == true || chatroom.lastTransaction?.isUnread == true
+                let address = chatroom.partner?.address,
+                let lastTransaction = chatroom.lastTransaction,
+                await chatsProvider.isUnreadChat(chatroom: chatroom)
             else { return }
             
-            await chatsProvider.markChatAsRead(chatroom: chatroom)
+            guard let transactions = chatroom.transactions as? Set<ChatTransaction>
+            else { return }
+            
+            await chatsProvider.setLastReadMessage(
+                height: lastTransaction.height,
+                transactions: transactions,
+                chatroom: address
+            )
         }
     }
     
@@ -1050,6 +1059,36 @@ extension ChatViewModel {
         dateHeaderHidden = false
         hideHeaderTimer?.cancel()
         hideHeaderTimer = nil
+    }
+    
+    func checkBottomMessage(indexPath: IndexPath) {
+        guard let message = messages[safe: indexPath.section],
+              let transaction = chatTransactions.first(
+                where: { $0.chatMessageId == message.id }
+              )
+        else {
+            return
+        }
+        
+        Task {
+            guard
+                let address = chatroom?.partner?.address,
+                let lastReadMessage = await  chatsProvider.getLastReadMessage(chatroom: address),
+                  lastReadMessage.height <= transaction.height || transaction.height == .zero
+            else {
+                return
+            }
+            
+            await chatsProvider.appendLastReadMessage(
+                readMessage: .init(
+                    height: transaction.height > .zero
+                    ? transaction.height
+                    : lastReadMessage.height,
+                    transactionsId: [transaction.transactionId]
+                ),
+                chatroom: address
+            )
+        }
     }
     
     func startHideDateTimer() {
