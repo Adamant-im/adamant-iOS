@@ -246,7 +246,7 @@ final class LoginViewController: FormViewController {
             })
         }.onCellSelection { [weak self] (_, row) in
             guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
-                  let passphrase = row.value?.trimmingCharacters(in: .whitespaces) else {
+                  let passphrase = row.value else {
                 return
             }
             
@@ -443,6 +443,7 @@ final class LoginViewController: FormViewController {
 // MARK: - Login functions
 extension LoginViewController {
     func loginWith(passphrase: String) {
+        let passphrase = passphrase.trimmingCharacters(in: .whitespaces)
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             dialogService.showWarning(withMessage: AccountServiceError.invalidPassphrase.localized)
             return
