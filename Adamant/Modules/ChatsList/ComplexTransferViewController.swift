@@ -19,7 +19,7 @@ protocol ComplexTransferViewControllerDelegate: AnyObject {
 final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
-    private let visibleWalletsService: VisibleWalletsService
+    private let walletsStoreService: WalletsStoreService
     private let addressBookService: AddressBookService
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
@@ -40,13 +40,13 @@ final class ComplexTransferViewController: UIViewController {
     // MARK: Init
     
     init(
-        visibleWalletsService: VisibleWalletsService,
+        walletsStoreService: WalletsStoreService,
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
         nodesStorage: NodesStorageProtocol
     ) {
-        self.visibleWalletsService = visibleWalletsService
+        self.walletsStoreService = walletsStoreService
         self.addressBookService = addressBookService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
@@ -96,7 +96,7 @@ final class ComplexTransferViewController: UIViewController {
     
     private func setupServices() {
         services.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices: [WalletService] = walletsStoreService.sorted(includeInvisible: false)
         services = availableServices
     }
     

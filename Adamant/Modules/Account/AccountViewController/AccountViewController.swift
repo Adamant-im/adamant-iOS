@@ -37,7 +37,7 @@ extension String.adamant.alert {
 final class AccountViewController: FormViewController {
     // MARK: - Dependencies
     
-    private let visibleWalletsService: VisibleWalletsService
+    private let walletsStoreService: WalletsStoreService
     private let screensFactory: ScreensFactory
     private let notificationsService: NotificationsService
     private let transfersProvider: TransfersProvider
@@ -45,7 +45,7 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let apiServiceCompose: ApiServiceComposeProtocol
-    private lazy var viewModel: AccountWalletsViewModel = .init(walletsService: visibleWalletsService)
+    private lazy var viewModel: AccountWalletsViewModel = .init(walletsStoreService: walletsStoreService)
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -100,7 +100,7 @@ final class AccountViewController: FormViewController {
     // MARK: - Init
     
     init(
-        visibleWalletsService: VisibleWalletsService,
+        walletsStoreService: WalletsStoreService,
         accountService: AccountService,
         dialogService: DialogService,
         screensFactory: ScreensFactory,
@@ -113,7 +113,7 @@ final class AccountViewController: FormViewController {
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol
     ) {
-        self.visibleWalletsService = visibleWalletsService
+        self.walletsStoreService = walletsStoreService
         self.accountService = accountService
         self.dialogService = dialogService
         self.screensFactory = screensFactory
@@ -894,7 +894,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices = walletsStoreService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }

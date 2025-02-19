@@ -52,6 +52,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     // MARK: - Dependencies
     
     var visibleWalletsService: VisibleWalletsService
+    var walletsStoreService: WalletsStoreService
     var accountService: AccountService
     
     // MARK: - Properties
@@ -71,9 +72,14 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     private var subscriptions = Set<AnyCancellable>()
     // MARK: - Lifecycle
     
-    init(visibleWalletsService: VisibleWalletsService, accountService: AccountService) {
+    init(
+        visibleWalletsService: VisibleWalletsService,
+        accountService: AccountService,
+        walletsStoreService: WalletsStoreService
+    ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
+        self.walletsStoreService = walletsStoreService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -134,7 +140,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func loadWallets() {
-        wallets = visibleWalletsService.sorted(includeInvisible: true).map { $0.core }
+        wallets = walletsStoreService.sorted(includeInvisible: true).map { $0.core }
     }
     
     @objc private func updateBalances() {

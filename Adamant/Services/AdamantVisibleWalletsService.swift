@@ -101,7 +101,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
         setInvisibleWallets(wallets)
     }
     
-    func getInvisibleWallets() -> [String] {
+    private func getInvisibleWallets() -> [String] {
         guard isUseCustomFilter(for: .visibility) else {
             let wallets = walletsServiceCompose.getWallets()
                 .filter { $0.core.defaultVisibility != true }
@@ -126,10 +126,6 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     }
     
     // MARK: Index Positions
-    
-    func getIndexPosition(for walletTokenUniqueID: String) -> Int? {
-        return indexesWallets.firstIndex(of: walletTokenUniqueID)
-    }
     
     func getSortedWallets(includeInvisible: Bool) -> [String] {
         guard isUseCustomFilter(for: .indexes) else {
@@ -190,37 +186,5 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     
     private func setUseCustomFilter(for type: Types, value: Bool) {
         securedStore.set(value, for: type.path)
-    }
-    
-    // MARK: - Sort by indexes
-    /* How it works:
-     1. Get all unsorted wallets
-     2. Get the sorted wallets from the database
-     3. Shuffle the unsorted wallets (by removing a wallet from the array and inserting it at a certain position).
-     We can't use only point 2, because in the future we can add new tokens that won't be in the database
-     */
-    func sorted(includeInvisible: Bool) -> [WalletService] {
-        let wallets = walletsServiceCompose.getWallets()
-        var availableServices = includeInvisible
-        ? wallets
-        : wallets.filter { !isInvisible($0.core.tokenUniqueID) }
-        
-        for (newIndex, tokenUniqueID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
-            guard let index = availableServices.firstIndex(
-                where: { $0.core.tokenUniqueID == tokenUniqueID }
-            ) else {
-                continue
-            }
-            
-            let wallet = availableServices.remove(at: index)
-            
-            if availableServices.indices.contains(newIndex) {
-                availableServices.insert(wallet, at: newIndex)
-            } else {
-                availableServices.append(wallet)
-            }
-        }
-        
-        return availableServices
     }
 }

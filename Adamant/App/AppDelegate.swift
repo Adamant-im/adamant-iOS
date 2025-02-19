@@ -57,7 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
     var pushNotificationsTokenService: PushNotificationsTokenService!
-    var visibleWalletsService: VisibleWalletsService!
     
     // MARK: - Lifecycle
     
@@ -70,7 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
         pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
-        visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
         // MARK: 1.1 Configure Firebase if needed
         
