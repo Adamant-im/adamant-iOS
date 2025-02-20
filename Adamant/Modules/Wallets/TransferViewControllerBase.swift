@@ -1101,6 +1101,11 @@ extension TransferViewControllerBase {
                 row.tag = BaseRows.amount.tag
                 row.formatter = self?.balanceFormatter
                 
+                if isMacOS {
+                    row.cell._textField.caretInset = 1
+                    row.cell.adjustHuggingPriority()
+                }
+
                 if let amount = self?.amount {
                     row.value = amount.doubleValue
                 }

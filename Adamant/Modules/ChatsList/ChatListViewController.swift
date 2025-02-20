@@ -366,7 +366,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
         
         lastDatesUpdate = Date()
-        tableView.reloadRows(at: indexPaths, with: .none)
+        tableView.reloadRowsAndPreserveSelection(at: indexPaths)
     }
     
     private func updateChats() {
@@ -1509,5 +1509,13 @@ private extension DataProviderState {
         case .updating: true
         case .failedToUpdate, .upToDate, .empty: false
         }
+    }
+}
+
+private extension UITableView {
+    func reloadRowsAndPreserveSelection(at indexPaths: [IndexPath]) {
+        let selectedRowIndexPath = indexPathForSelectedRow
+        reloadRows(at: indexPaths, with: .none)
+        selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
     }
 }
