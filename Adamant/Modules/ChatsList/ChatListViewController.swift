@@ -367,7 +367,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         lastDatesUpdate = Date()
         indexPaths.removeAll { $0 == swipedIndex }
-        tableView.reloadRows(at: indexPaths, with: .none)
+        tableView.reloadRowsAndPreserveSelection(at: indexPaths)
     }
     
     private func updateChats() {
@@ -1112,7 +1112,7 @@ extension ChatListViewController {
     func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
         swipedIndex = nil
         if let indexPath {
-            tableView.reloadRows(at: [indexPath], with: .none)
+            tableView.reloadRowsAndPreserveSelection(at: [indexPath])
         }
     }
     private func blockChat(with address: String, for chatroom: Chatroom?) {
@@ -1517,5 +1517,13 @@ private extension DataProviderState {
         case .updating: true
         case .failedToUpdate, .upToDate, .empty: false
         }
+    }
+}
+
+private extension UITableView {
+    func reloadRowsAndPreserveSelection(at indexPaths: [IndexPath]) {
+        let selectedRowIndexPath = indexPathForSelectedRow
+        reloadRows(at: indexPaths, with: .none)
+        selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
     }
 }
