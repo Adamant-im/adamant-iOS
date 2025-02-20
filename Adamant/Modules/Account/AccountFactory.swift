@@ -15,7 +15,7 @@ struct AccountFactory {
     
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
         AccountViewController(
-            walletsStoreService: assembler.resolve(WalletsStoreService.self)!,
+            walletStoreServiceProvider: assembler.resolve(WalletStoreServiceProviderProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,

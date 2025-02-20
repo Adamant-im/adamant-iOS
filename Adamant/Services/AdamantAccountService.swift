@@ -23,7 +23,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
 
     weak var notificationsService: NotificationsService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
-    weak var walletsStoreService: WalletsStoreService?
+    weak var walletsStoreService: WalletStoreServiceProtocol?
     
     // MARK: Properties
     

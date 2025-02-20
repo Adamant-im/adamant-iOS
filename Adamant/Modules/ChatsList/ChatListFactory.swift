@@ -39,7 +39,7 @@ struct ChatListFactory {
     
     func makeComplexTransferVC(screensFactory: ScreensFactory) -> UIViewController {
         ComplexTransferViewController(
-            walletsStoreService: assembler.resolve(WalletsStoreService.self)!,
+            walletsStoreService: assembler.resolve(WalletStoreServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 

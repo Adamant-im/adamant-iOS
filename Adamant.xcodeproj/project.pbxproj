@@ -187,6 +187,12 @@
 		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
+		4803FC9A2D6715AF00452D2C /* SecretWalletsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4803FC992D6715AF00452D2C /* SecretWalletsFactory.swift */; };
+		481558702D65A7660011B470 /* SecretWalletsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4815586F2D65A7660011B470 /* SecretWalletsService.swift */; };
+		481558722D65A7BD0011B470 /* AdamantSecretWalletsManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481558712D65A7BD0011B470 /* AdamantSecretWalletsManagerProtocol.swift */; };
+		48B6A8EB2D5738D800326EE8 /* WalletsStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EA2D5738D800326EE8 /* WalletsStoreService.swift */; };
+		48B6A8ED2D57390400326EE8 /* AdamantWalletsStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */; };
+		48B6A8EF2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EE2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift */; };
 		48DA2FCF2D4A0519008F9FC1 /* AccountWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */; };
 		48DA2FD12D4A054E008F9FC1 /* AccountWalletsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */; };
 		48DA2FD62D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */; };
@@ -897,6 +903,12 @@
 		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
+		4803FC992D6715AF00452D2C /* SecretWalletsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsFactory.swift; sourceTree = "<group>"; };
+		4815586F2D65A7660011B470 /* SecretWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsService.swift; sourceTree = "<group>"; };
+		481558712D65A7BD0011B470 /* AdamantSecretWalletsManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecretWalletsManagerProtocol.swift; sourceTree = "<group>"; };
+		48B6A8EA2D5738D800326EE8 /* WalletsStoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletsStoreService.swift; sourceTree = "<group>"; };
+		48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletsStoreService.swift; sourceTree = "<group>"; };
+		48B6A8EE2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletStoreServiceProvider.swift; sourceTree = "<group>"; };
 		48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsViewModel.swift; sourceTree = "<group>"; };
 		48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsState.swift; sourceTree = "<group>"; };
 		48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletCollectionViewCell+Model.swift"; sourceTree = "<group>"; };
@@ -2520,7 +2532,9 @@
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 				9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */,
+				481558712D65A7BD0011B470 /* AdamantSecretWalletsManagerProtocol.swift */,
 				41047B73294C61D10039E956 /* VisibleWalletsService.swift */,
+				48B6A8EA2D5738D800326EE8 /* WalletsStoreService.swift */,
 				4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */,
 				4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */,
 				3A9015A42A614A18002A2464 /* EmojiService.swift */,
@@ -2555,8 +2569,11 @@
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
+				4815586F2D65A7660011B470 /* SecretWalletsService.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
+				4803FC992D6715AF00452D2C /* SecretWalletsFactory.swift */,
 				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,
+				48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */,
 				3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */,
 				3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
@@ -2984,6 +3001,7 @@
 				4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */,
 				E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */,
 				93760BD62C656CF8002507C3 /* DefaultNodesProvider.swift */,
+				48B6A8EE2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift */,
 			);
 			path = DataProviders;
 			sourceTree = "<group>";
@@ -3538,6 +3556,7 @@
 				4186B332294200B4006594A3 /* BtcWalletService+DynamicConstants.swift in Sources */,
 				3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */,
 				3A26D93D2C3C1CC3003AD832 /* KlyNodeApiService.swift in Sources */,
+				4803FC9A2D6715AF00452D2C /* SecretWalletsFactory.swift in Sources */,
 				93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */,
 				93760BD72C656CF8002507C3 /* DefaultNodesProvider.swift in Sources */,
 				3A26D93B2C3C1C97003AD832 /* KlyApiCore.swift in Sources */,
@@ -3599,6 +3618,7 @@
 				AAC6413D2D40456700619DFE /* KlyNodeApiServiceProtocol.swift in Sources */,
 				932F77592989F999006D8801 /* ChatCellManager.swift in Sources */,
 				9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */,
+				48B6A8EB2D5738D800326EE8 /* WalletsStoreService.swift in Sources */,
 				E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */,
 				9340078029AC341100A20622 /* ChatAction.swift in Sources */,
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
@@ -3670,12 +3690,14 @@
 				3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */,
 				936658952B0AC15300BDB2D3 /* Node+UI.swift in Sources */,
 				26A976012B7E852E0095C367 /* ChatSelectTextViewFactory.swift in Sources */,
+				48B6A8ED2D57390400326EE8 /* AdamantWalletsStoreService.swift in Sources */,
 				41A1995429D56E340031AD75 /* ChatMessageReplyCell.swift in Sources */,
 				93294B872AAD0E0A00911109 /* AdmWallet.swift in Sources */,
 				6449BA6B235CA0930033B936 /* ERC20TransactionDetailsViewController.swift in Sources */,
 				E907350E2256779C00BF02CC /* DogeMainnet.swift in Sources */,
 				3A299C732B83975D00B54C61 /* ChatMediaContnentView+Model.swift in Sources */,
 				93ED214A2CC3555500AA1FC8 /* TxStatusServiceProtocol.swift in Sources */,
+				48B6A8EF2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift in Sources */,
 				41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */,
 				93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */,
 				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
@@ -3708,6 +3730,7 @@
 				A50A41142822FC35006BDFE1 /* BtcTransferViewController.swift in Sources */,
 				93294B8E2AAD2C6B00911109 /* SwiftyOnboardPage.swift in Sources */,
 				E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */,
+				481558702D65A7660011B470 /* SecretWalletsService.swift in Sources */,
 				648CE3A022999C890070A2CC /* BaseBtcTransaction.swift in Sources */,
 				A50A410A2822F8CE006BDFE1 /* BtcWallet.swift in Sources */,
 				E908472C2196FEA80095825D /* CoreDataAccount+CoreDataClass.swift in Sources */,
@@ -3910,6 +3933,7 @@
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,
 				644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */,
 				4153045B29C09C6C000E4BEA /* IncreaseFeeService.swift in Sources */,
+				481558722D65A7BD0011B470 /* AdamantSecretWalletsManagerProtocol.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E9B4E1A8210F079E007E77FC /* DoubleDetailsTableViewCell.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,

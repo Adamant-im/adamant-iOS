@@ -52,7 +52,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     // MARK: - Dependencies
     
     var visibleWalletsService: VisibleWalletsService
-    var walletsStoreService: WalletsStoreService
+    var walletsStoreService: WalletStoreServiceProviderProtocol
     var accountService: AccountService
     
     // MARK: - Properties
@@ -75,7 +75,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
-        walletsStoreService: WalletsStoreService
+        walletsStoreService: WalletStoreServiceProviderProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService

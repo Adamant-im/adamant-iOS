@@ -14,10 +14,10 @@ import Combine
 final class AccountWalletsViewModel {
     @ObservableValue var state: AccountWalletsState = .default
     
-    private let walletsStoreService: WalletsStoreService
+    private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
     
-    init(walletsStoreService: WalletsStoreService) {
+    init(walletsStoreService: WalletStoreServiceProviderProtocol) {
         self.walletsStoreService = walletsStoreService
         setup()
     }

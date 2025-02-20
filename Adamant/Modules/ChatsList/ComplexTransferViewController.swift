@@ -19,7 +19,7 @@ protocol ComplexTransferViewControllerDelegate: AnyObject {
 final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
-    private let walletsStoreService: WalletsStoreService
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let addressBookService: AddressBookService
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
@@ -40,7 +40,7 @@ final class ComplexTransferViewController: UIViewController {
     // MARK: Init
     
     init(
-        walletsStoreService: WalletsStoreService,
+        walletsStoreService: WalletStoreServiceProtocol,
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,

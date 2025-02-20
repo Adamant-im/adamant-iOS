@@ -26,7 +26,9 @@ struct AppAssembly: MainThreadAssembly {
         }
         
         // MARK: CellFactory
-        container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
+        container.register(CellFactory.self) { _ in
+            AdamantCellFactory()
+        }.inObjectScope(.container)
         
         // MARK: Secured Store
         container.register(SecuredStore.self) { _ in
@@ -72,13 +74,35 @@ struct AppAssembly: MainThreadAssembly {
             )
         }.inObjectScope(.container)
         
-        // MARK: VisibleWalletsService
-        container.register(WalletsStoreService.self) { r in
-            AdamantWalletsStoreService(
+        // MARK: WalletStoreServiceProtocol
+        container.register(WalletStoreServiceProtocol.self) { r in
+            AdamantWalletStoreService(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
-                walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
+        
+        container.register(WalletStoreServiceProviderProtocol.self) { r in
+            AdamantWalletStoreServiceProvider(
+                secretWalletsManager: r.resolve(AdamantSecretWalletsManagerProtocol.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Secret Wallets
+        container.register(SecretWalletsFactory.self) { r in
+            SecretWalletsFactory(
+                visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        container.register(AdamantSecretWalletsManagerProtocol.self) { r in
+            AdamantSecretWalletsManager(
+                walletsStoreService: r.resolve(WalletStoreServiceProtocol.self)!,
+                secretWalletsFactory: r.resolve(SecretWalletsFactory.self)!
+            )
+        }
         
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
@@ -277,7 +301,7 @@ struct AppAssembly: MainThreadAssembly {
             guard let service = c as? AdamantAccountService else { return }
             service.notificationsService = r.resolve(NotificationsService.self)!
             service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.walletsStoreService = r.resolve(WalletsStoreService.self)!
+            service.walletsStoreService = r.resolve(WalletStoreServiceProtocol.self)!
         }
         
         // MARK: AddressBookServeice

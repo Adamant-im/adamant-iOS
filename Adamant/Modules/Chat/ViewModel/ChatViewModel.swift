@@ -25,7 +25,7 @@ final class ChatViewModel: NSObject {
     private let transfersProvider: TransfersProvider
     private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
-    private let walletsStoreService: WalletsStoreService
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
@@ -162,7 +162,7 @@ final class ChatViewModel: NSObject {
         transfersProvider: TransfersProvider,
         chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
-        walletsStoreService: WalletsStoreService,
+        walletsStoreService: WalletStoreServiceProtocol,
         accountService: AccountService,
         accountProvider: AccountsProvider,
         richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
