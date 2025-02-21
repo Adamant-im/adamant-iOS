@@ -448,5 +448,18 @@ struct AppAssembly: MainThreadAssembly {
         container.register(DefaultNodesProvider.self) { _ in
             DefaultNodesProvider()
         }.inObjectScope(.transient)
+        
+        container.register(AdamantTransactionsService.self) {
+            AdamantTransactionServiceImpl(
+                healthCheckWrapper: .init(
+                    service: .init(apiCore: $0.resolve(APICoreProtocol.self)!),
+                    nodesStorage: $0.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: $0.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    isActive: true,
+                    params: NodeGroup.adm.blockchainHealthCheckParams,
+                    connection: $0.resolve(ReachabilityMonitor.self)!.connectionPublisher
+                )
+            )
+        }
     }
 }

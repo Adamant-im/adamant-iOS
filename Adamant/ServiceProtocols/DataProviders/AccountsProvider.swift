@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import CommonKit
+import UIKit
 
 enum AccountsProviderError: Error {
     case dummy(BaseAccount)
@@ -72,6 +73,12 @@ protocol AccountsProvider: Sendable {
     
     /// Request Dummy account, if account wasn't found or initiated
     func getDummyAccount(for address: String) async throws -> DummyAccount
+    
+    /// Checks account and returns if it's *avatar* from if it's known
+    func getKnownAccountAvatar(for address: String) -> String?
+    
+    /// Checks account and returns if it's *name* from if it's known
+    func getKnownAccountName(for address: String) -> String?
 }
 
 // MARK: - Known contacts

@@ -10,6 +10,7 @@ import Foundation
 @preconcurrency import CoreData
 import CommonKit
 import Combine
+import UIKit
 
 // MARK: - Provider
 @MainActor
@@ -296,6 +297,7 @@ extension AdamantAccountsProvider {
     ///   - publicKey: publicKey of an account
     ///   - completion: returns Account created in viewContext
     
+    
     func getAccount(
         byAddress address: String,
         publicKey: String
@@ -324,22 +326,28 @@ extension AdamantAccountsProvider {
         
         switch validation {
         case .valid:
-            return await withUnsafeContinuation { @MainActor contituation in
-                let account = createAndSaveCoreDataAccount(
-                    for: address,
-                    publicKey: publicKey,
-                    dummy: dummy,
-                    in: context
-                )
-                
-                contituation.resume(returning: account)
-            }
+            let account = createAndSaveCoreDataAccount(
+                for: address,
+                publicKey: publicKey,
+                dummy: dummy,
+                in: context
+            )
+            
+            return account
         case .system:
             let coreAccount = createCoreDataAccount(with: address, publicKey: "")
             return coreAccount
         case .invalid:
             throw AccountsProviderError.invalidAddress(address: address)
         }
+    }
+    
+    func getKnownAccountAvatar(for address: String) -> String? {
+        knownContacts[address]?.avatar
+    }
+    
+    func getKnownAccountName(for address: String) -> String? {
+        knownContacts[address]?.name
     }
     
     private func createAndSaveCoreDataAccount(
@@ -509,10 +517,6 @@ extension AdamantAccountsProvider {
         return coreAccount
     }
     
-    private func createCoreDataAccount(from account: AdamantAccount) -> CoreDataAccount {
-        createCoreDataAccount(from: account, context: stack.container.viewContext)
-    }
-    
     private func createCoreDataAccount(
         from account: AdamantAccount,
         context: NSManagedObjectContext
@@ -574,6 +578,7 @@ extension AdamantAccountsProvider {
             chatroom.isReadonly = acc.isReadonly
             chatroom.title = acc.name
         }
+
         
         return coreAccount
     }

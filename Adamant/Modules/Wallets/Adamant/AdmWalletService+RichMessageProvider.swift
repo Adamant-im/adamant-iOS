@@ -64,7 +64,7 @@ extension AdmWalletService {
         return shortDescription(isOutgoing: transaction.isOutgoing, balance: balance)
     }
     
-    private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
+    func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
         if isOutgoing {
             return "⬅️  \(AdmWalletService.formatter.string(from: balance)!)"
         } else {

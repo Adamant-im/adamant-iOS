@@ -24,7 +24,19 @@ struct ChatListFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             addressBook: assembler.resolve(AddressBookService.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            chatListProvider: ChatsListProvider.init(
+                container: .init(
+                    adamantChatService: assembler.resolve(AdamantTransactionsService.self)!,
+                    accountService: assembler.resolve(AccountService.self)!,
+                    accountsProvider: assembler.resolve(AccountsProvider.self)!,
+                    txService: assembler.resolve(ChatTransactionService.self)!,
+                    adamantCore: assembler.resolve(AdamantCore.self)!,
+                    walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+                    avatarService: assembler.resolve(AvatarService.self)!,
+                    addressBookService: assembler.resolve(AddressBookService.self)!
+                )
+            )
         )
     }
     

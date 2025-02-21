@@ -57,6 +57,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private let addressBook: AddressBookService
     private let avatarService: AvatarService
     private let walletServiceCompose: WalletServiceCompose
+    private let chatListProvider: ChatsListProvider
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -142,7 +143,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         dialogService: DialogService,
         addressBook: AddressBookService,
         avatarService: AvatarService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        chatListProvider: ChatsListProvider
     ) {
         self.accountService = accountService
         self.chatsProvider = chatsProvider
@@ -153,6 +155,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         self.addressBook = addressBook
         self.avatarService = avatarService
         self.walletServiceCompose = walletServiceCompose
+        self.chatListProvider = chatListProvider
         
         super.init(nibName: "ChatListViewController", bundle: nil)
     }
@@ -645,6 +648,7 @@ extension ChatListViewController {
             isBusy = true
             insertReloadRow()
             loadNewChats(offset: roomsLoadedCount)
+            await chatListProvider.fetchChats(loadedRoomsCount: roomsLoadedCount)
         }
     }
     
