@@ -230,7 +230,11 @@ final class LoginViewController: FormViewController {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
-            $0.cell.textField.enablePasteButtonAndPasswordToggle()
+            $0.cell.textField.enablePasteButtonAndPasswordToggle {
+                // assing text to textfield like this to make loginButton update its enabled/disabled state
+                self.form.rowBy(tag: Rows.passphrase.tag)?.value = $0
+                self.loginWith(passphrase: $0)
+            }
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }
             
@@ -550,9 +554,9 @@ extension LoginViewController {
 // MARK: UITextField + extensions
 
 private extension UITextField {
-    func enablePasteButtonAndPasswordToggle() {
+    func enablePasteButtonAndPasswordToggle(_ pasteButtonHandler: @escaping (String) -> Void) {
         let passwordToggleButton = makePasswordButton()
-        let pasteButton = makePasteButton()
+        let pasteButton = makePasteButton(pasteButtonHandler)
         
         let containerView = UIView()
         let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
@@ -579,17 +583,23 @@ private extension UITextField {
         rightViewMode = .always
     }
     
-    func makePasteButton() -> UIButton {
+    func makePasteButton(_ handler: @escaping (String) -> Void) -> UIButton {
         let button = UIButton(type: .custom)
         button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
         button.setImage(.asset(named: "clipboard"), for: .normal)
-        button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
+        button.addAction(
+            UIAction { [weak self] _ in
+                self?.pasteFromPasteboard(handler)
+            },
+            for: .touchUpInside
+        )
         return button
     }
     
-    @objc func pasteFromPasteboard(_ sender: UIButton) {
+    @objc func pasteFromPasteboard(_ handler: @escaping (String) -> Void) {
         if let pasteboardText = UIPasteboard.general.string {
-            self.text = pasteboardText
+            let newText = String(pasteboardText.prefix(150))
+            handler(newText)
         }
     }
 }
