@@ -8,11 +8,10 @@
 
 import CommonKit
 
-protocol AdamantSecretWalletsManagerProtocol: Sendable {
-    @MainActor
+protocol AdamantSecretWalletsManagerProtocol {
     var statePublisher: AnyObservable<AdamantSecretWalletsManager.State> { get }
         
-    /// Adding new secret wallet and activating it
+    /// Adds new secret wallet and activates it
     func createSecretWallet(withPassword password: String)
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol?
     func getCurrentWallet() -> WalletStoreServiceProtocol

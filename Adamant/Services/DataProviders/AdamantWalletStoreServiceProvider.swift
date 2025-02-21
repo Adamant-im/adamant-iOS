@@ -11,10 +11,11 @@ import CommonKit
 import Combine
 
 protocol WalletStoreServiceProviderProtocol: WalletStoreServiceProtocol {
+    @MainActor
     var currentWalletPublisher: AnyObservable<WalletStoreServiceProtocol> { get }
 }
 
-final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtocol, @unchecked Sendable {
+final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtocol {
     private let secretWalletsManager: AdamantSecretWalletsManagerProtocol
     
     @ObservableValue private(set) var currentWallet: WalletStoreServiceProtocol
@@ -28,13 +29,10 @@ final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtoco
         self.secretWalletsManager = secretWalletsManager
         self._currentWallet = ObservableValue(secretWalletsManager.getCurrentWallet())
         
-        MainActor.assumeIsolated {
-            setupBindings()
-        }
+        setupBindings()
     }
     
-    @MainActor
-    private func setupBindings(){
+    private func setupBindings() {
         secretWalletsManager.statePublisher
             .map { $0.currentWallet }
             .receive(on: DispatchQueue.main)

@@ -11,14 +11,14 @@ import Swinject
 import CommonKit
 
 extension AdamantSecretWalletsManager {
-    struct State: Sendable {
+    struct State {
         var currentWallet: WalletStoreServiceProtocol
         let defaultWallet: WalletStoreServiceProtocol
         var secretWallets: [WalletStoreServiceProtocol] = []
     }
 }
 
-final class AdamantSecretWalletsManager: @unchecked Sendable, AdamantSecretWalletsManagerProtocol {
+final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
     private let secretWalletsFactory: SecretWalletsFactory
     
     init(
@@ -32,7 +32,7 @@ final class AdamantSecretWalletsManager: @unchecked Sendable, AdamantSecretWalle
         self.secretWalletsFactory = secretWalletsFactory
     }
     
-    @ObservableValue private(set) var state: State
+    @ObservableValue private var state: State
     var statePublisher: AnyObservable<State> {
         $state.eraseToAnyPublisher()
     }

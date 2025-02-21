@@ -38,24 +38,28 @@ struct SecretWalletsFactory {
         }
         wallets.append(contentsOf: erc20WalletServices)
         let walletServiceCompose = AdamantWalletServiceCompose(wallets: wallets)
-        initWallets(withPass: password, for: walletServiceCompose)
+        Task.detached(priority: .userInitiated){
+            await initWallets(withPass: password, for: walletServiceCompose)
+        }
         let wallet = AdamantWalletStoreService(visibleWalletsService: visibleWalletsService, walletServiceCompose: walletServiceCompose)
         
         return wallet
     }
     
-    private func initWallets(withPass password: String, for walletService: WalletServiceCompose) {
+    private func initWallets(withPass password: String, for walletService: WalletServiceCompose) async {
         guard let passphrase: String = securedStore.get(StoreKey.accountService.passphrase) else {
             print("No passphrase found")
             return
         }
         
-        for wallet in walletService.getWallets() {
-            Task {
-                try? await wallet.core.initWallet(
-                    withPassphrase: passphrase,
-                    withPassword: password
-                )
+        await withTaskGroup(of: Void.self) { taskGroup in
+            for wallet in walletService.getWallets() {
+                taskGroup.addTask {
+                    _ = try? await wallet.core.initWallet(
+                        withPassphrase: passphrase,
+                        withPassword: password
+                    )
+                }
             }
         }
     }
