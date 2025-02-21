@@ -419,14 +419,7 @@ final class ChatViewModel: NSObject {
     
     func hideMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-            else { return }
-            
-            transaction.isHidden = true
-            try? transaction.managedObjectContext?.save()
-            
-            chatroom?.updateLastTransaction()
-            await chatsProvider.removeMessage(with: transaction.transactionId)
+            await chatsProvider.removeMessage(with: id)
         }
     }
     
@@ -723,6 +716,12 @@ final class ChatViewModel: NSObject {
         
         lastDateHeaderUpdate = Date()
         updateMessages(resetLoadingProperty: false)
+    }
+    
+    func cancelFileUploading(messageId: String, file: ChatFile) {
+        Task {
+            await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
+        }
     }
 
     func openFile(messageId: String, file: ChatFile) {
