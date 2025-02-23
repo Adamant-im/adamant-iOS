@@ -232,7 +232,9 @@ final class LoginViewController: FormViewController {
             $0.placeholderColor = UIColor.adamant.secondary
             $0.cell.textField.enablePasteButtonAndPasswordToggle {
                 // assing text to textfield like this to make loginButton update its enabled/disabled state
-                self.form.rowBy(tag: Rows.passphrase.tag)?.value = $0
+                let row = self.form.rowBy(tag: Rows.passphrase.tag) as? PasswordRow
+                row?.value = $0
+                row?.cell.textField.text = $0
                 self.loginWith(passphrase: $0)
             }
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
