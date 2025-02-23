@@ -226,16 +226,21 @@ final class LoginViewController: FormViewController {
         }
         
         // Passphrase row
-        <<< PasswordRow {
+        <<< PasteInterceptingPasswordRow {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
-            $0.cell.textField.enablePasteButtonAndPasswordToggle {
+            $0.cell._textField.pasteInterceptor = { [weak self] text in
+                if let text {
+                    self?.loginWith(passphrase: text)
+                }
+            }
+            $0.cell.textField.enablePasteButtonAndPasswordToggle { [weak self] in
                 // assing text to textfield like this to make loginButton update its enabled/disabled state
-                let row = self.form.rowBy(tag: Rows.passphrase.tag) as? PasswordRow
+                let row = self?.form.rowBy(tag: Rows.passphrase.tag) as? PasteInterceptingPasswordRow
                 row?.value = $0
                 row?.cell.textField.text = $0
-                self.loginWith(passphrase: $0)
+                self?.loginWith(passphrase: $0)
             }
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }
