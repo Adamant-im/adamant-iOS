@@ -8,7 +8,9 @@
 import Foundation
 import QuartzCore
 
-public func deadline<R>(
+/// Executes operation `operation` with deadline `instant`
+/// Supports actor isolation
+func deadline<R>(
     until instant: TimeInterval,
     isolation: isolated (any Actor)? = #isolation,
     operation: @Sendable () async throws -> R
