@@ -24,11 +24,13 @@ private struct FileMessage {
     var files: [FileUpload]
     var message: String?
     var txId: String?
+    var adamantMessage: AdamantMessage?
 }
 
 @MainActor
 final class ChatFileService: ChatFileProtocol, Sendable {
     typealias UploadResult = (decodedData: Data, encodedData: Data, nonce: String, cid: String)
+    typealias UploadFileResult = (file: UploadResult, preview: UploadResult?)
     
     // MARK: Dependencies
     
@@ -47,6 +49,7 @@ final class ChatFileService: ChatFileProtocol, Sendable {
     private var fileDownloadAttemptsCount: [String: Int] = [:]
     private var uploadingFilesDictionary: [String: FileMessage] = [:]
     private var previewDownloadsAttemps: [String: Int] = [:]
+    private var uploadTasks: [String: Task<UploadFileResult, Error>] = [:]
     private let synchronizer = AsyncStreamSender<@MainActor () -> Void>()
     private let _updateFileFields = ObservableSender<FileUpdateProperties>()
     
@@ -197,6 +200,19 @@ final class ChatFileService: ChatFileProtocol, Sendable {
         }
         
         return decodedData
+    }
+    
+    func cancelUpload(messageId: String, fileId: String) async {
+        if let task = uploadTasks[fileId] {
+            task.cancel()
+            uploadTasks[fileId] = nil
+            uploadingFiles.removeAll { $0 == fileId }
+        } else {
+            await removeFromRichFile(
+                oldId: fileId,
+                txId: messageId
+            )
+        }
     }
     
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool {
@@ -725,6 +741,7 @@ private extension ChatFileService {
             replyMessage: replyMessage,
             storageProtocol: storageProtocol
         )
+        fileMessage.adamantMessage = messageLocally
         
         cachePreviewFiles(files)
         
@@ -743,27 +760,25 @@ private extension ChatFileService {
 
         do {
             try await processFilesUpload(
-                fileMessage: &fileMessage,
+                fileMessage: fileMessage,
                 chatroom: chatroom,
                 keyPair: keyPair,
                 storageProtocol: storageProtocol,
                 ownerId: ownerId,
                 partnerAddress: partnerAddress,
                 saveEncrypted: saveEncrypted, 
-                txId: txId,
-                richFiles: &richFiles,
-                messageLocally: messageLocally
+                txId: txId
             )
             
-            let message = createAdamantMessage(
-                with: richFiles,
-                text: text,
-                replyMessage: replyMessage,
-                storageProtocol: storageProtocol
-            )
+            guard let fileMessage = uploadingFilesDictionary[txId],
+                  let adamantMessage = fileMessage.adamantMessage,
+                  !fileMessage.files.isEmpty
+            else {
+                return await chatsProvider.removeMessage(with: txId)
+            }
             
             _ = try await chatsProvider.sendFileMessage(
-                message,
+                adamantMessage,
                 recipientId: partnerAddress,
                 transactionLocalyId: txId,
                 from: chatroom
@@ -886,23 +901,14 @@ private extension ChatFileService {
         )
     }
     
-    func processFilesUpload(
-        fileMessage: inout FileMessage,
+    func createFileUploadTask(
+        file: FileResult,
         chatroom: Chatroom?,
         keyPair: Keypair,
         storageProtocol: NetworkFileProtocolType,
-        ownerId: String,
-        partnerAddress: String,
-        saveEncrypted: Bool,
-        txId: String,
-        richFiles: inout [RichMessageFile.File],
-        messageLocally: AdamantMessage
-    ) async throws {
-        let files = fileMessage.files
-        
-        for i in files.indices where !files[i].isUploaded {
-            let file = files[i].file
-            
+        saveEncrypted: Bool
+    ) -> Task<UploadFileResult, Error> {
+        return Task {
             let uploadProgress: @Sendable (Int) -> Void = { [synchronizer, file] value in
                 synchronizer.send { [weak self] in
                     self?.sendProgress(
@@ -916,34 +922,76 @@ private extension ChatFileService {
                 file: file,
                 recipientPublicKey: chatroom?.partner?.publicKey ?? .empty,
                 senderPrivateKey: keyPair.privateKey,
-                storageProtocol: storageProtocol, 
+                storageProtocol: storageProtocol,
                 progress: uploadProgress
             )
             
-            sendProgress(
-                for: result.file.cid,
-                progress: 100
-            )
+            return result
+        }
+    }
+    
+    func processFilesUpload(
+        fileMessage: FileMessage,
+        chatroom: Chatroom?,
+        keyPair: Keypair,
+        storageProtocol: NetworkFileProtocolType,
+        ownerId: String,
+        partnerAddress: String,
+        saveEncrypted: Bool,
+        txId: String
+    ) async throws {
+        let files = fileMessage.files
+        
+        for i in files.indices where !files[i].isUploaded {
+            let file = files[i].file
             
-            try cacheUploadedFile(
-                fileResult: result.file,
-                previewResult: result.preview,
+            // We possible already cancelled uploading this file, but effectively we didn't start uploading it
+            guard uploadingFiles.contains(file.url.absoluteString) else { continue }
+            
+            let uploadTask = createFileUploadTask(
                 file: file,
-                ownerId: ownerId,
-                partnerAddress: partnerAddress,
+                chatroom: chatroom,
+                keyPair: keyPair,
+                storageProtocol: storageProtocol,
                 saveEncrypted: saveEncrypted
             )
             
-            await updateRichFile(
-                oldId: file.url.absoluteString,
-                fileResult: result.file,
-                previewResult: result.preview,
-                fileMessage: &fileMessage,
-                richFiles: &richFiles,
-                file: file,
-                txId: txId,
-                messageLocally: messageLocally
-            )
+            uploadTasks[file.url.absoluteString] = uploadTask
+            
+            defer {
+                uploadTasks[file.url.absoluteString] = nil
+            }
+            
+            do {
+                let result = try await uploadTask.value
+                
+                sendProgress(
+                    for: result.file.cid,
+                    progress: 100
+                )
+                
+                try cacheUploadedFile(
+                    fileResult: result.file,
+                    previewResult: result.preview,
+                    file: file,
+                    ownerId: ownerId,
+                    partnerAddress: partnerAddress,
+                    saveEncrypted: saveEncrypted
+                )
+                
+                await updateRichFile(
+                    oldId: file.url.absoluteString,
+                    fileResult: result.file,
+                    previewResult: result.preview,
+                    file: file,
+                    txId: txId
+                )
+            } catch is CancellationError {
+                await removeFromRichFile(
+                    oldId: file.url.absoluteString,
+                    txId: txId
+                )
+            }
         }
     }
     
@@ -989,11 +1037,8 @@ private extension ChatFileService {
         oldId: String,
         fileResult: UploadResult,
         previewResult: UploadResult?,
-        fileMessage: inout FileMessage,
-        richFiles: inout [RichMessageFile.File],
         file: FileResult,
-        txId: String,
-        messageLocally: AdamantMessage
+        txId: String
     ) async {
         let cached = filesStorage.isCachedLocally(fileResult.cid)
         uploadingFiles.removeAll { $0 == oldId }
@@ -1019,6 +1064,11 @@ private extension ChatFileService {
             )
         }
         
+        guard var (fileMessage, richMessage) = uploadingFilesDictionary[richMessageId: txId]
+        else { return }
+        
+        var richFiles = richMessage.files
+        
         if let index = richFiles.firstIndex(where: { $0.id == oldId }) {
             richFiles[index].id = fileResult.cid
             richFiles[index].nonce = fileResult.nonce
@@ -1035,16 +1085,40 @@ private extension ChatFileService {
             uploadingFilesDictionary[txId] = fileMessage
         }
         
-        guard case let .richMessage(payload) = messageLocally,
-              var richMessage = payload as? RichMessageFile
-        else { return }
-        
         richMessage.files = richFiles
         
         try? await chatsProvider.updateTxMessageContent(
             txId: txId,
             richMessage: richMessage
         )
+    }
+    
+    func removeFromRichFile(
+        oldId: String,
+        txId: String
+    ) async {
+        uploadingFiles.removeAll { $0 == oldId }
+        
+        guard var (fileMessage, richMessage) = uploadingFilesDictionary[richMessageId: txId]
+        else { return }
+                
+        richMessage.files = richMessage.files.filter { $0.id != oldId }
+        fileMessage.adamantMessage = .richMessage(payload: richMessage)
+        
+        let updatedFiles = fileMessage.files.filter { $0.file.url.absoluteString != oldId }
+        
+        fileMessage.files = updatedFiles
+        uploadingFilesDictionary[txId] = fileMessage
+        
+        if !updatedFiles.isEmpty {
+            // skip double update which causes bugs
+            // first update: here
+            // second update: if fileMessages is empty in sendFile method
+            try? await chatsProvider.updateTxMessageContent(
+                txId: txId,
+                richMessage: richMessage
+            )
+        }
     }
     
     func handleUploadError(
@@ -1136,12 +1210,35 @@ private extension ChatFileService {
             throw FileManagerError.cantEncryptFile
         }
         
-        let cid = try await filesNetworkManager.uploadFiles(
+        try Task.checkCancellation()
+        
+        let result = await filesNetworkManager.uploadFiles(
             encodedData,
             type: storageProtocol,
             uploadProgress: uploadProgress
-        ).get()
+        )
         
-        return (data, encodedData, nonce, cid)
+        switch result {
+        case let .success(cid):
+            return (data, encodedData, nonce, cid)
+        case let .failure(error):
+            if case .apiError(let apiError) = error,
+               apiError == .requestCancelled {
+                try Task.checkCancellation()
+            }
+            
+            throw error
+        }
+    }
+}
+
+private extension Dictionary where Key == String, Value == FileMessage {
+    subscript(richMessageId txId: String) -> (FileMessage, RichMessageFile)? {
+        guard let fileMessage = self[txId],
+              case let .richMessage(payload) = fileMessage.adamantMessage,
+              let richMessage = payload as? RichMessageFile
+        else { return nil }
+        
+        return (fileMessage, richMessage)
     }
 }
