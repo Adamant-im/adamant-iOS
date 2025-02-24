@@ -159,14 +159,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
-            if isMacOS {
-                var size: CGSize = .init(width: 900, height: 900)
-                window.frame = .init(origin: window.frame.origin, size: size)
-                window.windowScene?.sizeRestrictions?.minimumSize = size
-                window.windowScene?.sizeRestrictions?.maximumSize = size
-                window.windowScene?.sizeRestrictions?.allowsFullScreen = false
-            }
-            
             let welcome = screensFactory.makeOnboard()
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
