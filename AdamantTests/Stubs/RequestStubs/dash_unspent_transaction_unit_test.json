@@ -1,0 +1,26 @@
+{
+    "result": [
+        {
+            "txid": "1",
+            "script": "some script",
+            "address": "some address",
+            "outputIndex": 1,
+            "satoshis": 30,
+            "height": 1,
+            "status": {
+                "confirmed": true
+            }
+        },
+        {
+            "txid": "1",
+            "script": "some script",
+            "address": "some address",
+            "outputIndex": 2,
+            "satoshis": 20,
+            "height": 1,
+            "status": {
+                "confirmed": true
+            }
+        }
+    ]
+}
