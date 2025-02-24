@@ -109,6 +109,16 @@ extension Transaction: Codable {
     
 }
 
+public extension Transaction {
+    var timestampMillisecondsFromDate: Int64 {
+        if let timestampMs = timestampMs {
+            Int64(timestampMs)
+        } else {
+            (date as NSDate).timeIntervalMillisecondsSince1970
+        }
+    }
+}
+
 extension Transaction: WrappableModel {
     public static let ModelKey = "transaction"
 }

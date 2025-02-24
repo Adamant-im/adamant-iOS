@@ -443,7 +443,7 @@ extension AdamantTransfersProvider {
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
-        transaction.timestampMs = Int64(transaction.date?.timeIntervalSince1970 ?? .zero)
+        transaction.timestampMs = transaction.date?.timeIntervalMillisecondsSince1970 ?? .zero
         transaction.recipientId = recipient
         transaction.senderId = loggedAccount.address
         transaction.type = Int16(TransactionType.chatMessage.rawValue)
@@ -637,7 +637,7 @@ extension AdamantTransfersProvider {
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
-        transaction.timestampMs = Int64(transaction.date?.timeIntervalSince1970 ?? .zero)
+        transaction.timestampMs = transaction.date?.timeIntervalMillisecondsSince1970 ?? .zero
         transaction.recipientId = recipient
         transaction.senderId = loggedAccount.address
         transaction.type = Int16(TransactionType.send.rawValue)

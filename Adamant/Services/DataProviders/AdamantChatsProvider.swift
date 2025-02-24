@@ -973,7 +973,7 @@ extension AdamantChatsProvider {
         let transaction = MessageTransaction(context: context)
         let id = UUID().uuidString
         transaction.date = Date() as NSDate
-        transaction.timestampMs = Int64(transaction.date?.timeIntervalSince1970 ?? .zero)
+        transaction.timestampMs = transaction.date?.timeIntervalMillisecondsSince1970 ?? .zero
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1020,7 +1020,7 @@ extension AdamantChatsProvider {
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
-        transaction.timestampMs = Int64(transaction.date?.timeIntervalSince1970 ?? .zero)
+        transaction.timestampMs = transaction.date?.timeIntervalMillisecondsSince1970 ?? .zero
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1185,7 +1185,7 @@ extension AdamantChatsProvider {
         
         // MARK: 2. Update transaction
         transaction.date = Date() as NSDate
-        transaction.timestampMs = Int64(transaction.date?.timeIntervalSince1970 ?? .zero)
+        transaction.timestampMs = transaction.date?.timeIntervalMillisecondsSince1970 ?? .zero
         transaction.statusEnum = .pending
         
         if let chatroom = transaction.chatroom {

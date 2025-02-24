@@ -1905,8 +1905,8 @@
 				6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */,
 			);
 			path = AdmDialogService;
-            sourceTree = "<group>";
-        };
+			sourceTree = "<group>";
+		};
 		85ACCA672D68DC60005658CE /* CoreDataHelpers */ = {
 			isa = PBXGroup;
 			children = (
