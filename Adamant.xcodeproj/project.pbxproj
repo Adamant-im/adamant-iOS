@@ -271,6 +271,7 @@
 		6FCF2D522D54F2B600F64D20 /* AdmDialogService+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */; };
 		6FCF2D532D54F2B600F64D20 /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */; };
 		6FF9F08C2D6CEB340013A3B1 /* CoreDataRealationMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */; };
+		85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
@@ -1002,6 +1003,7 @@
 		6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmDialogService+Extension.swift"; sourceTree = "<group>"; };
 		6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRealationMapper.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
+		85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesSortDescriptor.swift; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
@@ -1903,6 +1905,14 @@
 				6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */,
 			);
 			path = AdmDialogService;
+            sourceTree = "<group>";
+        };
+		85ACCA672D68DC60005658CE /* CoreDataHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */,
+			);
+			path = CoreDataHelpers;
 			sourceTree = "<group>";
 		};
 		85B405002D3012BD000AB744 /* AccountViewController */ = {
@@ -2670,6 +2680,7 @@
 				AA7202E22D6B4A4B00CCAC20 /* PasteInterceptingPasswordCell.swift */,
 				AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */,
 				AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */,
+				85ACCA672D68DC60005658CE /* CoreDataHelpers */,
 				93775E452A674FA9009061AC /* Markdown+Adamant.swift */,
 				E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */,
 				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
@@ -3623,6 +3634,7 @@
 				26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */,
 				93294B822AAD0BB400911109 /* BtcWalletFactory.swift in Sources */,
 				AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */,
+				85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */,
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				93294B7D2AAD067000911109 /* AppContainer.swift in Sources */,
 				93ED214C2CC3561800AA1FC8 /* TransactionsStatusServiceComposeProtocol.swift in Sources */,
