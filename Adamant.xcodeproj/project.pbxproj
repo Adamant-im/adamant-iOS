@@ -467,8 +467,9 @@
 		AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */; };
 		AA33BEB72D3041A30083E59C /* AddressConverterMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */; };
 		AA33BEB92D3044760083E59C /* BtcApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */; };
-		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
-		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
+		AA7202E32D6B4A5100CCAC20 /* PasteInterceptingPasswordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7202E22D6B4A4B00CCAC20 /* PasteInterceptingPasswordCell.swift */; };
+		AA7202E52D6B4ABB00CCAC20 /* PasteInterceptingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */; };
+		AA7202E72D6B4B3500CCAC20 /* PasteInterceptingPasswordRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */; };
 		AA8FFFB02D497175001D8576 /* AdmWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */; };
 		AA8FFFB22D49726F001D8576 /* SecuredStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */; };
 		AA8FFFB42D497510001D8576 /* AccountServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB32D497509001D8576 /* AccountServiceMock.swift */; };
@@ -478,6 +479,8 @@
 		AA8FFFBC2D49796A001D8576 /* ChatsProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */; };
 		AA8FFFC02D4AC011001D8576 /* AdamantCoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */; };
 		AA8FFFC42D4C1174001D8576 /* NativeAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */; };
+		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
+		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
 		AA8FFFE32D513681001D8576 /* CustomFieldRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */; };
 		AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
@@ -1146,7 +1149,9 @@
 		AA33BEB42D303CBD0083E59C /* AddressConverterMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressConverterMock.swift; sourceTree = "<group>"; };
 		AA33BEB52D303DB60083E59C /* APICoreProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocolMock.swift; sourceTree = "<group>"; };
 		AA33BEB82D30446F0083E59C /* BtcApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcApiServiceProtocolMock.swift; sourceTree = "<group>"; };
-		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
+		AA7202E22D6B4A4B00CCAC20 /* PasteInterceptingPasswordCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteInterceptingPasswordCell.swift; sourceTree = "<group>"; };
+		AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteInterceptingTextField.swift; sourceTree = "<group>"; };
+		AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteInterceptingPasswordRow.swift; sourceTree = "<group>"; };
 		AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletServiceTests.swift; sourceTree = "<group>"; };
 		AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStoreMock.swift; sourceTree = "<group>"; };
 		AA8FFFB32D497509001D8576 /* AccountServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceMock.swift; sourceTree = "<group>"; };
@@ -1156,6 +1161,7 @@
 		AA8FFFBB2D497966001D8576 /* ChatsProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProviderMock.swift; sourceTree = "<group>"; };
 		AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoreMock.swift; sourceTree = "<group>"; };
 		AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCoreTests.swift; sourceTree = "<group>"; };
+		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
 		AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFieldRow.swift; sourceTree = "<group>"; };
 		AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeInsetTextField.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
@@ -2601,6 +2607,9 @@
 		E913C9101FFFAA4B001A83F7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */,
+				AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */,
+				AA7202E22D6B4A4B00CCAC20 /* PasteInterceptingPasswordCell.swift */,
 				AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */,
 				AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */,
 				93775E452A674FA9009061AC /* Markdown+Adamant.swift */,
@@ -3573,6 +3582,7 @@
 				3A4068342ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift in Sources */,
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
 				93FC16A12B01DE120062B507 /* ERC20ApiService.swift in Sources */,
+				AA7202E72D6B4B3500CCAC20 /* PasteInterceptingPasswordRow.swift in Sources */,
 				3A299C692B838AA600B54C61 /* ChatMediaCell.swift in Sources */,
 				93294B9A2AAD624100911109 /* WalletFactoryCompose.swift in Sources */,
 				41C1698E29E7F36900FEB3CB /* AdamantRichTransactionReplyService.swift in Sources */,
@@ -3764,6 +3774,7 @@
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				3ACD307E2BBD86B700ABF671 /* FilesStorageProprietiesService.swift in Sources */,
 				3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */,
+				AA7202E32D6B4A5100CCAC20 /* PasteInterceptingPasswordCell.swift in Sources */,
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				9366588D2B0AB6BD00BDB2D3 /* CoinsNodesListState.swift in Sources */,
@@ -3886,6 +3897,7 @@
 				A5E0422B282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
 				3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */,
+				AA7202E52D6B4ABB00CCAC20 /* PasteInterceptingTextField.swift in Sources */,
 				93294B962AAD320B00911109 /* ScreensFactory.swift in Sources */,
 				3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */,
 				93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */,
