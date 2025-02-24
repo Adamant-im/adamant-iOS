@@ -760,16 +760,14 @@ private extension ChatFileService {
 
         do {
             try await processFilesUpload(
-                fileMessage: &fileMessage,
+                fileMessage: fileMessage,
                 chatroom: chatroom,
                 keyPair: keyPair,
                 storageProtocol: storageProtocol,
                 ownerId: ownerId,
                 partnerAddress: partnerAddress,
                 saveEncrypted: saveEncrypted, 
-                txId: txId,
-                richFiles: &richFiles,
-                messageLocally: messageLocally
+                txId: txId
             )
             
             guard let fileMessage = uploadingFilesDictionary[txId],
@@ -933,16 +931,14 @@ private extension ChatFileService {
     }
     
     func processFilesUpload(
-        fileMessage: inout FileMessage,
+        fileMessage: FileMessage,
         chatroom: Chatroom?,
         keyPair: Keypair,
         storageProtocol: NetworkFileProtocolType,
         ownerId: String,
         partnerAddress: String,
         saveEncrypted: Bool,
-        txId: String,
-        richFiles: inout [RichMessageFile.File],
-        messageLocally: AdamantMessage
+        txId: String
     ) async throws {
         let files = fileMessage.files
         
