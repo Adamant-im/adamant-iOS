@@ -82,12 +82,6 @@ struct AppAssembly: MainThreadAssembly {
             )
         }.inObjectScope(.container)
         
-        container.register(WalletStoreServiceProviderProtocol.self) { r in
-            AdamantWalletStoreServiceProvider(
-                secretWalletsManager: r.resolve(AdamantSecretWalletsManagerProtocol.self)!
-            )
-        }.inObjectScope(.container)
-        
         // MARK: Secret Wallets
         container.register(SecretWalletsFactory.self) { r in
             SecretWalletsFactory(
@@ -97,12 +91,18 @@ struct AppAssembly: MainThreadAssembly {
             )
         }.inObjectScope(.container)
         
-        container.register(AdamantSecretWalletsManagerProtocol.self) { r in
+        container.register(SecretWalletsManagerProtocol.self) { r in
             AdamantSecretWalletsManager(
                 walletsStoreService: r.resolve(WalletStoreServiceProtocol.self)!,
                 secretWalletsFactory: r.resolve(SecretWalletsFactory.self)!
             )
-        }
+        }.inObjectScope(.container)
+        
+        container.register(WalletStoreServiceProviderProtocol.self) { r in
+            AdamantWalletStoreServiceProvider(
+                secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
+            )
+        }.inObjectScope(.container)
         
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in

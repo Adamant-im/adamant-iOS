@@ -16,7 +16,7 @@ protocol WalletStoreServiceProviderProtocol: WalletStoreServiceProtocol {
 }
 
 final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtocol {
-    private let secretWalletsManager: AdamantSecretWalletsManagerProtocol
+    private let secretWalletsManager: SecretWalletsManagerProtocol
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -25,7 +25,7 @@ final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtoco
         $currentWallet.map { _ in () }.eraseToAnyPublisher()
     }
     
-    init(secretWalletsManager: AdamantSecretWalletsManagerProtocol) {
+    init(secretWalletsManager: SecretWalletsManagerProtocol) {
         self.secretWalletsManager = secretWalletsManager
         self._currentWallet = ObservableValue(secretWalletsManager.getCurrentWallet())
         

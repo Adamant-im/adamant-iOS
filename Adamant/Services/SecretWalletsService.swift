@@ -11,14 +11,14 @@ import Swinject
 import CommonKit
 
 extension AdamantSecretWalletsManager {
-    struct State {
+    struct State: SecretWalletsManagerStateProtocol {
         var currentWallet: WalletStoreServiceProtocol
         let defaultWallet: WalletStoreServiceProtocol
         var secretWallets: [WalletStoreServiceProtocol] = []
     }
 }
 
-final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
+final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     private let secretWalletsFactory: SecretWalletsFactory
     private let lock = NSLock()
     
@@ -33,8 +33,8 @@ final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
         self.secretWalletsFactory = secretWalletsFactory
     }
     
-    @ObservableValue private var state: State
-    var statePublisher: AnyObservable<State> {
+    @ObservableValue private var state: SecretWalletsManagerStateProtocol
+    var statePublisher: AnyObservable<SecretWalletsManagerStateProtocol> {
         $state.eraseToAnyPublisher()
     }
     
@@ -44,7 +44,6 @@ final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
         lock.lock()
         defer { lock.unlock() }
         state.secretWallets.append(wallet)
-        activateSecretWallet(at: state.secretWallets.count - 1)
     }
     
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol? {
@@ -58,8 +57,8 @@ final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
         state.currentWallet
     }
     
-    func getWallets() -> [WalletStoreServiceProtocol] {
-        [state.currentWallet] + state.secretWallets
+    func getSecretWallets() -> [WalletStoreServiceProtocol] {
+        state.secretWallets
     }
     
     func activateSecretWallet(at index: Int) {
