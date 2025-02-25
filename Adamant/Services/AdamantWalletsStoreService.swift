@@ -6,7 +6,7 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-final class AdamantWalletStoreService: WalletStoreServiceProtocol {
+struct AdamantWalletStoreService: WalletStoreServiceProtocol {
     let visibleWalletsService: VisibleWalletsService
     let walletServiceCompose: WalletServiceCompose
     

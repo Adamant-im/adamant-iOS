@@ -20,6 +20,7 @@ extension AdamantSecretWalletsManager {
 
 final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
     private let secretWalletsFactory: SecretWalletsFactory
+    private let lock = NSLock()
     
     init(
         walletsStoreService: WalletStoreServiceProtocol,
@@ -36,8 +37,6 @@ final class AdamantSecretWalletsManager: AdamantSecretWalletsManagerProtocol {
     var statePublisher: AnyObservable<State> {
         $state.eraseToAnyPublisher()
     }
-    
-    private let lock = NSLock()
     
     // MARK: - Manage state
     func createSecretWallet(withPassword password: String) {

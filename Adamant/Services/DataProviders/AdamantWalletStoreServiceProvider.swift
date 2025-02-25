@@ -12,17 +12,17 @@ import Combine
 
 protocol WalletStoreServiceProviderProtocol: WalletStoreServiceProtocol {
     @MainActor
-    var currentWalletPublisher: AnyObservable<WalletStoreServiceProtocol> { get }
+    var currentWalletPublisher: AnyObservable<Void> { get }
 }
 
 final class AdamantWalletStoreServiceProvider: WalletStoreServiceProviderProtocol {
     private let secretWalletsManager: AdamantSecretWalletsManagerProtocol
     
-    @ObservableValue private(set) var currentWallet: WalletStoreServiceProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    var currentWalletPublisher: AnyObservable<WalletStoreServiceProtocol> {
-        $currentWallet.eraseToAnyPublisher()
+    @ObservableValue private var currentWallet: WalletStoreServiceProtocol
+    var currentWalletPublisher: AnyObservable<Void> {
+        $currentWallet.map { _ in () }.eraseToAnyPublisher()
     }
     
     init(secretWalletsManager: AdamantSecretWalletsManagerProtocol) {

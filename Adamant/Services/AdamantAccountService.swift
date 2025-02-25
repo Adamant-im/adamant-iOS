@@ -23,7 +23,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
 
     weak var notificationsService: NotificationsService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
-    weak var walletsStoreService: WalletStoreServiceProtocol?
+    var walletsStoreService: WalletStoreServiceProtocol?
     
     // MARK: Properties
     
@@ -270,12 +270,8 @@ extension AdamantAccountService {
             }
         }
         
-        if updateOnlyVisible {
-            for wallet in wallets.filter({ !($0.core is AdmWalletService) }) where !(walletsStoreService?.isInvisible(wallet) ?? false) {
-                wallet.core.update()
-            }
-        } else {
-            for wallet in wallets.filter({ !($0.core is AdmWalletService) }) {
+        for wallet in wallets where !(wallet.core is AdmWalletService) {
+            if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
                 wallet.core.update()
             }
         }
