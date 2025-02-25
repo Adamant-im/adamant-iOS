@@ -1942,6 +1942,7 @@ extension AdamantChatsProvider {
     func removeMessage(with id: String) {
         if !self.removedMessages.contains(id) {
             self.removedMessages.append(id)
+            markTransactionAsHidden(id: id)
             
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
@@ -1953,6 +1954,23 @@ extension AdamantChatsProvider {
         chatroom.managedObjectContext?.perform {
             chatroom.markAsReaded()
             try? chatroom.managedObjectContext?.save()
+        }
+    }
+    
+    private func markTransactionAsHidden(id: String) {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        privateContext.performAndWait {
+            if let transaction = (try? privateContext.fetch(request))?.first {
+                transaction.isHidden = true
+                try? transaction.managedObjectContext?.save()
+                transaction.chatroom?.updateLastTransaction()
+            }
         }
     }
     

@@ -226,11 +226,22 @@ final class LoginViewController: FormViewController {
         }
         
         // Passphrase row
-        <<< PasswordRow {
+        <<< PasteInterceptingPasswordRow {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
-            $0.cell.textField.enablePasteButtonAndPasswordToggle()
+            $0.cell._textField.pasteInterceptor = { [weak self] text in
+                if let text {
+                    self?.loginWith(passphrase: text)
+                }
+            }
+            $0.cell.textField.enablePasteButtonAndPasswordToggle { [weak self] in
+                // assing text to textfield like this to make loginButton update its enabled/disabled state
+                let row = self?.form.rowBy(tag: Rows.passphrase.tag) as? PasteInterceptingPasswordRow
+                row?.value = $0
+                row?.cell.textField.text = $0
+                self?.loginWith(passphrase: $0)
+            }
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }
             
@@ -246,7 +257,7 @@ final class LoginViewController: FormViewController {
             })
         }.onCellSelection { [weak self] (_, row) in
             guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
-                  let passphrase = row.value?.trimmingCharacters(in: .whitespaces) else {
+                  let passphrase = row.value else {
                 return
             }
             
@@ -443,6 +454,7 @@ final class LoginViewController: FormViewController {
 // MARK: - Login functions
 extension LoginViewController {
     func loginWith(passphrase: String) {
+        let passphrase = passphrase.trimmingCharacters(in: .whitespaces)
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             dialogService.showWarning(withMessage: AccountServiceError.invalidPassphrase.localized)
             return
@@ -550,9 +562,9 @@ extension LoginViewController {
 // MARK: UITextField + extensions
 
 private extension UITextField {
-    func enablePasteButtonAndPasswordToggle() {
+    func enablePasteButtonAndPasswordToggle(_ pasteButtonHandler: @escaping (String) -> Void) {
         let passwordToggleButton = makePasswordButton()
-        let pasteButton = makePasteButton()
+        let pasteButton = makePasteButton(pasteButtonHandler)
         
         let containerView = UIView()
         let buttonStack = UIStackView(arrangedSubviews: [pasteButton, passwordToggleButton])
@@ -579,17 +591,23 @@ private extension UITextField {
         rightViewMode = .always
     }
     
-    func makePasteButton() -> UIButton {
+    func makePasteButton(_ handler: @escaping (String) -> Void) -> UIButton {
         let button = UIButton(type: .custom)
         button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
         button.setImage(.asset(named: "clipboard"), for: .normal)
-        button.addTarget(self, action: #selector(pasteFromPasteboard(_:)), for: .touchUpInside)
+        button.addAction(
+            UIAction { [weak self] _ in
+                self?.pasteFromPasteboard(handler)
+            },
+            for: .touchUpInside
+        )
         return button
     }
     
-    @objc func pasteFromPasteboard(_ sender: UIButton) {
+    @objc func pasteFromPasteboard(_ handler: @escaping (String) -> Void) {
         if let pasteboardText = UIPasteboard.general.string {
-            self.text = pasteboardText
+            let newText = String(pasteboardText.prefix(150))
+            handler(newText)
         }
     }
 }
