@@ -19,7 +19,7 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/krzyzanowskim/CryptoSwift.git",
+            url: "https://github.com/ChrisBenua/CryptoSwift.git",
             .upToNextMinor(from: "1.5.0")
         ),
         .package(
