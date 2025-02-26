@@ -451,5 +451,9 @@ struct AppAssembly: MainThreadAssembly {
         container.register(EthBIP32ServiceProtocol.self) { r in
             EthBIP32Service(ethApiService: r.resolve(ERC20ApiService.self)!)
         }.inObjectScope(.container)
+        
+        container.register(CoreDataRealationMapperProtocol.self) { r in
+            CoreDataRealationMapper(stack: r.resolve(CoreDataStack.self)!)
+        }.inObjectScope(.container)
     }
 }

@@ -917,8 +917,8 @@ extension ChatListViewController {
         }
     }
     private func messageId(transaction: ChatTransaction) -> String? {
-        if let transaction = transaction as? RichMessageTransaction {
-            return transaction.messageTransaction?.transactionId
+        if let richTransaction = transaction as? RichMessageTransaction {
+            return richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) ?? richTransaction.transactionId
         } else {
             return transaction.transactionId
         }
@@ -1172,7 +1172,7 @@ extension ChatListViewController {
             style: .normal,
             title: "👀"
         ) { (_, _, completionHandler) in
-            if chatroom.hasUnread {
+            if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
                 self.chatsManuallyMarkedAsUnread.remove(index)
             } else {

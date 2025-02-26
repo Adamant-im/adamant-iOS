@@ -1535,8 +1535,6 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
-        
-        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
                 
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0

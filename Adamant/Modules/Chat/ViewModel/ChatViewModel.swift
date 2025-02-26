@@ -80,6 +80,7 @@ final class ChatViewModel: NSObject {
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
+    var scrolledMessageId: Set<String>?
 
     let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
@@ -105,7 +106,9 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
-    @ObservableValue private(set) var unReadMesaggesIndexes: [Int: UnreadMode]?
+    @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
+    @ObservableValue private(set) var unreadMessagesIds: [String]?
+    @ObservableValue private(set) var messagesWithUnredReactionsIds: [String]?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
@@ -116,12 +119,12 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
+    @ObservableValue var scrollToMessage: String?
     @ObservableValue var filesPicked: [FileResult]?
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
-            return .messageId(messageIdToShow, toBottomIfNotFound: true)
+            return .messageId(messageIdToShow, toBottomIfNotFound: false)
         }
         
         guard let address = chatroom?.partner?.address else { return nil }
@@ -210,7 +213,9 @@ final class ChatViewModel: NSObject {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
-        self.messageIdToShow = messageIdToShow
+        if let messageIdToShow = messageIdToShow {
+            scroll(to: messageIdToShow)
+        }
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -406,7 +411,7 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
-    func messageWasRead(index: Int) {
+    func markMessageAsRead(index: Int) {
         guard _messages.wrappedValue.indices.contains(index) else { return }
         guard let chatroom else { return }
 
@@ -508,31 +513,33 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
     
-    func scroll(to message: ChatMessageReplyCell.Model) {
+    func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
         
         Task {
             do {
-                guard await !chatsProvider.isMessageDeleted(id: message.replyId) else {
+                guard await !chatsProvider.isMessageDeleted(id: messageId) else {
                     dialog.send(.alert(.adamant.chat.messageWasDeleted))
                     return
                 }
                 
                 if !chatTransactions.contains(
-                    where: { $0.transactionId == message.replyId }
+                    where: { $0.transactionId == messageId }
                 ) {
                     dialog.send(.progress(true))
                     try await chatsProvider.loadTransactionsUntilFound(
-                        message.replyId,
+                        messageId,
                         recipient: partnerAddress
                     )
                 }
                 
-                await waitForMessage(withId: message.replyId)
+                await waitForMessage(withId: messageId)
                 
-                scrollToMessage = (toId: message.replyId, fromId: message.id)
-                
+                scrollToMessage = messageId
                 dialog.send(.progress(false))
+                if let index = messages.firstIndex(where: { $0.id == messageId }) {
+                    markMessageAsRead(index: index)
+                }
             } catch {
                 print(error)
                 dialog.send(.progress(false))
@@ -974,33 +981,6 @@ final class ChatViewModel: NSObject {
 }
 
 extension ChatViewModel {
-    func getTempOffset(visibleIndex: Int?) -> String? {
-        let lastId = tempOffsets.popLast()
-        
-        guard let visibleIndex = visibleIndex,
-              let index = messages.firstIndex(where: { $0.messageId == lastId })
-        else {
-            return lastId
-        }
-        
-        return index > visibleIndex ? lastId : nil
-    }
-    
-    func appendTempOffset(_ id: String, toId: String) {
-        guard let indexFrom = messages.firstIndex(where: { $0.messageId == id }),
-              let indexTo = messages.firstIndex(where: { $0.messageId == toId }),
-              (indexFrom - indexTo) >= minDiffCountForOffset
-        else {
-            return
-        }
-        
-        if let index = tempOffsets.firstIndex(of: id) {
-            tempOffsets.remove(at: index)
-        }
-        
-        tempOffsets.append(id)
-    }
-    
     func openPartnerQR() {
         guard let partner = chatroom?.partner,
               isSendingAvailable
@@ -1100,16 +1080,15 @@ private extension ChatViewModel {
         
         $messages
             .map { messages in
-                messages.enumerated()
-                    .filter { $0.element.isUnread }
-                    .reduce(into: [Int: UnreadMode]()) { result, item in
-                        let (index, message) = item
-                        result[index] = message.unreadMode
-                    }
+                Set(
+                    messages.enumerated()
+                        .filter { $0.element.isUnread }
+                        .map { $0.offset }
+                )
             }
-            .removeDuplicates { $0 == $1 }
+            .removeDuplicates()
             .sink { [weak self] unreadIndexes in
-                self?.unReadMesaggesIndexes = unreadIndexes
+                self?.unreadMesaggesIndexes = unreadIndexes
             }
             .store(in: &subscriptions)
         
@@ -1218,7 +1197,6 @@ private extension ChatViewModel {
             with: address,
             offset: offset
         )
-        
         updateTransactions(performFetch: true)
     }
     
@@ -1248,8 +1226,8 @@ private extension ChatViewModel {
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             defer { completion() }
             var expirationTimestamp: TimeInterval?
-
-            var messages = await chatMessagesListFactory.makeMessages(
+            
+            var (messages, reactId, messageId) = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
@@ -1257,6 +1235,8 @@ private extension ChatViewModel {
             )
             
             postProcess(messages: &messages)
+            messagesWithUnredReactionsIds = reactId
+            unreadMessagesIds = messageId
             
             setupNewMessages(
                 newMessages: messages,

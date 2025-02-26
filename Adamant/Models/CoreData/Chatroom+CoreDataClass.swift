@@ -14,10 +14,6 @@ import CoreData
 public class Chatroom: NSManagedObject, @unchecked Sendable {
     static let entityName = "Chatroom"
     
-    var hasUnread: Bool {
-        return hasUnreadMessages
-    }
-    
     func markAsReaded() {
         hasUnreadMessages = false
        
@@ -49,13 +45,6 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
     }
     func markAsUnread() {
         hasUnreadMessages = true
-    }
-    
-    func getFirstUnread() -> ChatTransaction? {
-        if let trs = transactions as? Set<ChatTransaction> {
-            return trs.filter { $0.isUnread }.map { $0 }.first
-        }
-        return nil
     }
     
     @MainActor func getName(addressBookService: AddressBookService) -> String? {
@@ -118,8 +107,7 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
                 updatedAt = nil
             }
             
-            let hasUnreadTransactions = transactions.contains { $0.isUnread }
-            hasUnreadMessages = hasUnreadTransactions
+            hasUnreadMessages = transactions.contains { $0.isUnread }
         }
     }
 }
