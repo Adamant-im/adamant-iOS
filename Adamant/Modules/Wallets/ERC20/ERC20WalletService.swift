@@ -283,42 +283,38 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     func calculateFee(for address: EthereumAddress? = nil) async {
-        let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit(to: address)
-        
-        var price = priceRaw ?? BigUInt(token.defaultGasPriceGwei).toWei()
-        var gasLimit = gasLimitRaw ?? BigUInt(token.defaultGasLimit)
-        
-        let pricePercent = price * BigUInt(token.reliabilityGasPricePercent) / 100
-        let gasLimitPercent = gasLimit * BigUInt(token.reliabilityGasLimitPercent) / 100
-        
-        price = priceRaw == nil
-        ? price
-        : price + pricePercent
-        
-        gasLimit = gasLimitRaw == nil
-        ? gasLimit
-        : gasLimit + gasLimitPercent
+        // Setting initial
+        async let pricePriceAsync = getGasPrices()
+        async let gasLimitAsync = getGasLimit(to: address)
+        let feeCoeficient = isIncreaseFeeEnabled ? defaultIncreaseFee : 1
 
-        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        let gasPrice, gasLimit: BigUInt
 
-        newFee = isIncreaseFeeEnabled
-        ? newFee * defaultIncreaseFee
-        : newFee
+        // Getting gas data
+        do {
+            let (gasPriceFromChain, gasLimitFromChain) = try await (pricePriceAsync, gasLimitAsync)
+            try Task.checkCancellation()
+            gasPrice = gasPriceFromChain
+            gasLimit = gasLimitFromChain
+        } catch {
+            gasPrice = BigUInt(token.defaultGasPriceGwei).toWei()
+            gasLimit = BigUInt(token.defaultGasLimit)
+        }
         
-        guard transactionFee != newFee else { return }
-        
-        transactionFee = newFee
-        let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
-                
-        gasPrice = isIncreaseFeeEnabled
-        ? BigUInt(integerLiteral: incGasPrice)
-        : price
-        
-        isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
-        self.gasLimit = gasLimit
-        
-        NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        // Updating localy
+        getNewFee(
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
+            feeCoeficient: feeCoeficient
+        ) { [weak self] gasPrice, gasLimit, newFee in
+            guard let self else { return }
+            self.gasPrice = gasPrice
+            self.gasLimit = gasLimit
+            guard transactionFee != newFee else { return }
+            transactionFee = newFee
+            isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        }
     }
     
     func validate(address: String) -> AddressValidationResult {
