@@ -57,6 +57,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private let addressBook: AddressBookService
     private let avatarService: AvatarService
     private let walletServiceCompose: WalletServiceCompose
+    private let chatPreservation: ChatPreservationProtocol
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -142,7 +143,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         dialogService: DialogService,
         addressBook: AddressBookService,
         avatarService: AvatarService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        chatPreservation: ChatPreservationProtocol
     ) {
         self.accountService = accountService
         self.chatsProvider = chatsProvider
@@ -153,6 +155,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         self.addressBook = addressBook
         self.avatarService = avatarService
         self.walletServiceCompose = walletServiceCompose
+        self.chatPreservation = chatPreservation
         
         super.init(nibName: "ChatListViewController", bundle: nil)
     }
@@ -193,7 +196,10 @@ final class ChatListViewController: KeyboardObservingViewController {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.reloadData()
+    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -681,10 +687,15 @@ extension ChatListViewController {
         
         cell.accountLabel.text = chatroom.getName(addressBookService: addressBook)
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
-
-        if let lastTransaction = chatroom.lastTransaction {
+        if let address = chatroom.partner?.address,
+           let preservedMessage = shortDescription(for: address) {
+            cell.hasUnreadMessages = chatroom.hasUnreadMessages
+            cell.lastMessageLabel.attributedText = preservedMessage
+            cell.isClockVisible = false
+        } else if let lastTransaction = chatroom.lastTransaction {
             cell.hasUnreadMessages = lastTransaction.isUnread
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
+            cell.isClockVisible = lastTransaction.statusEnum == .pending
         } else {
             cell.lastMessageLabel.text = nil
         }
@@ -1034,7 +1045,53 @@ extension ChatListViewController {
             return nil
         }
     }
+    private func shortDescription(for address: String) -> NSAttributedString? {
+        var descriptionParts: [NSAttributedString] = []
+
+        if chatPreservation.getReplyMessage(address: address, thenRemoveIt: false) != nil {
+                let replyImageAttachment = NSTextAttachment()
+                replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
+                replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
+
+                descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
+            }
+        if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
+                let mediaCount = files.filter { $0.type.isMedia }.count
+                let otherCount = files.filter { !$0.type.isMedia }.count
+
+                let fileParts = [
+                    mediaCount > 0 ? "📸" + (mediaCount >= 2 ? "\(mediaCount)" : "") : nil,
+                    otherCount > 0 ? "📄" + (otherCount >= 2 ? "\(otherCount)" : "") : nil
+                ].compactMap { $0 }
+
+                if !fileParts.isEmpty {
+                    let parsedFileParts = fileParts
+                        .map { markdownParser.parse($0).resolveLinkColor() }
+                        .reduce(NSMutableAttributedString()) { result, part in
+                            if !result.string.isEmpty { result.append(NSAttributedString(string: " ")) }
+                            result.append(part)
+                            return result
+                        }
+                    descriptionParts.append(parsedFileParts)
+                }
+            }
+
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address, thenRemoveIt: false) {
+            let processedMessage = MessageProcessHelper.process(preservedMessage)
+            descriptionParts.append(NSAttributedString(string: processedMessage))
+        }
+        let hasTextContent = descriptionParts.contains { !$0.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     
+        guard hasTextContent else { return nil }
+
+        let result = NSMutableAttributedString(string: "✏️: ")
+        for (index, part) in descriptionParts.enumerated() {
+            if index > 0 { result.append(NSAttributedString(string: " ")) }
+            result.append(part)
+        }
+
+        return result
+    }
     private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {
         let prefix = isOutgoing
         ? "\(String.adamant.chatList.sentMessagePrefix)"
