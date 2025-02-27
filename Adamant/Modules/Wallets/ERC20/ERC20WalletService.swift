@@ -286,7 +286,10 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         // Setting initial
         async let pricePriceAsync = getGasPrices()
         async let gasLimitAsync = getGasLimit(to: address)
-        let feeCoeficient = isIncreaseFeeEnabled ? defaultIncreaseFee : 1
+        var feeCoeficient: Decimal = 1
+        if isIncreaseFeeEnabled {
+            feeCoeficient += token.increasedGasPricePercent / 100
+        }
 
         let gasPrice, gasLimit: BigUInt
 
