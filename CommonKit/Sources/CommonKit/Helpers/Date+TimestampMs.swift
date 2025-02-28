@@ -10,11 +10,6 @@ import Foundation
 
 public extension NSDate {
     var timeIntervalMillisecondsSince1970: Int64 {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "SSS"
-        guard let milliseconds = Int64(formatter.string(from: self as Date)) else {
-            return Int64(timeIntervalSince1970) * 1000
-        }
-        return Int64(timeIntervalSince1970) * 1000 + milliseconds
+        Int64(timeIntervalSince1970 * 1000) % 1000
     }
 }
