@@ -286,9 +286,9 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         // Setting initial
         async let pricePriceAsync = getGasPrices()
         async let gasLimitAsync = getGasLimit(to: address)
-        var feeCoeficient: Decimal = 1
+        var gasPriceCoeficient: Decimal = 1
         if isIncreaseFeeEnabled {
-            feeCoeficient += token.increasedGasPricePercent / 100
+            gasPriceCoeficient += token.increasedGasPricePercent / 100
         }
 
         let gasPrice, gasLimit: BigUInt
@@ -305,10 +305,10 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
         }
         
         // Updating localy
-        getNewFee(
+        updateGasAndFee(
             gasPrice: gasPrice,
             gasLimit: gasLimit,
-            feeCoeficient: feeCoeficient
+            gasPriceCoeficient: gasPriceCoeficient
         ) { [weak self] gasPrice, gasLimit, newFee in
             guard let self else { return }
             self.gasPrice = gasPrice

@@ -11,10 +11,10 @@ import Foundation
 
 // MARK: - Fee updates
 extension ERC20WalletService {
-    func getNewFee(
+    func updateGasAndFee(
         gasPrice: BigUInt,
         gasLimit: BigUInt,
-        feeCoeficient: Decimal,
+        gasPriceCoeficient: Decimal,
         completion: @escaping (_ gasPrice: BigUInt, _ gasLimit: BigUInt, _ newFee: Decimal) -> Void
     ) {
         let reliabilityGasPricePercentage = BigUInt(token.reliabilityGasPricePercent)
@@ -22,13 +22,13 @@ extension ERC20WalletService {
         
         let reliabilityGasPricePercent = gasPrice / reliabilityGasPricePercentage
         let reliabilityGasLimitPercent = gasLimit / reliabilityGasLimitPercentage
-        let finalGasPrice = reliabilityGasPricePercent + gasPrice
-        let finalGasLimit = reliabilityGasLimitPercent + gasLimit
+        let reliableGasPrice = reliabilityGasPricePercent + gasPrice
+        let reliableGasLimit = reliabilityGasLimitPercent + gasLimit
         
         completion(
-            BigUInt(finalGasPrice.asDouble() * feeCoeficient.doubleValue),
-            finalGasLimit,
-            (finalGasPrice * finalGasLimit).asDecimal(exponent: EthWalletService.currencyExponent) * feeCoeficient
+            BigUInt(reliableGasPrice.asDouble() * gasPriceCoeficient.doubleValue),
+            reliableGasLimit,
+            (reliableGasPrice * reliableGasLimit).asDecimal(exponent: EthWalletService.currencyExponent) * gasPriceCoeficient
         )
     }
 }
