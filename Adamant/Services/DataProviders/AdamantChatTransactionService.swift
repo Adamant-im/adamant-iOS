@@ -208,7 +208,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         }
         
         chatTransaction.date = transaction.date as NSDate
-        chatTransaction.timestampMs = transaction.timestampMillisecondsFromDate
+        chatTransaction.timestampMs = Int64(transaction.timestampMs)
         chatTransaction.amount = transaction.amount as NSDecimalNumber
         chatTransaction.recipientId = transaction.recipientId
         chatTransaction.senderId = transaction.senderId
@@ -249,7 +249,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         } else {
             transfer = TransferTransaction(context: context)
             transfer.date = transaction.date as NSDate
-            transfer.timestampMs = transaction.timestampMillisecondsFromDate
+            transfer.timestampMs = Int64(transaction.timestampMs)
             transfer.amount = transaction.amount as NSDecimalNumber
             transfer.recipientId = transaction.recipientId
             transfer.senderId = transaction.senderId

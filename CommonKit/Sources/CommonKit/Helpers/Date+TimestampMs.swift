@@ -10,6 +10,6 @@ import Foundation
 
 public extension NSDate {
     var timeIntervalMillisecondsSince1970: Int64 {
-        Int64(timeIntervalSince1970 * 1000) % 1000
+        Int64(timeIntervalSince1970 * 1000)
     }
 }

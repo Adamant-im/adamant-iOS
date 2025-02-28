@@ -14,7 +14,7 @@ public struct Transaction: Sendable {
     public let blockId: String
     public let type: TransactionType
     public let timestamp: UInt64
-    public let timestampMs: UInt64?
+    public let timestampMs: UInt64
     public let senderPublicKey: String
     public let senderId: String
     public let requesterPublicKey: String?
@@ -79,7 +79,7 @@ extension Transaction: Codable {
         
         let timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.timestamp = timestamp + UInt64(AdamantUtilities.magicAdamantTimeInterval)
-        self.timestampMs = (try? container.decodeIfPresent(UInt64.self, forKey: .timestampMs)) ?? self.timestamp
+        self.timestampMs = (try? container.decodeIfPresent(UInt64.self, forKey: .timestampMs)) ?? self.timestamp * 1000
         self.date = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
     
@@ -107,16 +107,6 @@ extension Transaction: Codable {
         try container.encode(fee.shiftedToAdamant(), forKey: .fee) // Decimal
     }
     
-}
-
-public extension Transaction {
-    var timestampMillisecondsFromDate: Int64 {
-        if let timestampMs = timestampMs {
-            Int64(timestampMs)
-        } else {
-            (date as NSDate).timeIntervalMillisecondsSince1970
-        }
-    }
 }
 
 extension Transaction: WrappableModel {
