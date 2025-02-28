@@ -607,8 +607,8 @@ struct fe: CustomDebugStringConvertible {
     static func fe25519_mul(_ r: inout fe, _ x: fe, _ y: fe) {
         var t = [UInt32](repeating: 0, count: 63)
         var i = 0
-        var j = 0
         while i < 32 {
+            var j = 0
             while j < 32 {
                 t[i+j] += x.v[i] * y.v[j]
                 j += 1
