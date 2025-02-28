@@ -16,7 +16,7 @@ import Alamofire
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
+final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
@@ -96,6 +96,14 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     
     var isTransactionFeeValid: Bool {
         return ethWallet?.balance ?? 0 > transactionFee
+    }
+    
+    var reliabilityGasPricePercent: BigUInt {
+        BigUInt(token.reliabilityGasPricePercent)
+    }
+    
+    var reliabilityGasLimitPercent: BigUInt {
+        BigUInt(token.reliabilityGasLimitPercent)
     }
     
     static let transferGas: Decimal = 21000
