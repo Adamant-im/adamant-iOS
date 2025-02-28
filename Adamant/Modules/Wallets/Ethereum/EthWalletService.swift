@@ -6,6 +6,7 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import AdamantWalletsKit
 import Foundation
 import UIKit
 import web3swift
@@ -76,23 +77,27 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     static let currencySymbol = "ETH"
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
-	
+    
+    static var coinInfo: CoinInfoDTO? {
+        CoinInfoProvider.coins[currencySymbol]
+    }
+    
 	static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
     
     var tokenSymbol: String {
-        return type(of: self).currencySymbol
+        type(of: self).currencySymbol
     }
     
     var tokenLogo: UIImage {
-        return type(of: self).currencyLogo
+        type(of: self).currencyLogo
     }
 	
     static var tokenNetworkSymbol: String {
-        return "ERC20"
+        "ERC20"
     }
     
     var tokenContract: String {
-        return ""
+        ""
     }
     
     var tokenUniqueID: String {
@@ -100,19 +105,19 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     }
     
     var richMessageType: String {
-        return Self.richMessageType
+        Self.richMessageType
 	}
 
     var qqPrefix: String {
-        return Self.qqPrefix
+        Self.qqPrefix
 	}
 
     var isSupportIncreaseFee: Bool {
-        return true
+        true
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
+        increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -161,6 +166,10 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
+    
+    var increasedGasPricePercent: Decimal {
+        Self.coinInfo?.increasedGasPricePercent ?? .zero
+    }
     
 	// MARK: - Properties
 	

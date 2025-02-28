@@ -12,6 +12,7 @@ import BigInt
 protocol ERC20GasAlgorithmComputable {
     var reliabilityGasPricePercent: BigUInt { get }
     var reliabilityGasLimitPercent: BigUInt { get }
+    var increasedGasPricePercent: Decimal { get }
 }
 
 extension ERC20GasAlgorithmComputable {
@@ -27,11 +28,11 @@ extension ERC20GasAlgorithmComputable {
         let reliableGasPrice = reliabilityGasPricePercent + gasPrice
         let reliableGasLimit = reliabilityGasLimitPercent + gasLimit
         
-        let newGasPrice = BigUInt(reliableGasPrice.asDouble() * gasPriceCoeficient.doubleValue)
-        let newFee = (reliableGasPrice * reliableGasLimit).asDecimal(exponent: EthWalletService.currencyExponent) * gasPriceCoeficient
+        let finalGasPrice = BigUInt(reliableGasPrice.asDouble() * gasPriceCoeficient.doubleValue)
+        let newFee = (finalGasPrice * reliableGasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
         
         completion(
-            newGasPrice,
+            finalGasPrice,
             reliableGasLimit,
             newFee
         )

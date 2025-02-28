@@ -106,6 +106,10 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         BigUInt(token.reliabilityGasLimitPercent)
     }
     
+    var increasedGasPricePercent: Decimal {
+        token.increasedGasPricePercent
+    }
+    
     static let transferGas: Decimal = 21000
     static let kvsAddress = "eth:address"
     
