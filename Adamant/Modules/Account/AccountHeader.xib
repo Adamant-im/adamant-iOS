@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -53,6 +53,18 @@
                     <rect key="frame" x="0.0" y="184" width="378" height="231"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
+                <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eb2-uN-n5L" userLabel="Wallets">
+                    <rect key="frame" x="246.5" y="54" width="50" height="47.5"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="1fJ-oy-zWi"/>
+                        <constraint firstAttribute="width" constant="50" id="IYN-Ky-Mer"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <state key="normal" backgroundImage="lock.square" catalog="system"/>
+                    <connections>
+                        <action selector="walletsButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="qE9-xE-Bul"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -60,9 +72,11 @@
                 <constraint firstAttribute="bottom" secondItem="LHk-7R-5oq" secondAttribute="bottom" id="5u8-dI-fD1"/>
                 <constraint firstItem="6hF-gW-1fF" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="13" id="EN0-a5-cHs"/>
                 <constraint firstAttribute="trailing" secondItem="LHk-7R-5oq" secondAttribute="trailing" id="FJv-73-Ayr"/>
+                <constraint firstItem="eb2-uN-n5L" firstAttribute="leading" secondItem="IVQ-4p-zci" secondAttribute="trailing" constant="20" id="Wjj-r2-R44"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="25" id="Z7D-Q0-s2x"/>
                 <constraint firstItem="LHk-7R-5oq" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="eip-WC-PKw"/>
                 <constraint firstItem="6hF-gW-1fF" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="gMH-Q7-bMw"/>
+                <constraint firstItem="6hF-gW-1fF" firstAttribute="top" secondItem="eb2-uN-n5L" secondAttribute="bottom" constant="10" id="gah-vl-ppB"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="jUo-aI-jOv"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -70,12 +84,14 @@
                 <outlet property="addressButton" destination="Iro-jA-X5P" id="u6V-wQ-5UR"/>
                 <outlet property="avatarImageView" destination="IVQ-4p-zci" id="FoL-e1-OKu"/>
                 <outlet property="walletViewContainer" destination="LHk-7R-5oq" id="u0m-up-Zyy"/>
+                <outlet property="walletsButton" destination="eb2-uN-n5L" id="wmX-XR-OS7"/>
             </connections>
-            <point key="canvasLocation" x="35" y="-95.5"/>
+            <point key="canvasLocation" x="33.600000000000001" y="-95.802098950524751"/>
         </view>
     </objects>
     <resources>
         <image name="avatar_placeholder" width="75" height="75"/>
-        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
+        <image name="lock.square" catalog="system" width="128" height="114"/>
+        <image name="square.and.arrow.up" catalog="system" width="110" height="128"/>
     </resources>
 </document>

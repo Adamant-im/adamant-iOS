@@ -417,10 +417,8 @@ extension EthWalletService {
         
         // MARK: 2. Create keys and addresses
         
-        let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
+        let store = try await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password)
         walletStorage = .init(keystore: store, unicId: tokenUniqueID)
-        
-
         
         let eWallet = walletStorage?.getWallet()
         

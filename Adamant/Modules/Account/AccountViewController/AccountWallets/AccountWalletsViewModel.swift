@@ -10,25 +10,38 @@ import Foundation
 import CommonKit
 import Combine
 
-@MainActor
-final class AccountWalletsViewModel {
-    @ObservableValue var state: AccountWalletsState = .default
-    
-    private let walletsStoreService: WalletStoreServiceProviderProtocol
-    private var subscriptions = Set<AnyCancellable>()
-    
-    init(walletsStoreService: WalletStoreServiceProviderProtocol) {
-        self.walletsStoreService = walletsStoreService
-        setup()
+extension AccountViewController {
+    @MainActor
+    final class AccountWalletsViewModel {
+        @ObservableValue var state: AccountWalletsState = .default
+        
+        private let walletsStoreService: WalletStoreServiceProviderProtocol
+        private var walletSubscriptions: Set<AnyCancellable> = []
+        private var currentWalletPublisherSubscription: Set<AnyCancellable> = []
+        
+        init(walletsStoreService: WalletStoreServiceProviderProtocol) {
+            self.walletsStoreService = walletsStoreService
+            setup()
+        }
     }
 }
 
-private extension AccountWalletsViewModel {
+private extension AccountViewController.AccountWalletsViewModel {
     func setup() {
         addObservers()
     }
     
     func addObservers() {
+        walletsStoreService.currentWalletPublisher
+            .sink(
+                receiveValue: { [weak self] _ in
+                    self?.updateState()
+                }
+            )
+            .store(in: &currentWalletPublisherSubscription)
+    }
+    
+    func addWalletObservers() {
         for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
@@ -37,10 +50,10 @@ private extension AccountWalletsViewModel {
                         self?.updateInfo(for: wallet)
                     }
                 )
-                .store(in: &subscriptions)
+                .store(in: &walletSubscriptions)
         }
     }
-
+    
     func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
         if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUniqueID }) {
@@ -49,8 +62,8 @@ private extension AccountWalletsViewModel {
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
             let network = ERC20Token.supportedTokens.contains(where: { $0.symbol == coreService.tokenSymbol })
-                ? type(of: coreService).tokenNetworkSymbol
-                : ""
+            ? type(of: coreService).tokenNetworkSymbol
+            : ""
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,
@@ -67,10 +80,10 @@ private extension AccountWalletsViewModel {
     }
 }
 
-extension AccountWalletsViewModel {
+extension AccountViewController.AccountWalletsViewModel {
     func updateState() {
-        subscriptions.removeAll()
+        walletSubscriptions.removeAll()
         state.wallets.removeAll()
-        setup()
+        addWalletObservers()
     }
 }

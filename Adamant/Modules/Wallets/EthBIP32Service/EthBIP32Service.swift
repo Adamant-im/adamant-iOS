@@ -8,32 +8,26 @@
 import Web3Core
 
 protocol EthBIP32ServiceProtocol {
-    func keyStore(passphrase: String) async throws -> BIP32Keystore
+    func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore
 }
 
-actor EthBIP32Service: EthBIP32ServiceProtocol {
-    private var passphrase: String?
-    private var keystore: BIP32Keystore?
-    
+// TODO: Return optimization
+struct EthBIP32Service: EthBIP32ServiceProtocol {
     private var ethApiService: EthApiServiceProtocol
     
     init(ethApiService: EthApiServiceProtocol) {
         self.ethApiService = ethApiService
     }
-    func keyStore(passphrase: String) async throws -> BIP32Keystore {
-        if let keystore = self.keystore, passphrase == self.passphrase {
-            return keystore
-        }
+    
+    func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore {
         do {
             guard let store = try BIP32Keystore(mnemonics: passphrase,
                                                 password: EthWalletService.walletPassword,
-                                                mnemonicsPassword: "",
+                                                mnemonicsPassword: password,
                                                 language: .english,
                                                 prefixPath: EthWalletService.walletPath) else {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
-            self.passphrase = passphrase
-            self.keystore = store
             await ethApiService.setKeystoreManager(.init([store]))
             return store
         }

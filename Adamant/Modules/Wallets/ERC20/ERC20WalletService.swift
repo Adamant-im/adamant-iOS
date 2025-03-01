@@ -382,9 +382,8 @@ extension ERC20WalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
 
-        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase)
+        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password)
 
-        
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
         }

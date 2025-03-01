@@ -602,18 +602,16 @@ fileprivate extension AdamantAlertAction {
 }
 
 extension AdamantDialogService {
-    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?) {
-        switch style {
-        case .alert, .actionSheet:
-            let uiStyle = style.asUIAlertControllerStyle()
-            if let actions = actions {
-                let uiActions: [UIAlertAction] = actions.map { $0.asUIAlertAction() }
-                
-                showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
-            } else {
-                showAlert(title: title, message: message, style: uiStyle, actions: nil, from: from)
-            }
-        }
+    func showAlert(
+        title: String?,
+        message: String?,
+        style: AdamantAlertStyle,
+        actions: [AdamantAlertAction]?,
+        from: UIAlertController.SourceView?
+    ) {
+        let uiStyle = style.asUIAlertControllerStyle()
+        let uiActions = actions?.map { $0.asUIAlertAction() }
+        showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
     }
     
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?) {

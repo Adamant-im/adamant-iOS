@@ -87,7 +87,8 @@ struct AppAssembly: MainThreadAssembly {
             SecretWalletsFactory(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
                 accountService: r.resolve(AccountService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                container: container
             )
         }.inObjectScope(.container)
         
@@ -489,5 +490,13 @@ struct AppAssembly: MainThreadAssembly {
         container.register(EthBIP32ServiceProtocol.self) { r in
             EthBIP32Service(ethApiService: r.resolve(ERC20ApiService.self)!)
         }.inObjectScope(.container)
+        
+        // MARK: SecretWalletsAlertService
+        container.register(SecretWalletsAlertService.self) { r in
+            SecretWalletsAlertService(
+                dialogService: r.resolve(DialogService.self)!,
+                secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
+            )
+        }.inObjectScope(.transient)
     }
 }

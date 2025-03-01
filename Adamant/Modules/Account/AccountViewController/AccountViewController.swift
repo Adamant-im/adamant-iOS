@@ -45,8 +45,10 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let apiServiceCompose: ApiServiceComposeProtocol
-    private lazy var viewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
-    
+    private let secretWalletsManager: SecretWalletsManagerProtocol
+    private lazy var walletsViewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
+    private let secretWalletsAlertService: SecretWalletsAlertService
+
     let accountService: AccountService
     let dialogService: DialogService
     let localAuth: LocalAuthentication
@@ -90,7 +92,7 @@ final class AccountViewController: FormViewController {
     
     private var currentWalletIndex: Int = .zero
     private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
-        viewModel.state.wallets.first { wallet in
+        walletsViewModel.state.wallets.first { wallet in
             wallet.index == currentWalletIndex
         }
     }
@@ -111,7 +113,9 @@ final class AccountViewController: FormViewController {
         currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
         walletServiceCompose: WalletServiceCompose,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        secretWalletsManager: SecretWalletsManagerProtocol,
+        secretWalletsAlertService: SecretWalletsAlertService
     ) {
         self.walletStoreServiceProvider = walletStoreServiceProvider
         self.accountService = accountService
@@ -124,6 +128,8 @@ final class AccountViewController: FormViewController {
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
         self.apiServiceCompose = apiServiceCompose
+        self.secretWalletsManager = secretWalletsManager
+        self.secretWalletsAlertService = secretWalletsAlertService
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -202,12 +208,14 @@ final class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
         
-        viewModel.$state
+        walletsViewModel.$state
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.pagingViewController.reloadMenu()
+                self.setupWalletsVC() //TODO: Change it to use it only when wallets are changed
+                self.pagingViewController.reloadData()
+                pagingViewController.select(index: currentWalletIndex)
             }
             .store(in: &notificationsSet)
         
@@ -852,7 +860,7 @@ final class AccountViewController: FormViewController {
                 guard let self = self else { return }
                 
                 self.setupWalletsVC()
-                self.viewModel.updateState()
+                self.walletsViewModel.updateState()
                 self.updatePagingItemHeight()
                 
                 self.pagingViewController.reloadData()
@@ -987,6 +995,10 @@ final class AccountViewController: FormViewController {
 
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
+    func walletsButtonTapped(from sender: UIView) {
+        secretWalletsAlertService.presentSecretWalletsActionSheet(from: sender)
+    }
+    
     func addressLabelTapped(from: UIView) {
         guard let address = accountService.account?.address else {
             return
@@ -1054,7 +1066,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         MainActor.assertIsolated()
         
         return DispatchQueue.onMainThreadSyncSafe {
-            return viewModel.state.wallets[safe: index] ?? WalletCollectionViewCell.Model.default
+            return walletsViewModel.state.wallets[safe: index] ?? WalletCollectionViewCell.Model.default
         }
     }
     

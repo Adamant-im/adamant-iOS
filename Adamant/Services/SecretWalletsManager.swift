@@ -13,8 +13,8 @@ import CommonKit
 extension AdamantSecretWalletsManager {
     struct State: SecretWalletsManagerStateProtocol {
         var currentWallet: WalletStoreServiceProtocol
-        let defaultWallet: WalletStoreServiceProtocol
-        var secretWallets: [WalletStoreServiceProtocol] = []
+        /// Where 0 is regular wallet and 1... are secret wallets
+        var wallets: [WalletStoreServiceProtocol] = []
     }
 }
 
@@ -22,20 +22,20 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     private let secretWalletsFactory: SecretWalletsFactory
     private let lock = NSLock()
     
+    private var state: SecretWalletsManagerStateProtocol
+    var statePublisher = ObservableSender<SecretWalletsManagerStateProtocol>()
+    
+    private(set) var currentWalletIndex: Int = 0
+    
     init(
         walletsStoreService: WalletStoreServiceProtocol,
         secretWalletsFactory: SecretWalletsFactory
     ) {
         self.state = State(
             currentWallet: walletsStoreService,
-            defaultWallet: walletsStoreService
+            wallets: [walletsStoreService]
         )
         self.secretWalletsFactory = secretWalletsFactory
-    }
-    
-    @ObservableValue private var state: SecretWalletsManagerStateProtocol
-    var statePublisher: AnyObservable<SecretWalletsManagerStateProtocol> {
-        $state.eraseToAnyPublisher()
     }
     
     // MARK: - Manage state
@@ -43,14 +43,14 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         let wallet = secretWalletsFactory.makeSecretWallet(withPassword: password)
         lock.lock()
         defer { lock.unlock() }
-        state.secretWallets.append(wallet)
+        state.wallets.append(wallet)
     }
     
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol? {
         lock.lock()
         defer { lock.unlock() }
-        guard state.secretWallets.indices.contains(index) else { return nil }
-        return state.secretWallets.remove(at: index)
+        guard index == 0 || state.wallets.indices.contains(index) else { return nil }
+        return state.wallets.remove(at: index)
     }
     
     func getCurrentWallet() -> WalletStoreServiceProtocol {
@@ -58,19 +58,19 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     }
     
     func getSecretWallets() -> [WalletStoreServiceProtocol] {
-        state.secretWallets
+        state.wallets
     }
     
-    func activateSecretWallet(at index: Int) {
-        lock.lock()
-        defer { lock.unlock() }
-        guard index < state.secretWallets.count else { return }
-        state.currentWallet = state.secretWallets[index]
+    func getCurrentWalletIndex() -> Int {
+        currentWalletIndex
     }
     
-    func activateDefaultWallet() {
+    func activateWallet(at index: Int) {
         lock.lock()
         defer { lock.unlock() }
-        state.currentWallet = state.defaultWallet
+        guard index < state.wallets.count else { return }
+        state.currentWallet = state.wallets[index]
+        currentWalletIndex = index
+        statePublisher.send(state)
     }
 }
