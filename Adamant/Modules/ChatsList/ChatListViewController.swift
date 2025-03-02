@@ -1056,8 +1056,8 @@ extension ChatListViewController {
                 descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
             }
         if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
-                let mediaCount = files.filter { $0.type.isMedia }.count
-                let otherCount = files.filter { !$0.type.isMedia }.count
+                let mediaCount = files.count(where: { $0.type.isMedia })
+                let otherCount = files.count(where: { !$0.type.isMedia })
 
                 let fileParts = [
                     mediaCount > 0 ? "📸" + (mediaCount >= 2 ? "\(mediaCount)" : "") : nil,
@@ -1080,9 +1080,9 @@ extension ChatListViewController {
             let processedMessage = MessageProcessHelper.process(preservedMessage)
             descriptionParts.append(NSAttributedString(string: processedMessage))
         }
-        let hasTextContent = descriptionParts.contains { !$0.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-    
-        guard hasTextContent else { return nil }
+        guard descriptionParts.contains(where: { !$0.string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty }) else {
+            return nil
+        }
 
         let result = NSMutableAttributedString(string: "✏️: ")
         for (index, part) in descriptionParts.enumerated() {
