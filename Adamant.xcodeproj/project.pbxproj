@@ -4835,10 +4835,10 @@
 		};
 		AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ChrisBenua/CryptoSwift";
+			repositoryURL = "https://github.com/Adamant-im/CryptoSwift.git";
 			requirement = {
 				kind = revision;
-				revision = f0ea2cac7983c4a808cade78743b391726ecc0ea;
+				revision = ae1cc15340ddf0f607981f9118fe80d7fd7cd2b5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
