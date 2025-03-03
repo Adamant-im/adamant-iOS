@@ -117,7 +117,11 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
-    @ObservableValue var filesPicked: [FileResult]?
+    @ObservableValue var filesPicked: [FileResult]? {
+        didSet {
+            updateFeeValue()
+        }
+    }
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -419,14 +423,7 @@ final class ChatViewModel: NSObject {
     
     func hideMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-            else { return }
-            
-            transaction.isHidden = true
-            try? transaction.managedObjectContext?.save()
-            
-            chatroom?.updateLastTransaction()
-            await chatsProvider.removeMessage(with: transaction.transactionId)
+            await chatsProvider.removeMessage(with: id)
         }
     }
     
@@ -723,6 +720,12 @@ final class ChatViewModel: NSObject {
         
         lastDateHeaderUpdate = Date()
         updateMessages(resetLoadingProperty: false)
+    }
+    
+    func cancelFileUploading(messageId: String, file: ChatFile) {
+        Task {
+            await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
+        }
     }
 
     func openFile(messageId: String, file: ChatFile) {
@@ -1097,7 +1100,7 @@ private extension ChatViewModel {
     func setupObservers() {
         $inputText
             .removeDuplicates()
-            .sink { [weak self] _ in self?.inputTextUpdated() }
+            .sink { [weak self] _ in self?.updateFeeValue() }
             .store(in: &subscriptions)
         
         chatFileService.updateFileFields
@@ -1435,14 +1438,22 @@ private extension ChatViewModel {
         }
     }
     
-    func inputTextUpdated() {
-        guard !inputText.isEmpty else {
+    func updateFeeValue() {
+        let pickedFilesCount = filesPicked?.count ?? .zero
+        guard let feeValue: Decimal = switch (inputText, pickedFilesCount) {
+        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount == .zero:
+            nil
+        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount > .zero:
+            0.001
+        default:
+            AdamantMessage.text(inputText).fee
+        } else {
             fee = ""
             return
         }
         
         let feeString = AdamantBalanceFormat.full.format(
-            AdamantMessage.text(inputText).fee,
+            feeValue,
             withCurrencySymbol: AdmWalletService.currencySymbol
         )
         

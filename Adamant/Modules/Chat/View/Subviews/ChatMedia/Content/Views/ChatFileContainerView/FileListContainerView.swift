@@ -83,12 +83,18 @@ private extension FileListContainerView {
                 txStatus: model.txStatus
             )
             view?.buttonActionHandler = { [weak self, file, model] in
-                self?.actionHandler(
-                    .openFile(
-                        messageId: model.messageId,
-                        file: file
+                if file.isBusy, file.isUploading {
+                    self?.actionHandler(
+                        .cancelUploading(messageId: model.messageId, file: file)
                     )
-                )
+                } else {
+                    self?.actionHandler(
+                        .openFile(
+                            messageId: model.messageId,
+                            file: file
+                        )
+                    )
+                }
             }
         }
     }

@@ -1,0 +1,12 @@
+{
+    "id": "some id",
+    "result": {
+        "txid": "some txid",
+        "confirmations": 0,
+        "hash": "some hash",
+        "valueIn": 1,
+        "valueOut": 0.95,
+        "vin": [],
+        "vout": []
+    }
+}
