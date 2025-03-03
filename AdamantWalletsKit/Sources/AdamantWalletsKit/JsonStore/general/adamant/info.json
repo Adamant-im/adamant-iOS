@@ -29,6 +29,7 @@
     "attachment": 300000
   },
   "nodes": {
+    "displayName": "adm-node",
     "list": [
       { "url": "https://clown.adamant.im" },
       { "url": "https://lake.adamant.im" },
@@ -63,6 +64,18 @@
       },
       {
         "url": "https://dschubba.adm.im"
+      },
+      {
+        "url": "https://tauri.bbry.org",
+        "alt_ip": "http://54.197.36.175:36666"
+      },
+      {
+        "url": "https://endless.bbry.org",
+        "alt_ip": "http://54.197.36.175:46666"
+      },
+      {
+        "url": "https://debate.bbry.org",
+        "alt_ip": "http://54.197.36.175:56666"
       }
     ],
     "healthCheck": {
@@ -71,10 +84,12 @@
       "onScreenUpdateInterval": 10000,
       "threshold": 10
     },
-    "minVersion": "0.8.0"
+    "minVersion": "0.8.0",
+    "nodeTimeCorrection": 500
   },
   "services": {
     "infoService": {
+      "displayName": "rates-info",
       "description": {
         "software": "adamant-currencyinfo-services",
         "github": "https://github.com/Adamant-im/adamant-currencyinfo-services",
@@ -93,10 +108,12 @@
       "healthCheck": {
         "normalUpdateInterval": 300000,
         "crucialUpdateInterval": 30000,
-        "onScreenUpdateInterval": 10000
+        "onScreenUpdateInterval": 10000,
+        "threshold": 6000000
       }
     },
     "ipfsNode": {
+      "displayName": "ipfs-node",
       "description": {
         "software": "ipfs-node",
         "github": "https://github.com/Adamant-im/ipfs-node",
@@ -119,7 +136,8 @@
       "healthCheck": {
         "normalUpdateInterval": 300000,
         "crucialUpdateInterval": 30000,
-        "onScreenUpdateInterval": 10000
+        "onScreenUpdateInterval": 10000,
+        "threshold": 6000000
       }
     }
   },
@@ -143,6 +161,7 @@
     "explorerTx": "http://srovpmanmrbmbqe63vp5nycsa3j3g6be3bz46ksmo35u5pw7jjtjamid.onion/tx/${ID}",
     "explorerAddress": "http://srovpmanmrbmbqe63vp5nycsa3j3g6be3bz46ksmo35u5pw7jjtjamid.onion/address/${ID}",
     "nodes": {
+      "displayName": "adm-node",
       "list": [
         {
           "url": "http://37g5to2z6bdoeegun4hms2hvkfbdxh4rcon4e3p267wtfkh4ji2ns6id.onion"
@@ -172,10 +191,12 @@
         "onScreenUpdateInterval": 10000,
         "threshold": 10
       },
-      "minVersion": "0.8.0"
+      "minVersion": "0.8.0",
+      "nodeTimeCorrection": 500
     },
     "services": {
       "infoService": {
+        "displayName": "rates-info",
         "description": {
           "software": "adamant-currencyinfo-services",
           "github": "https://github.com/Adamant-im/adamant-currencyinfo-services",
@@ -189,10 +210,12 @@
         "healthCheck": {
           "normalUpdateInterval": 300000,
           "crucialUpdateInterval": 30000,
-          "onScreenUpdateInterval": 10000
+          "onScreenUpdateInterval": 10000,
+          "threshold": 6000000
         }
       },
       "ipfsNode": {
+        "displayName": "ipfs-node",
         "description": {
           "software": "ipfs-node",
           "github": "https://github.com/Adamant-im/ipfs-node",
@@ -212,7 +235,8 @@
         "healthCheck": {
           "normalUpdateInterval": 300000,
           "crucialUpdateInterval": 30000,
-          "onScreenUpdateInterval": 10000
+          "onScreenUpdateInterval": 10000,
+          "threshold": 6000000
         }
       }
     }

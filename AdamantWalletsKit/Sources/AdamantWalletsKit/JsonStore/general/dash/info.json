@@ -30,6 +30,7 @@
   },
   "txConsistencyMaxTime": 800000,
   "nodes": {
+    "displayName": "dash-node",
     "list": [
       {
         "url": "https://dashnode1.adamant.im",
@@ -67,6 +68,7 @@
   ],
   "tor": {
     "nodes": {
+      "displayName": "dash-node",
       "list": [
         {
           "url": "http://ldod53womnlwjmd4noq5yuq26xx3mmbrr4uogkfymuakhofjcuqeygad.onion"

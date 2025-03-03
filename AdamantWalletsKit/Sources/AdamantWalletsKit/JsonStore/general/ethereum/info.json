@@ -33,6 +33,7 @@
   "defaultGasLimit": 22000,
   "warningGasPriceGwei": 25,
   "nodes": {
+    "displayName": "eth-node",
     "list": [
       {
         "url": "https://ethnode2.adamant.im",
@@ -52,6 +53,7 @@
   },
   "services": {
     "ethIndexer": {
+      "displayName": "eth-indexer",
       "description": {
         "software": "ETH-transactions-storage",
         "github": "https://github.com/Adamant-im/ETH-transactions-storage",
@@ -94,6 +96,7 @@
   ],
   "tor": {
     "nodes": {
+      "displayName": "eth-node",
       "list": [
         {
           "url": "http://jpbrp6xapsyfnvyosrpu5wmoi62fqotazkicjeiob32yz77rt7axobqd.onion",
@@ -112,6 +115,7 @@
     },
     "services": {
       "ethIndexer": {
+        "displayName": "eth-indexer",
         "description": {
           "software": "ETH-transactions-storage",
           "github": "https://github.com/Adamant-im/ETH-transactions-storage",

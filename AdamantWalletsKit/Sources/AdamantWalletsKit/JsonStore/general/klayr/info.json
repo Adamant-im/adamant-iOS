@@ -28,6 +28,7 @@
   },
   "txConsistencyMaxTime": 60000,
   "nodes": {
+    "displayName": "kly-node",
     "list": [
       {
         "url": "https://klynode2.adamant.im",
@@ -47,6 +48,7 @@
   },
   "services": {
     "klyService": {
+      "displayName": "kly-indexer",
       "description": {
         "software": "klayr-service",
         "github": "https://github.com/KlayrHQ/klayr-service",
@@ -85,6 +87,7 @@
   ],
   "tor": {
     "nodes": {
+      "displayName": "kly-node",
       "list": [
         {
           "url": "http://5fr7uybpxecid5gikrm65hstsfhve2772keyqdvxirsiywlyo6zap6yd.onion"
@@ -102,6 +105,7 @@
     },
     "services": {
       "klyService": {
+        "displayName": "kly-indexer",
         "description": {
           "software": "klayr-service",
           "github": "https://github.com/KlayrHQ/klayr-service",

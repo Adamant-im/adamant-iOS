@@ -2,9 +2,9 @@
   "name": "Bitcoin",
   "website": "https://bitcoin.org",
   "description": "Bitcoin is a cryptocurrency and worldwide payment system. It is the first decentralized digital currency, as the system works without a central bank or single administrator.",
-  "explorer": "https://explorer.btc.com",
-  "explorerTx": "https://explorer.btc.com/btc/transaction/${ID}",
-  "explorerAddress": "https://explorer.btc.com/btc/address/${ID}",
+  "explorer": "https://bitcoinexplorer.org",
+  "explorerTx": "https://bitcoinexplorer.org/tx/${ID}",
+  "explorerAddress": "https://bitcoinexplorer.org/address/${ID}",
   "regexAddress": "^bc1[a-zA-Z0-9]{39,59}$|^[13][1-9A-HJ-NP-Za-km-z]{25,34}$",
   "symbol": "BTC",
   "type": "coin",
@@ -29,6 +29,7 @@
   },
   "txConsistencyMaxTime": 10800000,
   "nodes": {
+    "displayName": "btc-node",
     "list": [
       {
         "url": "https://btcnode1.adamant.im/bitcoind",
@@ -48,6 +49,7 @@
   },
   "services": {
     "btcIndexer": {
+      "displayName": "btc-indexer",
       "description": {
         "software": "Esplora/Electrs",
         "github": "https://github.com/blockstream/electrs",
@@ -90,12 +92,13 @@
   ],
   "tor": {
     "nodes": {
+      "displayName": "btc-node",
       "list": [
         {
           "url": "http://cc6ibzkfeseuwnmtjc6hlsd44bzg2sr3shbv7n35nj2rk2vm6dmtlnqd.onion/bitcoind"
         },
         {
-          "url": "http://grnpvgtlrfws3424l726td5lctsod3hq2at4lhiasmedpxygbo5u2bqd.onion"
+          "url": "http://grnpvgtlrfws3424l726td5lctsod3hq2at4lhiasmedpxygbo5u2bqd.onion/bitcoind"
         }
       ],
       "healthCheck": {
@@ -107,6 +110,7 @@
     },
     "services": {
       "btcIndexer": {
+        "displayName": "btc-indexer",
         "description": {
           "software": "Esplora/Electrs",
           "github": "https://github.com/blockstream/electrs",
