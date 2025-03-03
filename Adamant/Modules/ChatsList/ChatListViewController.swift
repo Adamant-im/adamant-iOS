@@ -196,10 +196,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
     }
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        tableView.reloadData()
-    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -337,6 +333,12 @@ final class ChatListViewController: KeyboardObservingViewController {
                 .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
                 .store(in: &subscriptions)
         }
+        chatPreservation.updateNotifier
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.tableView.reloadData()
+            }
+            .store(in: &subscriptions)
     }
     
     private func closeDetailVC() {

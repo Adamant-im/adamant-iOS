@@ -9,6 +9,7 @@
 import CommonKit
 
 protocol ChatPreservationProtocol: AnyObject, Sendable {
+    var updateNotifier: ObservableSender<Void> { get }
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
     func setReplyMessage(_ message: MessageModel?, forAddress address: String)
