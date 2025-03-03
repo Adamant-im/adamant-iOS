@@ -76,7 +76,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
+        refreshControl.tintColor = .clear
         return refreshControl
     }()
     
@@ -1528,7 +1528,7 @@ extension ChatListViewController {
     }
 }
 
-private extension State {
+private extension DataProviderState {
     var isUpdating: Bool {
         switch self {
         case .updating: true

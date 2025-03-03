@@ -264,6 +264,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
+		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
 		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
@@ -464,6 +465,8 @@
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
 		A5F929B6262C858700C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B5262C858700C3E60A /* MarkdownKit */; };
 		A5F929B8262C858F00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B7262C858F00C3E60A /* MarkdownKit */; };
+		D39AA7892D42745D0069BC73 /* PinPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39AA7882D42745D0069BC73 /* PinPadView.swift */; };
+		D39AA78B2D47A0D80069BC73 /* LocalAuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39AA78A2D47A0CC0069BC73 /* LocalAuthenticationService.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -942,6 +945,7 @@
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
+		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
 		9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationsTokenService.swift; sourceTree = "<group>"; };
@@ -1106,6 +1110,8 @@
 		A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcUnspentTransactionResponse.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
+		D39AA7882D42745D0069BC73 /* PinPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinPadView.swift; sourceTree = "<group>"; };
+		D39AA78A2D47A0CC0069BC73 /* LocalAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthenticationService.swift; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -1745,6 +1751,16 @@
 				648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */,
 			);
 			path = Doge;
+			sourceTree = "<group>";
+		};
+		85B405002D3012BD000AB744 /* AccountViewController */ = {
+			isa = PBXGroup;
+			children = (
+				85B405012D3012C7000AB744 /* AccountViewController+Form.swift */,
+				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
+				E908473A219707200095825D /* AccountViewController+StayIn.swift */,
+			);
+			path = AccountViewController;
 			sourceTree = "<group>";
 		};
 		9306E08E2CF8C4EF00A99BA4 /* PKGenerator */ = {
@@ -2392,6 +2408,8 @@
 				E96D64C72295C44400CA5587 /* Data+utilites.swift */,
 				64A223D520F760BB005157CB /* Localization.swift */,
 				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
+				D39AA7882D42745D0069BC73 /* PinPadView.swift */,
+				D39AA78A2D47A0CC0069BC73 /* LocalAuthenticationService.swift */,
 				E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */,
 				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
 				6414C18D217DF43100373FA6 /* String+adamant.swift */,
@@ -2770,8 +2788,7 @@
 			isa = PBXGroup;
 			children = (
 				E9E7CDB02002B97B00DFC4DB /* AccountFactory.swift */,
-				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
-				E908473A219707200095825D /* AccountViewController+StayIn.swift */,
+				85B405002D3012BD000AB744 /* AccountViewController */,
 				E983AE2020E655C500497E1A /* AccountHeaderView.swift */,
 				269E13512B594B2D008D1CA7 /* AccountFooterView.swift */,
 				E941CCDA20E786D700C96220 /* AccountHeader.xib */,
@@ -2862,8 +2879,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
+				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
@@ -3426,6 +3443,7 @@
 				3AE0A42A2BC6A64900BF7125 /* FilesNetworkManager.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
 				3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */,
+				85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */,
 				937EDFC02C9CF6B300F219BB /* VersionFooterView.swift in Sources */,
 				A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */,
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
@@ -3558,6 +3576,7 @@
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				9366588D2B0AB6BD00BDB2D3 /* CoinsNodesListState.swift in Sources */,
+				D39AA78B2D47A0D80069BC73 /* LocalAuthenticationService.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
@@ -3606,6 +3625,7 @@
 				E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */,
 				E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */,
 				93294B902AAD2C6B00911109 /* SwiftyOnboardOverlay.swift in Sources */,
+				D39AA7892D42745D0069BC73 /* PinPadView.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */,
 				4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
@@ -3917,7 +3937,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3928,7 +3948,7 @@
 				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev-random1818.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3947,7 +3967,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3957,7 +3977,7 @@
 				);
 				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-random1818.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4101,7 +4121,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -4112,7 +4132,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.10.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev-random1818";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
@@ -4132,7 +4152,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -4143,7 +4163,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.10.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-random1818";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
@@ -4162,7 +4182,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4173,7 +4193,7 @@
 				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev-random1818.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4192,7 +4212,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4202,7 +4222,7 @@
 				);
 				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-random1818TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4223,7 +4243,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4234,7 +4254,7 @@
 				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev-random1818.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4253,7 +4273,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J2L77FMN46;
+				DEVELOPMENT_TEAM = 23VNGWAPN4;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4263,7 +4283,7 @@
 				);
 				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-random1818.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;

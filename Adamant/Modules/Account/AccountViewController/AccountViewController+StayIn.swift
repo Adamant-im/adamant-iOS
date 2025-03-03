@@ -1,17 +1,17 @@
 //
-//  SecurityViewController+StayIn.swift
+//  AccountViewController+StayIn.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 04.07.2018.
+//  Created by Anokhov Pavel on 10.11.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
 import Foundation
 import Eureka
-import MyLittlePinpad
+//import MyLittlePinpad
 import CommonKit
 
-extension SecurityViewController {
+extension AccountViewController {
     func setStayLoggedIn(enabled: Bool) {
         guard accountService.hasStayInAccount != enabled else {
             return
@@ -24,6 +24,8 @@ extension SecurityViewController {
 //            pinpad.commentLabel.isHidden = false
 //            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+//            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+//            setColors(for: pinpad)
 //            present(pinpad, animated: true, completion: nil)
         } else { // Validate pin and turn off Stay In
             pinpadRequest = .turnOffPin
@@ -33,72 +35,82 @@ extension SecurityViewController {
 //            pinpad.commentLabel.isHidden = false
 //            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+//            setColors(for: pinpad)
 //            present(pinpad, animated: true, completion: nil)
         }
     }
     
     // MARK: Use biometry
-    func setBiometry(enabled: Bool) {
+    func setBiometry(enabled: Bool) { 
         guard showLoggedInOptions, accountService.hasStayInAccount, accountService.useBiometry != enabled else {
             return
         }
         
-        let reason = enabled ? String.adamant.security.biometryOnReason : String.adamant.security.biometryOffReason
-        Task { @MainActor in
-            let result = await localAuth.authorizeUser(reason: reason)
-            switch result {
-            case .success:
-                self.dialogService.showSuccess(withMessage: String.adamant.alert.done)
-                self.accountService.updateUseBiometry(enabled)
-                
-            case .cancel:
-                DispatchQueue.main.async { [weak self] in
-                    if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                        row.value = self?.accountService.useBiometry
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let reason = enabled ? String.adamant.security.biometryOnReason : String.adamant.security.biometryOffReason
+            let result = await self.localAuth.authorizeUser(reason: reason)
+            
+                switch result {
+                case .success:
+                    self.dialogService.showSuccess(withMessage: String.adamant.alert.done)
+                    self.accountService.updateUseBiometry(enabled)
+                    
+                case .cancel:
+                    if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
+                        row.value = self.accountService.useBiometry
                         row.updateCell()
                     }
-                }
-                
-            case .fallback:
-                let pinpad = adamantPinpad(biometryButton: .none) { _ in }
-                
-                if enabled {
-//                    pinpad.commentLabel.text = String.adamant.security.biometryOnReason
-                    self.pinpadRequest = .turnOnBiometry
-                } else {
-//                    pinpad.commentLabel.text = String.adamant.security.biometryOffReason
-                    self.pinpadRequest = .turnOffBiometry
-                }
-                
-//                pinpad.commentLabel.isHidden = false
-//                pinpad.delegate = self
-                
-//                DispatchQueue.main.async {
+                    
+                case .fallback:
+                    let pinpad = adamantPinpad(biometryButton: .none) { _ in }
+                    
+                    if enabled {
+//                        pinpad.commentLabel.text = String.adamant.security.biometryOnReason
+                        self.pinpadRequest = .turnOnBiometry
+                    } else {
+//                        pinpad.commentLabel.text = String.adamant.security.biometryOffReason
+                        self.pinpadRequest = .turnOffBiometry
+                    }
+                    
+//                    pinpad.commentLabel.isHidden = false
+//                    pinpad.delegate = self
                     pinpad.modalPresentationStyle = .overFullScreen
+//                    self.setColors(for: pinpad)
 //                    self.present(pinpad, animated: true, completion: nil)
-//                }
-                
-            case .failed:
-                DispatchQueue.main.async {
+                    
+                case .failed:
                     if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
                         row.value = self.accountService.useBiometry
                         row.updateCell()
                         row.evaluateHidden()
                     }
                     
-                    if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
-                        section.evaluateHidden()
+                    if let row = self.form.rowBy(tag: Rows.notifications.tag) {
+                        row.evaluateHidden()
                     }
+                case .biometryLockout:
+                    return
                 }
-            case .biometryLockout:
-                break
-            }
         }
     }
+    
+//    func setColors(for pinpad: PinpadViewController) {
+//        pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+//        pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+//        pinpad.view.subviews.forEach { view in
+//            view.subviews.forEach { _view in
+//                if _view.backgroundColor == .white {
+//                    _view.backgroundColor = UIColor.adamant.backgroundColor
+//                }
+//            }
+//        }
+//        pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
+//    }
 }
 
 // MARK: - PinpadViewControllerDelegate
-//extension SecurityViewController: PinpadViewControllerDelegate {
+//extension AccountViewController: PinpadViewControllerDelegate {
 //    nonisolated func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
 //        MainActor.assumeIsolatedSafe {
 //            switch pinpadRequest {
@@ -129,12 +141,8 @@ extension SecurityViewController {
 //                            row.evaluateHidden()
 //                        }
 //                        
-//                        if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
-//                            section.evaluateHidden()
-//                        }
-//                        
-//                        if let section = self.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
-//                            section.evaluateHidden()
+//                        if let row = self.form.rowBy(tag: Rows.notifications.tag) {
+//                            row.evaluateHidden()
 //                        }
 //                        
 //                        pinpad.dismiss(animated: true, completion: nil)
@@ -183,11 +191,10 @@ extension SecurityViewController {
 //            }
 //        }
 //    }
-//    
-//    nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
+    
+//    func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
 //        Task { @MainActor in
 //            switch pinpadRequest {
-//                
 //                // MARK: User wants to turn of StayIn with his face. Or finger.
 //            case .turnOffPin?:
 //                let result = await localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff)
@@ -195,29 +202,30 @@ extension SecurityViewController {
 //                case .success:
 //                    self.accountService.dropSavedAccount()
 //                    
-//                    DispatchQueue.main.async {
-//                        if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
-//                            row.value = false
-//                            row.updateCell()
-//                            row.evaluateHidden()
-//                        }
-//                        
-//                        if let section = self.form.sectionBy(tag: Sections.notifications.tag) {
-//                            section.evaluateHidden()
-//                        }
-//                        
-//                        pinpad.dismiss(animated: true, completion: nil)
+//                    if let row: SwitchRow = self.form.rowBy(tag: Rows.biometry.tag) {
+//                        row.value = false
+//                        row.updateCell()
+//                        row.evaluateHidden()
 //                    }
 //                    
-//                case .cancel, .fallback, .failed, .biometryLockout: break
+//                    if let row = self.form.rowBy(tag: Rows.notifications.tag) {
+//                        row.evaluateHidden()
+//                    }
+//                    
+//                    pinpad.dismiss(animated: true, completion: nil)
+//                    
+//                case .cancel: break
+//                case .fallback: break
+//                case .failed: break
+//                case .biometryLockout: break
 //                }
 //            default:
-//                break
+//                return
 //            }
 //        }
 //    }
-//    
-//    nonisolated func pinpadDidCancel(_ pinpad: PinpadViewController) {
+    
+//    func pinpadDidCancel(_ pinpad: PinpadViewController) {
 //        MainActor.assumeIsolatedSafe {
 //            switch pinpadRequest {
 //                

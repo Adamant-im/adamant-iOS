@@ -89,15 +89,13 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
 
 // MARK: - Saved data
 extension AdamantAccountService {
-    func setStayLoggedIn(pin: String, completion: @escaping @Sendable (AccountServiceResult) -> Void) {
+    func setStayLoggedIn(pin: String) -> AccountServiceResult {
         guard let account = account, let keypair = keypair else {
-            completion(.failure(.userNotLogged))
-            return
+            return .failure(.userNotLogged)
         }
         
         if hasStayInAccount {
-            completion(.failure(.internalError(message: "Already has account", error: nil)))
-            return
+            return .failure(.internalError(message: "Already has account", error: nil))
         }
         
         securedStore.set(pin, for: .pin)
@@ -111,7 +109,7 @@ extension AdamantAccountService {
         
         hasStayInAccount = true
         NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : true])
-        completion(.success(account: account, alert: nil))
+        return .success(account: account, alert: nil)
     }
     
     func validatePin(_ pin: String) -> Bool {
@@ -397,7 +395,7 @@ extension AdamantAccountService {
             
             self.state = .loggedIn
             return account
-        } catch let error as ApiServiceError {
+        } catch let error {
             self.state = .notLogged
             
             switch error {
@@ -407,8 +405,6 @@ extension AdamantAccountService {
             default:
                 throw AccountServiceError.apiError(error: error)
             }
-        } catch {
-            throw AccountServiceError.internalError(message: error.localizedDescription, error: error)
         }
     }
     
@@ -427,10 +423,9 @@ extension AdamantAccountService {
         return await withTaskGroup(of: WalletAccount?.self) { group in
             for wallet in walletServiceCompose.getWallets() {
                 group.addTask {
-                    let result = try? await wallet.core.initWallet(
+                    try? await wallet.core.initWallet(
                         withPassphrase: passphrase
                     )
-                    return result
                 }
             }
             
@@ -495,7 +490,7 @@ private extension SecuredStore {
     }
     
     func get(_ key: Key) -> String? {
-        return get(key.stringValue)
+        get(key.stringValue)
     }
     
     func remove(_ key: Key) {

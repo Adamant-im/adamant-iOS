@@ -13,26 +13,27 @@ import CommonKit
 extension LoginViewController {
     /// Shows pinpad in main.async queue
     func loginWithPinpad() {
-        let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
+        let button: BiometryType = accountService.useBiometry ? localAuth.biometryType : .none
         
-        DispatchQueue.main.async { [weak self] in
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
-            pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self else { return }
+        let pinpad = adamantPinpad(biometryButton: button) { _ in }
+//            pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
+//            pinpad.commentLabel.isHidden = false
+//            pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
-            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
-            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
-            pinpad.view.subviews.forEach { view in
-                view.subviews.forEach { _view in
-                    if _view.backgroundColor == .white {
-                        _view.backgroundColor = UIColor.adamant.backgroundColor
-                    }
-                }
-            }
-            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
-            self?.present(pinpad, animated: true, completion: nil)
-        }
+//            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+//            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+//            pinpad.view.subviews.forEach { view in
+//                view.subviews.forEach { _view in
+//                    if _view.backgroundColor == .white {
+//                        _view.backgroundColor = UIColor.adamant.backgroundColor
+//                    }
+//                }
+//            }
+//            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
+//            present(pinpad, animated: true, completion: nil)
+//        }
     }
     
     /// Request user biometry authentication
@@ -43,21 +44,17 @@ extension LoginViewController {
             return
         }
         
-        localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount) { result in
-            Task { @MainActor [weak self] in
-                switch result {
-                case .success:
-                    self?.loginIntoSavedAccount()
-                    
-                case .fallback:
-                    self?.loginWithPinpad()
-                    
-                case .cancel:
-                    break
-                    
-                case .failed:
-                    break
-                }
+        Task { @MainActor in
+            let result = await localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount)
+            switch result {
+            case .success:
+                self.loginIntoSavedAccount()
+                
+            case .fallback:
+                self.loginWithPinpad()
+                
+            case .cancel, .failed, .biometryLockout:
+                break
             }
         }
     }
@@ -133,15 +130,14 @@ extension LoginViewController: PinpadViewControllerDelegate {
     
     nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
         Task { @MainActor in
-            localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-                switch result {
-                case .success:
-                    self?.loginIntoSavedAccount()
-                    
-                case .fallback, .cancel, .failed:
-                    break
-                }
-            })
+            let result = await localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount)
+            switch result {
+            case .success:
+                self.loginIntoSavedAccount()
+                
+            case .fallback, .cancel, .failed, .biometryLockout:
+                break
+            }
         }
     }
     

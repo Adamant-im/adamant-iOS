@@ -120,6 +120,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         
         // MARK: Balance
         let balanceRow = BalanceRow { [weak self] in
+            $0.cell.accessoryType = .disclosureIndicator
             $0.tag = BaseRows.balance.tag
             $0.cell.titleLabel.text = BaseRows.balance.localized
             
@@ -134,29 +135,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 alert: self?.service?.core.wallet?.notifications,
                 isBalanceInitialized: self?.service?.core.wallet?.isBalanceInitialized ?? false
             )
-            
-            let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
-            
-            $0.cell.height = { height }
-        }.cellUpdate { [weak self] (cell, row) in
-            let symbol = self?.service?.core.tokenSymbol ?? ""
-            
-            row.value = self?.balanceRowValueFor(
-                balance: self?.service?.core.wallet?.balance ?? 0,
-                symbol: symbol,
-                alert: self?.service?.core.wallet?.notifications,
-                isBalanceInitialized: self?.service?.core.wallet?.isBalanceInitialized ?? false
-            )
-            
-            let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
-            
-            cell.height = { height }
-            cell.titleLabel.text = BaseRows.balance.localized
+
+            let row = $0
+            $0.cell.height = { row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight }
         }
         
         balanceRow.cell.selectionStyle = .gray
         balanceRow.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
             cell.titleLabel.text = BaseRows.balance.localized
         }.onCellSelection { [weak self] (_, _) in
             guard
@@ -488,6 +473,7 @@ private extension WalletViewControllerBase {
             isBalanceInitialized: wallet.isBalanceInitialized
         )
         row.updateCell()
+        row.reload()
     }
     
     func makeNodesList() -> UIViewController {

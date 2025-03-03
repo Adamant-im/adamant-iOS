@@ -144,24 +144,38 @@ extension UITextField {
 }
 
 extension UITextField {
+
+    // MARK: - Password toggle button
+
+    static var buttonContainerHeight: CGFloat { 28 }
+    static var buttonImageEdgeInsets: UIEdgeInsets {
+        UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
+    }
+
     func enablePasswordToggle() {
-        let button = UIButton(type: .custom)
-        updatePasswordToggleImage(button)
-        button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
+        let button = makePasswordButton()
         
-        let contanerView = UIView()
-        contanerView.addSubview(button)
+        let containerView = UIView()
+        containerView.addSubview(button)
         button.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview().inset(3)
+            make.directionalEdges.equalToSuperview()
         }
-        contanerView.snp.makeConstraints { make in
-            make.size.equalTo(28)
+        containerView.snp.makeConstraints { make in
+            make.size.equalTo(UITextField.buttonContainerHeight)
         }
         
-        rightView = contanerView
+        rightView = containerView
         rightViewMode = .always
     }
     
+    func makePasswordButton() -> UIButton {
+        let button = UIButton(type: .custom)
+        button.imageEdgeInsets = UITextField.buttonImageEdgeInsets
+        updatePasswordToggleImage(button)
+        button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
+        return button
+    }
+
     private func updatePasswordToggleImage(_ button: UIButton) {
         let imageName = isSecureTextEntry ? "eye_close" : "eye_open"
         button.setImage(.asset(named: imageName), for: .normal)

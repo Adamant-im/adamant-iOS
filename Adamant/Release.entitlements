@@ -22,7 +22,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.adamant.adamant-messenger</string>
+		<string>group.adamant.adamant-messenger-random1818</string>
 	</array>
 	<key>com.apple.security.device.camera</key>
 	<true/>
@@ -32,7 +32,7 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)im.adamant.messenger</string>
+		<string>$(AppIdentifierPrefix)im.adamant.messenger-random1818</string>
 	</array>
 </dict>
 </plist>
