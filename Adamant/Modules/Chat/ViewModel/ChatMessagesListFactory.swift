@@ -30,7 +30,6 @@ actor ChatMessagesListFactory {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
 
         await taskSemaphore.wait()
-        print("makeMessages start")
         defer { Task { await taskSemaphore.signal() } }
         var processedTransactionIds: [String] = []
 
