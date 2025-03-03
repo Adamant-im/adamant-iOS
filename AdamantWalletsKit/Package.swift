@@ -14,18 +14,9 @@ let package = Package(
             targets: ["AdamantWalletsKit"]
         )
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/Adamant-im/adamant-wallets.git",
-            branch: "trello.com/c/txGIRwKv"
-        )
-    ],
     targets: [
         .target(
             name: "AdamantWalletsKit",
-            dependencies: [
-                .product(name: "AdamantWalletsAssets", package: "adamant-wallets")
-            ],
             resources: [
                 .copy("JsonStore/general"),
                 .copy("JsonStore/blockchains"),
