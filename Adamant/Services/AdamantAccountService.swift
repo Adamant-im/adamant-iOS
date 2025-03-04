@@ -21,6 +21,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
+    private let coreDataStack: CoreDataStack
 
     weak var notificationsService: NotificationsService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
@@ -46,6 +47,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
+        coreDataStack: CoreDataStack,
         connection: AnyObservable<Bool>
     ) {
         self.apiService = apiService
@@ -54,6 +56,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
         self.currencyInfoService = currencyInfoService
+        self.coreDataStack = coreDataStack
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -459,6 +462,8 @@ extension AdamantAccountService {
         keypair = nil
         passphrase = nil
         state = .notLogged
+        apiService.cancelCurrentTasks()
+        coreDataStack.clearCoreData()
         
         guard wasLogged else { return }
         NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
