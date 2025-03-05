@@ -46,6 +46,7 @@ final class ChatViewController: MessagesViewController {
     private var shouldScrollToBottom: Bool = true
     private var separatorIndex: Int?
     private var didAddSeparator: Bool = false
+    private var pendingOffsetAdjustment: CGFloat = 0
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -793,15 +794,8 @@ private extension ChatViewController {
         messagesLoaded = true
         if let position = viewModel.startPosition {
             scrollToPosition(position)
-        } else if let separatorIndex = separatorIndex {
-            DispatchQueue.main.async {
-                let indexPath = IndexPath(item: 0, section: separatorIndex - 1)
-                self.messagesCollectionView.scrollToItem(
-                    at: indexPath,
-                    at: .bottom,
-                    animated: true
-                )
-            }
+        } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
+            scrollToPosition(.messageId(unreadMessage), animated: false, additionalOffset: 70)
         }
     }
     func updateSeparatorIndex() {
@@ -945,7 +939,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, additionalOffset: CGFloat = 0) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -968,6 +962,7 @@ private extension ChatViewController {
                 at: .top,
                 animated: animated
             )
+            self.pendingOffsetAdjustment = additionalOffset
             
             viewModel.needToAnimateCellIndex = needToAnimateCell
             ? index
@@ -1219,7 +1214,7 @@ private extension ChatViewController {
 extension ChatViewController {
     override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         animateScroll(isStarted: false)
-        
+        applyAdditionalOffset()
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
         let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
@@ -1234,6 +1229,16 @@ extension ChatViewController {
         cell?.isSelected = false
         
         viewModel.needToAnimateCellIndex = nil
+    }
+    private func applyAdditionalOffset() {
+        guard pendingOffsetAdjustment != 0 else { return }
+        
+        let currentOffset = self.messagesCollectionView.contentOffset
+        self.messagesCollectionView.setContentOffset(
+            CGPoint(x: currentOffset.x, y: currentOffset.y - self.pendingOffsetAdjustment),
+            animated: true
+        )
+        self.pendingOffsetAdjustment = 0
     }
 }
 private let scrollToUnreadInset: CGFloat = 10
