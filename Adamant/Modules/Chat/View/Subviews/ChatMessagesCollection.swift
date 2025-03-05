@@ -42,15 +42,25 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             setBottomOffset(fixedBottomOffset, safely: true)
         }
     }
-    
-    func reloadData(newIds: [String]) {
+    func reloadData(newIds: [String], is scrollToBottom: Bool) {
         guard newIds.last == currentIds.last || newIds.first != currentIds.first else {
             return applyNewIds(newIds)
         }
-        
-        let bottomOffset = self.bottomOffset
+        let wasAtBottom = scrollToBottom
+        let isUserScrolling = isDragging || isDecelerating
+        let firstVisibleIndex = indexPathsForVisibleItems.first
+        let firstVisibleOffset = contentOffset.y - (firstVisibleIndex.flatMap { layoutAttributesForItem(at: $0)?.frame.origin.y } ?? 0)
+
         applyNewIds(newIds)
-        setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
+
+        if isUserScrolling, let firstVisibleIndex = firstVisibleIndex {
+            let newOffset = layoutAttributesForItem(at: firstVisibleIndex)?.frame.origin.y ?? 0
+            setContentOffset(CGPoint(x: 0, y: newOffset + firstVisibleOffset), animated: false)
+            return
+        }
+        if wasAtBottom {
+            setBottomOffset(bottomOffset, safely: true)
+        }
     }
     
     func setFullBottomInset(_ inset: CGFloat) {
