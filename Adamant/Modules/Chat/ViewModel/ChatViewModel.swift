@@ -15,6 +15,7 @@ import AdvancedContextMenuKit
 @preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
+import OrderedCollections
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -107,8 +108,8 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
-    @ObservableValue private(set) var unreadMessagesIds: [String]?
-    @ObservableValue private(set) var messagesWithUnredReactionsIds: [String]?
+    @ObservableValue private(set) var unreadMessagesIds: OrderedSet<String>?
+    @ObservableValue private(set) var messagesWithUnredReactionsIds: OrderedSet<String>?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
