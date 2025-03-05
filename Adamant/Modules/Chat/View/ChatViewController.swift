@@ -44,6 +44,8 @@ final class ChatViewController: MessagesViewController {
     private var viewAppeared = false
     private var scrollToUnreadBottomConstraint: Constraint?
     private var shouldScrollToBottom: Bool = true
+    private var separatorIndex: Int?
+    private var didAddSeparator: Bool = false
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -170,6 +172,7 @@ final class ChatViewController: MessagesViewController {
         
         guard isMacOS, !viewAppeared else { return }
         focusInputBarWithoutAnimation()
+        updateSeparatorIndex()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -205,7 +208,30 @@ final class ChatViewController: MessagesViewController {
         }
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
-    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+        
+        let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "NewMessagesCell",
+            for: indexPath
+        ) as! NewMessagesCell
+        
+        return header
+    }
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        return (separatorIndex == section) ? CGSize(width: collectionView.bounds.width, height: 25) : .zero
+    }
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
         scrollDidStop()
     }
@@ -316,6 +342,7 @@ private extension ChatViewController {
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in
+                self?.updateSeparatorIndex()
                 self?.updateMessages()
                 self?.updateMessagesPosition()
             }
@@ -760,11 +787,27 @@ private extension ChatViewController {
         messagesLoaded = true
         if let position = viewModel.startPosition {
             scrollToPosition(position)
-        } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-            scrollToPosition(.messageId(unreadMessage), animated: false)
+        } else if let separatorIndex = separatorIndex {
+            DispatchQueue.main.async {
+                let indexPath = IndexPath(item: 0, section: separatorIndex - 1)
+                self.messagesCollectionView.scrollToItem(
+                    at: indexPath,
+                    at: .bottom,
+                    animated: true
+                )
+            }
         }
     }
-    
+    func updateSeparatorIndex() {
+        guard !didAddSeparator,
+        viewModel.messages.count > 0 else { return }
+        guard let firstUnreadId = viewModel.unreadMessagesIds?.first else {
+            separatorIndex = nil
+            return
+        }
+        didAddSeparator = true
+        separatorIndex = viewModel.messages.firstIndex(where: { $0.id == firstUnreadId })
+    }
     func updateFullscreenLoadingView() {
         loadingView.isHidden = !viewModel.fullscreenLoading
         
@@ -850,6 +893,9 @@ private extension ChatViewController {
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
         collection.register(ChatMediaCell.self)
+        collection.register(NewMessagesCell.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: "NewMessagesCell")
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader

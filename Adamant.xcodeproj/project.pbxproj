@@ -264,6 +264,7 @@
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
 		6F030E1C2D4C0E950077ACA2 /* EthBIP32Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */; };
+		6FC3898C2D77CA10000144A6 /* NewMessagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC3898B2D77CA10000144A6 /* NewMessagesCell.swift */; };
 		6FCF2D522D54F2B600F64D20 /* AdmDialogService+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */; };
 		6FCF2D532D54F2B600F64D20 /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */; };
 		6FF9F08C2D6CEB340013A3B1 /* CoreDataRealationMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */; };
@@ -482,14 +483,14 @@
 		AA8FFFC42D4C1174001D8576 /* NativeAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */; };
 		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
 		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
-		AA8FFFE32D513681001D8576 /* CustomFieldRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */; };
-		AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */; };
 		AA8FFFD52D50DCEF001D8576 /* dash_send_transation_response.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD42D50DCE4001D8576 /* dash_send_transation_response.json */; };
 		AA8FFFD72D50DD0E001D8576 /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFD62D50DD07001D8576 /* Data+Extensions.swift */; };
 		AA8FFFD82D50DF63001D8576 /* dash_unspent_transaction_intergration_test.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */; };
 		AA8FFFDA2D50DFB2001D8576 /* dash_unspent_transaction_unit_test.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFD92D50DFA3001D8576 /* dash_unspent_transaction_unit_test.json */; };
 		AA8FFFDC2D50E079001D8576 /* dash_unverified_unspent_transactions.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFDB2D50E063001D8576 /* dash_unverified_unspent_transactions.json */; };
 		AA8FFFE12D50E175001D8576 /* dash_send_transaction_unit_response.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8FFFDF2D50E13F001D8576 /* dash_send_transaction_unit_response.json */; };
+		AA8FFFE32D513681001D8576 /* CustomFieldRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */; };
+		AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */; };
 		AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */; };
 		AAB01CAF2D3AECED007D6BF4 /* DogeWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */; };
 		AAB01CB12D3AF01B007D6BF4 /* DogeApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */; };
@@ -993,6 +994,7 @@
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthBIP32Service.swift; sourceTree = "<group>"; };
+		6FC3898B2D77CA10000144A6 /* NewMessagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessagesCell.swift; sourceTree = "<group>"; };
 		6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
 		6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmDialogService+Extension.swift"; sourceTree = "<group>"; };
 		6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRealationMapper.swift; sourceTree = "<group>"; };
@@ -1177,14 +1179,14 @@
 		AA8FFFBF2D4AC00B001D8576 /* AdamantCoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoreMock.swift; sourceTree = "<group>"; };
 		AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCoreTests.swift; sourceTree = "<group>"; };
 		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
-		AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFieldRow.swift; sourceTree = "<group>"; };
-		AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeInsetTextField.swift; sourceTree = "<group>"; };
 		AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unspent_transaction_intergration_test.json; sourceTree = "<group>"; };
 		AA8FFFD42D50DCE4001D8576 /* dash_send_transation_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_send_transation_response.json; sourceTree = "<group>"; };
 		AA8FFFD62D50DD07001D8576 /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
 		AA8FFFD92D50DFA3001D8576 /* dash_unspent_transaction_unit_test.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unspent_transaction_unit_test.json; sourceTree = "<group>"; };
 		AA8FFFDB2D50E063001D8576 /* dash_unverified_unspent_transactions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unverified_unspent_transactions.json; sourceTree = "<group>"; };
 		AA8FFFDF2D50E13F001D8576 /* dash_send_transaction_unit_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_send_transaction_unit_response.json; sourceTree = "<group>"; };
+		AA8FFFE22D513670001D8576 /* CustomFieldRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFieldRow.swift; sourceTree = "<group>"; };
+		AA8FFFE42D513780001D8576 /* EdgeInsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeInsetTextField.swift; sourceTree = "<group>"; };
 		AAB01CAC2D3AE449007D6BF4 /* BitcoinKitTransactionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinKitTransactionFactory.swift; sourceTree = "<group>"; };
 		AAB01CAE2D3AECE6007D6BF4 /* DogeWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAB01CB02D3AF015007D6BF4 /* DogeApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2222,6 +2224,7 @@
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
 				93996A962968209C008D080B /* ChatMessagesCollection.swift */,
 				9382F61229DEC0A3005E6216 /* ChatModelView.swift */,
+				6FC3898B2D77CA10000144A6 /* NewMessagesCell.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -3765,6 +3768,7 @@
 				3AA388072B67F53F00125684 /* BtcNetworkInfoDTO.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
 				4153045929C09902000E4BEA /* AdamantIncreaseFeeService.swift in Sources */,
+				6FC3898C2D77CA10000144A6 /* NewMessagesCell.swift in Sources */,
 				3AA50DEF2AEBE65D00C58FC8 /* PartnerQRView.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				936658972B0ACB1500BDB2D3 /* CoinsNodesListViewModel.swift in Sources */,
