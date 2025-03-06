@@ -36,7 +36,7 @@ extension AccountViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute, storage // Application
+        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, secretWallets, contribute, storage // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -57,6 +57,7 @@ extension AccountViewController {
             case .biometry: return "biometry"
             case .notifications: return "notifications"
             case .visibleWallets: return "visibleWallets"
+            case .secretWallets: return "secretWallets"
             case .contribute: return "contribute"
             case .coinsNodes: return "coinsNodes"
             case .language: return "language"
@@ -81,6 +82,7 @@ extension AccountViewController {
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
             case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+            case .secretWallets: return .localized("SecretWallets.Row.Title", comment: "Secret wallets page: row title")
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             case .coinsNodes: return .adamant.coinsNodesList.title
             case .language: return .localized("AccountTab.Row.Language", comment: "Account tab: 'Language' row")
@@ -107,6 +109,7 @@ extension AccountViewController {
             case .biometry: image = nil // Determined by localAuth service
             case .notifications: image = .asset(named: "row_Notifications.png")
             case .visibleWallets: image = .asset(named: "row_balance")
+            case .secretWallets: image = .asset(named: "row_security")
             case .contribute: image = .asset(named: "row_contribute")
             case .language: image = .asset(named: "row_language")
             case .storage: image = .asset(named: "row_storage")

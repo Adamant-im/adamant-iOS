@@ -1396,3 +1396,4 @@
 "SecretWallets.Menu.AddSecretWallet" = "Geheimen hinzufügen";
 "SecretWallets.Menu.TellMeMore" = "Über Wallets";
 "SecretWallets.Menu.Title" = "Aktive Wallets";
+"SecretWallets.Row.Title" = "Geheime Geldbörsen";

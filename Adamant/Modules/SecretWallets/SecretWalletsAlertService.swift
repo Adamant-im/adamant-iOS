@@ -27,10 +27,14 @@ final class SecretWalletsAlertService {
         
         for (index, wallet) in state.wallets.enumerated() {
             let isSelected = (index == state.currentActiveIndex)
-            let suffix = isSelected ? " ✓" : ""
+            var walletName = wallet.name
+            if isSelected {
+                walletName.insert("[", at: walletName.index(walletName.startIndex, offsetBy: 0))
+                walletName.insert("]", at: walletName.index(walletName.startIndex, offsetBy: index == 0 ? 2 : 3))
+            }
             
             let action = AdamantAlertAction(
-                title: wallet.name + suffix,
+                title: walletName,
                 style: .default
             ) { [weak self] in
                 self?.secretWalletsViewModel.pickWallet(at: index)

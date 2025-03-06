@@ -1373,3 +1373,4 @@
 "SecretWallets.Menu.AddSecretWallet" = "Добавить секретный";
 "SecretWallets.Menu.TellMeMore" = "О кошельках";
 "SecretWallets.Menu.Title" = "Активные кошельки";
+"SecretWallets.Row.Title" = "Секретные кошельки";

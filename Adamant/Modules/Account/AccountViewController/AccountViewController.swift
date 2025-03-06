@@ -255,6 +255,23 @@ final class AccountViewController: FormViewController {
         
         appSection.append(visibleWalletsRow)
         
+        // Secret Wallets
+        let secretWalletsRow = LabelRow {
+            $0.tag = Rows.secretWallets.tag
+            $0.title = Rows.secretWallets.localized
+            $0.cell.imageView?.image = Rows.secretWallets.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, row) in
+            cell.accessoryType = .disclosureIndicator
+            row.title =  Rows.secretWallets.localized
+        }.onCellSelection { [weak self] (cell, _) in
+            guard let self = self else { return }
+            self.secretWalletsAlertService.presentSecretWalletsActionSheet(from: cell)
+        }
+        
+        // Добавление строки в секцию
+        appSection.append(secretWalletsRow)
+
         // Node list
         let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized

@@ -1363,3 +1363,4 @@
 "SecretWallets.Menu.AddSecretWallet" = "添加秘密";
 "SecretWallets.Menu.TellMeMore" = "关于钱包";
 "SecretWallets.Menu.Title" = "活动钱包";
+"SecretWallets.Row.Title" = "秘密钱包";

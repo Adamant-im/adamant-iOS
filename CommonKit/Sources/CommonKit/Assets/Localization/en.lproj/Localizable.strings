@@ -1372,3 +1372,4 @@
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.Title" = "Active wallets";
+"SecretWallets.Row.Title" = "Secret wallets";
