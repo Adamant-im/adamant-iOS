@@ -1352,3 +1352,14 @@
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
 
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
+
+/* Secret Wallets */
+"SecretWallets.Menu.Regular" = "普通";
+"SecretWallets.Menu.Secret" = "🔐1️⃣ 秘密";
+"SecretWallets.Menu.Secret" = "🔐2️⃣ 秘密";
+"SecretWallets.Menu.Secret" = "🔐3️⃣ 秘密";
+"SecretWallets.Menu.Secret" = "🔐4️⃣ 秘密";
+"SecretWallets.Menu.Secret" = "🔐5️⃣ 秘密";
+"SecretWallets.Menu.AddSecretWallet" = "添加秘密";
+"SecretWallets.Menu.TellMeMore" = "关于钱包";
+"SecretWallets.Menu.Title" = "活动钱包";

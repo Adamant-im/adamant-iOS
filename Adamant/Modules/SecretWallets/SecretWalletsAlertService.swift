@@ -40,7 +40,7 @@ final class SecretWalletsAlertService {
         
         if state.wallets.count < 6 {
             let enableWalletAction = AdamantAlertAction(
-                title: "🪄 Add secret wallet",
+                title: String.localized("SecretWallets.Menu.AddSecretWallet", comment: "Secret wallet menu: add secret wallet"),
                 style: .default
             ) { [weak self] in
                 self?.showEnableSecretWalletAlert()
@@ -49,7 +49,7 @@ final class SecretWalletsAlertService {
         }
         
         let infoAction = AdamantAlertAction(
-            title: "💡 Tell me more",
+            title: String.localized("SecretWallets.Menu.TellMeMore", comment: "Secret wallet menu: tell me more"),
             style: .default
         ) { [weak self] in
             self?.showSecretWalletInfoAlert()
@@ -65,7 +65,7 @@ final class SecretWalletsAlertService {
         
         let source: UIAlertController.SourceView = .view(sourceView)
         dialogService.showAlert(
-            title: nil,
+            title: String.localized("SecretWallets.Menu.Title", comment: "Secret wallet menu: title"),
             message: nil,
             style: .actionSheet,
             actions: actions,

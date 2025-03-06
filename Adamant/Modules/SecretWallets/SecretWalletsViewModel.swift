@@ -27,7 +27,7 @@ extension SecretWalletsAlertService {
         
         private func setup() {
             self.state.currentActiveIndex = 0
-            self.state.wallets.append(WalletItem(name: "💰 Regular"))
+            self.state.wallets.append(WalletItem(name: String.localized("SecretWallets.Menu.Regular", comment: "Secret wallet menu: regular wallet")))
         }
         
         func pickWallet(at index: Int) {
@@ -42,13 +42,8 @@ extension SecretWalletsAlertService {
             secretWalletsManager.createSecretWallet(withPassword: password)
             secretWalletsManager.activateSecretWallet(at: index - 1)
             
-            state.wallets.append(makeWalletItem(withIndex: index))
+            state.wallets.append(WalletItem(name: String.localized("SecretWallets.Menu.Secret\(index)", comment: "Secret wallet menu: regular wallet")))
             self.state.currentActiveIndex = index
-        }
-        
-        private func makeWalletItem(withIndex index: Int) -> WalletItem {
-            let icon = index <= 5 ? "\(index)️⃣" : "🔢"
-            return WalletItem(name: "🔐\(icon) Secret \(index)")
         }
     }
 }

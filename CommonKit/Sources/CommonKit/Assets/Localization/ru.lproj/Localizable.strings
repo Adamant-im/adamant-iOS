@@ -1362,3 +1362,14 @@
 "Chat.Alert.ReviewNodesList" = "К списку узлов ADM";
 
 "Chat.Timestamp.InFuture.Error" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит.\nПроверьте время на устройстве или попробуйте отправить сообщение снова.";
+
+/* Secret Wallets */
+"SecretWallets.Menu.Regular" = "Обычный";
+"SecretWallets.Menu.Secret" = "🔐1️⃣ Секретный";
+"SecretWallets.Menu.Secret" = "🔐2️⃣ Секретный";
+"SecretWallets.Menu.Secret" = "🔐3️⃣ Секретный";
+"SecretWallets.Menu.Secret" = "🔐4️⃣ Секретный";
+"SecretWallets.Menu.Secret" = "🔐5️⃣ Секретный";
+"SecretWallets.Menu.AddSecretWallet" = "Добавить секретный";
+"SecretWallets.Menu.TellMeMore" = "О кошельках";
+"SecretWallets.Menu.Title" = "Активные кошельки";
