@@ -25,7 +25,7 @@ final class ChatViewModel: NSObject {
     private let transfersProvider: TransfersProvider
     private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
-    private let visibleWalletService: VisibleWalletsService
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
@@ -162,7 +162,7 @@ final class ChatViewModel: NSObject {
         transfersProvider: TransfersProvider,
         chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
-        visibleWalletService: VisibleWalletsService,
+        walletsStoreService: WalletStoreServiceProtocol,
         accountService: AccountService,
         accountProvider: AccountsProvider,
         richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
@@ -185,7 +185,7 @@ final class ChatViewModel: NSObject {
         self.chatMessagesListFactory = chatMessagesListFactory
         self.addressBookService = addressBookService
         self.walletServiceCompose = walletServiceCompose
-        self.visibleWalletService = visibleWalletService
+        self.walletsStoreService = walletsStoreService
         self.accountService = accountService
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
@@ -1483,7 +1483,7 @@ private extension ChatViewModel {
     
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
-            .map { visibleWalletService.isInvisible($0.core.tokenUniqueID) }
+            .map { walletsStoreService.isInvisible($0) }
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible

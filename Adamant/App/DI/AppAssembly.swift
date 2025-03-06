@@ -26,7 +26,9 @@ struct AppAssembly: MainThreadAssembly {
         }
         
         // MARK: CellFactory
-        container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
+        container.register(CellFactory.self) { _ in
+            AdamantCellFactory()
+        }.inObjectScope(.container)
         
         // MARK: Secured Store
         container.register(SecuredStore.self) { _ in
@@ -69,6 +71,36 @@ struct AppAssembly: MainThreadAssembly {
                 securedStore: r.resolve(SecuredStore.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: WalletStoreServiceProtocol
+        container.register(WalletStoreServiceProtocol.self) { r in
+            AdamantWalletStoreService(
+                visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Secret Wallets
+        container.register(SecretWalletsFactory.self) { r in
+            SecretWalletsFactory(
+                visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        container.register(SecretWalletsManagerProtocol.self) { r in
+            AdamantSecretWalletsManager(
+                walletsStoreService: r.resolve(WalletStoreServiceProtocol.self)!,
+                secretWalletsFactory: r.resolve(SecretWalletsFactory.self)!
+            )
+        }.inObjectScope(.container)
+        
+        container.register(WalletStoreServiceProviderProtocol.self) { r in
+            AdamantWalletStoreServiceProvider(
+                secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
             )
         }.inObjectScope(.container)
         
@@ -275,7 +307,7 @@ struct AppAssembly: MainThreadAssembly {
             guard let service = c as? AdamantAccountService else { return }
             service.notificationsService = r.resolve(NotificationsService.self)!
             service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
+            service.walletsStoreService = r.resolve(WalletStoreServiceProtocol.self)!
         }
         
         // MARK: AddressBookServeice
