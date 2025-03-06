@@ -9,6 +9,8 @@
 import CommonKit
 import Combine
 
+//TODO: Consider logout
+
 extension SecretWalletsAlertService {
     @MainActor
     final class SecretWalletsViewModel: ObservableObject {
@@ -24,35 +26,29 @@ extension SecretWalletsAlertService {
         }
         
         private func setup() {
-            self.state.currentActiveIndex = secretWalletsManager.currentWalletIndex
-            self.state.wallets.append(WalletItem(name: "Regular"))
-            for index in 0...secretWalletsManager.getSecretWallets().count - 1 where index > 0 {
-                state.wallets.append(WalletItem(name: "Secret \(index)"))
-            }
+            self.state.currentActiveIndex = 0
+            self.state.wallets.append(WalletItem(name: "💰 Regular"))
         }
         
         func pickWallet(at index: Int) {
             state.currentActiveIndex = index
-            secretWalletsManager.activateWallet(at: index)
+            guard index != 0 else { return secretWalletsManager.activateDefaultWallet() }
+            secretWalletsManager.activateSecretWallet(at: index - 1)
         }
         
         func createSecretWallet(password: String) {
             let index = state.wallets.count
             
             secretWalletsManager.createSecretWallet(withPassword: password)
-            secretWalletsManager.activateWallet(at: index )
+            secretWalletsManager.activateSecretWallet(at: index - 1)
             
-            self.state.wallets.append(WalletItem(name: "Secret \(index)"))
+            state.wallets.append(makeWalletItem(withIndex: index))
             self.state.currentActiveIndex = index
         }
         
-        func removeSecretWallet(at index: Int) {
-            _ = secretWalletsManager.removeSecretWallet(at: index)
-            state.wallets.remove(at: index)
-            if index == state.currentActiveIndex {
-                state.currentActiveIndex = 0
-                secretWalletsManager.activateWallet(at: 0)
-            }
+        private func makeWalletItem(withIndex index: Int) -> WalletItem {
+            let icon = index <= 5 ? "\(index)️⃣" : "🔢"
+            return WalletItem(name: "🔐\(icon) Secret \(index)")
         }
     }
 }

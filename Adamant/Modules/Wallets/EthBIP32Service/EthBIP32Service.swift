@@ -11,15 +11,18 @@ protocol EthBIP32ServiceProtocol {
     func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore
 }
 
-// TODO: Return optimization
-struct EthBIP32Service: EthBIP32ServiceProtocol {
+actor EthBIP32Service: EthBIP32ServiceProtocol {
     private var ethApiService: EthApiServiceProtocol
+    private var keystores: [String: BIP32Keystore] = [:]
     
     init(ethApiService: EthApiServiceProtocol) {
         self.ethApiService = ethApiService
     }
     
     func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore {
+        if let keystore = self.keystores[passphrase + password] {
+            return keystore
+        }
         do {
             guard let store = try BIP32Keystore(mnemonics: passphrase,
                                                 password: EthWalletService.walletPassword,
@@ -29,6 +32,7 @@ struct EthBIP32Service: EthBIP32ServiceProtocol {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             await ethApiService.setKeystoreManager(.init([store]))
+            keystores[passphrase + password] = store
             return store
         }
     }

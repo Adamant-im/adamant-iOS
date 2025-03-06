@@ -27,10 +27,10 @@ final class SecretWalletsAlertService {
         
         for (index, wallet) in state.wallets.enumerated() {
             let isSelected = (index == state.currentActiveIndex)
-            let prefix = isSelected ? "✓ " : ""
+            let suffix = isSelected ? " ✓" : ""
             
             let action = AdamantAlertAction(
-                title: prefix + wallet.name,
+                title: wallet.name + suffix,
                 style: .default
             ) { [weak self] in
                 self?.secretWalletsViewModel.pickWallet(at: index)
@@ -38,24 +38,18 @@ final class SecretWalletsAlertService {
             actions.append(action)
         }
         
-        let enableWalletAction = AdamantAlertAction(
-            title: "Add secret wallet",
-            style: .default
-        ) { [weak self] in
-            self?.showEnableSecretWalletAlert()
+        if state.wallets.count < 6 {
+            let enableWalletAction = AdamantAlertAction(
+                title: "🪄 Add secret wallet",
+                style: .default
+            ) { [weak self] in
+                self?.showEnableSecretWalletAlert()
+            }
+            actions.append(enableWalletAction)
         }
-        actions.append(enableWalletAction)
-        
-//        let removeWalletAction = AdamantAlertAction(
-//            title: "Remove secret wallet",
-//            style: .destructive
-//        ) { [weak self] in
-//            self?.showRemoveSecretWalletAlert(from: sourceView)
-//        }
-//        actions.append(removeWalletAction)
         
         let infoAction = AdamantAlertAction(
-            title: "Tell me more",
+            title: "💡 Tell me more",
             style: .default
         ) { [weak self] in
             self?.showSecretWalletInfoAlert()
@@ -77,33 +71,6 @@ final class SecretWalletsAlertService {
             actions: actions,
             from: source
         )
-    }
-    
-    private func showRemoveSecretWalletAlert(from sourceView: UIView) {
-        let state = secretWalletsViewModel.state
-        let alert = UIAlertController(
-            title: "Remove Secret Wallet",
-            message: "Select the secret wallet to remove:",
-            preferredStyle: .actionSheet
-        )
-        
-        for (index, wallet) in state.wallets.enumerated() where index != 0 {
-            let action = UIAlertAction(
-                title: wallet.name,
-                style: .destructive
-            ) { [weak self] _ in
-                self?.secretWalletsViewModel.removeSecretWallet(at: index)
-            }
-            alert.addAction(action)
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
-            self?.presentSecretWalletsActionSheet(from: sourceView)
-        }
-        
-        alert.addAction(cancelAction)
-        
-        dialogService.present(alert, animated: true, completion: nil)
     }
     
     private func showEnableSecretWalletAlert() {

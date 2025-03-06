@@ -9,7 +9,7 @@
 import CommonKit
 import Swinject
 
-//TODO: Что на счет заинджектить сюда все зависимости для кошельков и тут инициализировать все кошельки?
+//TODO: ‼️‼️‼️ Double check wallets initialization and dependencies injection while making the review ‼️‼️‼️
 
 struct SecretWalletsFactory {
     private let visibleWalletsService: VisibleWalletsService
@@ -43,11 +43,13 @@ struct SecretWalletsFactory {
             ERC20WalletService(token: $0)
         }
         wallets.append(contentsOf: erc20WalletServices)
+        
         let walletServiceCompose = AdamantWalletServiceCompose(wallets: wallets)
         Task { @MainActor in
             await injectDependencies(in: walletServiceCompose)
             await initWallets(withPass: password, for: walletServiceCompose)
         }
+        
         let wallet = AdamantWalletStoreService(visibleWalletsService: visibleWalletsService, walletServiceCompose: walletServiceCompose)
         
         return wallet

@@ -10,16 +10,17 @@ import CommonKit
 
 protocol SecretWalletsManagerProtocol {
     var statePublisher: ObservableSender<SecretWalletsManagerStateProtocol> { get }
-    var currentWalletIndex: Int { get }
         
     func createSecretWallet(withPassword password: String)
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol?
     func getCurrentWallet() -> WalletStoreServiceProtocol
     func getSecretWallets() -> [WalletStoreServiceProtocol]
-    func activateWallet(at index: Int)
+    func activateSecretWallet(at index: Int)
+    func activateDefaultWallet()
 }
 
 protocol SecretWalletsManagerStateProtocol {
     var currentWallet: WalletStoreServiceProtocol { get set }
-    var wallets: [WalletStoreServiceProtocol] { get set }
+    var regularWallet: WalletStoreServiceProtocol { get set }
+    var secretWallets: [WalletStoreServiceProtocol] { get set }
 }

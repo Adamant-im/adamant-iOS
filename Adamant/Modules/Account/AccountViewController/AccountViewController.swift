@@ -213,7 +213,7 @@ final class AccountViewController: FormViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.setupWalletsVC() //TODO: Change it to use it only when wallets are changed
+                self.setupWalletsVC()
                 self.pagingViewController.reloadData()
                 pagingViewController.select(index: currentWalletIndex)
             }
