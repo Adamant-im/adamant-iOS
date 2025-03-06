@@ -548,6 +548,7 @@ private extension ChatViewController {
             $0.directionalEdges.equalToSuperview()
         }
     }
+    
     func updateScrollToUnreadButtonPosition() {
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
             if self.scrollDownButton.alpha == 0 {
@@ -558,6 +559,7 @@ private extension ChatViewController {
             self.view.layoutIfNeeded()
         }
     }
+    
     func updateUnreadMessages() {
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
@@ -566,6 +568,7 @@ private extension ChatViewController {
             viewModel.markMessageAsRead(index: indexPath.section)
         }
     }
+    
     func configureHeader() {
         navigationItem.titleView = updatingIndicatorView
         navigationItem.largeTitleDisplayMode = .never
@@ -755,6 +758,7 @@ private extension ChatViewController {
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
     }
+    
     func updateMessagesPosition() {
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
         messagesLoaded = true
@@ -1103,7 +1107,7 @@ private extension ChatViewController {
             in: messagesCollectionView
         )
     }
-    
+
     func animateScroll(isStarted: Bool) {
         UIView.animate(withDuration: 0.1) {
             self.messagesCollectionView.alpha = isStarted ? 0.2 : 1.0

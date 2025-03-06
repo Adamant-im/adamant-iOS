@@ -63,6 +63,7 @@ extension TransferTransaction: AdamantTransactionDetails {
         let partner = partner as? CoreDataAccount
         return partner?.chatroom
     }
+    
     func addToRichMessageTransactions(_ transaction: RichMessageTransaction) {
         self.mutableSetValue(forKey: "richMessageTransactions").add(transaction)
     }

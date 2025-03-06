@@ -40,6 +40,7 @@ extension MessageTransaction {
             reactionsData = data
         }
     }
+    
     func addToRichMessageTransactions(_ transaction: RichMessageTransaction) {
         self.mutableSetValue(forKey: "richMessageTransactions").add(transaction)
     }

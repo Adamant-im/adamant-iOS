@@ -21,6 +21,7 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
             trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
         }
     }
+    
     func markMessageAsReaded(chatMessageId: String, stack: CoreDataStack) {
         guard let trs = transactions as? Set<ChatTransaction>,
               let message = trs.first(where: { $0.chatMessageId == chatMessageId }) else {
