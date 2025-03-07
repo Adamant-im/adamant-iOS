@@ -11,7 +11,7 @@ import Combine
 
 //TODO: Consider logout
 
-extension SecretWalletsAlertService {
+extension SecretWalletsAlertMenuView {
     @MainActor
     final class SecretWalletsViewModel: ObservableObject {
         @Published private(set) var state: SecretWalletsState = .default

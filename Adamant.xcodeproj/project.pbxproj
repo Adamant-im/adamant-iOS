@@ -188,7 +188,7 @@
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */; };
 		48023DEF2D72EA7F00852961 /* AccountHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 48023DEE2D72EA7F00852961 /* AccountHeader.xib */; };
-		48023DF12D72FB3500852961 /* SecretWalletsAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48023DF02D72FB3500852961 /* SecretWalletsAlertService.swift */; };
+		48023DF12D72FB3500852961 /* SecretWalletsAlertMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48023DF02D72FB3500852961 /* SecretWalletsAlertMenuView.swift */; };
 		4803FC9A2D6715AF00452D2C /* SecretWalletsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4803FC992D6715AF00452D2C /* SecretWalletsFactory.swift */; };
 		481558702D65A7660011B470 /* SecretWalletsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4815586F2D65A7660011B470 /* SecretWalletsManager.swift */; };
 		481558722D65A7BD0011B470 /* SecretWalletsManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481558712D65A7BD0011B470 /* SecretWalletsManagerProtocol.swift */; };
@@ -923,7 +923,7 @@
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41E3C9CB2A0E20F500AF0985 /* AdamantCoinTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinTools.swift; sourceTree = "<group>"; };
 		48023DEE2D72EA7F00852961 /* AccountHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountHeader.xib; sourceTree = "<group>"; };
-		48023DF02D72FB3500852961 /* SecretWalletsAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsAlertService.swift; sourceTree = "<group>"; };
+		48023DF02D72FB3500852961 /* SecretWalletsAlertMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsAlertMenuView.swift; sourceTree = "<group>"; };
 		4803FC992D6715AF00452D2C /* SecretWalletsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsFactory.swift; sourceTree = "<group>"; };
 		4815586F2D65A7660011B470 /* SecretWalletsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsManager.swift; sourceTree = "<group>"; };
 		481558712D65A7BD0011B470 /* SecretWalletsManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsManagerProtocol.swift; sourceTree = "<group>"; };
@@ -1807,7 +1807,7 @@
 			children = (
 				488C1E892D7150F900E955E8 /* SecretWalletsState.swift */,
 				482231202D714C3D00D592D8 /* SecretWalletsViewModel.swift */,
-				48023DF02D72FB3500852961 /* SecretWalletsAlertService.swift */,
+				48023DF02D72FB3500852961 /* SecretWalletsAlertMenuView.swift */,
 			);
 			path = SecretWallets;
 			sourceTree = "<group>";
@@ -3901,7 +3901,7 @@
 				AAB01CAD2D3AE44B007D6BF4 /* BitcoinKitTransactionFactory.swift in Sources */,
 				648CE3A222999CE70070A2CC /* BTCRawTransaction.swift in Sources */,
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
-				48023DF12D72FB3500852961 /* SecretWalletsAlertService.swift in Sources */,
+				48023DF12D72FB3500852961 /* SecretWalletsAlertMenuView.swift in Sources */,
 				3A26D9392C3C1C62003AD832 /* KlyWalletFactory.swift in Sources */,
 				3A299C6B2B838F2300B54C61 /* ChatMediaContainerView.swift in Sources */,
 				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,

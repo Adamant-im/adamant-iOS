@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension SecretWalletsAlertService {
+extension SecretWalletsAlertMenuView {
     struct SecretWalletsState: Equatable {
         var wallets: [WalletItem]
         var currentActiveIndex: Int

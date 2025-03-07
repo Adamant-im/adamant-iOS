@@ -1364,11 +1364,11 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "💰 Regular";
-"SecretWallets.Menu.Secret1" = "🔐1️⃣ Secret";
-"SecretWallets.Menu.Secret2" = "🔐2️⃣ Secret";
-"SecretWallets.Menu.Secret3" = "🔐3️⃣ Secret";
-"SecretWallets.Menu.Secret4" = "🔐4️⃣ Secret";
-"SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ Secret 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ Secret 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ Secret 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ Secret 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.Title" = "Active wallets";

@@ -492,8 +492,8 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: SecretWalletsAlertService
-        container.register(SecretWalletsAlertService.self) { r in
-            SecretWalletsAlertService(
+        container.register(SecretWalletsAlertMenuView.self) { r in
+            SecretWalletsAlertMenuView(
                 dialogService: r.resolve(DialogService.self)!,
                 secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
             )

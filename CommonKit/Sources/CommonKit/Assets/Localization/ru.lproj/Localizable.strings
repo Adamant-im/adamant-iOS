@@ -1365,11 +1365,11 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "Обычный";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ Секретный";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ Секретный";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ Секретный";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ Секретный";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ Секретный";
+"SecretWallets.Menu.Secret" = "🔐1️⃣ Секретный 1";
+"SecretWallets.Menu.Secret" = "🔐2️⃣ Секретный 2";
+"SecretWallets.Menu.Secret" = "🔐3️⃣ Секретный 3";
+"SecretWallets.Menu.Secret" = "🔐4️⃣ Секретный 4";
+"SecretWallets.Menu.Secret" = "🔐5️⃣ Секретный 5";
 "SecretWallets.Menu.AddSecretWallet" = "Добавить секретный";
 "SecretWallets.Menu.TellMeMore" = "О кошельках";
 "SecretWallets.Menu.Title" = "Активные кошельки";

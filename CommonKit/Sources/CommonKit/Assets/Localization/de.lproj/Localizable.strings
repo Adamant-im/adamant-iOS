@@ -1388,11 +1388,11 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "Normal";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ Geheim";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ Geheim";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ Geheim";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ Geheim";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ Geheim";
+"SecretWallets.Menu.Secret" = "🔐1️⃣ Geheim 1";
+"SecretWallets.Menu.Secret" = "🔐2️⃣ Geheim 2";
+"SecretWallets.Menu.Secret" = "🔐3️⃣ Geheim 3";
+"SecretWallets.Menu.Secret" = "🔐4️⃣ Geheim 4";
+"SecretWallets.Menu.Secret" = "🔐5️⃣ Geheim 5";
 "SecretWallets.Menu.AddSecretWallet" = "Geheimen hinzufügen";
 "SecretWallets.Menu.TellMeMore" = "Über Wallets";
 "SecretWallets.Menu.Title" = "Aktive Wallets";

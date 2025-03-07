@@ -47,7 +47,7 @@ final class AccountViewController: FormViewController {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private let secretWalletsManager: SecretWalletsManagerProtocol
     private lazy var walletsViewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
-    private let secretWalletsAlertService: SecretWalletsAlertService
+    private let secretWalletsAlertService: SecretWalletsAlertMenuView
 
     let accountService: AccountService
     let dialogService: DialogService
@@ -115,7 +115,7 @@ final class AccountViewController: FormViewController {
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol,
         secretWalletsManager: SecretWalletsManagerProtocol,
-        secretWalletsAlertService: SecretWalletsAlertService
+        secretWalletsAlertService: SecretWalletsAlertMenuView
     ) {
         self.walletStoreServiceProvider = walletStoreServiceProvider
         self.accountService = accountService

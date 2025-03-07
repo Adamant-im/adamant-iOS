@@ -1355,11 +1355,11 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "普通";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ 秘密";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ 秘密";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ 秘密";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ 秘密";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ 秘密";
+"SecretWallets.Menu.Secret" = "🔐1️⃣ 秘密 1";
+"SecretWallets.Menu.Secret" = "🔐2️⃣ 秘密 2";
+"SecretWallets.Menu.Secret" = "🔐3️⃣ 秘密 3";
+"SecretWallets.Menu.Secret" = "🔐4️⃣ 秘密 4";
+"SecretWallets.Menu.Secret" = "🔐5️⃣ 秘密 5";
 "SecretWallets.Menu.AddSecretWallet" = "添加秘密";
 "SecretWallets.Menu.TellMeMore" = "关于钱包";
 "SecretWallets.Menu.Title" = "活动钱包";
