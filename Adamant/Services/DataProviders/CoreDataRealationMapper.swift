@@ -13,7 +13,7 @@ protocol CoreDataRealationMapperProtocol {
 }
 
 final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
-    let stack: CoreDataStack
+    private let stack: CoreDataStack
     
     init(stack: CoreDataStack) {
         self.stack = stack
