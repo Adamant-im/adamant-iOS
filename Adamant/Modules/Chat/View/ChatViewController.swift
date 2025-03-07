@@ -154,6 +154,10 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if navigationController?.delegate !== self {
+            navigationController?.delegate = self
+        }
+        
         viewModel.updatePartnerName()
     }
     
