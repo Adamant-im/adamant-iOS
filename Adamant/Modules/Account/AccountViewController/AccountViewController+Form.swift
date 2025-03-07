@@ -109,7 +109,7 @@ extension AccountViewController {
             case .biometry: image = nil // Determined by localAuth service
             case .notifications: image = .asset(named: "row_Notifications.png")
             case .visibleWallets: image = .asset(named: "row_balance")
-            case .secretWallets: image = .asset(named: "row_security")
+            case .secretWallets: image = .asset(named: "row_secret_wallets")
             case .contribute: image = .asset(named: "row_contribute")
             case .language: image = .asset(named: "row_language")
             case .storage: image = .asset(named: "row_storage")
