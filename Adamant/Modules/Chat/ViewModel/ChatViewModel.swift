@@ -82,6 +82,7 @@ final class ChatViewModel: NSObject {
     var needToAnimateCellIndex: Int?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
+    var shouldScrollToBottom: Bool = true
 
     let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
@@ -1129,6 +1130,12 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
+        $unreadMessagesIds
+            .removeDuplicates()
+            .sink { newValue in
+                self.updateScrolledMessageState(newUnreadIds: newValue)
+            }
+            .store(in: &subscriptions)
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
@@ -1673,6 +1680,20 @@ private extension ChatViewModel {
         dialog.send(.progress(false))
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
+    }
+    func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
+        let newUnreadIds = newUnreadIds ?? []
+        let previousUnreadIds = scrolledMessageId ?? []
+        let hasNewIds = !newUnreadIds.isSubset(of: previousUnreadIds)
+        
+        if hasNewIds {
+            scrolledMessageId = previousUnreadIds.union(newUnreadIds)
+            shouldScrollToBottom = false
+        }
+        
+        if newUnreadIds.isEmpty {
+            shouldScrollToBottom = true
+        }
     }
 }
 
