@@ -103,6 +103,7 @@ final class ChatViewModel: NSObject {
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
     let showBuyAndSell = ObservableSender<Void>()
+    let didUpdateCoreData = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -1049,7 +1050,8 @@ extension ChatViewModel {
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
     nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        Task { @MainActor in updateTransactions(performFetch: false) }
+        Task { @MainActor in didUpdateCoreData.send() }
+        //TODO: solve the problem with the СoreData updating too often (trello.com/c/iXjNrBsv)
     }
 }
 
@@ -1197,6 +1199,11 @@ private extension ChatViewModel {
         filesStorageProprieties.autoDownloadFullMediaPolicyPublisher
             .combineLatest(filesStorageProprieties.autoDownloadPreviewPolicyPublisher)
             .sink { [weak self] _ in self?.autoDownloadPolicyChanged() }
+            .store(in: &subscriptions)
+        //this is a temporary solution to fix the issue with excessive notifications from date related to subsequent recording of messages, it will require a lot of time within a separate task
+        didUpdateCoreData
+            .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
     }
     

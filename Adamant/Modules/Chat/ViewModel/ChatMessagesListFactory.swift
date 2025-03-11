@@ -20,7 +20,6 @@ actor ChatMessagesListFactory {
         self.chatMessageFactory = chatMessageFactory
         self.coreDataRelationMapper = coreDataRelationMapper
     }
-    private var taskSemaphore = TaskSemaphore()
     
     func makeMessages(
         transactions: [ChatTransaction],
@@ -30,8 +29,6 @@ actor ChatMessagesListFactory {
     ) async -> ([ChatMessage], OrderedSet<String>, OrderedSet<String>) {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
 
-        await taskSemaphore.wait()
-        defer { Task { await taskSemaphore.signal() } }
         var processedTransactionIds: OrderedSet<String> = []
 
         await withTaskGroup(of: [String].self) { group in
@@ -121,18 +118,4 @@ private func isNeedToDisplayDateHeader(
     else { return false }
     
     return !Calendar.current.isDate(currentDate, inSameDayAs: previousDate)
-}
-actor TaskSemaphore {
-    private var isLocked = false
-
-    func wait() async {
-        while isLocked {
-            await Task.yield()
-        }
-        isLocked = true
-    }
-
-    func signal() {
-        isLocked = false
-    }
 }
