@@ -208,7 +208,6 @@ private extension ChatDialogManager {
             )
         )
         let cancelButton = UIAlertAction(title: .adamant.alert.cancel, style: .default)
-        cancelButton.setValue(UIColor.blue, forKey: "titleTextColor")
         alert.addAction(cancelButton)
         alert.modalPresentationStyle = .overFullScreen
         dialogService.present(alert, animated: true, completion: nil)
