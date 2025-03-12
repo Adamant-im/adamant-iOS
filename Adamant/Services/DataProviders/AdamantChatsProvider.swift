@@ -973,6 +973,7 @@ extension AdamantChatsProvider {
         let transaction = MessageTransaction(context: context)
         let id = UUID().uuidString
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1019,6 +1020,7 @@ extension AdamantChatsProvider {
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1183,6 +1185,7 @@ extension AdamantChatsProvider {
         
         // MARK: 2. Update transaction
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.statusEnum = .pending
         
         if let chatroom = transaction.chatroom {
@@ -1412,8 +1415,7 @@ extension AdamantChatsProvider {
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "chatroom = %@", chatroom),
             NSPredicate(format: "isHidden == false")])
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
-                                   NSSortDescriptor(key: "transactionId", ascending: true)]
+        request.sortDescriptors = .sortChatTransactions(ascending: true)
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         
         return controller
@@ -1426,8 +1428,7 @@ extension AdamantChatsProvider {
             NSPredicate(format: "isUnread == true"),
             NSPredicate(format: "isHidden == false")])
         
-        request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
         

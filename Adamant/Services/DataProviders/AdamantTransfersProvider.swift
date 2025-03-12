@@ -340,8 +340,7 @@ extension AdamantTransfersProvider {
     // MARK: Controllers
     func transfersController() -> NSFetchedResultsController<TransferTransaction> {
         let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         
         return controller
@@ -349,8 +348,7 @@ extension AdamantTransfersProvider {
     
     func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction> {
         let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         request.predicate = NSPredicate(format: "partner = %@", account)
         
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -361,8 +359,7 @@ extension AdamantTransfersProvider {
     func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction> {
         let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
         request.predicate = NSPredicate(format: "isUnread == true")
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         
         return controller
@@ -446,6 +443,7 @@ extension AdamantTransfersProvider {
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipient
         transaction.senderId = loggedAccount.address
         transaction.type = Int16(TransactionType.chatMessage.rawValue)
@@ -639,6 +637,7 @@ extension AdamantTransfersProvider {
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipient
         transaction.senderId = loggedAccount.address
         transaction.type = Int16(TransactionType.send.rawValue)

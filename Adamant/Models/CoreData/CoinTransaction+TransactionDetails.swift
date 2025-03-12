@@ -38,4 +38,8 @@ extension CoinTransaction: TransactionDetails {
     var blockHeight: UInt64? {
         return nil
     }
+    
+    var timeIntervalMillisecondsSince1970: Int64 {
+        date?.timeIntervalMillisecondsSince1970 ?? .zero
+    }
 }

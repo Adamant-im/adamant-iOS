@@ -1589,15 +1589,6 @@ extension ChatListViewController {
     }
 }
 
-private extension DataProviderState {
-    var isUpdating: Bool {
-        switch self {
-        case .updating: true
-        case .failedToUpdate, .upToDate, .empty: false
-        }
-    }
-}
-
 private extension UITableView {
     func reloadRowsAndPreserveSelection(at indexPaths: [IndexPath]) {
         let selectedRowIndexPath = indexPathForSelectedRow

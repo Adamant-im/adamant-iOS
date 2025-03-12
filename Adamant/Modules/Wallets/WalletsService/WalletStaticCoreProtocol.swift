@@ -37,16 +37,29 @@ extension WalletStaticCoreProtocol {
         let coinInfoSIH = coinInfo?.services?.infoService?.healthCheck
         let coinInfoSNH = coinInfo?.services?.ipfsNode?.healthCheck
         
+        if let coinInfoNH = coinInfoNH {
+            return CoinHealthCheckParameters(
+                normalUpdateInterval: TimeInterval(coinInfoNH.normalUpdateInterval / 1000),
+                crucialUpdateInterval: TimeInterval(coinInfoNH.crucialUpdateInterval / 1000),
+                onScreenUpdateInterval: TimeInterval(coinInfoNH.onScreenUpdateInterval / 1000),
+                
+                threshold: coinInfoNH.threshold ?? 0,
+                
+                normalServiceUpdateInterval: TimeInterval(coinInfoSIH?.normalUpdateInterval ?? coinInfoSNH?.normalUpdateInterval ?? coinInfoNH.normalUpdateInterval / 1000),
+                crucialServiceUpdateInterval: TimeInterval(coinInfoSIH?.crucialUpdateInterval ?? coinInfoSNH?.crucialUpdateInterval ?? coinInfoNH.crucialUpdateInterval / 1000),
+                onScreenServiceUpdateInterval: TimeInterval(coinInfoSIH?.onScreenUpdateInterval ?? coinInfoSNH?.onScreenUpdateInterval ?? coinInfoNH.onScreenUpdateInterval / 1000)
+            )
+        }
+        print("error with healsCheck values")
         return CoinHealthCheckParameters(
-            normalUpdateInterval: TimeInterval(coinInfoNH?.normalUpdateInterval ?? 0 / 1000),
-            crucialUpdateInterval: TimeInterval(coinInfoNH?.crucialUpdateInterval ?? 0 / 1000),
-            onScreenUpdateInterval: TimeInterval(coinInfoNH?.onScreenUpdateInterval ?? 0 / 1000),
-            
-            threshold: coinInfoNH?.threshold ?? 0,
-            
-            normalServiceUpdateInterval: TimeInterval(coinInfoSIH?.normalUpdateInterval ?? coinInfoSNH?.normalUpdateInterval ?? 0),
-            crucialServiceUpdateInterval: TimeInterval(coinInfoSIH?.crucialUpdateInterval ?? coinInfoSNH?.crucialUpdateInterval ?? 0),
-            onScreenServiceUpdateInterval: TimeInterval(coinInfoSIH?.onScreenUpdateInterval ?? coinInfoSNH?.onScreenUpdateInterval ?? 0))
+            normalUpdateInterval: 300,
+            crucialUpdateInterval: 30,
+            onScreenUpdateInterval: 10,
+            threshold: 10,
+            normalServiceUpdateInterval: 300,
+            crucialServiceUpdateInterval: 30,
+            onScreenServiceUpdateInterval: 10
+        )
     }
     static var newPendingInterval: Int {
         coinInfo?.txFetchInfo?.newPendingInterval ?? 0
