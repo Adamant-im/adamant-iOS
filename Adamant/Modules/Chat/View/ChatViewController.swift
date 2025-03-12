@@ -824,6 +824,7 @@ private extension ChatViewController {
         }
         return button
     }
+    
     func makeScrollToUnreadReactButton() -> ChatScrollButton {
         let button = ChatScrollButton(position: .reaction)
         button.action = { [weak self] in
@@ -835,6 +836,7 @@ private extension ChatViewController {
         
         return button
     }
+    
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
