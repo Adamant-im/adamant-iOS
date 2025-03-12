@@ -7,7 +7,6 @@
 
 
 import Foundation
-import AdamantWalletsAssets
 
 public struct MainBlockchainInfoDTO: Codable {
     public let blockchain: String
