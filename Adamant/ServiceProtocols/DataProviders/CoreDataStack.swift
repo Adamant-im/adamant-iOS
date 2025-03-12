@@ -11,4 +11,5 @@ import CoreData
 
 protocol CoreDataStack: Sendable {
     var container: NSPersistentContainer { get }
+    func clearCoreData()
 }
