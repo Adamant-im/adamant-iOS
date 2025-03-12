@@ -5,9 +5,7 @@
 //  Created by Владимир Клевцов on 17.1.25..
 //
 
-
 import Foundation
-import AdamantWalletsAssets
 
 public struct MainBlockchainInfoDTO: Codable {
     public let blockchain: String
