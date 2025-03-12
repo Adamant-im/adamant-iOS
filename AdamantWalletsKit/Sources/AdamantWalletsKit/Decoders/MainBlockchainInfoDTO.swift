@@ -5,7 +5,6 @@
 //  Created by Владимир Клевцов on 17.1.25..
 //
 
-
 import Foundation
 
 public struct MainBlockchainInfoDTO: Codable {
