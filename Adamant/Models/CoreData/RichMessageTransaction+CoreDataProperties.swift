@@ -23,6 +23,8 @@ extension RichMessageTransaction {
     @NSManaged public var richType: String?
     @NSManaged public var transferStatusRaw: NSNumber?
     @NSManaged public var additionalType: RichAdditionalType
+    @NSManaged public var messageTransaction: MessageTransaction?
+    @NSManaged public var transferTransaction: TransferTransaction?
     
     func isTransferReply() -> Bool {
         return richContent?[RichContentKeys.reply.replyMessage] is [String: String]

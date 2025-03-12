@@ -1542,8 +1542,6 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
-        
-        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
                 
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0
@@ -1954,6 +1952,14 @@ extension AdamantChatsProvider {
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
+        }
+    }
+    
+    func markMessageAsRead(chatroom: Chatroom, message: String) {
+        chatroom.managedObjectContext?.perform { [weak self] in
+            guard let self else { return }
+            chatroom.markMessageAsReaded(chatMessageId: message, stack: self.stack)
+            try? chatroom.managedObjectContext?.save()
         }
     }
     
