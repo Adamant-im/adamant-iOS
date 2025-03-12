@@ -138,7 +138,7 @@ extension BitcoinKit.Transaction: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        return .pending
+        return .notInitiated
     }
     
     var senderAddress: String {
