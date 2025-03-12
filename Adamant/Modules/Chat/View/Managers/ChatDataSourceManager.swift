@@ -186,7 +186,7 @@ private extension ChatDataSourceManager {
         case let .reply(id):
             viewModel.replyMessageIfNeeded(id: id)
         case let .scrollTo(message):
-            viewModel.scroll(to: message)
+            viewModel.scroll(to: message.replyId)
         case let .copy(text):
             viewModel.copyMessageAction(text)
         case let .remove(id):
@@ -201,6 +201,8 @@ private extension ChatDataSourceManager {
             viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file):
             viewModel.openFile(messageId: messageId, file: file)
+        case let .cancelUploading(messageId, file):
+            viewModel.cancelFileUploading(messageId: messageId, file: file)
         case let .autoDownloadContentIfNeeded(messageId, files):
             viewModel.autoDownloadContentIfNeeded(
                 messageId: messageId,

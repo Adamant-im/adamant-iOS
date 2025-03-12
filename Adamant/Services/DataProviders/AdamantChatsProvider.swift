@@ -530,10 +530,17 @@ extension AdamantChatsProvider {
                         senderId: address,
                         privateKey: privateKey
                     )
+                    await self?.setupAsReadyToSyncChats()
                 }
             case .failure:
                 break
             }
+        }
+    }
+    
+    func setupAsReadyToSyncChats() {
+        if isInitiallySynced {
+            isInitiallySynced = false
         }
     }
     
@@ -1535,8 +1542,6 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
-        
-        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
                 
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0
@@ -1942,6 +1947,7 @@ extension AdamantChatsProvider {
     func removeMessage(with id: String) {
         if !self.removedMessages.contains(id) {
             self.removedMessages.append(id)
+            markTransactionAsHidden(id: id)
             
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
@@ -1949,10 +1955,35 @@ extension AdamantChatsProvider {
         }
     }
     
+    func markMessageAsRead(chatroom: Chatroom, message: String) {
+        chatroom.managedObjectContext?.perform { [weak self] in
+            guard let self else { return }
+            chatroom.markMessageAsReaded(chatMessageId: message, stack: self.stack)
+            try? chatroom.managedObjectContext?.save()
+        }
+    }
+    
     func markChatAsRead(chatroom: Chatroom) {
         chatroom.managedObjectContext?.perform {
             chatroom.markAsReaded()
             try? chatroom.managedObjectContext?.save()
+        }
+    }
+    
+    private func markTransactionAsHidden(id: String) {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        privateContext.performAndWait {
+            if let transaction = (try? privateContext.fetch(request))?.first {
+                transaction.isHidden = true
+                try? transaction.managedObjectContext?.save()
+                transaction.chatroom?.updateLastTransaction()
+            }
         }
     }
     

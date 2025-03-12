@@ -1,0 +1,29 @@
+{
+  "name": "Swarm",
+  "website": "https://www.ethswarm.org",
+  "description": "BZZ is the Swarm Network’s native token. Users of the network’s services (i.e. bandwidth and storage) use it to compensate the providers, or node operators, for those services.",
+  "symbol": "BZZ",
+  "type": "token",
+  "decimals": 16,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/ethswarm"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/ethersphere"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/ethswarm/"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://www.ethswarm.org/swarm-whitepaper.pdf"
+    }
+  ]
+}

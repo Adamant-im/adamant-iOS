@@ -1,0 +1,29 @@
+{
+  "name": "Storj",
+  "website": "https://www.storj.io",
+  "description": "Storj is an open-source cloud storage platform",
+  "symbol": "STORJ",
+  "type": "token",
+  "decimals": 8,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/storj"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/storj"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://www.storj.io/storj.pdf"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/storj"
+    }
+  ]
+}

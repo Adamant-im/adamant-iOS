@@ -54,7 +54,8 @@ let package = Package(
             url: "https://github.com/apple/swift-async-algorithms",
             .upToNextMinor(from: "1.0.0")
         ),
-        .package(path: "../BitcoinKit")
+        .package(path: "../BitcoinKit"),
+        .package(path: "../AdamantWalletsKit")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -71,7 +72,8 @@ let package = Package(
                 "KeychainAccess",
                 "RNCryptor",
                 "Alamofire",
-                "BitcoinKit"
+                "BitcoinKit",
+                .product(name: "AdamantWalletsKit", package: "AdamantWalletsKit")
             ],
             resources: [
                 .process("./Assets/GitData.plist")

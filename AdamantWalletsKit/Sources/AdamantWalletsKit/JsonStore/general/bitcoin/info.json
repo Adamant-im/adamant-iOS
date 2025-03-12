@@ -1,0 +1,135 @@
+{
+  "name": "Bitcoin",
+  "website": "https://bitcoin.org",
+  "description": "Bitcoin is a cryptocurrency and worldwide payment system. It is the first decentralized digital currency, as the system works without a central bank or single administrator.",
+  "explorer": "https://bitcoinexplorer.org",
+  "explorerTx": "https://bitcoinexplorer.org/tx/${ID}",
+  "explorerAddress": "https://bitcoinexplorer.org/address/${ID}",
+  "regexAddress": "^bc1[a-zA-Z0-9]{39,59}$|^[13][1-9A-HJ-NP-Za-km-z]{25,34}$",
+  "symbol": "BTC",
+  "type": "coin",
+  "decimals": 8,
+  "minBalance": 0.00001,
+  "cryptoTransferDecimals": 8,
+  "minTransferAmount": 0.00000546,
+  "defaultFee": 0.00003153,
+  "qqPrefix": "bitcoin",
+  "status": "active",
+  "createCoin": true,
+  "defaultVisibility": true,
+  "defaultOrdinalLevel": 10,
+  "consensus": "PoW",
+  "blockTimeAvg": 600000,
+  "txFetchInfo": {
+    "newPendingInterval": 10000,
+    "oldPendingInterval": 3000,
+    "registeredInterval": 40000,
+    "newPendingAttempts": 20,
+    "oldPendingAttempts": 4
+  },
+  "txConsistencyMaxTime": 10800000,
+  "nodes": {
+    "displayName": "btc-node",
+    "list": [
+      {
+        "url": "https://btcnode1.adamant.im/bitcoind",
+        "alt_ip": "http://176.9.38.204:44099/bitcoind"
+      },
+      {
+        "url": "https://btcnode3.adamant.im/bitcoind",
+        "alt_ip": "http://195.201.242.108:44099/bitcoind"
+      }
+    ],
+    "healthCheck": {
+      "normalUpdateInterval": 360000,
+      "crucialUpdateInterval": 30000,
+      "onScreenUpdateInterval": 10000,
+      "threshold": 2
+    }
+  },
+  "services": {
+    "btcIndexer": {
+      "displayName": "btc-indexer",
+      "description": {
+        "software": "Esplora/Electrs",
+        "github": "https://github.com/blockstream/electrs",
+        "docs": "https://github.com/blockstream/esplora/blob/master/API.md"
+      },
+      "list": [
+        {
+          "url": "https://btcnode1.adamant.im",
+          "alt_ip": "http://176.9.38.204:44099"
+        },
+        {
+          "url": "https://btcnode3.adamant.im",
+          "alt_ip": "http://195.201.242.108:44099"
+        }
+      ],
+      "healthCheck": {
+        "normalUpdateInterval": 330000,
+        "crucialUpdateInterval": 30000,
+        "onScreenUpdateInterval": 10000
+      }
+    }
+  },
+  "links": [
+    {
+      "name": "github",
+      "url": "https://github.com/bitcoin"
+    },
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/Bitcoin"
+    },
+    {
+      "name": "reddit",
+      "url": "https://reddit.com/r/Bitcoin"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://bitcoin.org/bitcoin.pdf"
+    }
+  ],
+  "tor": {
+    "nodes": {
+      "displayName": "btc-node",
+      "list": [
+        {
+          "url": "http://cc6ibzkfeseuwnmtjc6hlsd44bzg2sr3shbv7n35nj2rk2vm6dmtlnqd.onion/bitcoind"
+        },
+        {
+          "url": "http://grnpvgtlrfws3424l726td5lctsod3hq2at4lhiasmedpxygbo5u2bqd.onion/bitcoind"
+        }
+      ],
+      "healthCheck": {
+        "normalUpdateInterval": 360000,
+        "crucialUpdateInterval": 30000,
+        "onScreenUpdateInterval": 10000,
+        "threshold": 2
+      }
+    },
+    "services": {
+      "btcIndexer": {
+        "displayName": "btc-indexer",
+        "description": {
+          "software": "Esplora/Electrs",
+          "github": "https://github.com/blockstream/electrs",
+          "docs": "https://github.com/blockstream/esplora/blob/master/API.md"
+        },
+        "list": [
+          {
+            "url": "http://cc6ibzkfeseuwnmtjc6hlsd44bzg2sr3shbv7n35nj2rk2vm6dmtlnqd.onion"
+          },
+          {
+            "url": "http://grnpvgtlrfws3424l726td5lctsod3hq2at4lhiasmedpxygbo5u2bqd.onion"
+          }
+        ],
+        "healthCheck": {
+          "normalUpdateInterval": 330000,
+          "crucialUpdateInterval": 30000,
+          "onScreenUpdateInterval": 10000
+        }
+      }
+    }
+  }
+}

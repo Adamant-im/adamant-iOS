@@ -1,0 +1,17 @@
+{
+  "name": "Stably USD",
+  "website": "https://stably.io/usds",
+  "description": "One-to-one U.S. Dollar backed, redeemable stablecoin",
+  "symbol": "USDS",
+  "type": "token",
+  "decimals": 6,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/stably_official"
+    }
+  ]
+}

@@ -8,7 +8,9 @@
 
 import Foundation
 
-public final class AdamantApiService {
+public final class AdamantApiService: @unchecked Sendable {
+    @Atomic private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
+    
     public let adamantCore: AdamantCore
     public let service: BlockchainHealthCheckWrapper<AdamantApiCore>
     
@@ -22,12 +24,29 @@ public final class AdamantApiService {
     
     public func request<Output>(
         waitsForConnectivity: Bool = false,
-        _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
-        await service.request(
-            waitsForConnectivity: waitsForConnectivity
-        ) { admApiCore, origin in
-            await request(admApiCore.apiCore, origin)
+        let task = AdamantApiTask<Output>(task: Task {
+            await service.request(
+                waitsForConnectivity: waitsForConnectivity
+            ) { admApiCore, origin in
+                let result = await request(admApiCore.apiCore, origin)
+                do {
+                    try Task.checkCancellation()
+                } catch {
+                    return .failure(.requestCancelled)
+                }
+                return result
+            }
+        })
+        task.storeIn(taskStorage: &adamantApiTaskStorage)
+        defer { task.removeFrom(taskStorage: &adamantApiTaskStorage) }
+        return await task.value
+    }
+    
+    public func cancelCurrentTasks() {
+        adamantApiTaskStorage.forEach { _, task in
+            task.cancel()
         }
     }
 }

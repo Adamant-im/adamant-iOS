@@ -57,7 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
     var pushNotificationsTokenService: PushNotificationsTokenService!
-    var visibleWalletsService: VisibleWalletsService!
     
     // MARK: - Lifecycle
     
@@ -70,7 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
         pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
-        visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
         // MARK: 1.1 Configure Firebase if needed
         
@@ -159,14 +157,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
-            if isMacOS {
-                var size: CGSize = .init(width: 900, height: 900)
-                window.frame = .init(origin: window.frame.origin, size: size)
-                window.windowScene?.sizeRestrictions?.minimumSize = size
-                window.windowScene?.sizeRestrictions?.maximumSize = size
-                window.windowScene?.sizeRestrictions?.allowsFullScreen = false
-            }
-            
             let welcome = screensFactory.makeOnboard()
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)

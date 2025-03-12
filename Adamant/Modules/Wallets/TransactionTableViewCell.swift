@@ -192,11 +192,9 @@ final class TransactionTableViewCell: UITableViewCell {
             } else {
                 dateLabel.text = nil
             }
-        case .notInitiated:
-            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
         case .failed:
             dateLabel.text = TransactionStatus.failed.localized
-        case .pending, .registered:
+        case .pending, .registered, .notInitiated:
             dateLabel.text = TransactionStatus.pending.localized
         default:
             dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString

@@ -15,6 +15,7 @@ import AdvancedContextMenuKit
 @preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
+import OrderedCollections
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -25,7 +26,7 @@ final class ChatViewModel: NSObject {
     private let transfersProvider: TransfersProvider
     private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
-    private let visibleWalletService: VisibleWalletsService
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
@@ -80,6 +81,8 @@ final class ChatViewModel: NSObject {
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
+    var scrolledMessageId: Set<String>?
+    var shouldScrollToBottom: Bool = true
 
     let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
@@ -88,7 +91,6 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let didTapAdmNodesList = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
-    let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
     let presentKeyboard = ObservableSender<Void>()
@@ -101,11 +103,15 @@ final class ChatViewModel: NSObject {
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
     let showBuyAndSell = ObservableSender<Void>()
+    let didUpdateCoreData = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
+    @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
+    @ObservableValue private(set) var unreadMessagesIds: OrderedSet<String>?
+    @ObservableValue private(set) var messagesWithUnredReactionsIds: OrderedSet<String>?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
@@ -116,12 +122,16 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
-    @ObservableValue var filesPicked: [FileResult]?
+    @ObservableValue var scrollToMessage: String?
+    @ObservableValue var filesPicked: [FileResult]? {
+        didSet {
+            updateFeeValue()
+        }
+    }
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
-            return .messageId(messageIdToShow, toBottomIfNotFound: true)
+            return .messageId(messageIdToShow, toBottomIfNotFound: false)
         }
         
         guard let address = chatroom?.partner?.address else { return nil }
@@ -158,7 +168,7 @@ final class ChatViewModel: NSObject {
         transfersProvider: TransfersProvider,
         chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
-        visibleWalletService: VisibleWalletsService,
+        walletsStoreService: WalletStoreServiceProtocol,
         accountService: AccountService,
         accountProvider: AccountsProvider,
         richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
@@ -181,7 +191,7 @@ final class ChatViewModel: NSObject {
         self.chatMessagesListFactory = chatMessagesListFactory
         self.addressBookService = addressBookService
         self.walletServiceCompose = walletServiceCompose
-        self.visibleWalletService = visibleWalletService
+        self.walletsStoreService = walletsStoreService
         self.accountService = accountService
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
@@ -209,7 +219,10 @@ final class ChatViewModel: NSObject {
     ) {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
-        self.messageIdToShow = messageIdToShow
+        self.chatroom?.updateLastTransaction()
+        if let messageIdToShow = messageIdToShow {
+            scroll(to: messageIdToShow)
+        }
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -406,27 +419,19 @@ final class ChatViewModel: NSObject {
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
     
-    func entireChatWasRead() {
+    func markMessageAsRead(index: Int) {
+        guard _messages.wrappedValue.indices.contains(index) else { return }
+        guard let chatroom else { return }
+
+        let message = _messages.wrappedValue[index]
         Task {
-            guard
-                let chatroom = chatroom,
-                chatroom.hasUnreadMessages == true || chatroom.lastTransaction?.isUnread == true
-            else { return }
-            
-            await chatsProvider.markChatAsRead(chatroom: chatroom)
+            await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
         }
     }
     
     func hideMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-            else { return }
-            
-            transaction.isHidden = true
-            try? transaction.managedObjectContext?.save()
-            
-            chatroom?.updateLastTransaction()
-            await chatsProvider.removeMessage(with: transaction.transactionId)
+            await chatsProvider.removeMessage(with: id)
         }
     }
     
@@ -510,31 +515,33 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
     
-    func scroll(to message: ChatMessageReplyCell.Model) {
+    func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
         
         Task {
             do {
-                guard await !chatsProvider.isMessageDeleted(id: message.replyId) else {
+                guard await !chatsProvider.isMessageDeleted(id: messageId) else {
                     dialog.send(.alert(.adamant.chat.messageWasDeleted))
                     return
                 }
                 
                 if !chatTransactions.contains(
-                    where: { $0.transactionId == message.replyId }
+                    where: { $0.transactionId == messageId }
                 ) {
                     dialog.send(.progress(true))
                     try await chatsProvider.loadTransactionsUntilFound(
-                        message.replyId,
+                        messageId,
                         recipient: partnerAddress
                     )
                 }
                 
-                await waitForMessage(withId: message.replyId)
+                await waitForMessage(withId: messageId)
                 
-                scrollToMessage = (toId: message.replyId, fromId: message.id)
-                
+                scrollToMessage = messageId
                 dialog.send(.progress(false))
+                if let index = messages.firstIndex(where: { $0.id == messageId }) {
+                    markMessageAsRead(index: index)
+                }
             } catch {
                 print(error)
                 dialog.send(.progress(false))
@@ -723,6 +730,12 @@ final class ChatViewModel: NSObject {
         
         lastDateHeaderUpdate = Date()
         updateMessages(resetLoadingProperty: false)
+    }
+    
+    func cancelFileUploading(messageId: String, file: ChatFile) {
+        Task {
+            await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
+        }
     }
 
     func openFile(messageId: String, file: ChatFile) {
@@ -976,33 +989,6 @@ final class ChatViewModel: NSObject {
 }
 
 extension ChatViewModel {
-    func getTempOffset(visibleIndex: Int?) -> String? {
-        let lastId = tempOffsets.popLast()
-        
-        guard let visibleIndex = visibleIndex,
-              let index = messages.firstIndex(where: { $0.messageId == lastId })
-        else {
-            return lastId
-        }
-        
-        return index > visibleIndex ? lastId : nil
-    }
-    
-    func appendTempOffset(_ id: String, toId: String) {
-        guard let indexFrom = messages.firstIndex(where: { $0.messageId == id }),
-              let indexTo = messages.firstIndex(where: { $0.messageId == toId }),
-              (indexFrom - indexTo) >= minDiffCountForOffset
-        else {
-            return
-        }
-        
-        if let index = tempOffsets.firstIndex(of: id) {
-            tempOffsets.remove(at: index)
-        }
-        
-        tempOffsets.append(id)
-    }
-    
     func openPartnerQR() {
         guard let partner = chatroom?.partner,
               isSendingAvailable
@@ -1066,7 +1052,8 @@ extension ChatViewModel {
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
     nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        Task { @MainActor in updateTransactions(performFetch: false) }
+        Task { @MainActor in didUpdateCoreData.send() }
+        //TODO: solve the problem with the СoreData updating too often (trello.com/c/iXjNrBsv)
     }
 }
 
@@ -1097,7 +1084,21 @@ private extension ChatViewModel {
     func setupObservers() {
         $inputText
             .removeDuplicates()
-            .sink { [weak self] _ in self?.inputTextUpdated() }
+            .sink { [weak self] _ in self?.updateFeeValue() }
+            .store(in: &subscriptions)
+        
+        $messages
+            .map { messages in
+                Set(
+                    messages.enumerated()
+                        .filter { $0.element.isUnread }
+                        .map { $0.offset }
+                )
+            }
+            .removeDuplicates()
+            .sink { [weak self] unreadIndexes in
+                self?.unreadMesaggesIndexes = unreadIndexes
+            }
             .store(in: &subscriptions)
         
         chatFileService.updateFileFields
@@ -1133,6 +1134,12 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
+        $unreadMessagesIds
+            .removeDuplicates()
+            .sink { newValue in
+                self.updateScrolledMessageState(newUnreadIds: newValue)
+            }
+            .store(in: &subscriptions)
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
@@ -1195,6 +1202,11 @@ private extension ChatViewModel {
             .combineLatest(filesStorageProprieties.autoDownloadPreviewPolicyPublisher)
             .sink { [weak self] _ in self?.autoDownloadPolicyChanged() }
             .store(in: &subscriptions)
+        //this is a temporary solution to fix the issue with excessive notifications from date related to subsequent recording of messages, it will require a lot of time within a separate task
+        didUpdateCoreData
+            .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.updateTransactions(performFetch: false) }
+            .store(in: &subscriptions)
     }
     
     func loadMessages(address: String, offset: Int) async {
@@ -1205,7 +1217,6 @@ private extension ChatViewModel {
             with: address,
             offset: offset
         )
-        
         updateTransactions(performFetch: true)
     }
     
@@ -1235,8 +1246,8 @@ private extension ChatViewModel {
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             defer { completion() }
             var expirationTimestamp: TimeInterval?
-
-            var messages = await chatMessagesListFactory.makeMessages(
+            
+            var (messages, reactId, messageId) = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
@@ -1244,18 +1255,14 @@ private extension ChatViewModel {
             )
             
             postProcess(messages: &messages)
+            messagesWithUnredReactionsIds = reactId
+            unreadMessagesIds = messageId
             
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
-            
-            // The 'makeMessages' method doesn't include reactions.
-            // If the message count is different from the number of transactions, update the chat read status if necessary.
-            if messages.count != chatTransactions.count {
-                updateChatRead.send()
-            }
         }
     }
     
@@ -1435,14 +1442,22 @@ private extension ChatViewModel {
         }
     }
     
-    func inputTextUpdated() {
-        guard !inputText.isEmpty else {
+    func updateFeeValue() {
+        let pickedFilesCount = filesPicked?.count ?? .zero
+        guard let feeValue: Decimal = switch (inputText, pickedFilesCount) {
+        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount == .zero:
+            nil
+        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount > .zero:
+            0.001
+        default:
+            AdamantMessage.text(inputText).fee
+        } else {
             fee = ""
             return
         }
         
         let feeString = AdamantBalanceFormat.full.format(
-            AdamantMessage.text(inputText).fee,
+            feeValue,
             withCurrencySymbol: AdmWalletService.currencySymbol
         )
         
@@ -1472,7 +1487,7 @@ private extension ChatViewModel {
     
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
-            .map { visibleWalletService.isInvisible($0.core.tokenUniqueID) }
+            .map { walletsStoreService.isInvisible($0) }
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible
@@ -1674,6 +1689,21 @@ private extension ChatViewModel {
         dialog.send(.progress(false))
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
+    }
+    
+    func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
+        let newUnreadIds = newUnreadIds ?? []
+        let previousUnreadIds = scrolledMessageId ?? []
+        let hasNewIds = !newUnreadIds.isSubset(of: previousUnreadIds)
+        
+        if hasNewIds {
+            scrolledMessageId = previousUnreadIds.union(newUnreadIds)
+            shouldScrollToBottom = false
+        }
+        
+        if newUnreadIds.isEmpty {
+            shouldScrollToBottom = true
+        }
     }
 }
 
