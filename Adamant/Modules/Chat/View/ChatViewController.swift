@@ -795,7 +795,7 @@ private extension ChatViewController {
         if let position = viewModel.startPosition {
             scrollToPosition(position)
         } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-            scrollToPosition(.messageId(unreadMessage), animated: false, additionalOffset: 70)
+            scrollToPosition(.messageId(unreadMessage), animated: false, additionalOffset: 120)
         }
     }
     func updateSeparatorIndex() {
