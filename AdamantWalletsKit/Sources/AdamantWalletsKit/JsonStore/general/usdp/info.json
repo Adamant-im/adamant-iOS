@@ -1,0 +1,21 @@
+{
+  "name": "PAX Dollar",
+  "website": "https://www.paxos.com/usdp",
+  "description": "PAX Dollar is a regulated stablecoin collateralized 1:1 by United States Dollars held in US bank",
+  "symbol": "USDP",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/paxosglobal"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/paxosglobal/usdp-contracts"
+    }
+  ]
+}

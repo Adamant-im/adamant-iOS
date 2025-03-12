@@ -20,10 +20,6 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
-    static let currencySymbol: String = ""
-    static let currencyLogo: UIImage = UIImage()
-    static let qqPrefix: String = ""
-    
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
     

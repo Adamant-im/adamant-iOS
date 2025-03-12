@@ -229,10 +229,6 @@ protocol WalletViewController {
 // MARK: - Wallet Service
 protocol WalletCoreProtocol: AnyObject, Sendable {
     // MARK: Currency
-    static var currencySymbol: String { get }
-    static var currencyLogo: UIImage { get }
-    static var qqPrefix: String { get }
-    
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
