@@ -990,7 +990,7 @@ extension AdamantChatsProvider {
         {
             transaction.statusEnum = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
-            
+            chatroom.lastTransaction = transaction
             chatroom.addToTransactions(transaction)
             
             do {
@@ -1045,7 +1045,7 @@ extension AdamantChatsProvider {
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             
             chatroom.addToTransactions(transaction)
-            
+            chatroom.lastTransaction = transaction
             do {
                 try context.save()
                 return transaction
