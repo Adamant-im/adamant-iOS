@@ -478,24 +478,28 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
         viewModel.$unreadMesaggesIndexes
             .removeDuplicates()
             .sink { [weak self] _ in
                 self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
+        
         viewModel.$unreadMessagesIds
             .removeDuplicates()
             .sink { _ in
                 self.updateScrollDownButtonVisibility()
             }
             .store(in: &subscriptions)
+        
         viewModel.$messagesWithUnredReactionsIds
             .removeDuplicates()
             .sink { [weak self] _ in
                 self?.updateScrollToUnreadButtonVisibility()
             }
             .store(in: &subscriptions)
+        
         viewModel.showBuyAndSell
             .sink { [weak self] in
                 self?.presentBuyAndSell()

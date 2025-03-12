@@ -271,8 +271,9 @@ final class ChatViewModel: NSObject {
                 return
             }
             
-            let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
-            let isChatLoading = await chatsProvider.isChatLoading(with: address)
+            async let chatLoadingState = (chatsProvider.isChatLoaded(with: address), chatsProvider.isChatLoading(with: address))
+            
+            let (isChatLoaded, isChatLoading) = await chatLoadingState
             
             guard !isChatLoading else {
                 await waitForChatLoading(with: address)
@@ -1149,7 +1150,7 @@ private extension ChatViewModel {
             await chatsProvider.stateObserver
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] state in
-                    self?.isHeaderLoading = state == .updating ? true : false
+                    self?.isHeaderLoading = state.isUpdating
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
