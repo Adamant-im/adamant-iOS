@@ -25,7 +25,7 @@ struct ChatFactory {
     let accountProvider: AccountsProvider
     let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     let addressBookService: AddressBookService
-    let visibleWalletService: VisibleWalletsService
+    let walletsStoreService: WalletStoreServiceProtocol
     let avatarService: AvatarService
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
@@ -46,7 +46,7 @@ struct ChatFactory {
         accountProvider = assembler.resolve(AccountsProvider.self)!
         richTransactionStatusService = assembler.resolve(TransactionsStatusServiceComposeProtocol.self)!
         addressBookService = assembler.resolve(AddressBookService.self)!
-        visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
+        walletsStoreService = assembler.resolve(WalletStoreServiceProtocol.self)!
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
@@ -120,7 +120,7 @@ private extension ChatFactory {
                 walletServiceCompose: walletServiceCompose),
             coreDataRelationMapper: coreDataRealationMapper),
             addressBookService: addressBookService,
-            visibleWalletService: visibleWalletService,
+            walletsStoreService: walletsStoreService,
             accountService: accountService,
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,

@@ -16,6 +16,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     @Atomic private var preservedFiles: [String: [FileResult]] = [:]
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
+    var updateNotifier = ObservableSender<Void>()
     init() {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -31,10 +32,12 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         preservedMessages = [:]
         preservedReplayMessage = [:]
         preservedFiles = [:]
+        updateNotifier.send()
     }
     
     func preserveMessage(_ message: String, forAddress address: String) {
         preservedMessages[address] = message
+        updateNotifier.send()
     }
     
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
@@ -44,6 +47,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
 
         if thenRemoveIt {
             preservedMessages.removeValue(forKey: address)
+            updateNotifier.send()
         }
 
         return message
@@ -51,6 +55,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     
     func setReplyMessage(_ message: MessageModel?, forAddress address: String) {
         preservedReplayMessage[address] = message
+        updateNotifier.send()
     }
     
     func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
@@ -60,6 +65,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         
         if thenRemoveIt {
             preservedMessages.removeValue(forKey: address)
+            updateNotifier.send()
         }
         
         return replayMessage
@@ -67,6 +73,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     
     func preserveFiles(_ files: [FileResult]?, forAddress address: String) {
         preservedFiles[address] = files
+        updateNotifier.send()
     }
     
     func getPreservedFiles(
@@ -79,6 +86,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
 
         if thenRemoveIt {
             preservedFiles.removeValue(forKey: address)
+            updateNotifier.send()
         }
 
         return files

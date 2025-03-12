@@ -530,10 +530,17 @@ extension AdamantChatsProvider {
                         senderId: address,
                         privateKey: privateKey
                     )
+                    await self?.setupAsReadyToSyncChats()
                 }
             case .failure:
                 break
             }
+        }
+    }
+    
+    func setupAsReadyToSyncChats() {
+        if isInitiallySynced {
+            isInitiallySynced = false
         }
     }
     
@@ -983,7 +990,7 @@ extension AdamantChatsProvider {
         {
             transaction.statusEnum = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
-            
+            chatroom.lastTransaction = transaction
             chatroom.addToTransactions(transaction)
             
             do {
@@ -1038,7 +1045,7 @@ extension AdamantChatsProvider {
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             
             chatroom.addToTransactions(transaction)
-            
+            chatroom.lastTransaction = transaction
             do {
                 try context.save()
                 return transaction
@@ -1947,6 +1954,7 @@ extension AdamantChatsProvider {
             }
         }
     }
+    
     func markMessageAsRead(chatroom: Chatroom, message: String) {
         chatroom.managedObjectContext?.perform { [weak self] in
             guard let self else { return }
@@ -1954,6 +1962,7 @@ extension AdamantChatsProvider {
             try? chatroom.managedObjectContext?.save()
         }
     }
+    
     func markChatAsRead(chatroom: Chatroom) {
         chatroom.managedObjectContext?.perform {
             chatroom.markAsReaded()

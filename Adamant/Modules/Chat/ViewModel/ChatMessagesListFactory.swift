@@ -10,6 +10,7 @@ import Foundation
 import MessageKit
 import Combine
 import CommonKit
+import OrderedCollections
 
 actor ChatMessagesListFactory {
     private let chatMessageFactory: ChatMessageFactory
@@ -19,19 +20,16 @@ actor ChatMessagesListFactory {
         self.chatMessageFactory = chatMessageFactory
         self.coreDataRelationMapper = coreDataRelationMapper
     }
-    private var taskSemaphore = TaskSemaphore()
     
     func makeMessages(
         transactions: [ChatTransaction],
         sender: ChatSender,
         isNeedToLoadMoreMessages: Bool,
         expirationTimestamp minExpTimestamp: inout TimeInterval?
-    ) async -> ([ChatMessage], [String], [String]) {
+    ) async -> ([ChatMessage], OrderedSet<String>, OrderedSet<String>) {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
 
-        await taskSemaphore.wait()
-        defer { Task { await taskSemaphore.signal() } }
-        var processedTransactionIds: [String] = []
+        var processedTransactionIds: OrderedSet<String> = []
 
         await withTaskGroup(of: [String].self) { group in
             for chatTransaction in transactions {
@@ -49,7 +47,6 @@ actor ChatMessagesListFactory {
                 processedTransactionIds.append(contentsOf: result)
             }
         }
-    
         let transactionsWithoutReact = transactions.filter { chatTransaction in
             guard let transaction = chatTransaction as? RichMessageTransaction,
                   transaction.additionalType == .reaction
@@ -57,10 +54,11 @@ actor ChatMessagesListFactory {
             
             return false
         }
-        let transactionIdsWithoutReact = transactionsWithoutReact
-            .filter { $0.isUnread }
-            .compactMap { $0.transactionId }
-        
+        let transactionIdsWithoutReact: OrderedSet<String> = OrderedSet(
+            transactionsWithoutReact
+                .filter { $0.isUnread }
+                .compactMap { $0.transactionId }
+        )
         let messages = transactionsWithoutReact.enumerated().map { index, transaction in
             var expTimestamp: TimeInterval?
             let message = makeMessage(
@@ -120,18 +118,4 @@ private func isNeedToDisplayDateHeader(
     else { return false }
     
     return !Calendar.current.isDate(currentDate, inSameDayAs: previousDate)
-}
-actor TaskSemaphore {
-    private var isLocked = false
-
-    func wait() async {
-        while isLocked {
-            await Task.yield()
-        }
-        isLocked = true
-    }
-
-    func signal() {
-        isLocked = false
-    }
 }

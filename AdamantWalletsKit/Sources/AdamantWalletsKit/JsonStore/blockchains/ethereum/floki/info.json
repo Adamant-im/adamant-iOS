@@ -1,0 +1,9 @@
+{
+  "name": "Floki",
+  "symbol": "FLOKI",
+  "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 100,
+  "contractId": "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
+  "decimals": 9
+}

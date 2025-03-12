@@ -15,6 +15,7 @@ import AdvancedContextMenuKit
 @preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
+import OrderedCollections
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -25,7 +26,7 @@ final class ChatViewModel: NSObject {
     private let transfersProvider: TransfersProvider
     private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
-    private let visibleWalletService: VisibleWalletsService
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
@@ -81,6 +82,7 @@ final class ChatViewModel: NSObject {
     var needToAnimateCellIndex: Int?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
+    var shouldScrollToBottom: Bool = true
 
     let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
@@ -101,14 +103,15 @@ final class ChatViewModel: NSObject {
     let presentDropView = ObservableSender<Bool>()
     let enableScroll = ObservableSender<Bool>()
     let showBuyAndSell = ObservableSender<Void>()
+    let didUpdateCoreData = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
-    @ObservableValue private(set) var unreadMessagesIds: [String]?
-    @ObservableValue private(set) var messagesWithUnredReactionsIds: [String]?
+    @ObservableValue private(set) var unreadMessagesIds: OrderedSet<String>?
+    @ObservableValue private(set) var messagesWithUnredReactionsIds: OrderedSet<String>?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
@@ -165,7 +168,7 @@ final class ChatViewModel: NSObject {
         transfersProvider: TransfersProvider,
         chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
-        visibleWalletService: VisibleWalletsService,
+        walletsStoreService: WalletStoreServiceProtocol,
         accountService: AccountService,
         accountProvider: AccountsProvider,
         richTransactionStatusService: TransactionsStatusServiceComposeProtocol,
@@ -188,7 +191,7 @@ final class ChatViewModel: NSObject {
         self.chatMessagesListFactory = chatMessagesListFactory
         self.addressBookService = addressBookService
         self.walletServiceCompose = walletServiceCompose
-        self.visibleWalletService = visibleWalletService
+        self.walletsStoreService = walletsStoreService
         self.accountService = accountService
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
@@ -415,6 +418,7 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
+    
     func markMessageAsRead(index: Int) {
         guard _messages.wrappedValue.indices.contains(index) else { return }
         guard let chatroom else { return }
@@ -424,6 +428,7 @@ final class ChatViewModel: NSObject {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
         }
     }
+    
     func hideMessage(id: String) {
         Task {
             await chatsProvider.removeMessage(with: id)
@@ -1047,7 +1052,8 @@ extension ChatViewModel {
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
     nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        Task { @MainActor in updateTransactions(performFetch: false) }
+        Task { @MainActor in didUpdateCoreData.send() }
+        //TODO: solve the problem with the СoreData updating too often (trello.com/c/iXjNrBsv)
     }
 }
 
@@ -1128,6 +1134,12 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
+        $unreadMessagesIds
+            .removeDuplicates()
+            .sink { newValue in
+                self.updateScrolledMessageState(newUnreadIds: newValue)
+            }
+            .store(in: &subscriptions)
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
@@ -1189,6 +1201,11 @@ private extension ChatViewModel {
         filesStorageProprieties.autoDownloadFullMediaPolicyPublisher
             .combineLatest(filesStorageProprieties.autoDownloadPreviewPolicyPublisher)
             .sink { [weak self] _ in self?.autoDownloadPolicyChanged() }
+            .store(in: &subscriptions)
+        //this is a temporary solution to fix the issue with excessive notifications from date related to subsequent recording of messages, it will require a lot of time within a separate task
+        didUpdateCoreData
+            .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
     }
     
@@ -1470,7 +1487,7 @@ private extension ChatViewModel {
     
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
-            .map { visibleWalletService.isInvisible($0.core.tokenUniqueID) }
+            .map { walletsStoreService.isInvisible($0) }
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible
@@ -1672,6 +1689,21 @@ private extension ChatViewModel {
         dialog.send(.progress(false))
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
+    }
+    
+    func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
+        let newUnreadIds = newUnreadIds ?? []
+        let previousUnreadIds = scrolledMessageId ?? []
+        let hasNewIds = !newUnreadIds.isSubset(of: previousUnreadIds)
+        
+        if hasNewIds {
+            scrolledMessageId = previousUnreadIds.union(newUnreadIds)
+            shouldScrollToBottom = false
+        }
+        
+        if newUnreadIds.isEmpty {
+            shouldScrollToBottom = true
+        }
     }
 }
 

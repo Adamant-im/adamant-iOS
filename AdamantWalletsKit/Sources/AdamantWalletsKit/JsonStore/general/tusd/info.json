@@ -1,0 +1,25 @@
+{
+  "name": "TrueUSD",
+  "website": "https://trueusd.com",
+  "description": "TUSD is the first independently verified digital asset redeemable 1-for-1 in US dollars",
+  "symbol": "TUSD",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/tusd_official"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/trusttoken/contracts-pre22"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://trueusd.com/pdf/TUSD_WhitePaper.pdf"
+    }
+  ]
+}
