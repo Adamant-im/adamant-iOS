@@ -27,7 +27,7 @@ class _SafeDecimalRow: FieldRow<SafeDecimalCell> {
     }
 }
 
-final class SafeDecimalCell: CustomFieldCell<Double, EdgeInsetTextField>, CellType {
+final class SafeDecimalCell: _FieldCell<Double>, CellType {
     required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
@@ -40,13 +40,5 @@ final class SafeDecimalCell: CustomFieldCell<Double, EdgeInsetTextField>, CellTy
         super.setup()
         textField.autocorrectionType = .no
         textField.setPopupKeyboardType(.decimalPad)
-    }
-}
-
-extension CustomFieldCell {
-    /// Sets hugging priorities to make text field to take as much space as possible
-    func adjustHuggingPriority() {
-        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        titleLabel?.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
 }

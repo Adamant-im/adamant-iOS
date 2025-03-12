@@ -92,7 +92,6 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
-.idea/
 
 ### Xcode Patch ###
 *.xcodeproj/*

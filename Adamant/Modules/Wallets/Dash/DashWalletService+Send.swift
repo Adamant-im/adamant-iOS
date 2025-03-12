@@ -71,13 +71,12 @@ extension DashWalletService: WalletServiceTwoStepSend {
         }
         
         // MARK: 4. Create local transaction
-        let transaction = transactionFactory.createTransaction(
+        let transaction = BitcoinKit.Transaction.createNewTransaction(
             toAddress: toAddress,
             amount: rawAmount,
             fee: fee,
             changeAddress: wallet.addressEntity,
             utxos: utxos,
-            lockTime: 0,
             keys: [key]
         )
         return transaction

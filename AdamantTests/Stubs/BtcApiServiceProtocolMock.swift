@@ -18,7 +18,7 @@ final class BtcApiServiceProtocolMock: BtcApiServiceProtocol {
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request(origin: .mock) { core, origin in
+        await api.request(origin: NodeOrigin(url: URL(string: "http://samplenodeorigin.com")!)) { core, origin in
             await request(core, origin)
         }
     }

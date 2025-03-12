@@ -64,7 +64,7 @@ final class DashApiCore: BlockchainHealthCheckableService, Sendable {
     }
 }
 
-final class DashApiService: DashApiServiceProtocol {
+final class DashApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DashApiCore>
     
     @MainActor

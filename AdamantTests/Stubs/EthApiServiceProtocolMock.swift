@@ -22,7 +22,7 @@ final class EthApiServiceProtocolMock: EthApiServiceProtocol {
         _ request: @escaping @Sendable (Web3) async throws -> Output
     ) async -> WalletServiceResult<Output>  {
         await api.performRequest(
-            origin: .mock
+            origin: NodeOrigin(url: URL(string: "http://samplenodeorigin.com")!)
         ) { _ in
             try await request(self.web3)
         }
@@ -34,7 +34,7 @@ final class EthApiServiceProtocolMock: EthApiServiceProtocol {
     ) async -> WalletServiceResult<Output> {
         await request(
             api.apiCore,
-            .mock
+            NodeOrigin(url: URL(string: "http://samplenodeorigin.com")!)
         ).mapError { $0.asWalletServiceError() }
     }
     

@@ -71,8 +71,6 @@ protocol ChatFileProtocol: Sendable {
     
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool
     
-    func cancelUpload(messageId: String, fileId: String) async
-    
     func isPreviewAutoDownloadAllowedByPolicy(
         hasPartnerName: Bool,
         isFromCurrentSender: Bool,

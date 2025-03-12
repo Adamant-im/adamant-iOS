@@ -130,7 +130,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
-    private var swipedIndex: IndexPath?
+    
     // MARK: Init
     
     init(
@@ -360,14 +360,13 @@ final class ChatListViewController: KeyboardObservingViewController {
     /// update specific rows in the tableView to refresh the dates.
     private func refreshDatesIfNeeded() {
         guard !isBusy,
-              var indexPaths = tableView.indexPathsForVisibleRows
+              let indexPaths = tableView.indexPathsForVisibleRows
         else {
             return
         }
         
         lastDatesUpdate = Date()
-        indexPaths.removeAll { $0 == swipedIndex }
-        tableView.reloadRowsAndPreserveSelection(at: indexPaths)
+        tableView.reloadRows(at: indexPaths, with: .none)
     }
     
     private func updateChats() {
@@ -1075,7 +1074,6 @@ extension ChatListViewController {
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        swipedIndex = indexPath
         guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
             return nil
         }
@@ -1097,7 +1095,6 @@ extension ChatListViewController {
         _ tableView: UITableView,
         leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        swipedIndex = indexPath
         guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
             return nil
         }
@@ -1109,12 +1106,7 @@ extension ChatListViewController {
         
         return UISwipeActionsConfiguration(actions: actions)
     }
-    func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
-        swipedIndex = nil
-        if let indexPath {
-            tableView.reloadRowsAndPreserveSelection(at: [indexPath])
-        }
-    }
+    
     private func blockChat(with address: String, for chatroom: Chatroom?) {
         Task {
             chatroom?.isHidden = true
@@ -1517,13 +1509,5 @@ private extension DataProviderState {
         case .updating: true
         case .failedToUpdate, .upToDate, .empty: false
         }
-    }
-}
-
-private extension UITableView {
-    func reloadRowsAndPreserveSelection(at indexPaths: [IndexPath]) {
-        let selectedRowIndexPath = indexPathForSelectedRow
-        reloadRows(at: indexPaths, with: .none)
-        selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
     }
 }
