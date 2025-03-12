@@ -917,6 +917,7 @@ extension ChatListViewController {
             }
         }
     }
+    
     private func messageId(transaction: ChatTransaction) -> String? {
         if let richTransaction = transaction as? RichMessageTransaction {
             return richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) ?? richTransaction.transactionId
@@ -924,6 +925,7 @@ extension ChatListViewController {
             return transaction.transactionId
         }
     }
+    
     @MainActor
     func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
         // MARK: 1. Create and config ViewController

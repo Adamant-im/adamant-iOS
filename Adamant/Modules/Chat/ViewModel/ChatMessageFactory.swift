@@ -542,6 +542,7 @@ private extension ChatMessageFactory {
             ]
         ))
     }
+    
     func checkTransactionForUnreadReaction(transaction: ChatTransaction) -> Bool {
         if let messageTransaction = transaction as? MessageTransaction,
            let richTransactions = messageTransaction.richMessageTransactions,

@@ -1176,6 +1176,7 @@ extension ChatViewController {
         viewModel.needToAnimateCellIndex = nil
     }
 }
+
 private let scrollToUnreadInset: CGFloat = 10
 private let scrollDownButtonInset: CGFloat = 10
 private let messagePadding: CGFloat = 12

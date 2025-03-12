@@ -418,6 +418,7 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
+    
     func markMessageAsRead(index: Int) {
         guard _messages.wrappedValue.indices.contains(index) else { return }
         guard let chatroom else { return }
@@ -427,6 +428,7 @@ final class ChatViewModel: NSObject {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
         }
     }
+    
     func hideMessage(id: String) {
         Task {
             await chatsProvider.removeMessage(with: id)
@@ -1688,6 +1690,7 @@ private extension ChatViewModel {
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
     }
+    
     func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
         let newUnreadIds = newUnreadIds ?? []
         let previousUnreadIds = scrolledMessageId ?? []
