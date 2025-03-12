@@ -16,7 +16,7 @@ final class NewMessagesCell: UICollectionReusableView {
     
     private let label: UILabel = {
         let label = UILabel()
-        label.text = "New Messages"
+        label.text = String.localized("chat.NewMessages")
         label.font = .boldSystemFont(ofSize: 14)
         label.textColor = .adamant.active
         label.textAlignment = .right

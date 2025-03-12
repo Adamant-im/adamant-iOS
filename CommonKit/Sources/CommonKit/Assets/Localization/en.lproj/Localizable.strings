@@ -758,6 +758,8 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+"chat.NewMessages" = "New Messages";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Store files encrypted";
 
