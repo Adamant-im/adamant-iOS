@@ -530,12 +530,12 @@ extension AdamantChatsProvider {
                         senderId: address,
                         privateKey: privateKey
                     )
-                    await self?.setupAsReadyToSyncChats()
                 }
             case .failure:
                 break
             }
         }
+        setupAsReadyToSyncChats()
     }
     
     func setupAsReadyToSyncChats() {
