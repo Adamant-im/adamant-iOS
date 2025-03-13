@@ -546,13 +546,21 @@ private extension ChatViewController {
     }
     
     func updateScrollToUnreadButtonPosition() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+        if messagesLoaded {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                if self.scrollDownButton.alpha == 0 {
+                    self.scrollToUnreadBottomConstraint?.update(offset: 0)
+                } else {
+                    self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
+                }
+                self.view.layoutIfNeeded()
+            }
+        } else {
             if self.scrollDownButton.alpha == 0 {
                 self.scrollToUnreadBottomConstraint?.update(offset: 0)
             } else {
                 self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
             }
-            self.view.layoutIfNeeded()
         }
     }
     
@@ -778,7 +786,13 @@ private extension ChatViewController {
     func updateScrollDownButtonVisibility() {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
         
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+        if messagesLoaded {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
+                self.updateScrollToUnreadButtonPosition()
+                self.scrollDownButton.updateCounter(topCount)
+            }
+        } else {
             self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
             self.updateScrollToUnreadButtonPosition()
             self.scrollDownButton.updateCounter(topCount)
@@ -787,8 +801,11 @@ private extension ChatViewController {
 
     func updateScrollToUnreadButtonVisibility() {
         let count = viewModel.messagesWithUnredReactionsIds?.count ?? 0
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+        if messagesLoaded {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1
+            }
+        } else {
             self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1
         }
         scrollToUnreadReactButton.updateCounter(count)
