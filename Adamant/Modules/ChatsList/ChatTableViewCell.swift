@@ -88,7 +88,6 @@ final class ChatTableViewCell: UITableViewCell {
             } else {
                 self.clockView.isHidden = true
                 self.lastMessageLeadingAnchor.constant = 10
-                self.layoutIfNeeded()
             }
         }
     }
