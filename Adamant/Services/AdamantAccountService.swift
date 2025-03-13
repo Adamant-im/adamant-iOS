@@ -408,10 +408,8 @@ extension AdamantAccountService {
         }
     }
     
-    func reloadWallets() {
-        Task {
-            _ = await initWallets()
-        }
+    func reloadWallets() async {
+        _ = await initWallets()
     }
     
     func initWallets() async -> [WalletAccount?] {

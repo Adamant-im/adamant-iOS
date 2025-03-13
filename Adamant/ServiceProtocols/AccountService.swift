@@ -171,7 +171,7 @@ protocol AccountService: AnyObject, Sendable {
     func logout()
     
     /// Reload current wallets state
-    func reloadWallets()
+    func reloadWallets() async
     
     // MARK: Stay in functions
     
