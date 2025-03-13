@@ -21,11 +21,17 @@ final class ChatTableViewCell: UITableViewCell {
     @IBOutlet weak var lastMessageLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var badgeView: UIView!
+    @IBOutlet weak var clockView: UIImageView!
+    @IBOutlet weak var lastMessageLeadingAnchor: NSLayoutConstraint!
     
     override func awakeFromNib() {
-        Task { @MainActor in badgeView.layer.cornerRadius = badgeView.bounds.height / 2 }
+        Task { @MainActor in
+            badgeView.layer.cornerRadius = badgeView.bounds.height / 2
+            clockView.contentMode = .scaleAspectFit
+            clockView.image = UIImage.asset(named: "status_pending")
+            clockView.tintColor = .adamant.secondary
+        }
     }
-    
     var avatarImage: UIImage? {
         get {
             return avatarImageView.image
@@ -69,6 +75,23 @@ final class ChatTableViewCell: UITableViewCell {
         }
         set {
             badgeView.backgroundColor = newValue
+        }
+    }
+    var isClockVisible: Bool {
+        get {
+            return !clockView.isHidden
+        }
+        set {
+            if newValue {
+                clockView.isHidden = false
+                lastMessageLeadingAnchor.constant = 27
+            } else {
+                UIView.animate(withDuration: 0.3) {
+                    self.clockView.isHidden = true
+                    self.lastMessageLeadingAnchor.constant = 10
+                    self.layoutIfNeeded()
+                }
+            }
         }
     }
 }

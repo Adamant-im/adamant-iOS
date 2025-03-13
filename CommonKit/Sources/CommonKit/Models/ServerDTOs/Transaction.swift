@@ -14,6 +14,7 @@ public struct Transaction: Sendable {
     public let blockId: String
     public let type: TransactionType
     public let timestamp: UInt64
+    public let timestampMs: UInt64
     public let senderPublicKey: String
     public let senderId: String
     public let requesterPublicKey: String?
@@ -37,6 +38,7 @@ extension Transaction: Codable {
         case blockId
         case type
         case timestamp
+        case timestampMs
         case senderPublicKey
         case senderId
         case requesterPublicKey
@@ -58,7 +60,6 @@ extension Transaction: Codable {
         self.height = (try? container.decode(Int64.self, forKey: .height)) ?? 0
         self.blockId = (try? container.decode(String.self, forKey: .blockId)) ?? ""
         self.type = try container.decode(TransactionType.self, forKey: .type)
-        self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
         self.senderId = try container.decode(String.self, forKey: .senderId)
         self.recipientId = (try? container.decode(String.self, forKey: .recipientId)) ?? ""
@@ -75,8 +76,11 @@ extension Transaction: Codable {
         
         let fee = try container.decode(Decimal.self, forKey: .fee)
         self.fee = fee.shiftedFromAdamant()
-
-        self.date = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(self.timestamp))
+        
+        let timestamp = try container.decode(UInt64.self, forKey: .timestamp)
+        self.timestamp = timestamp + UInt64(AdamantUtilities.magicAdamantTimeInterval)
+        self.timestampMs = (try? container.decodeIfPresent(UInt64.self, forKey: .timestampMs)) ?? self.timestamp * 1000
+        self.date = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -87,6 +91,7 @@ extension Transaction: Codable {
         try container.encode(blockId, forKey: .blockId) // String
         try container.encode(type, forKey: .type) // TransactionType
         try container.encode(timestamp, forKey: .timestamp) // UInt64
+        try container.encode(timestampMs, forKey: .timestampMs) // UInt64
         try container.encode(senderPublicKey, forKey: .senderPublicKey) // String
         try container.encode(senderId, forKey: .senderId) // String
         try container.encode(recipientId, forKey: .recipientId) // String?

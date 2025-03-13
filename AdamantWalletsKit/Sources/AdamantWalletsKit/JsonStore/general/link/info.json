@@ -1,0 +1,29 @@
+{
+  "name": "Chainlink",
+  "website": "https://chain.link",
+  "description": "Chainlink is a decentralized blockchain oracle network built on Ethereum",
+  "symbol": "LINK",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/chainlink"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/Chainlink"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/smartcontractkit"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://research.chain.link/whitepaper-v2.pdf"
+    }
+  ]
+}

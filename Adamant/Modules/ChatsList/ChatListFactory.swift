@@ -24,7 +24,8 @@ struct ChatListFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             addressBook: assembler.resolve(AddressBookService.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            chatPreservation: assembler.resolve(ChatPreservationProtocol.self)!
         )
     }
     

@@ -61,9 +61,8 @@ private extension AccountViewController.AccountWalletsViewModel {
             state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
-            let network = ERC20Token.supportedTokens.contains(where: { $0.symbol == coreService.tokenSymbol })
-            ? type(of: coreService).tokenNetworkSymbol
-            : ""
+            let network = type(of: coreService).tokenNetworkSymbol
+            
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,

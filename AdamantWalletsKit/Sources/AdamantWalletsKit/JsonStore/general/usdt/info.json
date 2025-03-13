@@ -1,0 +1,25 @@
+{
+  "name": "Tether",
+  "website": "https://tether.to",
+  "description": "Stablecoin pegged to the US Dollar",
+  "symbol": "USDT",
+  "type": "token",
+  "decimals": 6,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/Tether_to"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/Tether"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://assets.ctfassets.net/vyse88cgwfbl/5UWgHMvz071t2Cq5yTw5vi/c9798ea8db99311bf90ebe0810938b01/TetherWhitePaper.pdf"
+    }
+  ]
+}

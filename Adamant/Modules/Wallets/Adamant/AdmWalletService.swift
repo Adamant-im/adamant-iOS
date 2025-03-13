@@ -14,7 +14,8 @@ import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
+final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
+    static let currencySymbol = "ADM"
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -267,5 +268,11 @@ extension AdmWalletService: SwinjectDependentService {
             controller.delegate = self
             transfersController = controller
         }
+    }
+}
+
+extension AdmWalletService {
+    static var adamantTimestampCorrection: TimeInterval {
+        0.5
     }
 }

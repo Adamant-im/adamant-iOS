@@ -223,12 +223,13 @@ final class AccountViewController: FormViewController {
         
         walletsViewModel.$state
             .removeDuplicates()
+            .debounce(for: .nanoseconds(500_000_000), scheduler: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.setupWalletsVC()
-                self.pagingViewController.reloadData()
-                pagingViewController.select(index: currentWalletIndex)
+                self.pagingViewController.reloadMenu()
+                self.pagingViewController.select(index: currentWalletIndex, animated: false)
             }
             .store(in: &notificationsSet)
         
@@ -938,11 +939,8 @@ final class AccountViewController: FormViewController {
     }
     
     private func updatePagingItemHeight() {
-        if walletViewControllers.count > 0 {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
-        } else {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
-        }
+        let itemHeight: CGFloat = walletViewControllers.count > .zero ? 114 : .zero
+        pagingViewController.menuItemSize = .fixed(width: 110, height: itemHeight)
         
         updateHeaderSize(with: pagingViewController.menuItemSize.height, animated: true)
     }
@@ -1016,9 +1014,9 @@ final class AccountViewController: FormViewController {
             )
         }
         
-        refreshControl.endRefreshing()
-        DispatchQueue.background.async { [accountService] in
-            accountService.reloadWallets()
+        Task { @MainActor in
+            await accountService.reloadWallets()
+            refreshControl.endRefreshing()
         }
     }
 }

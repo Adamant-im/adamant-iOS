@@ -1,0 +1,130 @@
+{
+  "name": "Klayr",
+  "website": "https://klayr.xyz",
+  "description": "Blockchain application platform",
+  "explorer": "https://explorer.klayr.xyz",
+  "explorerTx": "https://explorer.klayr.xyz/transaction/${ID}",
+  "explorerAddress": "https://explorer.klayr.xyz/account/${ID}",
+  "regexAddress": "^kly[a-z2-9]{38}$",
+  "symbol": "KLY",
+  "type": "coin",
+  "decimals": 8,
+  "minBalance": 0.05,
+  "cryptoTransferDecimals": 8,
+  "defaultFee": 0.00164,
+  "qqPrefix": "klayr",
+  "status": "active",
+  "createCoin": true,
+  "defaultVisibility": true,
+  "defaultOrdinalLevel": 50,
+  "consensus": "dPoS",
+  "blockTimeFixed": 10000,
+  "txFetchInfo": {
+    "newPendingInterval": 3000,
+    "oldPendingInterval": 3000,
+    "registeredInterval": 5000,
+    "newPendingAttempts": 15,
+    "oldPendingAttempts": 4
+  },
+  "txConsistencyMaxTime": 60000,
+  "nodes": {
+    "displayName": "kly-node",
+    "list": [
+      {
+        "url": "https://klynode2.adamant.im",
+        "alt_ip": "http://109.176.199.130:44099"
+      },
+      {
+        "url": "https://klynode3.adm.im",
+        "alt_ip": "http://37.27.205.78:44099"
+      }
+    ],
+    "healthCheck": {
+      "normalUpdateInterval": 270000,
+      "crucialUpdateInterval": 30000,
+      "onScreenUpdateInterval": 10000,
+      "threshold": 5
+    }
+  },
+  "services": {
+    "klyService": {
+      "displayName": "kly-indexer",
+      "description": {
+        "software": "klayr-service",
+        "github": "https://github.com/KlayrHQ/klayr-service",
+        "docs": "https://klayr.xyz/documentation/klayr-service"
+      },
+      "list": [
+        {
+          "url": "https://klyservice2.adamant.im",
+          "alt_ip": "http://109.176.199.130:44098"
+        },
+        {
+          "url": "https://klyservice3.adm.im",
+          "alt_ip": "http://37.27.205.78:44098"
+        }
+      ],
+      "healthCheck": {
+        "normalUpdateInterval": 330000,
+        "crucialUpdateInterval": 30000,
+        "onScreenUpdateInterval": 10000
+      }
+    }
+  },
+  "links": [
+    {
+      "name": "github",
+      "url": "https://github.com/klayrHQ"
+    },
+    {
+      "name": "twitter",
+      "url": "https://x.com/KlayrHQ"
+    },
+    {
+      "name": "reddit",
+      "url": "https://reddit.com/r/klayr"
+    }
+  ],
+  "tor": {
+    "nodes": {
+      "displayName": "kly-node",
+      "list": [
+        {
+          "url": "http://5fr7uybpxecid5gikrm65hstsfhve2772keyqdvxirsiywlyo6zap6yd.onion"
+        },
+        {
+          "url": "http://5rmyjfvazkg5gcyo3gwvdinykvycsleeebumdm6zlj6dhf6gshpelfid.onion"
+        }
+      ],
+      "healthCheck": {
+        "normalUpdateInterval": 270000,
+        "crucialUpdateInterval": 30000,
+        "onScreenUpdateInterval": 10000,
+        "threshold": 5
+      }
+    },
+    "services": {
+      "klyService": {
+        "displayName": "kly-indexer",
+        "description": {
+          "software": "klayr-service",
+          "github": "https://github.com/KlayrHQ/klayr-service",
+          "docs": "https://klayr.xyz/documentation/klayr-service"
+        },
+        "list": [
+          {
+            "url": "http://3om4mobnbppxuexwufprp4cle4fivstooqqap6yoll5qk3kikesmqgad.onion"
+          },
+          {
+            "url": "http://xif2b7cchtn27aq2qypjc6p3phamrt4fdc3gbl5e6kk2fw3ypovre5id.onion"
+          }
+        ],
+        "healthCheck": {
+          "normalUpdateInterval": 330000,
+          "crucialUpdateInterval": 30000,
+          "onScreenUpdateInterval": 10000
+        }
+      }
+    }
+  }
+}

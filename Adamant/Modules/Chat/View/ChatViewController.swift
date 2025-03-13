@@ -38,15 +38,16 @@ final class ChatViewController: MessagesViewController {
     // MARK: Properties
     
     private var subscriptions = Set<AnyCancellable>()
-    private var topMessageId: String?
     private var bottomMessageId: String?
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
+    private var scrollToUnreadBottomConstraint: Constraint?
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
+    private lazy var scrollToUnreadReactButton = makeScrollToUnreadReactButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
@@ -153,6 +154,10 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if navigationController?.delegate !== self {
+            navigationController?.delegate = self
+        }
+        
         viewModel.updatePartnerName()
     }
     
@@ -172,6 +177,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        updateUnreadMessages()
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
@@ -200,7 +206,6 @@ final class ChatViewController: MessagesViewController {
             cell.isSelected = false
             viewModel.needToAnimateCellIndex = nil
         }
-        
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
@@ -215,13 +220,13 @@ final class ChatViewController: MessagesViewController {
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
+        updateUnreadMessages()
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
         
         if scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating {
             updateDateHeaderIfNeeded()
         }
-        
         guard
             viewAppeared,
             scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
@@ -313,7 +318,10 @@ private extension ChatViewController {
         
         viewModel.$messages
             .removeDuplicates()
-            .sink { [weak self] _ in self?.updateMessages() }
+            .sink { [weak self] _ in
+                self?.updateMessages()
+                self?.updateMessagesPosition()
+            }
             .store(in: &subscriptions)
         
         viewModel.$fullscreenLoading
@@ -400,13 +408,9 @@ private extension ChatViewController {
         
         viewModel.$scrollToMessage
             .sink { [weak self] in
-                guard let toId = $0,
-                      let fromId = $1
+                guard let toId = $0
                 else { return }
                 
-                if self?.isScrollPositionNearlyTheBottom != true {
-                    self?.viewModel.appendTempOffset(fromId, toId: toId)
-                }
                 self?.scrollToPosition(.messageId(toId), animated: true)
             }
             .store(in: &subscriptions)
@@ -427,10 +431,6 @@ private extension ChatViewController {
         viewModel.$dateHeaderHidden
             .removeDuplicates()
             .sink { [weak self] in self?.dateHeaderLabel.isHidden = $0 }
-            .store(in: &subscriptions)
-        
-        viewModel.updateChatRead
-            .sink { [weak self] in self?.checkIsChatWasRead() }
             .store(in: &subscriptions)
         
         viewModel.commitVibro
@@ -482,11 +482,33 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
+        viewModel.$unreadMesaggesIndexes
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateUnreadMessages()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$unreadMessagesIds
+            .removeDuplicates()
+            .sink { _ in
+                self.updateScrollDownButtonVisibility()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$messagesWithUnredReactionsIds
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateScrollToUnreadButtonVisibility()
+            }
+            .store(in: &subscriptions)
+        
         viewModel.showBuyAndSell
-                    .sink { [weak self] in
-                        self?.presentBuyAndSell()
-                    }
-                    .store(in: &subscriptions)
+            .sink { [weak self] in
+                self?.presentBuyAndSell()
+            }
+            .store(in: &subscriptions)
     }
 }
 
@@ -504,16 +526,42 @@ private extension ChatViewController {
     }
     
     func configureLayout() {
+        view.addSubview(scrollToUnreadReactButton)
         view.addSubview(scrollDownButton)
-        scrollDownButton.snp.makeConstraints { [unowned inputBar] in
+        scrollDownButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
             $0.bottom.equalTo(inputBar.snp.top).offset(-scrollDownButtonInset)
-            $0.size.equalTo(30)
+            $0.size.equalTo(scrollButtonHeight)
+        }
+        scrollToUnreadReactButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
+            self.scrollToUnreadBottomConstraint = $0.bottom.equalTo(scrollDownButton.snp.bottom).constraint
+            $0.size.equalTo(scrollButtonHeight)
         }
         
         view.addSubview(loadingView)
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
+        }
+    }
+    
+    func updateScrollToUnreadButtonPosition() {
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            if self.scrollDownButton.alpha == 0 {
+                self.scrollToUnreadBottomConstraint?.update(offset: 0)
+            } else {
+                self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
+            }
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    func updateUnreadMessages() {
+        guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        
+        for indexPath in visibleIndexPaths where unreadIndexes.contains(indexPath.section) {
+            viewModel.markMessageAsRead(index: indexPath.section)
         }
     }
     
@@ -699,18 +747,22 @@ private extension ChatViewController {
         isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
         
         guard oldValue != isScrollPositionNearlyTheBottom else { return }
-        checkIsChatWasRead()
     }
     
     func updateMessages() {
-        defer { checkIsChatWasRead() }
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
-        
+    }
+    
+    func updateMessagesPosition() {
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        viewModel.startPosition.map { scrollToPosition($0) }
         messagesLoaded = true
+        if let position = viewModel.startPosition {
+            scrollToPosition(position)
+        } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
+            scrollToPosition(.messageId(unreadMessage), animated: false)
+        }
     }
     
     func updateFullscreenLoadingView() {
@@ -724,7 +776,22 @@ private extension ChatViewController {
     }
     
     func updateScrollDownButtonVisibility() {
-        scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
+        let topCount = viewModel.unreadMessagesIds?.count ?? 0
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
+            self.updateScrollToUnreadButtonPosition()
+            self.scrollDownButton.updateCounter(topCount)
+        }
+    }
+
+    func updateScrollToUnreadButtonVisibility() {
+        let count = viewModel.messagesWithUnredReactionsIds?.count ?? 0
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1
+        }
+        scrollToUnreadReactButton.updateCounter(count)
     }
     
     func updateDateHeaderIfNeeded() {
@@ -755,17 +822,24 @@ private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollButton {
         let button = ChatScrollButton(position: .down)
         button.action = { [weak self] in
-            guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
-            else {
-                self?.viewModel.animateScrollIfNeeded(
-                    to: self?.viewModel.messages.count ?? 0,
-                    visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section
-                )
-                
-                self?.messagesCollectionView.scrollToBottom(animated: true)
-                return
+            guard let self else { return }
+            if viewModel.shouldScrollToBottom {
+                self.messagesCollectionView.scrollToBottom(animated: true)
+            } else if let id = viewModel.unreadMessagesIds?.first {
+                viewModel.scroll(to: id)
+                viewModel.shouldScrollToBottom = true
             }
-            self?.scrollToPosition(.messageId(id), animated: true)
+        }
+        return button
+    }
+    
+    func makeScrollToUnreadReactButton() -> ChatScrollButton {
+        let button = ChatScrollButton(position: .reaction)
+        button.action = { [weak self] in
+            guard let self,
+                  let unreadId = self.viewModel.messagesWithUnredReactionsIds?.last else { return }
+            
+            viewModel.scroll(to: unreadId)
         }
         
         return button
@@ -820,11 +894,6 @@ private extension ChatViewController {
         navigationController?.pushViewController(detailsViewController, animated: true)
     }
     
-    func checkIsChatWasRead() {
-        guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
-        viewModel.entireChatWasRead()
-    }
-    
     @MainActor
     func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
@@ -837,7 +906,7 @@ private extension ChatViewController {
             var needToAnimateCell = true
             
             if scrollToBottomIfNotFound,
-               index == nil {
+                index == nil {
                 index = viewModel.messages.count - 1
                 needToAnimateCell = false
             }
@@ -846,7 +915,7 @@ private extension ChatViewController {
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
-                at: [.centeredVertically, .centeredHorizontally],
+                at: .top,
                 animated: animated
             )
             
@@ -1036,7 +1105,7 @@ private extension ChatViewController {
             in: messagesCollectionView
         )
     }
-    
+
     func animateScroll(isStarted: Bool) {
         UIView.animate(withDuration: 0.1) {
             self.messagesCollectionView.alpha = isStarted ? 0.2 : 1.0
@@ -1118,7 +1187,9 @@ extension ChatViewController {
     }
 }
 
-private let scrollDownButtonInset: CGFloat = 20
+private let scrollToUnreadInset: CGFloat = 10
+private let scrollDownButtonInset: CGFloat = 10
 private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
+private let scrollButtonHeight: CGFloat = 38

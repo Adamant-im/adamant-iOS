@@ -117,19 +117,6 @@ private extension AdamantRichTransactionReactService {
         )
         
         self.reactions[id] = reactions
-        
-        let baseTransaction = getTransactionFromDB(id: id)
-        
-        switch baseTransaction {
-        case let trs as MessageTransaction:
-            update(transaction: trs)
-        case let trs as TransferTransaction:
-            update(transaction: trs)
-        case let trs as RichMessageTransaction:
-            update(transaction: trs)
-        default:
-            break
-        }
     }
     
     func update(transaction: RichMessageTransaction) {

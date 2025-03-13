@@ -35,7 +35,7 @@ struct BTCRawTransaction {
             transactionStatus = confirmations > 0 ? .success : .pending
         } else {
             confirmationsValue = nil
-            transactionStatus = .notInitiated
+            transactionStatus = .registered
         }
         
         // Transfers

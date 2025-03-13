@@ -1,0 +1,29 @@
+{
+  "name": "Holo",
+  "website": "https://holo.host",
+  "description": "Holo is a peer-to-peer platform for distributed applications based on a cloud storage infrastructure",
+  "symbol": "HOT",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/H_O_L_O_"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/holochain"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/Holo-Host"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://holo.host/whitepapers"
+    }
+  ]
+}

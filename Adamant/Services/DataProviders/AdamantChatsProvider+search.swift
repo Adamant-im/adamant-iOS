@@ -27,8 +27,7 @@ extension AdamantChatsProvider {
                 NSPredicate(format: "isHidden == false")])
         }
         
-        request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         
         do {
             let results = try stack.container.viewContext.fetch(request)
@@ -55,8 +54,7 @@ extension AdamantChatsProvider {
             NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash)
         ])
         
-        request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         
         do {
             let results = try stack.container.viewContext.fetch(request)

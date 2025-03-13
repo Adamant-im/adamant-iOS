@@ -57,6 +57,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private let addressBook: AddressBookService
     private let avatarService: AvatarService
     private let walletServiceCompose: WalletServiceCompose
+    private let chatPreservation: ChatPreservationProtocol
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -70,6 +71,11 @@ final class ChatListViewController: KeyboardObservingViewController {
     var searchController: UISearchController?
     
     private var transactionsRequiringBalanceUpdate: [String] = []
+    private var chatsManuallyMarkedAsUnread: Set<Int> = Set() {
+        didSet {
+            setBadgeValue(unreadController?.fetchedObjects?.count)
+        }
+    }
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
@@ -142,7 +148,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         dialogService: DialogService,
         addressBook: AddressBookService,
         avatarService: AvatarService,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        chatPreservation: ChatPreservationProtocol
     ) {
         self.accountService = accountService
         self.chatsProvider = chatsProvider
@@ -153,6 +160,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         self.addressBook = addressBook
         self.avatarService = avatarService
         self.walletServiceCompose = walletServiceCompose
+        self.chatPreservation = chatPreservation
         
         super.init(nibName: "ChatListViewController", bundle: nil)
     }
@@ -193,7 +201,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
     }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -286,6 +293,7 @@ final class ChatListViewController: KeyboardObservingViewController {
             .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: nil)
                 self?.areMessagesLoaded = false
+                self?.chatsManuallyMarkedAsUnread = Set()
             }
             .store(in: &subscriptions)
         
@@ -331,6 +339,12 @@ final class ChatListViewController: KeyboardObservingViewController {
                 .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
                 .store(in: &subscriptions)
         }
+        chatPreservation.updateNotifier
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.tableView.reloadData()
+            }
+            .store(in: &subscriptions)
     }
     
     private func closeDetailVC() {
@@ -563,6 +577,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if let chatroom = chatsController?.fetchedObjects?[safe: nIndexPath.row] {
             let vc = chatViewController(for: chatroom)
             vc.hidesBottomBarWhenPushed = true
+            chatsManuallyMarkedAsUnread.remove(indexPath.row)
             
             if let split = self.splitViewController {
                 let chat = UINavigationController(rootViewController:vc)
@@ -682,10 +697,15 @@ extension ChatListViewController {
         
         cell.accountLabel.text = chatroom.getName(addressBookService: addressBook)
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
-
-        if let lastTransaction = chatroom.lastTransaction {
-            cell.hasUnreadMessages = lastTransaction.isUnread
+        if let address = chatroom.partner?.address,
+           let preservedMessage = shortDescription(for: address) {
+            cell.hasUnreadMessages = chatroom.hasUnreadMessages
+            cell.lastMessageLabel.attributedText = preservedMessage
+            cell.isClockVisible = false
+        } else if let lastTransaction = chatroom.lastTransaction {
+            cell.hasUnreadMessages = chatroom.hasUnreadMessages
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
+            cell.isClockVisible = lastTransaction.statusEnum == .pending
         } else {
             cell.lastMessageLabel.text = nil
         }
@@ -906,15 +926,23 @@ extension ChatListViewController {
                 message: text?.string,
                 image: image
             ) { [weak self] in
-                self?.presentChatroom(chatroom)
+                self?.presentChatroom(chatroom, with: self?.messageId(transaction: transaction))
             }
         }
     }
     
+    private func messageId(transaction: ChatTransaction) -> String? {
+        if let richTransaction = transaction as? RichMessageTransaction {
+            return richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) ?? richTransaction.transactionId
+        } else {
+            return transaction.transactionId
+        }
+    }
+    
     @MainActor
-    func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
+    func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
         // MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom, with: message?.transactionId)
+        let vc = chatViewController(for: chatroom, with: message)
         
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
@@ -1035,7 +1063,53 @@ extension ChatListViewController {
             return nil
         }
     }
-    
+    private func shortDescription(for address: String) -> NSAttributedString? {
+        var descriptionParts: [NSAttributedString] = []
+
+        if chatPreservation.getReplyMessage(address: address, thenRemoveIt: false) != nil {
+                let replyImageAttachment = NSTextAttachment()
+                replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
+                replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
+
+                descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
+            }
+        if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
+                let mediaCount = files.count(where: { $0.type.isMedia })
+                let otherCount = files.count(where: { !$0.type.isMedia })
+
+                let fileParts = [
+                    mediaCount > 0 ? "📸" + (mediaCount >= 2 ? "\(mediaCount)" : "") : nil,
+                    otherCount > 0 ? "📄" + (otherCount >= 2 ? "\(otherCount)" : "") : nil
+                ].compactMap { $0 }
+
+                if !fileParts.isEmpty {
+                    let parsedFileParts = fileParts
+                        .map { markdownParser.parse($0).resolveLinkColor() }
+                        .reduce(NSMutableAttributedString()) { result, part in
+                            if !result.string.isEmpty { result.append(NSAttributedString(string: " ")) }
+                            result.append(part)
+                            return result
+                        }
+                    descriptionParts.append(parsedFileParts)
+                }
+            }
+
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address, thenRemoveIt: false) {
+            let processedMessage = MessageProcessHelper.process(preservedMessage)
+            descriptionParts.append(NSAttributedString(string: processedMessage))
+        }
+        guard descriptionParts.contains(where: { !$0.string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty }) else {
+            return nil
+        }
+
+        let result = NSMutableAttributedString(string: "✏️: ")
+        for (index, part) in descriptionParts.enumerated() {
+            if index > 0 { result.append(NSAttributedString(string: " ")) }
+            result.append(part)
+        }
+
+        return result
+    }
     private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {
         let prefix = isOutgoing
         ? "\(String.adamant.chatList.sentMessagePrefix)"
@@ -1104,7 +1178,7 @@ extension ChatListViewController {
         
         var actions: [UIContextualAction] = []
       
-        let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
+        let markAsRead = makeMarkAsReadContextualAction(for: chatroom, index: indexPath.row)
         actions.append(markAsRead)
         
         return UISwipeActionsConfiguration(actions: actions)
@@ -1162,15 +1236,17 @@ extension ChatListViewController {
         return block
     }
     
-    private func makeMarkAsReadContextualAction(for chatroom: Chatroom) -> UIContextualAction {
+    private func makeMarkAsReadContextualAction(for chatroom: Chatroom, index: Int) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
             title: "👀"
         ) { (_, _, completionHandler) in
-            if chatroom.hasUnread {
+            if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
+                self.chatsManuallyMarkedAsUnread.remove(index)
             } else {
                 chatroom.markAsUnread()
+                self.chatsManuallyMarkedAsUnread.insert(index)
             }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
@@ -1342,9 +1418,11 @@ extension ChatListViewController {
             item = tabBarItem
         }
         
-        if let value = value, value > 0 {
-            item.badgeValue = String(value)
-            notificationsService.setBadge(number: value)
+        let adjustedValue = (value ?? 0) + chatsManuallyMarkedAsUnread.count
+
+        if adjustedValue > 0 {
+            item.badgeValue = String(adjustedValue)
+            notificationsService.setBadge(number: adjustedValue)
         } else {
             item.badgeValue = nil
             notificationsService.setBadge(number: nil)
@@ -1469,7 +1547,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
             
-            presenter.presentChatroom(chatroom, with: message)
+            presenter.presentChatroom(chatroom, with: message.transactionId)
         }
     }
     
@@ -1510,15 +1588,6 @@ extension ChatListViewController {
         ]
         commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         return commands
-    }
-}
-
-private extension DataProviderState {
-    var isUpdating: Bool {
-        switch self {
-        case .updating: true
-        case .failedToUpdate, .upToDate, .empty: false
-        }
     }
 }
 

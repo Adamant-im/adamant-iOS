@@ -14,6 +14,13 @@ enum DataProviderState {
     case updating
     case upToDate
     case failedToUpdate(Error)
+    
+    var isUpdating: Bool {
+        switch self {
+        case .updating: true
+        case .failedToUpdate, .upToDate, .empty: false
+        }
+    }
 }
 
 protocol DataProvider: AnyObject, Actor {

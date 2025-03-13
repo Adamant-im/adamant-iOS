@@ -302,6 +302,7 @@ struct AppAssembly: MainThreadAssembly {
                 securedStore: r.resolve(SecuredStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
                 currencyInfoService: r.resolve(InfoServiceProtocol.self)!,
+                coreDataStack: r.resolve(CoreDataStack.self)!,
                 connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
@@ -491,6 +492,10 @@ struct AppAssembly: MainThreadAssembly {
             EthBIP32Service(ethApiService: r.resolve(ERC20ApiService.self)!)
         }.inObjectScope(.container)
         
+        container.register(CoreDataRealationMapperProtocol.self) { r in
+            CoreDataRealationMapper(stack: r.resolve(CoreDataStack.self)!)
+        }.inObjectScope(.container)
+
         // MARK: SecretWalletsViewModel
         container.register(SecretWalletsViewModel.self) { r in
             SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
