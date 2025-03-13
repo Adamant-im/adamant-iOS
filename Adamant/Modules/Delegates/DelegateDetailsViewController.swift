@@ -193,7 +193,8 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            dialogService.presentShareAlertFor(string: value,
+            dialogService.presentShareAlertFor(title: nil,
+                                               string: value,
                                                types: [.copyToPasteboard, .share],
                                                excludedActivityTypes: nil,
                                                animated: true, from: cell,

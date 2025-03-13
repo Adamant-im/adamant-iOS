@@ -1374,3 +1374,11 @@
 "SecretWallets.Menu.TellMeMore" = "О кошельках";
 "SecretWallets.Menu.Title" = "Активные кошельки";
 "SecretWallets.Row.Title" = "Секретные кошельки";
+
+/* Secret Wallets Coins name*/
+"SecretWallets.Bitcoin.Secret" = "Секретный Bitcoin кошелек";
+"SecretWallets.Doge.Secret" = "Секретный Doge кошелек";
+"SecretWallets.erc20_wallet.Secret" = "Секретный %@ кошелек";
+"SecretWallets.Dash.Secret" = "Секретный Dash кошелек";
+"SecretWallets.Ethereum.Secret" = "Секретный Ethereum кошелек";
+"SecretWallets.kly.Secret" = "Секретный KLY кошелек";

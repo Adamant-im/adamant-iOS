@@ -63,6 +63,7 @@ final class PKGeneratorViewModel: ObservableObject {
     
     func onTap(key: String) {
         dialogService.presentShareAlertFor(
+            title: nil,
             string: key,
             types: [
                 .copyToPasteboard,

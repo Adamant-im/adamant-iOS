@@ -15,10 +15,10 @@ final class SecretWalletsAlertMenuView {
     
     init(
         dialogService: DialogService,
-        secretWalletsManager: SecretWalletsManagerProtocol
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.dialogService = dialogService
-        self.secretWalletsViewModel = .init(secretWalletsManager: secretWalletsManager)
+        self.secretWalletsViewModel = secretWalletsViewModel
     }
     
     func presentSecretWalletsActionSheet(from sourceView: UIView) {
@@ -27,7 +27,7 @@ final class SecretWalletsAlertMenuView {
         
         for (index, wallet) in state.wallets.enumerated() {
             let isSelected = index == state.currentActiveIndex
-            var walletName = isSelected ? "[ " + wallet.name + " ]" : wallet.name
+            let walletName = isSelected ? "[ " + wallet.name + " ]" : wallet.name
             
             let action = AdamantAlertAction(
                 title: walletName,

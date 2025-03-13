@@ -1262,7 +1262,7 @@ extension TransferViewControllerBase {
             return
         }
 
-        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
+        dialogService.presentShareAlertFor(title: nil, string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
             guard let tableView = self?.tableView else { return }
             
             if let indexPath = tableView.indexPathForSelectedRow {

@@ -83,8 +83,8 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Secret Wallets
-        container.register(SecretWalletsFactory.self) { r in
-            SecretWalletsFactory(
+        container.register(AdamantSecretWalletsManager.SecretWalletsFactory.self) { r in
+            AdamantSecretWalletsManager.SecretWalletsFactory(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
@@ -95,7 +95,7 @@ struct AppAssembly: MainThreadAssembly {
         container.register(SecretWalletsManagerProtocol.self) { r in
             AdamantSecretWalletsManager(
                 walletsStoreService: r.resolve(WalletStoreServiceProtocol.self)!,
-                secretWalletsFactory: r.resolve(SecretWalletsFactory.self)!
+                secretWalletsFactory: r.resolve(AdamantSecretWalletsManager.SecretWalletsFactory.self)!
             )
         }.inObjectScope(.container)
         
@@ -410,7 +410,7 @@ struct AppAssembly: MainThreadAssembly {
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
-                accountService: r.resolve(AccountService.self)!, 
+                accountService: r.resolve(AccountService.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
@@ -491,11 +491,16 @@ struct AppAssembly: MainThreadAssembly {
             EthBIP32Service(ethApiService: r.resolve(ERC20ApiService.self)!)
         }.inObjectScope(.container)
         
+        // MARK: SecretWalletsViewModel
+        container.register(SecretWalletsViewModel.self) { r in
+            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: SecretWalletsAlertService
         container.register(SecretWalletsAlertMenuView.self) { r in
             SecretWalletsAlertMenuView(
                 dialogService: r.resolve(DialogService.self)!,
-                secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
+                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
             )
         }.inObjectScope(.transient)
     }

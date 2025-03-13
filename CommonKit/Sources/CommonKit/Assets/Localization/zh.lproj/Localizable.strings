@@ -1364,3 +1364,11 @@
 "SecretWallets.Menu.TellMeMore" = "关于钱包";
 "SecretWallets.Menu.Title" = "活动钱包";
 "SecretWallets.Row.Title" = "秘密钱包";
+
+/* Secret Wallets Coins name*/
+"SecretWallets.Bitcoin.Secret" = "比特币秘密钱包";
+"SecretWallets.Doge.Secret" = "狗狗币秘密钱包";
+"SecretWallets.erc20_wallet.Secret" = "秘密 %@ 钱包";
+"SecretWallets.Dash.Secret" = "达世币秘密钱包";
+"SecretWallets.Ethereum.Secret" = "以太坊秘密钱包";
+"SecretWallets.kly.Secret" = "KLY 秘密钱包";

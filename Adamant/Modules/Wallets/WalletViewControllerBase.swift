@@ -54,6 +54,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     let dialogService: DialogService
     let screensFactory: ScreensFactory
+    let secretWalletsViewModel: SecretWalletsViewModel
     var service: WalletService?
 
     // MARK: - Properties, WalletViewController
@@ -89,6 +90,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         accountService: AccountService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
+        secretWalletsViewModel: SecretWalletsViewModel,
         service: WalletService?
     ) {
         self.dialogService = dialogService
@@ -96,6 +98,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         self.accountService = accountService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
+        self.secretWalletsViewModel = secretWalletsViewModel
         self.service = service
         super.init(nibName: "WalletViewControllerBase", bundle: nil)
     }
@@ -310,6 +313,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 }
                 
                 self?.dialogService.presentShareAlertFor(
+                    title: self?.makeTitle(),
                     string: address,
                     types: types,
                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -322,6 +326,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return addressRow
     }
     
+    func makeTitle() -> String { fatalError("Should be overriden") }
     func setTitle() { }
     
     // MARK: - Other

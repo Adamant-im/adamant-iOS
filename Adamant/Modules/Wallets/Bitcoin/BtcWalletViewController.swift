@@ -14,6 +14,10 @@ extension String.adamant {
         String.localized("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
     }
     
+    static var secretBitcoin: String {
+        String.localized("SecretWallets.Bitcoin.Secret", comment: "Secret wallets: Bitcoin")
+    }
+    
     static var sendBtc: String {
         String.localized("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
     }
@@ -30,6 +34,15 @@ final class BtcWalletViewController: WalletViewControllerBase {
     }
     
     override func setTitle() {
-        walletTitleLabel.text = String.adamant.bitcoin
+        walletTitleLabel.text = makeTitle()
+    }
+    
+    override func makeTitle() -> String {
+        let index = secretWalletsViewModel.state.currentActiveIndex
+        if index <= 0 {
+            return String.adamant.bitcoin
+        } else {
+            return String.adamant.secretBitcoin + " \(index)"
+        }
     }
 }

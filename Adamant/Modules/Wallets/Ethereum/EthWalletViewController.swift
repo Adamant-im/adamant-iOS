@@ -14,6 +14,10 @@ extension String.adamant.wallets {
         String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
     }
     
+    static var secretEthereum: String {
+        String.localized("SecretWallets.Ethereum.Secret", comment: "Account tab: Ethereum wallet")
+    }
+    
     static var sendEth: String {
         String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
     }
@@ -29,6 +33,15 @@ final class EthWalletViewController: WalletViewControllerBase {
     }
     
     override func setTitle() {
-        walletTitleLabel.text = String.adamant.wallets.ethereum
+        walletTitleLabel.text = makeTitle()
+    }
+    
+    override func makeTitle() -> String {
+        let index = secretWalletsViewModel.state.currentActiveIndex
+        if index <= 0 {
+           return String.adamant.wallets.ethereum
+        } else {
+            return String.adamant.wallets.secretEthereum + " \(index)"
+        }
     }
 }

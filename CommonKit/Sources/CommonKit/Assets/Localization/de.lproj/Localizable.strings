@@ -1397,3 +1397,11 @@
 "SecretWallets.Menu.TellMeMore" = "Über Wallets";
 "SecretWallets.Menu.Title" = "Aktive Wallets";
 "SecretWallets.Row.Title" = "Geheime Geldbörsen";
+
+/* Secret Wallets Coins name*/
+"SecretWallets.Bitcoin.Secret" = "Geheime Bitcoin-Wallet";
+"SecretWallets.Doge.Secret" = "Geheime Doge-Wallet";
+"SecretWallets.erc20_wallet.Secret" = "Geheime %@-Wallet";
+"SecretWallets.Dash.Secret" = "Geheime Dash-Wallet";
+"SecretWallets.Ethereum.Secret" = "Geheime Ethereum-Wallet";
+"SecretWallets.kly.Secret" = "Geheime KLY-Wallet";

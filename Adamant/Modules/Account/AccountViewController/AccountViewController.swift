@@ -48,7 +48,8 @@ final class AccountViewController: FormViewController {
     private let secretWalletsManager: SecretWalletsManagerProtocol
     private lazy var walletsViewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
     private let secretWalletsAlertService: SecretWalletsAlertMenuView
-
+    private let secretWalletsViewModel: SecretWalletsViewModel
+    
     let accountService: AccountService
     let dialogService: DialogService
     let localAuth: LocalAuthentication
@@ -62,7 +63,7 @@ final class AccountViewController: FormViewController {
     private var pagingViewController: PagingViewController!
     
     private var notificationsSet: Set<AnyCancellable> = []
-        
+    
     // MARK: StayIn
     
     var showLoggedInOptions: Bool {
@@ -115,7 +116,8 @@ final class AccountViewController: FormViewController {
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol,
         secretWalletsManager: SecretWalletsManagerProtocol,
-        secretWalletsAlertService: SecretWalletsAlertMenuView
+        secretWalletsAlertService: SecretWalletsAlertMenuView,
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.walletStoreServiceProvider = walletStoreServiceProvider
         self.accountService = accountService
@@ -130,6 +132,7 @@ final class AccountViewController: FormViewController {
         self.apiServiceCompose = apiServiceCompose
         self.secretWalletsManager = secretWalletsManager
         self.secretWalletsAlertService = secretWalletsAlertService
+        self.secretWalletsViewModel = secretWalletsViewModel
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -173,6 +176,16 @@ final class AccountViewController: FormViewController {
         
         accountHeaderView = header
         accountHeaderView.delegate = self
+        
+        secretWalletsViewModel.$state
+            .map{ $0.currentActiveIndex }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] index in
+                guard index >= 0 else { return }
+                self?.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
+            }
+            .store(in: &notificationsSet)
         
         updateAccountInfo()
         
@@ -271,7 +284,7 @@ final class AccountViewController: FormViewController {
         
         // Добавление строки в секцию
         appSection.append(secretWalletsRow)
-
+        
         // Node list
         let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized
@@ -739,7 +752,7 @@ final class AccountViewController: FormViewController {
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
-
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -891,7 +904,7 @@ final class AccountViewController: FormViewController {
     private func updateUI() {
         let appSection = form.sectionBy(tag: Sections.application.tag)
         appSection?.header?.title = Sections.application.localized
-
+        
         let walletSection = form.sectionBy(tag: Sections.wallet.tag)
         walletSection?.header?.title = Sections.wallet.localized
         
@@ -968,10 +981,10 @@ final class AccountViewController: FormViewController {
     func layoutTableHeaderView() {
         guard let view = tableView.tableHeaderView else { return }
         var frame = view.frame
-
+        
         frame.size.height = 300
         view.frame = frame
-
+        
         self.tableView.tableHeaderView = view
     }
     
@@ -1022,17 +1035,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
         }
         
         let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-        dialogService.presentShareAlertFor(stringForPasteboard: address,
-                                           stringForShare: encodedAddress,
-                                           stringForQR: encodedAddress,
-                                           types: [.copyToPasteboard,
-                                                   .share,
-                                                   .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
-                                                  ],
-                                           excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                           animated: true,
-                                           from: from,
-                                           completion: nil)
+        dialogService.presentShareAlertFor(title: nil, stringForPasteboard: address, stringForShare: encodedAddress, stringForQR: encodedAddress, types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)], excludedActivityTypes: ShareContentType.address.excludedActivityTypes, animated: true, from: from, completion: nil)
     }
 }
 
@@ -1078,7 +1081,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             walletViewControllers[index].viewController
         }
     }
-
+    
     nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         MainActor.assertIsolated()
         
@@ -1101,7 +1104,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
                   first.height != second.height else {
                 return
             }
-
+            
             updateHeaderSize(with: second, animated: true)
         }
     }

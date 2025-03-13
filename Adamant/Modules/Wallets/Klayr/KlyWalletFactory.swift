@@ -24,6 +24,7 @@ struct KlyWalletFactory: WalletFactory {
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!,
             service: service
         )
     }

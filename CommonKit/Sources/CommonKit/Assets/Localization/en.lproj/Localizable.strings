@@ -1373,3 +1373,11 @@
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.Title" = "Active wallets";
 "SecretWallets.Row.Title" = "Secret wallets";
+
+/* Secret Wallets Coins name*/
+"SecretWallets.Bitcoin.Secret" = "Secret Bitcoin Wallet";
+"SecretWallets.Doge.Secret" = "Secret Doge Wallet";
+"SecretWallets.erc20_wallet.Secret" = "Secret %@ Wallet";
+"SecretWallets.Dash.Secret" = "Secret Dash Wallet";
+"SecretWallets.Ethereum.Secret" = "Secret Ethereum Wallet";
+"SecretWallets.kly.Secret" = "Secret KLY Wallet";

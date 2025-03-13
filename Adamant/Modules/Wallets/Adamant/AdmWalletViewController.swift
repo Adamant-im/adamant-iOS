@@ -246,6 +246,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
                let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
                 self?.dialogService.presentShareAlertFor(
+                    title: self?.makeTitle(),
                     stringForPasteboard: address,
                     stringForShare: encodedAddress,
                     stringForQR: encodedAddress,
@@ -268,7 +269,11 @@ final class AdmWalletViewController: WalletViewControllerBase {
     }
     
     override func setTitle() {
-        walletTitleLabel.text = String.adamant.wallets.adamant
+        walletTitleLabel.text = makeTitle()
+    }
+    
+    override func makeTitle() -> String {
+        String.adamant.wallets.adamant
     }
     
     func updateRows() {

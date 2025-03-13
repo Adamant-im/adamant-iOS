@@ -308,10 +308,10 @@ extension AdamantDialogService {
         present(alert, animated: animated, completion: completion)
     }
     
-    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+    func presentShareAlertFor(title: String? = nil, string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
         
-        let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        let alert = createShareAlertFor(title: title, stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
@@ -326,16 +326,17 @@ extension AdamantDialogService {
         present(alert, animated: animated, completion: completion)
     }
     
-    func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+    func presentShareAlertFor(title: String?, stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
         
-        let alert = createShareAlertFor(stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        let alert = createShareAlertFor(title: title, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
     private func createShareAlertFor(
+        title: String? = nil,
         stringForPasteboard: String,
         stringForShare: String,
         stringForQR: String,
@@ -347,7 +348,7 @@ extension AdamantDialogService {
         didSelect: ((ShareType) -> Void)? = nil
     ) -> UIAlertController {
         let alert = UIAlertController(
-            title: nil,
+            title: title,
             message: nil,
             preferredStyleSafe: .actionSheet,
             source: from

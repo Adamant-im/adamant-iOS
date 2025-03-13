@@ -14,6 +14,10 @@ extension String.adamant {
         String.localized("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
     }
     
+    static var secretDoge: String {
+        String.localized("SecretWallets.Doge.Secret", comment: "Secret wallets: Doge")
+    }
+    
     static var sendDoge: String {
         String.localized("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
     }
@@ -29,6 +33,15 @@ final class DogeWalletViewController: WalletViewControllerBase {
     }
     
     override func setTitle() {
-        walletTitleLabel.text = String.adamant.doge
+        walletTitleLabel.text = makeTitle()
+    }
+    
+    override func makeTitle() -> String {
+        let index = secretWalletsViewModel.state.currentActiveIndex
+        if index <= 0 {
+            return String.adamant.doge
+        } else {
+            return String.adamant.secretDoge + " \(index)"
+        }
     }
 }

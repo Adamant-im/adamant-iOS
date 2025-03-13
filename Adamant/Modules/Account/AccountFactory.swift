@@ -28,7 +28,8 @@ struct AccountFactory {
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
             secretWalletsManager: assembler.resolve(SecretWalletsManagerProtocol.self)!,
-            secretWalletsAlertService: assembler.resolve(SecretWalletsAlertMenuView.self)!
+            secretWalletsAlertService: assembler.resolve(SecretWalletsAlertMenuView.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 }

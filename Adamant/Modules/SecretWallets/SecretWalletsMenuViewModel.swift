@@ -9,18 +9,42 @@
 import CommonKit
 import Combine
 
-//TODO: Consider logout
+extension String.adamant {
+    enum AddSecretWallet {
+        static var title: String {
+            .localized(
+                "SecretWallets.AddSecretWallet.Title",
+                comment: "Secret wallet: add secret wallet title"
+            )
+        }
+        static var description: String {
+            .localized(
+                "SecretWallets.AddSecretWallet.Description",
+                comment: "Secret wallet: add secret wallet description"
+            )
+        }
+        static var passwordPlaceholder: String {
+            .localized(
+                "SecretWallets.AddSecretWallet.PasswordPlaceholder",
+                comment: "Secret wallet: add secret wallet description"
+            )
+        }
+    }
+}
+
 @MainActor
-final class SecretWalletsViewModel: ObservableObject {
-    @Published private(set) var state: SecretWalletsState = .default
+final class SecretWalletsMenuViewModel: ObservableObject {
+    @Published private(set) var state: SecretWalletsMenuState = .default
     
     private let secretWalletsManager: SecretWalletsManagerProtocol
     private var subscriptions = Set<AnyCancellable>()
     
-    init(secretWalletsManager: SecretWalletsManagerProtocol) {
+    nonisolated init(secretWalletsManager: SecretWalletsManagerProtocol) {
         self.secretWalletsManager = secretWalletsManager
         
-        setup()
+        Task{ @MainActor in
+            setup()
+        }
     }
     
     private func setup() {

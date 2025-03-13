@@ -1209,6 +1209,7 @@ extension ChatListViewController {
             
             guard !partner.isSystem else {
                 self.dialogService.presentShareAlertFor(
+                    title: nil,
                     string: address,
                     types: [
                         .copyToPasteboard,
@@ -1270,6 +1271,7 @@ extension ChatListViewController {
             guard let self = self else { return }
             
             self.dialogService.presentShareAlertFor(
+                title: title,
                 string: address,
                 types: [
                     .copyToPasteboard,
