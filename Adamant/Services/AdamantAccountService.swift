@@ -423,7 +423,8 @@ extension AdamantAccountService {
                 group.addTask {
                     let result = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
-                        withPassword: .empty
+                        withPassword: .empty,
+                        storeInKVC: true
                     )
                     return result
                 }

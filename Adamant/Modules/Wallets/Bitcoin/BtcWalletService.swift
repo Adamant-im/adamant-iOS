@@ -445,7 +445,7 @@ extension BtcWalletService {
         btcWallet = nil
     }
     
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVC: Bool) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -483,6 +483,7 @@ extension BtcWalletService {
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
         
+        guard storeInKVC else { return eWallet }
         // MARK: 4. Save address into KVS
         let service = self
         do {

@@ -403,7 +403,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService {
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVC: Bool) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
         }
@@ -443,6 +443,8 @@ extension EthWalletService {
             enabled = true
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
+        
+        guard storeInKVC else { return eWallet }
         
         // MARK: 4. Save into KVS
         let service = self

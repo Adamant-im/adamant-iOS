@@ -9,7 +9,6 @@
 import CommonKit
 import Swinject
 
-//TODO: ‼️‼️‼️ Double check wallets initialization and dependencies injection while making the review ‼️‼️‼️
 extension AdamantSecretWalletsManager{
     struct SecretWalletsFactory {
         private let visibleWalletsService: VisibleWalletsService
@@ -73,7 +72,8 @@ extension AdamantSecretWalletsManager{
                     taskGroup.addTask {
                         _ = try? await wallet.core.initWallet(
                             withPassphrase: passphrase,
-                            withPassword: password
+                            withPassword: password,
+                            storeInKVC: false
                         )
                     }
                 }

@@ -368,7 +368,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService {
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVC: Bool) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
         setState(.notInitiated)

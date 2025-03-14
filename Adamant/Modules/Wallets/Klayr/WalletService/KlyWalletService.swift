@@ -99,9 +99,9 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     // MARK: -
     
     func initWallet(
-        withPassphrase passphrase: String, withPassword password: String
+        withPassphrase passphrase: String, withPassword password: String, storeInKVC: Bool
     ) async throws -> WalletAccount {
-        try await initWallet(passphrase: passphrase, password: password)
+        try await initWallet(passphrase: passphrase, password: password, storeInKVC: storeInKVC)
     }
     
     func setInitiationFailed(reason: String) {
@@ -413,7 +413,7 @@ private extension KlyWalletService {
 
 // MARK: - Init Wallet
 private extension KlyWalletService {
-    func initWallet(passphrase: String, password: String) async throws -> WalletAccount {
+    func initWallet(passphrase: String, password: String, storeInKVC: Bool) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -464,6 +464,8 @@ private extension KlyWalletService {
         else {
             throw WalletServiceError.accountNotFound
         }
+        
+        guard storeInKVC else { return eWallet }
         
         // Save into KVS
         
