@@ -13,21 +13,11 @@ echo "TEMP_ASSETS_PATH: $TEMP_ASSETS_PATH"
 echo "WALLETS_ASSETS_PATH: $WALLETS_ASSETS_PATH"
 echo "NOTIFICATION_IMAGES_PATH: $NOTIFICATION_IMAGES_PATH"
 
-# Remove old WalletImages folder
-if [ -d "$NOTIFICATION_IMAGES_PATH" ]; then
-    echo "Removing old WalletImages folder..."
-    rm -rf "$NOTIFICATION_IMAGES_PATH"
-fi
-mkdir -p "$NOTIFICATION_IMAGES_PATH"
-echo "Created new WalletImages folder."
+# Remove old asset folders
+rm -rf "$NOTIFICATION_IMAGES_PATH" "$WALLETS_ASSETS_PATH"
+mkdir -p "$NOTIFICATION_IMAGES_PATH" "$WALLETS_ASSETS_PATH"
 
-# Remove old Wallets.xcassets folder
-if [ -d "$WALLETS_ASSETS_PATH" ]; then
-    echo "Removing old Wallets.xcassets..."
-    rm -rf "$WALLETS_ASSETS_PATH"
-fi
-mkdir -p "$WALLETS_ASSETS_PATH"
-echo "Created new Wallets.xcassets folder."
+echo "Created new WalletImages and Wallets.xcassets folders."
 
 # Function to create Contents.json
 function create_contents {
@@ -38,91 +28,51 @@ function create_contents {
     echo "Generating Contents.json for $TARGET..."
 
     if [ "$WITH_DARK" = true ]; then
-        cat > ${TARGET}/Contents.json << __EOF__
+        cat > "${TARGET}/Contents.json" << __EOF__
 {
   "images" : [
-    {
-      "filename" : "${IMAGE_NAME}.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "${IMAGE_NAME}_dark.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "${IMAGE_NAME}@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "${IMAGE_NAME}_dark@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "${IMAGE_NAME}@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "${IMAGE_NAME}_dark@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-    }
+    { "filename" : "${IMAGE_NAME}.png", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "${IMAGE_NAME}@2x.png", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "${IMAGE_NAME}@3x.png", "idiom" : "universal", "scale" : "3x" },
+    { "appearances": [{ "appearance": "luminosity", "value": "dark" }], "filename": "${IMAGE_NAME}_dark.png", "idiom": "universal", "scale": "1x" },
+    { "appearances": [{ "appearance": "luminosity", "value": "dark" }], "filename": "${IMAGE_NAME}_dark@2x.png", "idiom": "universal", "scale": "2x" },
+    { "appearances": [{ "appearance": "luminosity", "value": "dark" }], "filename": "${IMAGE_NAME}_dark@3x.png", "idiom": "universal", "scale": "3x" }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
-  }
+  "info": { "author": "xcode", "version": 1 }
 }
 __EOF__
     else
-        cat > ${TARGET}/Contents.json << __EOF__
+        cat > "${TARGET}/Contents.json" << __EOF__
 {
   "images" : [
-    {
-      "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "${IMAGE_NAME}.png"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "${IMAGE_NAME}@2x.png"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "${IMAGE_NAME}@3x.png"
-    }
+    { "filename" : "${IMAGE_NAME}.png", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "${IMAGE_NAME}@2x.png", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "${IMAGE_NAME}@3x.png", "idiom" : "universal", "scale" : "3x" }
   ],
-  "info" : {
-    "version" : 1,
-    "author" : "xcode"
-  }
+  "info": { "author": "xcode", "version": 1 }
 }
 __EOF__
     fi
+}
+
+# Function to copy images with fallback to wallet icons
+function copy_images_with_fallback {
+    SOURCE_DIR=$1
+    IMAGE_NAME=$2
+    DEST_DIR=$3
+    FALLBACK_IMAGE_NAME=$4
+
+    mkdir -p "$DEST_DIR"
+
+    # Copy regular images with fallback
+    cp "$SOURCE_DIR/${IMAGE_NAME}.png" "$DEST_DIR/${IMAGE_NAME}.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}.png" "$DEST_DIR/${IMAGE_NAME}.png" 2>/dev/null
+    cp "$SOURCE_DIR/${IMAGE_NAME}@2x.png" "$DEST_DIR/${IMAGE_NAME}@2x.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}@2x.png" "$DEST_DIR/${IMAGE_NAME}@2x.png" 2>/dev/null
+    cp "$SOURCE_DIR/${IMAGE_NAME}@3x.png" "$DEST_DIR/${IMAGE_NAME}@3x.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}@3x.png" "$DEST_DIR/${IMAGE_NAME}@3x.png" 2>/dev/null
+
+    # Copy dark mode images with fallback
+    cp "$SOURCE_DIR/${IMAGE_NAME}_dark.png" "$DEST_DIR/${IMAGE_NAME}_dark.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}_dark.png" "$DEST_DIR/${IMAGE_NAME}_dark.png" 2>/dev/null
+    cp "$SOURCE_DIR/${IMAGE_NAME}_dark@2x.png" "$DEST_DIR/${IMAGE_NAME}_dark@2x.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}_dark@2x.png" "$DEST_DIR/${IMAGE_NAME}_dark@2x.png" 2>/dev/null
+    cp "$SOURCE_DIR/${IMAGE_NAME}_dark@3x.png" "$DEST_DIR/${IMAGE_NAME}_dark@3x.png" 2>/dev/null || cp "$SOURCE_DIR/${FALLBACK_IMAGE_NAME}_dark@3x.png" "$DEST_DIR/${IMAGE_NAME}_dark@3x.png" 2>/dev/null
 }
 
 # Process each token in TemporaryAssets/General
@@ -143,29 +93,35 @@ function process_tokens {
                 continue
             fi
 
-            # Wallet images
-            TARGET_WALLET_IMAGESET="$WALLETS_ASSETS_PATH/${TOKEN_NAME}_wallet.imageset"
-            mkdir -p "$TARGET_WALLET_IMAGESET"
-            echo "Creating wallet imageset: $TARGET_WALLET_IMAGESET"
+            # Function to process an image set
+            function process_image_set {
+                TYPE=$1
+                FALLBACK_TYPE=$2
+                TARGET_PATH="$WALLETS_ASSETS_PATH/${TOKEN_NAME}_${TYPE}.imageset"
+                IMAGE_BASE_NAME="${TOKEN_NAME}_${TYPE}"
 
-            cp "$IMAGES_DIR/${TOKEN_NAME}_wallet.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet.png" 2>/dev/null
-            cp "$IMAGES_DIR/${TOKEN_NAME}_wallet@2x.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet@2x.png" 2>/dev/null
-            cp "$IMAGES_DIR/${TOKEN_NAME}_wallet@3x.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet@3x.png" 2>/dev/null
+                mkdir -p "$TARGET_PATH"
+                echo "Creating $TYPE imageset: $TARGET_PATH"
 
-            # Check for dark mode images
-            WITH_DARK=false
-            if [ -e "$IMAGES_DIR/${TOKEN_NAME}_wallet_dark.png" ]; then
-                echo "Dark mode images found for $TOKEN_NAME"
-                cp "$IMAGES_DIR/${TOKEN_NAME}_wallet_dark.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet_dark.png"
-                cp "$IMAGES_DIR/${TOKEN_NAME}_wallet_dark@2x.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet_dark@2x.png" 2>/dev/null
-                cp "$IMAGES_DIR/${TOKEN_NAME}_wallet_dark@3x.png" "$TARGET_WALLET_IMAGESET/${TOKEN_NAME}_wallet_dark@3x.png" 2>/dev/null
-                WITH_DARK=true
-            fi
+                # Copy images, using wallet images as fallback
+                copy_images_with_fallback "$IMAGES_DIR" "$IMAGE_BASE_NAME" "$TARGET_PATH" "${TOKEN_NAME}_${FALLBACK_TYPE}"
 
-            # Generate Contents.json for wallet
-            create_contents "$TARGET_WALLET_IMAGESET" "${TOKEN_NAME}_wallet" "$WITH_DARK"
+                # Check for dark mode images
+                WITH_DARK=false
+                if [ -e "$TARGET_PATH/${IMAGE_BASE_NAME}_dark.png" ]; then
+                    WITH_DARK=true
+                fi
 
-            # Copy notification content images
+                # Generate Contents.json
+                create_contents "$TARGET_PATH" "$IMAGE_BASE_NAME" "$WITH_DARK"
+            }
+
+            # Process wallet, wallet_row (fallback to wallet), and notification (fallback to wallet)
+            process_image_set "wallet" "wallet"
+            process_image_set "wallet_row" "wallet"
+            process_image_set "notification" "wallet"
+
+            # Copy notification content image (only @3x)
             if [ -e "$IMAGES_DIR/${TOKEN_NAME}_wallet@3x.png" ]; then
                 echo "Copying notification content image for $TOKEN_NAME"
                 cp "$IMAGES_DIR/${TOKEN_NAME}_wallet@3x.png" "$NOTIFICATION_IMAGES_PATH/${TOKEN_NAME}_notificationContent.png"
