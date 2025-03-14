@@ -868,6 +868,12 @@
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "密码短语";
 
+/* QRGenerator: Password textview placeholder */
+"QrGeneratorScene.Password.Placeholder" = "密码";
+
+/* QRGenerator: Toggle textview title */
+"QrGeneratorScene.Toggle.Title" = "秘密钱包";
+
 /* QRGenerator: small 'Tap to save' tooltip under generated QR */
 "QrGeneratorScene.TapToSave" = "点击保存";
 

@@ -24,11 +24,17 @@ extension String.adamant {
         static var passphrasePlaceholder: String {
             String.localized("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
         }
+        static var passwordPlaceholder: String {
+            String.localized("QrGeneratorScene.Password.Placeholder", comment: "QRGenerator: Password textview placeholder")
+        }
         static var wrongPassphraseError: String {
             String.localized("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in invalid passphrase")
         }
         static var internalError: String {
             String.localized("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
+        }
+        static var toggleTitle: String {
+            String.localized("QrGeneratorScene.Toggle.Title", comment: "QRGenerator: Toggle button title")
         }
     }
 }

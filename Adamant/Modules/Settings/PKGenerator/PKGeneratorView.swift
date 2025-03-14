@@ -32,6 +32,13 @@ struct PKGeneratorView: View {
 }
 
 private extension PKGeneratorView {
+    private var inactiveBaseColor: Color {
+        Color(UIColor.gray.withAlphaComponent(0.5))
+    }
+    private var activeBaseColor: Color {
+        Color(UIColor.adamant.primary)
+    }
+    
     var loadingBackground: some View {
         HStack {
             Spacer()
@@ -61,13 +68,26 @@ private extension PKGeneratorView {
                     text: $viewModel.state.passphrase
                 )
                 
-                Button(action: { viewModel.generateKeys() }) {
+                Toggle(isOn: $viewModel.state.isSecretWalletsEnabled) {
+                    Text(String.adamant.qrGenerator.toggleTitle)
+                        .foregroundColor(viewModel.state.isSecretWalletsEnabled ? activeBaseColor : inactiveBaseColor)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: Color(uiColor: .adamant.active)))
+                
+                if viewModel.state.isSecretWalletsEnabled {
+                    AdamantSecureField(
+                        placeholder: .adamant.qrGenerator.passwordPlaceholder,
+                        text: $viewModel.state.secretWalletPassword
+                    )
+                }
+                
+                Button(action: { viewModel.generateKeys() }, label: {
                     Text(String.adamant.pkGenerator.generateButton)
                         .foregroundStyle(Color(uiColor: .adamant.primary))
                         .padding(.horizontal, 30)
                         .background(loadingBackground)
                         .expanded(axes: .horizontal)
-                }
+                })
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }
     }
@@ -76,7 +96,6 @@ private extension PKGeneratorView {
         NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }) {
             HStack {
                 Image(uiImage: keyInfo.icon)
-                    .renderingMode(.template)
                     .resizable()       
                     .frame(squareSize: 25)
                     .foregroundStyle(Color(uiColor: .adamant.tableRowIcons))

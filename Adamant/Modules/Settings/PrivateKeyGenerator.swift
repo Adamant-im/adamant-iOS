@@ -18,5 +18,5 @@ protocol PrivateKeyGenerator {
     var rowImage: UIImage? { get }
     var keyFormat: KeyFormat { get }
     
-    func generatePrivateKeyFor(passphrase: String) -> String?
+    func generatePrivateKeyFor(passphrase: String, password: String) async -> String?
 }

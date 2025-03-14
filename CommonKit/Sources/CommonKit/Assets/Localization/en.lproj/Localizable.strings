@@ -875,6 +875,12 @@
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "Passphrase";
 
+/* QRGenerator: Password textview placeholder */
+"QrGeneratorScene.Password.Placeholder" = "Password";
+
+/* QRGenerator: Toggle textview title */
+"QrGeneratorScene.Toggle.Title" = "Secret wallets";
+
 /* QRGenerator: small 'Tap to save' tooltip under generated QR */
 "QrGeneratorScene.TapToSave" = "Tap to save";
 

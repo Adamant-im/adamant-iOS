@@ -79,11 +79,11 @@ extension KlyWalletService: PrivateKeyGenerator {
     
     var keyFormat: KeyFormat { .HEX }
     
-    func generatePrivateKeyFor(passphrase: String) -> String? {
+    func generatePrivateKeyFor(passphrase: String, password: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase),
               let keypair = try? LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: salt
+                salt: password.isEmpty ? salt : "mnemonic\(password)"
               )
         else {
             return nil

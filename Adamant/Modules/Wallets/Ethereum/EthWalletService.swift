@@ -47,20 +47,20 @@ extension Web3Error {
             return .networkError
             
         case .generalError(let error),
-             .keystoreError(let error as Error):
+                .keystoreError(let error as Error):
             return .internalError(message: error.localizedDescription, error: error)
             
         case .inputError(let message), .processingError(let message):
             return .internalError(message: message, error: nil)
             
         case .transactionSerializationError,
-             .dataError,
-             .walletError,
-             .unknownError,
-             .rpcError,
-             .revert,
-             .revertCustom,
-             .typeError:
+                .dataError,
+                .walletError,
+                .unknownError,
+                .rpcError,
+                .revert,
+                .revertCustom,
+                .typeError:
             return .internalError(message: "Unknown error", error: nil)
         case .valueError(desc: let desc):
             return .internalError(message: "Unknown error \(String(describing: desc))", error: nil)
@@ -74,10 +74,10 @@ extension Web3Error {
 
 final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, SmartTokenInfoProtocol, @unchecked Sendable {
     static let currencySymbol = "ETH"
-	// MARK: - Constants
-	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
-	
-	static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
+    // MARK: - Constants
+    let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
+    
+    static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -86,7 +86,6 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
-	
     static var tokenNetworkSymbol: String {
         return "ERC20"
     }
@@ -101,12 +100,12 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     
     var richMessageType: String {
         return Self.richMessageType
-	}
-
+    }
+    
     var qqPrefix: String {
         return Self.qqPrefix
-	}
-
+    }
+    
     var isSupportIncreaseFee: Bool {
         return true
     }
@@ -129,9 +128,9 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     @Atomic private(set) var gasLimit: BigUInt = 0
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private var balanceInvalidationSubscription: AnyCancellable?
-	
-	static let transferGas: Decimal = 21000
-	static let kvsAddress = "eth:address"
+    
+    static let transferGas: Decimal = 21000
+    static let kvsAddress = "eth:address"
     
     static let walletPath = "m/44'/60'/3'/1"
     static let walletPassword = ""
@@ -162,8 +161,8 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
     
-	// MARK: - Properties
-	
+    // MARK: - Properties
+    
     public static let transactionsListApiSubpath = "ethtxs"
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
@@ -171,7 +170,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
-
+    
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $historyTransactions.eraseToAnyPublisher()
     }
@@ -318,7 +317,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
         
         setState(.upToDate)
         await calculateFee()
-	}
+    }
     
     private func markBalanceAsFresh(_ wallet: EthWallet) {
         wallet.isBalanceInitialized = true
@@ -355,7 +354,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
         gasLimit = gasLimitRaw == nil
         ? gasLimit
         : gasLimit + gasLimitPercent
-
+        
         var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
         
         newFee = isIncreaseFeeEnabled
@@ -366,7 +365,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
         
         transactionFee = newFee
         let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
-                
+        
         gasPrice = isIncreaseFeeEnabled
         ? BigUInt(integerLiteral: incGasPrice)
         : price
@@ -376,18 +375,18 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
         
         NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
     }
-	
-	// MARK: - Tools
-	
-	func validate(address: String) -> AddressValidationResult {
-		return addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
-	}
-	
-	func getGasPrices() async throws -> BigUInt {
+    
+    // MARK: - Tools
+    
+    func validate(address: String) -> AddressValidationResult {
+        return addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
+    }
+    
+    func getGasPrices() async throws -> BigUInt {
         try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.gasPrice()
         }.get()
-	}
+    }
     
     func getGasLimit(to address: EthereumAddress?) async throws -> BigUInt {
         guard let ethWallet = ethWallet else { throw WalletServiceError.internalError(.endpointBuildFailed) }
@@ -556,15 +555,15 @@ extension EthWalletService {
         return try await getBalance(forAddress: address)
     }
     
-	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
+    func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
         let balance = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.getBalance(for: address)
         }.get()
         
         return balance.asDecimal(exponent: EthWalletService.currencyExponent)
-	}
-	
-	func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+    }
+    
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
@@ -584,7 +583,7 @@ extension EthWalletService {
                 message: "ETH Wallet: failed to get address from KVS"
             )
         }
-	}
+    }
 }
 
 #if DEBUG
@@ -841,14 +840,14 @@ extension EthWalletService: PrivateKeyGenerator {
     
     var keyFormat: KeyFormat { .HEX }
     
-    func generatePrivateKeyFor(passphrase: String) -> String? {
+    func generatePrivateKeyFor(passphrase: String, password: String) async -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             return nil
         }
         
-        guard let keystore = try? BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath),
-            let account = keystore.addresses?.first,
-            let privateKeyData = try? keystore.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account) else {
+        guard let keystore = try? await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password),
+              let account = keystore.addresses?.first,
+              let privateKeyData = try? keystore.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account) else {
             return nil
         }
         

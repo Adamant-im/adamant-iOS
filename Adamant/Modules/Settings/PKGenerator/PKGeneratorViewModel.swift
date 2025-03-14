@@ -85,14 +85,16 @@ final class PKGeneratorViewModel: ObservableObject {
         guard !state.isLoading else { return }
         withAnimation { state.isLoading = true }
         let passphrase = state.passphrase.lowercased()
+        let password = state.secretWalletPassword
         
         Task {
             defer { withAnimation { state.isLoading = false } }
             
             do {
                 let keys = try await Task.detached { [walletServiceCompose] in
-                    try generatePrivateKeys(
+                    try await generatePrivateKeys(
                         passphrase: passphrase,
+                        password: password,
                         walletServiceCompose: walletServiceCompose
                     )
                 }.value
@@ -135,22 +137,43 @@ private extension PKGeneratorViewModel {
 
 private func generatePrivateKeys(
     passphrase: String,
+    password: String,
     walletServiceCompose: WalletServiceCompose
-) throws -> [PKGeneratorState.KeyInfo] {
-    guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase)
-    else { throw AdamantError(message: .adamant.qrGenerator.wrongPassphraseError) }
+) async throws -> [PKGeneratorState.KeyInfo] {
+    guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+        throw AdamantError(message: .adamant.qrGenerator.wrongPassphraseError)
+    }
     
-    return walletServiceCompose.getWallets().compactMap {
-        guard
-            let generator = $0.core as? PrivateKeyGenerator,
-            let key = generator.generatePrivateKeyFor(passphrase: passphrase)
-        else { return nil }
+    let wallets = walletServiceCompose.getWallets()
+    
+    return await withTaskGroup(of: PKGeneratorState.KeyInfo?.self, returning: [PKGeneratorState.KeyInfo].self) { group in
+        for wallet in wallets {
+            group.addTask {
+                guard let generator = wallet.core as? PrivateKeyGenerator else {
+                    return nil
+                }
+                
+                let key = await generator.generatePrivateKeyFor(passphrase: passphrase, password: password)
+                guard let key = key else {
+                    return nil
+                }
+                
+                return PKGeneratorState.KeyInfo(
+                    title: generator.rowTitle,
+                    description: .adamant.pkGenerator.keyFormat(generator.keyFormat.rawValue),
+                    icon: generator.rowImage ?? .init(),
+                    key: key
+                )
+            }
+        }
         
-        return PKGeneratorState.KeyInfo(
-            title: generator.rowTitle,
-            description: .adamant.pkGenerator.keyFormat(generator.keyFormat.rawValue),
-            icon: generator.rowImage ?? .init(),
-            key: key
-        )
+        var result: [PKGeneratorState.KeyInfo] = []
+        for await keyInfo in group {
+            if let keyInfo = keyInfo {
+                result.append(keyInfo)
+            }
+        }
+        
+        return result
     }
 }
