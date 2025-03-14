@@ -273,6 +273,7 @@
 		6FCF2D532D54F2B600F64D20 /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */; };
 		6FF9F08C2D6CEB340013A3B1 /* CoreDataRealationMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */; };
 		85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */; };
+		851FF2762D7B3E6B00276625 /* ChatViewController+NavigationControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
@@ -1006,6 +1007,7 @@
 		6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRealationMapper.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesSortDescriptor.swift; sourceTree = "<group>"; };
+		851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+NavigationControllerDelegate.swift"; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
@@ -2219,6 +2221,7 @@
 				93996A9829682690008D080B /* Subviews */,
 				938F7D592955C8CB001915CA /* Managers */,
 				938F7D632955C94F001915CA /* ChatViewController.swift */,
+				851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */,
 				26A975FE2B7E843E0095C367 /* SelectTextView.swift */,
 				26A976002B7E852E0095C367 /* ChatSelectTextViewFactory.swift */,
 			);
@@ -4042,6 +4045,7 @@
 				AAB01CB52D3AF27E007D6BF4 /* DogeInternalApiProtocol.swift in Sources */,
 				93ED214F2CC3567600AA1FC8 /* TransactionsStatusServiceCompose.swift in Sources */,
 				E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */,
+				851FF2762D7B3E6B00276625 /* ChatViewController+NavigationControllerDelegate.swift in Sources */,
 				3A26D9432C3C2E19003AD832 /* KlyWalletService+StatusCheck.swift in Sources */,
 				265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */,
 				4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */,
@@ -4864,10 +4868,10 @@
 		};
 		AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ChrisBenua/CryptoSwift";
+			repositoryURL = "https://github.com/Adamant-im/CryptoSwift.git";
 			requirement = {
 				kind = revision;
-				revision = f0ea2cac7983c4a808cade78743b391726ecc0ea;
+				revision = ae1cc15340ddf0f607981f9118fe80d7fd7cd2b5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

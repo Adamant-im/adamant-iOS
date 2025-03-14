@@ -311,10 +311,6 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-            if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
-                dialog.send(.noActiveNodesAlert)
-            }
-            
             if !(filesPicked?.isEmpty ?? true) {
                 do {
                     try await sendFiles(with: text)
@@ -714,11 +710,6 @@ final class ChatViewModel: NSObject {
             return false
         }
         
-        guard apiServiceCompose.get(.adm)?.hasEnabledNode == true else {
-            dialog.send(.noActiveNodesAlert)
-            return false
-        }
-        
         return true
     }
     
@@ -986,6 +977,12 @@ final class ChatViewModel: NSObject {
     
     func updateSwipingOffset(_ offset: CGFloat) {
         swipeableMessage.state = .offset(offset)
+    }
+    
+    func checkForADMNodesAvailability() {
+        if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
+            dialog.send(.noActiveNodesAlert)
+        }
     }
 }
 

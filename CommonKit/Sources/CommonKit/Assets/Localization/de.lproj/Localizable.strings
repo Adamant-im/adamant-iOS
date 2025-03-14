@@ -1381,6 +1381,7 @@
 "Chat.unknown.title" = "Unbekannt";
 
 /* No active nodes */
+"Chat.Alert.Title.NoActiveNodes" = "Keine aktiven ADM-Knoten";
 "Chat.Alert.NoActiveNodes" = "Es können keine neuen Nachrichten angefordert werden - Keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
 
 /* Review Nodes List */

@@ -192,7 +192,7 @@ private extension ChatDialogManager {
     
     func showNoActiveNodesAlert() {
         let alert = UIAlertController(
-            title: "",
+            title: .adamant.chat.noActiveNodesTitle,
             message: .adamant.chat.noActiveNodes,
             preferredStyleSafe: .alert,
             source: nil
@@ -201,13 +201,14 @@ private extension ChatDialogManager {
         alert.addAction(
             .init(
                 title: .adamant.chat.reviewNodesList,
-                style: .default,
+                style: .destructive,
                 handler: { [weak self] _ in
                     self?.viewModel.didTapAdmNodesList.send(())
                 }
             )
         )
-        alert.addAction(.init(title: .adamant.alert.cancel, style: .cancel))
+        let cancelButton = UIAlertAction(title: .adamant.alert.cancel, style: .default)
+        alert.addAction(cancelButton)
         alert.modalPresentationStyle = .overFullScreen
         dialogService.present(alert, animated: true, completion: nil)
     }

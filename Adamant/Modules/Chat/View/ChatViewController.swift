@@ -47,7 +47,8 @@ final class ChatViewController: MessagesViewController {
     private var separatorIndex: Int?
     private var didAddSeparator: Bool = false
     private var pendingOffsetAdjustment: CGFloat = 0
-   
+    private var isScrollDownButtonHidden = true
+    private var previousUnreadCount: Int = 0
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
@@ -146,7 +147,6 @@ final class ChatViewController: MessagesViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         updateIsScrollPositionNearlyTheBottom()
-        updateScrollDownButtonVisibility()
     }
     
     override func viewDidLayoutSubviews() {
@@ -158,7 +158,11 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if navigationController?.delegate !== self {
+            navigationController?.delegate = self
+        }
         viewModel.updatePartnerName()
+        updateScrollDownButtonVisibility()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -571,12 +575,9 @@ private extension ChatViewController {
     }
     
     func updateScrollToUnreadButtonPosition() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-            if self.scrollDownButton.alpha == 0 {
-                self.scrollToUnreadBottomConstraint?.update(offset: 0)
-            } else {
-                self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
-            }
+        let offset = (scrollDownButton.alpha == 0) ? 0 : -(scrollToUnreadInset + scrollButtonHeight)
+        scrollToUnreadBottomConstraint?.update(offset: offset)
+        if messagesLoaded {
             self.view.layoutIfNeeded()
         }
     }
@@ -813,21 +814,37 @@ private extension ChatViewController {
     
     func updateScrollDownButtonVisibility() {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-            self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
-            self.updateScrollToUnreadButtonPosition()
-            self.scrollDownButton.updateCounter(topCount)
-        }
+        self.scrollDownButton.updateCounter(topCount)
+        guard isScrollDownButtonHidden != isScrollPositionNearlyTheBottom else { return }
+            isScrollDownButtonHidden = isScrollPositionNearlyTheBottom
+            let buttonUpdate = {
+                self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
+                self.updateScrollToUnreadButtonPosition()
+            }
+            if messagesLoaded {
+                UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                    buttonUpdate()
+                }
+            } else {
+                buttonUpdate()
+            }
     }
 
     func updateScrollToUnreadButtonVisibility() {
         let count = viewModel.messagesWithUnredReactionsIds?.count ?? 0
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-            self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1
-        }
         scrollToUnreadReactButton.updateCounter(count)
+
+        guard (previousUnreadCount == 0 && count > 0) || (previousUnreadCount > 0 && count == 0) else {
+            previousUnreadCount = count
+            return
+        }
+        previousUnreadCount = count
+        let updateAlpha = { self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1 }
+        if messagesLoaded {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: updateAlpha)
+        } else {
+            updateAlpha()
+        }
     }
     
     func updateDateHeaderIfNeeded() {
@@ -877,7 +894,7 @@ private extension ChatViewController {
             
             viewModel.scroll(to: unreadId)
         }
-        
+        button.alpha = 0
         return button
     }
     

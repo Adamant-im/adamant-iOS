@@ -37,7 +37,7 @@ extension WalletStaticCoreProtocol {
         let coinInfoSIH = coinInfo?.services?.infoService?.healthCheck
         let coinInfoSNH = coinInfo?.services?.ipfsNode?.healthCheck
         
-        if let coinInfoNH = coinInfoNH {
+        if let coinInfoNH {
             return CoinHealthCheckParameters(
                 normalUpdateInterval: TimeInterval(coinInfoNH.normalUpdateInterval / 1000),
                 crucialUpdateInterval: TimeInterval(coinInfoNH.crucialUpdateInterval / 1000),
