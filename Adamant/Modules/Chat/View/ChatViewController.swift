@@ -547,12 +547,8 @@ private extension ChatViewController {
     }
     
     func updateScrollToUnreadButtonPosition() {
-let offset = (scrollDownButton.alpha == 0) ? 0 : -(scrollToUnreadInset + scrollButtonHeight)
-scrollToUnreadBottomConstraint?.update(offset: offset)
-            self.scrollToUnreadBottomConstraint?.update(offset: 0)
-        } else {
-            self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
-        }
+        let offset = (scrollDownButton.alpha == 0) ? 0 : -(scrollToUnreadInset + scrollButtonHeight)
+        scrollToUnreadBottomConstraint?.update(offset: offset)
         if messagesLoaded {
             self.view.layoutIfNeeded()
         }
@@ -780,18 +776,19 @@ private extension ChatViewController {
     func updateScrollDownButtonVisibility() {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
         self.scrollDownButton.updateCounter(topCount)
-        if isScrollDownButtonHidden != isScrollPositionNearlyTheBottom {
+        guard isScrollDownButtonHidden != isScrollPositionNearlyTheBottom else { return }
             isScrollDownButtonHidden = isScrollPositionNearlyTheBottom
-            if messagesLoaded {
-                UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-                    self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
-                    self.updateScrollToUnreadButtonPosition()
-                }
-            } else {
+            let buttonUpdate = {
                 self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
                 self.updateScrollToUnreadButtonPosition()
             }
-        }
+            if messagesLoaded {
+                UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                    buttonUpdate()
+                }
+            } else {
+                buttonUpdate()
+            }
     }
 
     func updateScrollToUnreadButtonVisibility() {
