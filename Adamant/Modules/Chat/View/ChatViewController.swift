@@ -547,7 +547,8 @@ private extension ChatViewController {
     }
     
     func updateScrollToUnreadButtonPosition() {
-        if self.scrollDownButton.alpha == 0 {
+let offset = (scrollDownButton.alpha == 0) ? 0 : -(scrollToUnreadInset + scrollButtonHeight)
+scrollToUnreadBottomConstraint?.update(offset: offset)
             self.scrollToUnreadBottomConstraint?.update(offset: 0)
         } else {
             self.scrollToUnreadBottomConstraint?.update(offset: -(scrollToUnreadInset + scrollButtonHeight))
