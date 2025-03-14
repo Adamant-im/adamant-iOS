@@ -21,7 +21,8 @@ final class AccountHeaderView: UIView {
     @IBOutlet weak var addressButton: UIButton!
     @IBOutlet weak var walletViewContainer: UIView!
     @IBOutlet weak var secretWalletsImageView: UIImageView!
-    private var outlineLayer: CAShapeLayer?
+    
+    private var circularBackgroundView: UIView?
     
     weak var delegate: AccountHeaderViewDelegate?
     
@@ -32,6 +33,20 @@ final class AccountHeaderView: UIView {
         addPersistentOutline()
         
         setupGestureRecognizers()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard let bgView = circularBackgroundView else { return }
+        
+        let iconFrame = secretWalletsImageView.frame
+        let bgWidth = iconFrame.width * 2
+        let bgHeight = iconFrame.height * 2
+        bgView.frame = CGRect(x: iconFrame.midX - bgWidth / 2,
+                              y: iconFrame.midY - bgHeight / 2,
+                              width: bgWidth,
+                              height: bgHeight)
+        bgView.layer.cornerRadius = bgWidth / 2
     }
     
     func setWalletIcon(_ icon: WalletIcon, badgeCount: Int) {
@@ -47,19 +62,6 @@ final class AccountHeaderView: UIView {
     @objc private func walletsButtonTapped() {
         animateOutline()
         delegate?.walletsButtonTapped(from: secretWalletsImageView)
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        guard let outlineLayer = outlineLayer else { return }
-        guard !secretWalletsImageView.frame.isEmpty else { return }
-        
-        let imageView = secretWalletsImageView!
-        let center = imageView.center
-        let radius = imageView.bounds.width
-        let path = UIBezierPath(arcCenter: center, radius: radius, startAngle: 0, endAngle: .pi * 2, clockwise: true)
-        outlineLayer.path = path.cgPath
     }
 }
 
@@ -79,7 +81,15 @@ private extension AccountHeaderView {
     }
     
     private func addPersistentOutline() {
+        let bgView = UIView()
+        bgView.backgroundColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark
+            ? .adamant.secondary
+            : UIColor.black
+        }
         
+        secretWalletsImageView.superview?.insertSubview(bgView, belowSubview: secretWalletsImageView)
+        self.circularBackgroundView = bgView
     }
     
     private func animateOutline() {
@@ -87,8 +97,8 @@ private extension AccountHeaderView {
     }
 }
 
-extension AccountHeaderView{
-    enum WalletIcon: String{
+extension AccountHeaderView {
+    enum WalletIcon: String {
         case regular = "secret_wallets_regular"
         case secret = "secret_wallets_active"
         
