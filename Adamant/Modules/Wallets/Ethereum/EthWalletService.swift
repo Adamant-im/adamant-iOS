@@ -428,7 +428,6 @@ extension EthWalletService {
         
         // MARK: 3. Update
         ethWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -443,9 +442,16 @@ extension EthWalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
+        self.setState(.upToDate)
+        
+        Task {
+            await self.update()
+        }
+        
         guard storeInKVC else { return eWallet }
         
         // MARK: 4. Save into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
@@ -455,24 +461,13 @@ extension EthWalletService {
                 }
             }
             
-            service.setState(.upToDate)
-            
-            Task {
-                await service.update()
-            }
-            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-                
-                Task {
-                    await service.update()
-                }
-                
+
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
                         service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
@@ -482,7 +477,6 @@ extension EthWalletService {
                 return eWallet
                 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }

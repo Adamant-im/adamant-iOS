@@ -325,7 +325,6 @@ extension DashWalletService {
         )
         
         self.dashWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -340,9 +339,16 @@ extension DashWalletService {
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
         
+        self.setState(.upToDate)
+        
+        Task {
+            self.update()
+        }
+        
         guard storeInKVC else { return eWallet }
         
         // MARK: 4. Save address into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             let service = self
@@ -352,11 +358,6 @@ extension DashWalletService {
                 }
             }
             
-            service.setState(.upToDate)
-            
-            Task {
-                service.update()
-            }
             return eWallet
         } catch let error as WalletServiceError {
             let service = self
@@ -364,11 +365,6 @@ extension DashWalletService {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-                
-                Task {
-                    await service.update()
-                }
                 
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
@@ -376,11 +372,9 @@ extension DashWalletService {
                     }
                 }
                 
-                service.setState(.upToDate)
                 return eWallet
                 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }

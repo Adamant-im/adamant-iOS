@@ -465,6 +465,12 @@ private extension KlyWalletService {
             throw WalletServiceError.accountNotFound
         }
         
+        setState(.upToDate)
+        
+        Task {
+            await update()
+        }
+        
         guard storeInKVC else { return eWallet }
         
         // Save into KVS
@@ -476,29 +482,17 @@ private extension KlyWalletService {
                 updateKvsAddress(kvsAddressModel)
             }
             
-            setState(.upToDate)
-            
-            Task {
-                await update()
-            }
-            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                setState(.upToDate)
-                
-                Task {
-                    await update()
-                }
                 
                 updateKvsAddress(kvsAddressModel)
                 
                 return eWallet
             default:
-                setState(.upToDate)
                 throw error
             }
         }

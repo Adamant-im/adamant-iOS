@@ -468,7 +468,6 @@ extension BtcWalletService {
             addressConverter: addressConverter
         )
         self.btcWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
@@ -483,8 +482,16 @@ extension BtcWalletService {
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
         
+        self.setState(.upToDate)
+        
+        Task {
+            self.update()
+        }
+        
         guard storeInKVC else { return eWallet }
+        
         // MARK: 4. Save address into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
@@ -495,23 +502,12 @@ extension BtcWalletService {
                 throw WalletServiceError.accountNotFound
             }
             
-            service.setState(.upToDate)
-            
-            Task {
-                service.update()
-            }
-            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-                
-                Task {
-                    await service.update()
-                }
                 
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
@@ -522,7 +518,6 @@ extension BtcWalletService {
                 return eWallet
                 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }

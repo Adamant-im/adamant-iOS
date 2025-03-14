@@ -178,12 +178,16 @@ final class AccountViewController: FormViewController {
         accountHeaderView.delegate = self
         
         secretWalletsViewModel.$state
-            .map{ $0.currentActiveIndex }
+            .map { $0.currentActiveIndex }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] index in
+                guard let self = self else { return }
+                self.setupWalletsVC()
+                self.pagingViewController.reloadData()
+                self.pagingViewController.select(index: currentWalletIndex, animated: false)
                 guard index >= 0 else { return }
-                self?.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
+                self.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
             }
             .store(in: &notificationsSet)
         
@@ -223,11 +227,10 @@ final class AccountViewController: FormViewController {
         
         walletsViewModel.$state
             .removeDuplicates()
-            .debounce(for: .nanoseconds(500_000_000), scheduler: DispatchQueue.main)
+            .debounce(for: .seconds(1) , scheduler: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.setupWalletsVC()
                 self.pagingViewController.reloadMenu()
                 self.pagingViewController.select(index: currentWalletIndex, animated: false)
             }
