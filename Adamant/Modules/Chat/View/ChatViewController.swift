@@ -741,14 +741,11 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func updateIsScrollPositionNearlyTheBottom() {
-        let oldValue = isScrollPositionNearlyTheBottom
         isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
-        
-        guard oldValue != isScrollPositionNearlyTheBottom else { return }
     }
     
     func updateMessages() {
-        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
+        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
     }
