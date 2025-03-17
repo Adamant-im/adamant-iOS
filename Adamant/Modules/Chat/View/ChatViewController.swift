@@ -43,7 +43,6 @@ final class ChatViewController: MessagesViewController {
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
     private var scrollToUnreadBottomConstraint: Constraint?
-    private var pendingOffsetAdjustment: CGFloat = 0
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
     
@@ -757,7 +756,7 @@ private extension ChatViewController {
         if let position = viewModel.startPosition {
             scrollToPosition(position)
         } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-            scrollToPosition(.messageId(unreadMessage), animated: false, additionalOffset: 120)
+            scrollToPosition(.messageId(unreadMessage), animated: false)
         }
     }
     
@@ -911,7 +910,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, additionalOffset: CGFloat = 0) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -934,7 +933,6 @@ private extension ChatViewController {
                 at: .top,
                 animated: animated
             )
-            self.pendingOffsetAdjustment = additionalOffset
             
             viewModel.needToAnimateCellIndex = needToAnimateCell
             ? index
@@ -1187,7 +1185,6 @@ extension ChatViewController {
     override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         animateScroll(isStarted: false)
         
-        applyAdditionalOffset()
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
         let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
@@ -1202,21 +1199,6 @@ extension ChatViewController {
         cell?.isSelected = false
         
         viewModel.needToAnimateCellIndex = nil
-    }
-    
-    private func applyAdditionalOffset() {
-        guard pendingOffsetAdjustment != 0 else { return }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let currentOffset = self.messagesCollectionView.contentOffset
-            self.messagesCollectionView.setContentOffset(
-                CGPoint(x: currentOffset.x, y: currentOffset.y - self.pendingOffsetAdjustment),
-                animated: true
-            )
-            self.pendingOffsetAdjustment = 0
-        }
     }
 }
 

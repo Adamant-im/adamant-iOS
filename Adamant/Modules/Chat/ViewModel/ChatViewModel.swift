@@ -1104,8 +1104,8 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
         $messages
             .removeDuplicates()
-            .sink { _ in
-                self.updateSeparatorIndex()
+            .sink { [weak self] _ in
+                self?.updateSeparatorIndex()
             }
             .store(in: &subscriptions)
         chatFileService.updateFileFields
