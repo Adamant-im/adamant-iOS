@@ -595,7 +595,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
                !value.isEmpty {
                 row.value = value
             } else {
-                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+                row.value = TransactionStatus.registered.localized
+                cell.detailTextLabel?.textColor = .adamant.attention
             }
         }
         

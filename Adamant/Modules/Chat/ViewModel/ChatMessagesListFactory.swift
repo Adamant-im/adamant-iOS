@@ -10,12 +10,15 @@ import Foundation
 import MessageKit
 import Combine
 import CommonKit
+import OrderedCollections
 
 actor ChatMessagesListFactory {
     private let chatMessageFactory: ChatMessageFactory
+    private let coreDataRelationMapper: CoreDataRealationMapperProtocol
     
-    init(chatMessageFactory: ChatMessageFactory) {
+    init(chatMessageFactory: ChatMessageFactory, coreDataRelationMapper: CoreDataRealationMapperProtocol) {
         self.chatMessageFactory = chatMessageFactory
+        self.coreDataRelationMapper = coreDataRelationMapper
     }
     
     func makeMessages(
@@ -23,9 +26,27 @@ actor ChatMessagesListFactory {
         sender: ChatSender,
         isNeedToLoadMoreMessages: Bool,
         expirationTimestamp minExpTimestamp: inout TimeInterval?
-    ) -> [ChatMessage] {
+    ) async -> ([ChatMessage], OrderedSet<String>, OrderedSet<String>) {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
-        
+
+        var processedTransactionIds: OrderedSet<String> = []
+
+        await withTaskGroup(of: [String].self) { group in
+            for chatTransaction in transactions {
+                guard let transaction = chatTransaction as? RichMessageTransaction,
+                      transaction.additionalType == .reaction,
+                      transaction.isUnread
+                else { continue }
+
+                group.addTask { [weak self] in
+                    return await self?.coreDataRelationMapper.mapReactionRelationship(transaction: transaction) ?? []
+                }
+            }
+
+            for await result in group {
+                processedTransactionIds.append(contentsOf: result)
+            }
+        }
         let transactionsWithoutReact = transactions.filter { chatTransaction in
             guard let transaction = chatTransaction as? RichMessageTransaction,
                   transaction.additionalType == .reaction
@@ -33,8 +54,12 @@ actor ChatMessagesListFactory {
             
             return false
         }
-        
-        return transactionsWithoutReact.enumerated().map { index, transaction in
+        let transactionIdsWithoutReact: OrderedSet<String> = OrderedSet(
+            transactionsWithoutReact
+                .filter { $0.isUnread }
+                .compactMap { $0.transactionId }
+        )
+        let messages = transactionsWithoutReact.enumerated().map { index, transaction in
             var expTimestamp: TimeInterval?
             let message = makeMessage(
                 transaction,
@@ -53,6 +78,8 @@ actor ChatMessagesListFactory {
             
             return message
         }
+
+        return (messages, processedTransactionIds, transactionIdsWithoutReact)
     }
 }
 

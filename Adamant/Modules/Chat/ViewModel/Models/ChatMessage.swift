@@ -21,6 +21,7 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
     let dateHeader: ComparableAttributedString?
     let topSpinnerOn: Bool
     let dateHeaderIsHidden: Bool
+    var isUnread: Bool
     
     static var `default`: Self {
         Self(
@@ -33,7 +34,8 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
             bottomString: nil,
             dateHeader: nil,
             topSpinnerOn: false,
-            dateHeaderIsHidden: true
+            dateHeaderIsHidden: true,
+            isUnread: true
         )
     }
 }

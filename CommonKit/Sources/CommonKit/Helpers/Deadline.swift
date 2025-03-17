@@ -15,7 +15,7 @@ func deadline<R>(
     isolation: isolated (any Actor)? = #isolation,
     operation: @Sendable () async throws -> R
 ) async throws -> R where R: Sendable {
-    let result = await withoutActuallyEscaping(operation) { operation in
+    let result = await withoutActuallyEscaping(operation) { escapableOperation in
         await withTaskGroup(
             of: DeadlineState<R>.self,
             returning: Result<R, any Error>.self,
@@ -24,7 +24,7 @@ func deadline<R>(
             
             taskGroup.addTask {
                 do {
-                    let result = try await operation()
+                    let result = try await escapableOperation()
                     return .operationResult(.success(result))
                 } catch {
                     return .operationResult(.failure(error))

@@ -129,4 +129,6 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         votes: [DelegateVote],
         date: Date
     ) async -> ApiServiceResult<Bool>
+    
+    func cancelCurrentTasks()
 }

@@ -5,12 +5,19 @@
 //  Created by Stanislav Jelezoglo on 13.01.2023.
 //  Copyright © 2023 Adamant. All rights reserved.
 //
-
 import UIKit
+import AdamantWalletsKit
 
 public extension UIImage {
     static func asset(named: String) -> UIImage? {
-        .init(named: named, in: .module, with: nil)
+        if let image = UIImage(named: named, in: .module, with: nil) {
+            return image
+        }
+        if let image = WalletsImageProvider.image(named: named) {
+            return image
+        }
+
+        return nil
     }
     
     func imageResized(to size: CGSize) -> UIImage {

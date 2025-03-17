@@ -132,8 +132,7 @@ extension AdamantApiService {
         }
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
-        response = await request(waitsForConnectivity: waitsForConnectivity) {
-            [queryItems] core, origin in
+        response = await request(waitsForConnectivity: waitsForConnectivity) { [queryItems] core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: ApiCommands.Transactions.root,

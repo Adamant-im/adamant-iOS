@@ -533,10 +533,17 @@ extension AdamantChatsProvider {
                         senderId: address,
                         privateKey: privateKey
                     )
+                    await self?.setupAsReadyToSyncChats()
                 }
             case .failure:
                 break
             }
+        }
+    }
+    
+    func setupAsReadyToSyncChats() {
+        if isInitiallySynced {
+            isInitiallySynced = false
         }
     }
     
@@ -969,6 +976,7 @@ extension AdamantChatsProvider {
         let transaction = MessageTransaction(context: context)
         let id = UUID().uuidString
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -986,7 +994,7 @@ extension AdamantChatsProvider {
         {
             transaction.statusEnum = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
-            
+            chatroom.lastTransaction = transaction
             chatroom.addToTransactions(transaction)
             
             do {
@@ -1015,6 +1023,7 @@ extension AdamantChatsProvider {
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
@@ -1041,7 +1050,7 @@ extension AdamantChatsProvider {
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             
             chatroom.addToTransactions(transaction)
-            
+            chatroom.lastTransaction = transaction
             do {
                 try context.save()
                 return transaction
@@ -1179,6 +1188,7 @@ extension AdamantChatsProvider {
         
         // MARK: 2. Update transaction
         transaction.date = Date() as NSDate
+        transaction.timestampMs = transaction.timeIntervalMillisecondsSince1970
         transaction.statusEnum = .pending
         
         if let chatroom = transaction.chatroom {
@@ -1413,8 +1423,7 @@ extension AdamantChatsProvider {
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "chatroom = %@", chatroom),
             NSPredicate(format: "isHidden == false")])
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
-                                   NSSortDescriptor(key: "transactionId", ascending: true)]
+        request.sortDescriptors = .sortChatTransactions(ascending: true)
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         
         return controller
@@ -1427,8 +1436,7 @@ extension AdamantChatsProvider {
             NSPredicate(format: "isUnread == true"),
             NSPredicate(format: "isHidden == false")])
         
-        request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
-                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.sortDescriptors = .sortChatTransactions(ascending: false)
         
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
         
@@ -1543,8 +1551,6 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
-        
-        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
                 
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0
@@ -1955,6 +1961,14 @@ extension AdamantChatsProvider {
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
+        }
+    }
+    
+    func markMessageAsRead(chatroom: Chatroom, message: String) {
+        chatroom.managedObjectContext?.perform { [weak self] in
+            guard let self else { return }
+            chatroom.markMessageAsReaded(chatMessageId: message, stack: self.stack)
+            try? chatroom.managedObjectContext?.save()
         }
     }
     

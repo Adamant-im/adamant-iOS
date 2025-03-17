@@ -1,0 +1,33 @@
+{
+  "name": "Onyxcoin",
+  "website": "https://onyx.org",
+  "description": "Onyx DeFi Liquidity Protocol supported by the Onyx DAO",
+  "symbol": "XCN",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/OnyxProtocol"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/Onyx-Protocol"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://onyx.org/Whitepaper.pdf"
+    },
+    {
+      "name": "telegram_chat",
+      "url": "https://t.me/OnyxOrg"
+    },
+    {
+      "name": "blog",
+      "url": "https://medium.com/OnyxProtocol"
+    }
+  ]
+}

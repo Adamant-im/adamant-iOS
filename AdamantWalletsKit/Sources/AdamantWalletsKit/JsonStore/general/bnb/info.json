@@ -1,0 +1,30 @@
+{
+  "name": "Binance Coin",
+  "website": "https://bnbchain.org",
+  "description": "Cryptocurrency that powers the BNB Chain ecosystem",
+  "explorer": "https://explorer.bnbchain.org",
+  "symbol": "BNB",
+  "type": "coin",
+  "decimals": 8,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "github",
+      "url": "https://github.com/bnb-chain"
+    },
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/BNBChain"
+    },
+    {
+      "name": "reddit",
+      "url": "http://reddit.com/r/bnbchainofficial"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://github.com/bnb-chain/whitepaper"
+    }
+  ]
+}

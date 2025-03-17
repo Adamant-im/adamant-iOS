@@ -24,7 +24,8 @@ struct ChatListFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             addressBook: assembler.resolve(AddressBookService.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            chatPreservation: assembler.resolve(ChatPreservationProtocol.self)!
         )
     }
     
@@ -39,7 +40,7 @@ struct ChatListFactory {
     
     func makeComplexTransferVC(screensFactory: ScreensFactory) -> UIViewController {
         ComplexTransferViewController(
-            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
+            walletsStoreService: assembler.resolve(WalletStoreServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 
