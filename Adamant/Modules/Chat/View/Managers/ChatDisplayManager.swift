@@ -67,6 +67,23 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         }
     }
     
+    nonisolated func messageFooterView(
+        for indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> MessageReusableView {
+        DispatchQueue.onMainThreadSyncSafe {
+            guard let separatorIndex = viewModel.separatorIndex, indexPath.section == separatorIndex else {
+                return MessageReusableView()
+            }
+            
+            let footer = messagesCollectionView.dequeueReusableFooterView(
+                NewMessagesCell.self,
+                for: indexPath
+            )
+            return footer
+        }
+    }
+    
     nonisolated func enabledDetectors(
         for _: MessageType,
         at _: IndexPath,
