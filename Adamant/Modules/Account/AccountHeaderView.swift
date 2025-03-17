@@ -68,24 +68,53 @@ final class AccountHeaderView: UIView {
 private extension AccountHeaderView {
     func setupGestureRecognizers() {
         secretWalletsImageView.isUserInteractionEnabled = true
-        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(walletsButtonTapped))
         secretWalletsImageView.addGestureRecognizer(tapGesture)
+        
+        guard self.circularBackgroundView != nil else { return }
+        circularBackgroundView!.isUserInteractionEnabled = true
+        let bgTapGesture = UITapGestureRecognizer(target: self, action: #selector(walletsButtonTapped))
+        circularBackgroundView!.addGestureRecognizer(bgTapGesture)
     }
     
     func updateWalletBadge(count: Int) {
-        secretWalletsImageView.viewWithTag(99)?.removeFromSuperview()
+        guard let bgView = circularBackgroundView else { return }
+        
+        bgView.viewWithTag(99)?.removeFromSuperview()
         
         guard count > 0 else { return }
         
+        let badgeLabel = UILabel()
+        badgeLabel.tag = 99
+        badgeLabel.text = "\(count)"
+        badgeLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        badgeLabel.textAlignment = .center
+        badgeLabel.textColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .light ? .white : .black
+        }
+        badgeLabel.backgroundColor = .adamant.secondary
+        
+        let badgeSize: CGFloat = 24
+        badgeLabel.layer.cornerRadius = badgeSize / 2
+        badgeLabel.layer.masksToBounds = true
+        
+        badgeLabel.translatesAutoresizingMaskIntoConstraints = false
+        bgView.addSubview(badgeLabel)
+        
+        NSLayoutConstraint.activate([
+            badgeLabel.widthAnchor.constraint(equalToConstant: badgeSize),
+            badgeLabel.heightAnchor.constraint(equalToConstant: badgeSize),
+            badgeLabel.trailingAnchor.constraint(equalTo: bgView.trailingAnchor, constant: 0),
+            badgeLabel.bottomAnchor.constraint(equalTo: bgView.bottomAnchor, constant: 0)
+        ])
     }
-    
+
     private func addPersistentOutline() {
         let bgView = UIView()
         bgView.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark
-            ? .adamant.secondary
-            : UIColor.black
+            return traitCollection.userInterfaceStyle == .light
+            ? .adamant.secondBackgroundColor
+            : .adamant.background
         }
         
         secretWalletsImageView.superview?.insertSubview(bgView, belowSubview: secretWalletsImageView)
@@ -93,7 +122,22 @@ private extension AccountHeaderView {
     }
     
     private func animateOutline() {
+        guard let bgView = circularBackgroundView else { return }
         
+        let originalColor = bgView.backgroundColor
+        let highlightColor = UIColor.systemGray5
+        
+        UIView.animate(withDuration: 0.1, animations: {
+            bgView.backgroundColor = highlightColor
+            bgView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+            self.secretWalletsImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        }, completion: { _ in
+            UIView.animate(withDuration: 0.1, animations: {
+                bgView.backgroundColor = originalColor
+                bgView.transform = .identity
+                self.secretWalletsImageView.transform = .identity
+            })
+        })
     }
 }
 
