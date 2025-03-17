@@ -548,12 +548,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    func setupAsReadyToSyncChats() {
-        if isInitiallySynced {
-            isInitiallySynced = false
-        }
-    }
-    
     func disconnectFromSocket() {
         self.socketService.disconnect()
     }
