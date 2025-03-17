@@ -539,6 +539,13 @@ extension AdamantChatsProvider {
                 break
             }
         }
+        setupAsReadyToSyncChats()
+    }
+    
+    func setupAsReadyToSyncChats() {
+        if isInitiallySynced {
+            isInitiallySynced = false
+        }
     }
     
     func setupAsReadyToSyncChats() {

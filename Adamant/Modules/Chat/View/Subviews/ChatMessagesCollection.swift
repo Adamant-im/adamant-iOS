@@ -43,14 +43,20 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         }
     }
     
-    func reloadData(newIds: [String]) {
-        guard newIds.last == currentIds.last || newIds.first != currentIds.first else {
+    func reloadData(newIds: [String], isOnBottom: Bool) {
+        let hasNewMessagesAtTop = newIds.first != currentIds.first
+        let hasNewMessagesAtBottom = newIds.last != currentIds.last
+
+        guard hasNewMessagesAtTop || hasNewMessagesAtBottom else {
             return applyNewIds(newIds)
         }
-        
+
         let bottomOffset = self.bottomOffset
         applyNewIds(newIds)
-        setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
+
+        if hasNewMessagesAtTop || (hasNewMessagesAtBottom && isOnBottom) {
+            setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
+        }
     }
     
     func setFullBottomInset(_ inset: CGFloat) {

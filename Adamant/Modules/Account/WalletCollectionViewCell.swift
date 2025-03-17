@@ -33,7 +33,7 @@ class WalletCollectionViewCell: PagingCell {
 private extension WalletCollectionViewCell {
     func update(item: WalletCollectionViewCell.Model) {
         currencyImageView.image = item.currencyImage
-        if item.currencyNetwork.isEmpty {
+        if item.currencyNetwork == item.currencySymbol {
             currencySymbolLabel.text = item.currencySymbol
         } else {
             let currencyFont = currencySymbolLabel.font ?? .systemFont(ofSize: 12)

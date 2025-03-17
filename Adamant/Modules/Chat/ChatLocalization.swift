@@ -102,6 +102,9 @@ extension String.adamant {
         static var unknownTitle: String {
             String.localized("Chat.unknown.title", comment: "Chat unknown")
         }
+        static var noActiveNodesTitle: String {
+            String.localized("Chat.Alert.Title.NoActiveNodes", comment: "No active nodes title")
+        }
         static var noActiveNodes: String {
             String.localized("Chat.Alert.NoActiveNodes", comment: "No active nodes")
         }
