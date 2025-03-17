@@ -1134,10 +1134,11 @@ private extension ChatViewModel {
         
         $unreadMessagesIds
             .removeDuplicates()
-            .sink { newValue in
-                self.updateScrolledMessageState(newUnreadIds: newValue)
+            .sink { [weak self] newValue in
+                self?.updateScrolledMessageState(newUnreadIds: newValue)
             }
             .store(in: &subscriptions)
+        
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
