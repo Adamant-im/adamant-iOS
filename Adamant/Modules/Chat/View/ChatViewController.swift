@@ -494,8 +494,8 @@ private extension ChatViewController {
         
         viewModel.$unreadMessagesIds
             .removeDuplicates()
-            .sink { _ in
-                self.updateScrollDownButtonVisibility()
+            .sink { [weak self] _ in
+                self?.updateScrollDownButtonVisibility()
             }
             .store(in: &subscriptions)
         
@@ -742,14 +742,11 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func updateIsScrollPositionNearlyTheBottom() {
-        let oldValue = isScrollPositionNearlyTheBottom
         isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
-        
-        guard oldValue != isScrollPositionNearlyTheBottom else { return }
     }
     
     func updateMessages() {
-        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
+        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
     }
@@ -845,6 +842,7 @@ private extension ChatViewController {
                 viewModel.shouldScrollToBottom = true
             }
         }
+        button.alpha = 0
         return button
     }
     
