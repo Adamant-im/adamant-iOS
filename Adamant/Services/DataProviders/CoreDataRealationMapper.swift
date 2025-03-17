@@ -39,6 +39,9 @@ final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
                     let transactionInContext = privateContext.object(with: transaction.objectID) as? RichMessageTransaction
                     transactionInContext?.chatTransaction = chatTrs
                     chatTrs.addToRichMessageTransactions(transactionInContext!)
+                    if privateContext.hasChanges {
+                        try privateContext.save()
+                    }
                 }
                 
                 return processedIds
