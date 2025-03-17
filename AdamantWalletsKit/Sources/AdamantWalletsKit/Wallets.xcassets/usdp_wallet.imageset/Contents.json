@@ -1,23 +1,8 @@
 {
   "images" : [
-    {
-      "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "usdp_wallet.png"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "usdp_wallet@2x.png"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "usdp_wallet@3x.png"
-    }
+    { "filename" : "usdp_wallet.png", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "usdp_wallet@2x.png", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "usdp_wallet@3x.png", "idiom" : "universal", "scale" : "3x" }
   ],
-  "info" : {
-    "version" : 1,
-    "author" : "xcode"
-  }
+  "info": { "author": "xcode", "version": 1 }
 }
