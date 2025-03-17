@@ -493,8 +493,8 @@ private extension ChatViewController {
         
         viewModel.$unreadMessagesIds
             .removeDuplicates()
-            .sink { _ in
-                self.updateScrollDownButtonVisibility()
+            .sink { [weak self] _ in
+                self?.updateScrollDownButtonVisibility()
             }
             .store(in: &subscriptions)
         
@@ -841,6 +841,7 @@ private extension ChatViewController {
                 viewModel.shouldScrollToBottom = true
             }
         }
+        button.alpha = 0
         return button
     }
     
