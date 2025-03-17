@@ -90,6 +90,8 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Rows
     
     enum BaseRows {
+        case senderAddress
+        case type
         case balance
         case amount
         case fiat
@@ -105,6 +107,8 @@ class TransferViewControllerBase: FormViewController {
         
         var tag: String {
             switch self {
+            case .senderAddress: return "senderAddress"
+            case .type: return "type"
             case .balance: return "balance"
             case .amount: return "amount"
             case .fiat: return "fiat"
@@ -122,6 +126,8 @@ class TransferViewControllerBase: FormViewController {
         
         var localized: String {
             switch self {
+            case .senderAddress: return .localized("TransferScene.Row.SenderAddress", comment: "Transfer: sender address")
+            case .type: return .localized("TransferScene.Row.Type", comment: "Transfer: transaction type")
             case .balance: return .localized("TransferScene.Row.Balance", comment: "Transfer: logged user balance.")
             case .amount: return .localized("TransferScene.Row.Amount", comment: "Transfer: amount of adamant to transfer.")
             case .fiat: return .localized("TransferScene.Row.Fiat", comment: "Transfer: fiat value of crypto-amout")
@@ -188,6 +194,8 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let apiServiceCompose: ApiServiceComposeProtocol
+    let secretWalletManager: SecretWalletsManagerProtocol
+    let secretWalletViewModel: SecretWalletsViewModel
     
     // MARK: - Properties
     
@@ -319,7 +327,9 @@ class TransferViewControllerBase: FormViewController {
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        apiServiceCompose: ApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol,
+        secretWalletManager: SecretWalletsManagerProtocol,
+        secretWalletViewModel: SecretWalletsViewModel
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -333,6 +343,8 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.apiServiceCompose = apiServiceCompose
+        self.secretWalletManager = secretWalletManager
+        self.secretWalletViewModel = secretWalletViewModel
         super.init(style: .insetGrouped)
     }
     
@@ -501,6 +513,8 @@ class TransferViewControllerBase: FormViewController {
             $0.tag = Sections.wallet.tag
         }
         
+        section.append(defaultRowFor(baseRow: BaseRows.senderAddress))
+        section.append(defaultRowFor(baseRow: BaseRows.type))
         section.append(defaultRowFor(baseRow: BaseRows.balance))
         section.append(defaultRowFor(baseRow: BaseRows.maxToTransfer))
         
@@ -1023,6 +1037,28 @@ class TransferViewControllerBase: FormViewController {
 extension TransferViewControllerBase {
     func defaultRowFor(baseRow: BaseRows) -> BaseRow {
         switch baseRow {
+        case .senderAddress:
+            return LabelRow { [weak self] in
+                $0.title = BaseRows.senderAddress.localized
+                $0.tag = BaseRows.senderAddress.tag
+                $0.disabled = true
+                $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
+                $0.value = self?.walletCore.wallet?.address
+            }
+        case .type:
+            return LabelRow {
+                $0.title = BaseRows.type.localized
+                $0.tag = BaseRows.type.tag
+                $0.disabled = true
+                
+                $0.value = secretWalletViewModel.state.currentWallet?.name ?? String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet")
+                
+                for wallet in secretWalletManager.getRegularWallet().sorted(includeInvisible: false) where wallet.core.wallet?.address == walletCore.wallet?.address {
+                        $0.value = String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet")
+                        break
+                    }
+            }
+            
         case .balance:
             return SafeDecimalRow { [weak self] in
                 $0.title = BaseRows.balance.localized

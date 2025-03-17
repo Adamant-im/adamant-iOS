@@ -1211,6 +1211,12 @@
 /* Transfer: fiat value of crypto-amout */
 "TransferScene.Row.Fiat" = "Wert";
 
+/* Transfer: sender address */
+"TransferScene.Row.SenderAddress" = "Adresse";
+
+/* Transfer: type of wallet */
+"TransferScene.Row.Type" = "Typ";
+
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Kontostand";
 
