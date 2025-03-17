@@ -29,9 +29,12 @@ final class SecretWalletsViewModel: ObservableObject {
     }
     
     func pickWallet(at index: Int) {
-        state.currentActiveIndex = index
-        guard index != 0 else { return secretWalletsManager.activateDefaultWallet() }
-        secretWalletsManager.activateSecretWallet(at: index - 1)
+        if index == 0 {
+            secretWalletsManager.activateDefaultWallet()
+        } else {
+            secretWalletsManager.activateSecretWallet(at: index - 1)
+        }
+        state.currentActiveIndex = index // We must change state after to avoid bugs
     }
     
     func createSecretWallet(password: String) {

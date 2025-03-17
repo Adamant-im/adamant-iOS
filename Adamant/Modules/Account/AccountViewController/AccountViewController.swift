@@ -236,6 +236,74 @@ final class AccountViewController: FormViewController {
             }
             .store(in: &notificationsSet)
         
+        setupSections()
+        
+        // MARK: Notification Center
+        addObservers()
+        
+        setColors()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: animated)
+        }
+        
+        for vc in pagingViewController.pageViewController.children {
+            vc.viewWillAppear(animated)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !initiated {
+            initiated = true
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
+            layoutTableHeaderView()
+            if !initiated {
+                initiated = true
+            }
+        }
+        
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: TableView configuration
+    
+    override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    // MARK: Other
+    
+    private func setupSections() {
         // MARK: Rows&Sections
         
         // MARK: Application
@@ -707,71 +775,7 @@ final class AccountViewController: FormViewController {
         form.append(appSection)
         
         form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
-        
-        // MARK: Notification Center
-        addObservers()
-        
-        setColors()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
-        
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
-        }
-        
-        for vc in pagingViewController.pageViewController.children {
-            vc.viewWillAppear(animated)
-        }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        if !initiated {
-            initiated = true
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
-        }
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
-            layoutTableHeaderView()
-            if !initiated {
-                initiated = true
-            }
-        }
-        
-        pagingViewController?.indicatorColor = UIColor.adamant.primary
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    // MARK: TableView configuration
-    
-    override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-        return .fade
-    }
-    
-    override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-        return .fade
-    }
-    
-    // MARK: Other
     
     func addObservers() {
         NotificationCenter.default.addObserver(
