@@ -665,6 +665,7 @@ private extension ChatViewController {
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
         phPickerVC.delegate = viewModel.mediaPickerDelegate
+        phPickerVC.view.tintColor = .systemBlue
         present(phPickerVC, animated: true)
     }
     
