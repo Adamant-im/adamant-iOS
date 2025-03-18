@@ -250,13 +250,13 @@ final class LoginViewController: FormViewController {
             $0.tag = Rows.loginButton.tag
             $0.title = Rows.loginButton.localized
             $0.disabled = Condition.function([Rows.passphrase.tag], { form -> Bool in
-                guard let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag), row.value != nil else {
+                guard let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag), row.value != nil else {
                     return true
                 }
                 return false
             })
-        }.onCellSelection { [weak self] (_, row) in
-            guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
+        }.onCellSelection { [weak self] (_, _) in
+            guard let row: PasteInterceptingPasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
                   let passphrase = row.value else {
                 return
             }
@@ -381,7 +381,7 @@ final class LoginViewController: FormViewController {
         }
         
         // MARK: tableView position tuning
-        if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
+        if let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
             NotificationCenter.default.addObserver(
                 forName: UITextField.textDidBeginEditingNotification,
                 object: row.cell.textField,
