@@ -776,9 +776,14 @@ private extension ChatFileService {
             else {
                 return await chatsProvider.removeMessage(with: txId)
             }
-            
+            let message = createAdamantMessage(
+                with: richFiles,
+                text: text,
+                replyMessage: replyMessage,
+                storageProtocol: storageProtocol
+            )
             _ = try await chatsProvider.sendFileMessage(
-                adamantMessage,
+                message,
                 recipientId: partnerAddress,
                 transactionLocalyId: txId,
                 from: chatroom
