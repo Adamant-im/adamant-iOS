@@ -45,6 +45,7 @@ final class ChatViewController: MessagesViewController {
     private var scrollToUnreadBottomConstraint: Constraint?
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
+    private var scrollToPosition: UICollectionView.ScrollPosition = .top
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -493,8 +494,8 @@ private extension ChatViewController {
         
         viewModel.$unreadMessagesIds
             .removeDuplicates()
-            .sink { _ in
-                self.updateScrollDownButtonVisibility()
+            .sink { [weak self] _ in
+                self?.updateScrollDownButtonVisibility()
             }
             .store(in: &subscriptions)
         
@@ -837,10 +838,12 @@ private extension ChatViewController {
             if viewModel.shouldScrollToBottom {
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
+                scrollToPosition = .top
                 viewModel.scroll(to: id)
                 viewModel.shouldScrollToBottom = true
             }
         }
+        button.alpha = 0
         return button
     }
     
@@ -850,6 +853,7 @@ private extension ChatViewController {
             guard let self,
                   let unreadId = self.viewModel.messagesWithUnredReactionsIds?.last else { return }
             
+            scrollToPosition = .bottom
             viewModel.scroll(to: unreadId)
         }
         button.alpha = 0
@@ -926,7 +930,7 @@ private extension ChatViewController {
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
-                at: .top,
+                at: scrollToPosition,
                 animated: animated
             )
             
