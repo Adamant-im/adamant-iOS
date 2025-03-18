@@ -93,10 +93,11 @@ private extension PKGeneratorView {
     }
     
     func keyView(_ keyInfo: PKGeneratorState.KeyInfo) -> some View {
-        NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }) {
+        NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }, content: {
             HStack {
                 Image(uiImage: keyInfo.icon)
-                    .resizable()       
+                    .renderingMode(.template)
+                    .resizable()
                     .frame(squareSize: 25)
                     .foregroundStyle(Color(uiColor: .adamant.tableRowIcons))
                  
@@ -112,6 +113,6 @@ private extension PKGeneratorView {
                 Text(keyInfo.key).lineLimit(1)
                     .foregroundStyle(Color(uiColor: .adamant.secondary))
             }
-        }
+        })
     }
 }

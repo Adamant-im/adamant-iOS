@@ -1379,6 +1379,9 @@
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.Title" = "Active wallets";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Enter password to add secret wallet";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Password";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Add";
 "SecretWallets.Row.Title" = "Secret wallets";
 
 /* Secret Wallets Coins name*/

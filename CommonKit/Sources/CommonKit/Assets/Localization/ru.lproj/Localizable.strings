@@ -1372,14 +1372,17 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "Обычный";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ Секретный 1";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ Секретный 2";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ Секретный 3";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ Секретный 4";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ Секретный 5";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ Секретный 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ Секретный 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ Секретный 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ Секретный 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ Секретный 5";
 "SecretWallets.Menu.AddSecretWallet" = "Добавить секретный";
 "SecretWallets.Menu.TellMeMore" = "О кошельках";
 "SecretWallets.Menu.Title" = "Активные кошельки";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Введите пароль, чтобы добавить секретный кошелек";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Пароль";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Добавить";
 "SecretWallets.Row.Title" = "Секретные кошельки";
 
 /* Secret Wallets Coins name*/

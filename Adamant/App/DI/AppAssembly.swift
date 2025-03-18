@@ -105,6 +105,17 @@ struct AppAssembly: MainThreadAssembly {
             )
         }.inObjectScope(.container)
         
+        container.register(SecretWalletsViewModel.self) { r in
+            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
+        }.inObjectScope(.container)
+        
+        container.register(SecretWalletsAlertMenuView.self) { r in
+            SecretWalletsAlertMenuView(
+                dialogService: r.resolve(DialogService.self)!,
+                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
+            )
+        }.inObjectScope(.transient)
+        
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
@@ -495,18 +506,5 @@ struct AppAssembly: MainThreadAssembly {
         container.register(CoreDataRealationMapperProtocol.self) { r in
             CoreDataRealationMapper(stack: r.resolve(CoreDataStack.self)!)
         }.inObjectScope(.container)
-
-        // MARK: SecretWalletsViewModel
-        container.register(SecretWalletsViewModel.self) { r in
-            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
-        }.inObjectScope(.container)
-        
-        // MARK: SecretWalletsAlertService
-        container.register(SecretWalletsAlertMenuView.self) { r in
-            SecretWalletsAlertMenuView(
-                dialogService: r.resolve(DialogService.self)!,
-                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
-            )
-        }.inObjectScope(.transient)
     }
 }

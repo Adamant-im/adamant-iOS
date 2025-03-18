@@ -1109,7 +1109,6 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
                   first.height != second.height else {
                 return
             }
-            
             updateHeaderSize(with: second, animated: true)
         }
     }

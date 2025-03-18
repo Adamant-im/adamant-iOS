@@ -35,6 +35,15 @@ final class AccountHeaderView: UIView {
         setupGestureRecognizers()
     }
     
+    @IBAction func addressButtonTapped(_ sender: UIButton) {
+        delegate?.addressLabelTapped(from: sender)
+    }
+    
+    @objc private func walletsButtonTapped() {
+        animateOutline()
+        delegate?.walletsButtonTapped(from: secretWalletsImageView)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let bgView = circularBackgroundView else { return }
@@ -48,20 +57,13 @@ final class AccountHeaderView: UIView {
                               height: bgHeight)
         bgView.layer.cornerRadius = bgWidth / 2
     }
-    
+}
+
+extension AccountHeaderView {
     func setWalletIcon(_ icon: WalletIcon, badgeCount: Int) {
         secretWalletsImageView.tintColor = .adamant.secondary
         secretWalletsImageView.image = .asset(named: icon.rawValue)?.withRenderingMode(.alwaysTemplate) ?? .init()
         updateWalletBadge(count: badgeCount)
-    }
-    
-    @IBAction func addressButtonTapped(_ sender: UIButton) {
-        delegate?.addressLabelTapped(from: sender)
-    }
-    
-    @objc private func walletsButtonTapped() {
-        animateOutline()
-        delegate?.walletsButtonTapped(from: secretWalletsImageView)
     }
 }
 
@@ -109,7 +111,7 @@ private extension AccountHeaderView {
         ])
     }
 
-    private func addPersistentOutline() {
+    func addPersistentOutline() {
         let bgView = UIView()
         bgView.backgroundColor = UIColor { traitCollection in
             return traitCollection.userInterfaceStyle == .light
@@ -121,7 +123,7 @@ private extension AccountHeaderView {
         self.circularBackgroundView = bgView
     }
     
-    private func animateOutline() {
+    func animateOutline() {
         guard let bgView = circularBackgroundView else { return }
         
         let originalColor = bgView.backgroundColor

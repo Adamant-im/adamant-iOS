@@ -75,7 +75,7 @@ final class SecretWalletsAlertMenuView {
     
     private func showEnableSecretWalletAlert() {
         let passwordAlert = UIAlertController(
-            title: "Enter password to add secret wallet",
+            title: String.localized("SecretWallets.Menu.AddSecretWallet.Title", comment: "Add secret wallet title"),
             message: nil,
             preferredStyle: .alert
         )
@@ -85,10 +85,10 @@ final class SecretWalletsAlertMenuView {
             textField.placeholder = "Password"
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: String.localized("Cancel", comment:  "Cancel adding password"), style: .cancel)
         passwordAlert.addAction(cancelAction)
         
-        let enableAction = UIAlertAction(title: "Enable", style: .default) { [weak self] _ in
+        let enableAction = UIAlertAction(title: String.localized("SecretWallets.Menu.AddSecretWallet.Add", comment: "Confirm adding secret password"), style: .default) { [weak self] _ in
             guard
                 let self = self,
                 let password = passwordAlert.textFields?.first?.text,
