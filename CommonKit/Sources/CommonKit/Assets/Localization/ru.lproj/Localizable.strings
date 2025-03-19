@@ -1361,6 +1361,11 @@
 "Chat.Alert.Title.NoActiveNodes" = "Нет активных узлов ADM";
 "Chat.Alert.NoActiveNodes" = "Не удается получить новые сообщения — нет активных узлов блокчейна ADM. Поскольку вы отключили некоторые из них, посмотрите список узлов еще раз.";
 
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Проверьте время на устройстве";
+"Chat.Alert.TimestampIsInTheFuture" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит. Проверьте время на устройстве или попробуйте отправить сообщение снова.";
+"Chat.Alert.TimeSettings" = "Настроить время";
+
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "К списку узлов ADM";
 

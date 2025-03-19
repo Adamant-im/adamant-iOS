@@ -93,6 +93,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let didTapAdmNodesList = ObservableSender<Void>()
+    let didTapShowTimeSettings = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
@@ -508,6 +509,12 @@ final class ChatViewModel: NSObject {
                 switch error as? ChatsProviderError {
                 case .invalidTransactionStatus:
                     break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.richError(error))
+                    }
                 default:
                     dialog.send(.richError(error))
                 }
@@ -1443,7 +1450,7 @@ private extension ChatViewModel {
             }
         case let .serverError(error):
             if case .timestampIsInTheFuture = error {
-                dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
+                dialog.send(.timestampIsInTheFuture)
             }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break
