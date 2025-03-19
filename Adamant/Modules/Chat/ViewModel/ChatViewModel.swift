@@ -54,7 +54,7 @@ final class ChatViewModel: NSObject {
     private var isLoading = false
     var separatorIndex: Int?
     var separatorId: String?
-    var isSeparatorAdded: Bool = false
+    var didAddSeparator: Bool = false
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
