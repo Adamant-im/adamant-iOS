@@ -871,7 +871,10 @@ private extension ChatViewController {
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
         )
-        
+        collection.register(
+            NewMessagesCell.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter
+        )
         return collection
     }
 }

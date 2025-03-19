@@ -119,6 +119,18 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         }
     }
     
+    nonisolated func footerViewSize(
+        for section: Int,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CGSize {
+        MainActor.assumeIsolatedSafe {
+            guard let separatorIndex = viewModel.separatorIndex, section == separatorIndex else {
+                return .zero
+            }
+            return CGSize(width: messagesCollectionView.bounds.width, height: 25)
+        }
+    }
+    
     nonisolated func attributedTextCellSizeCalculator(
         for message: MessageType,
         at indexPath: IndexPath,
