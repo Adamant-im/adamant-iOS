@@ -52,9 +52,19 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
-    var separatorIndex: Int?
-    var separatorId: String?
-    var isSeparatorAdded: Bool = false
+    var pinnedUnreadSeparatorIndex: Int?
+    
+    /// Invoke it just after messages loaded.
+    func pinFirstUnreadMessageIfNeeded() {
+        if pinnedUnreadSeparatorIndex != nil { return }
+        
+        guard let firstUnreadId = unreadMessagesIds?.first,
+              let firstUnreadIdx = messages.firstIndex(where: { $0.id == firstUnreadId })
+        else {
+            return
+        }
+        pinnedUnreadSeparatorIndex = max(0, firstUnreadIdx - 1)
+    }
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -1099,13 +1109,6 @@ private extension ChatViewModel {
             .removeDuplicates()
             .sink { [weak self] unreadIndexes in
                 self?.unreadMesaggesIndexes = unreadIndexes
-                self?.updateSeparatorId()
-            }
-            .store(in: &subscriptions)
-        $messages
-            .removeDuplicates()
-            .sink { [weak self] _ in
-                self?.updateSeparatorIndex()
             }
             .store(in: &subscriptions)
         chatFileService.updateFileFields
@@ -1712,31 +1715,6 @@ private extension ChatViewModel {
         if newUnreadIds.isEmpty {
             shouldScrollToBottom = true
         }
-    }
-    
-    func updateSeparatorId() {
-        guard !didAddSeparator, !messages.isEmpty else { return }
-        
-        guard let firstUnreadId = unreadMessagesIds?.first else {
-            separatorId = nil
-            separatorIndex = nil
-            return
-        }
-        
-        didAddSeparator = true
-        separatorId = firstUnreadId
-        updateSeparatorIndex()
-    }
-
-    func updateSeparatorIndex() {
-        guard let separatorId = separatorId,
-              let index = messages.firstIndex(where: { $0.id == separatorId })
-        else {
-            separatorIndex = nil
-            return
-        }
-        
-        separatorIndex = index - 1
     }
 }
 

@@ -72,7 +72,9 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageReusableView {
         DispatchQueue.onMainThreadSyncSafe {
-            guard let separatorIndex = viewModel.separatorIndex, indexPath.section == separatorIndex else {
+            // Find approptiate place to invoke this method
+            viewModel.pinFirstUnreadMessageIfNeeded()
+            guard let separatorIndex = viewModel.pinnedUnreadSeparatorIndex, indexPath.section == separatorIndex else {
                 return MessageReusableView()
             }
             

@@ -124,7 +124,9 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
         MainActor.assumeIsolatedSafe {
-            guard let separatorIndex = viewModel.separatorIndex, section == separatorIndex else {
+            // Find approptiate place to invoke this method
+            viewModel.pinFirstUnreadMessageIfNeeded()
+            guard let separatorIndex = viewModel.pinnedUnreadSeparatorIndex, section == separatorIndex else {
                 return .zero
             }
             return CGSize(width: messagesCollectionView.bounds.width, height: 25)
