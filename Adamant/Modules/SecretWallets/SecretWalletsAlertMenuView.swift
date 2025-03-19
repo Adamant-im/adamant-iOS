@@ -105,11 +105,18 @@ final class SecretWalletsAlertMenuView {
     
     private func showSecretWalletInfoAlert() {
         let infoAlert = UIAlertController(
-            title: "Secret Wallets",
-            message: "Secret wallets are encrypted and require a password...",
+            title: String.localized("SecretWallets.Menu.TellMeMore.Title", comment: "Tell me more about secret wallets"),
+            message: String.localized("SecretWallets.Menu.TellMeMore.Subtitle", comment: "Subtitle for tell me more alert"),
             preferredStyle: .alert
         )
-        infoAlert.addAction(.init(title: "Got it", style: .default))
+        infoAlert.addAction(.init(title: String.localized("Cancel"), style: .cancel))
+        
+        let learnMoreAction = UIAlertAction(title: String.localized("SecretWallets.Menu.TellMeMore.LearnMore", comment: "Learn more about secret wallets") , style: .default) { _ in
+            if let url = URL(string: "http://news.adamant.im/") {
+                UIApplication.shared.open(url)
+            }
+        }
+        infoAlert.addAction(learnMoreAction)
         
         dialogService.present(infoAlert, animated: true, completion: nil)
     }

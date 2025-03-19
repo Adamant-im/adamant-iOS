@@ -1378,6 +1378,9 @@
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
 "SecretWallets.Menu.Title" = "Active wallets";
 "SecretWallets.Menu.AddSecretWallet.Title" = "Enter password to add secret wallet";
 "SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Password";
