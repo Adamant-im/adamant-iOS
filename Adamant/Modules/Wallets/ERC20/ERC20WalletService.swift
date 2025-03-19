@@ -24,27 +24,27 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var minAmount: Decimal = 0
     
     var tokenSymbol: String {
-        return token.symbol
+        token.symbol
     }
     
     var tokenName: String {
-        return token.name
+        token.name
     }
     
     var tokenLogo: UIImage {
-        return token.logo
+        token.logo
     }
     
     static var tokenNetworkSymbol: String {
-        return "ERC20"
+        "ERC20"
     }
     
     var consistencyMaxTime: Double {
-        return 1200
+        1200
     }
     
     var tokenContract: String {
-        return token.contractAddress
+        token.contractAddress
     }
    
     var tokenUniqueID: String {
@@ -52,27 +52,27 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     }
     
     var defaultVisibility: Bool {
-        return token.defaultVisibility
+        token.defaultVisibility
     }
     
     var defaultOrdinalLevel: Int? {
-        return token.defaultOrdinalLevel
+        token.defaultOrdinalLevel
     }
     
     var richMessageType: String {
-        return Self.richMessageType
+        Self.richMessageType
 	}
 
     var qqPrefix: String {
-        return EthWalletService.qqPrefix
+        EthWalletService.qqPrefix
 	}
 
     var isSupportIncreaseFee: Bool {
-        return true
+        true
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
+        increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -95,7 +95,7 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     private(set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
-        return ethWallet?.balance ?? 0 > transactionFee
+        ethWallet?.balance ?? 0 > transactionFee
     }
     
     var reliabilityGasPricePercent: BigUInt {

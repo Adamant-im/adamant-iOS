@@ -73,13 +73,13 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
+final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC20GasAlgorithmComputable, @unchecked Sendable {
     static let currencySymbol = "ETH"
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
     static var coinInfo: CoinInfoDTO? {
-        CoinInfoProvider.coins[currencySymbol]
+        CoinInfoProvider.storage?[currencySymbol]
     }
     
 	static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
@@ -168,7 +168,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     static let richMessageType = "eth_transaction"
     
     var increasedGasPricePercent: Decimal {
-        Self.coinInfo?.increasedGasPricePercent ?? .zero
+        Decimal(Self.coinInfo?.increasedGasPricePercent ?? 50)
     }
     
 	// MARK: - Properties
