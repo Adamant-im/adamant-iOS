@@ -187,6 +187,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: dynamicRichMessageType
     )
@@ -408,7 +409,8 @@ extension ERC20WalletService {
         
         self.setState(.upToDate, silent: true)
         Task {
-            await update()
+            await self.update()
+            self.addTransactionObserver()
         }
         return eWallet
     }
@@ -431,8 +433,6 @@ extension ERC20WalletService: SwinjectDependentService {
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
-        
-        addTransactionObserver()
     }
 }
 

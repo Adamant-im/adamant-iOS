@@ -202,6 +202,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -485,7 +486,8 @@ extension BtcWalletService {
         self.setState(.upToDate)
         
         Task {
-            self.update()
+            await self.update()
+            self.addTransactionObserver()
         }
         
         guard storeInKVC else { return eWallet }
@@ -545,8 +547,6 @@ extension BtcWalletService: SwinjectDependentService {
         btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-        
-        addTransactionObserver()
     }
 }
 

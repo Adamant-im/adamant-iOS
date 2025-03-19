@@ -55,6 +55,7 @@ class TransactionsListViewControllerBase: UIViewController {
     let dialogService: DialogService
     let reachabilityMonitor: ReachabilityMonitor
     let screensFactory: ScreensFactory
+    let secretWalletsViewModel: SecretWalletsViewModel
     
     // MARK: - Proprieties
     
@@ -94,12 +95,14 @@ class TransactionsListViewControllerBase: UIViewController {
         walletService: WalletService,
         dialogService: DialogService,
         reachabilityMonitor: ReachabilityMonitor,
-        screensFactory: ScreensFactory
+        screensFactory: ScreensFactory,
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.walletService = walletService
         self.dialogService = dialogService
         self.reachabilityMonitor = reachabilityMonitor
         self.screensFactory = screensFactory
+        self.secretWalletsViewModel = secretWalletsViewModel
         
         super.init(nibName: String(describing: TransactionsListViewControllerBase.self), bundle: nil)
     }
@@ -114,7 +117,7 @@ class TransactionsListViewControllerBase: UIViewController {
         super.viewDidLoad()
 
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = String.adamant.transactionList.title
+        navigationItem.title = String.adamant.transactionList.title + (secretWalletsViewModel.state.currentWallet?.name ?? "")
         emptyLabel.text = String.adamant.transactionList.noTransactionYet
         
         update(walletService.core.getLocalTransactionHistory())

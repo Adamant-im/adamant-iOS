@@ -191,6 +191,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -446,6 +447,7 @@ extension EthWalletService {
         
         Task {
             await self.update()
+            self.addTransactionObserver()
         }
         
         guard storeInKVC else { return eWallet }
@@ -534,8 +536,6 @@ extension EthWalletService: SwinjectDependentService {
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
-        
-        addTransactionObserver()
     }
 }
 

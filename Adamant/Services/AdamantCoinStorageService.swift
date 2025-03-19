@@ -17,6 +17,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     
     private let blockchainType: String
     private let coinId: String
+    private let coinAddress: String
     private let coreDataStack: CoreDataStack
     private lazy var transactionController = getTransactionController()
     private var subscriptions = Set<AnyCancellable>()
@@ -29,8 +30,9 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     
     // MARK: Init
     
-    init(coinId: String, coreDataStack: CoreDataStack, blockchainType: String) {
+    init(coinId: String, coinAddress: String, coreDataStack: CoreDataStack, blockchainType: String) {
         self.coinId = coinId
+        self.coinAddress = coinAddress
         self.coreDataStack = coreDataStack
         self.blockchainType = blockchainType
         super.init()
@@ -67,6 +69,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
             coinTransaction.senderId = transaction.senderAddress
             coinTransaction.isOutgoing = transaction.isOutgoing
             coinTransaction.coinId = coinId
+            coinTransaction.uniqueId = coinId + coinAddress
             coinTransaction.transactionId = transaction.txId
             coinTransaction.transactionStatus = transaction.transactionStatus
             coinTransaction.blockchainType = blockchainType
@@ -105,15 +108,21 @@ private extension AdamantCoinStorageService {
         .sink { [weak self] notification in
             let changes = notification.managedObjectContextChanges(of: CoinTransaction.self)
 
+            guard self != nil, self?.coinId != nil && self?.coinAddress != nil else {
+                return
+            }
+            
+            let uniqueId = self!.coinId + self!.coinAddress
+            
             if let inserted = changes.inserted, !inserted.isEmpty {
                 let filteredInserted: [TransactionDetails] = inserted.filter {
-                    $0.coinId == self?.coinId
+                    $0.uniqueId == uniqueId
                 }
                 self?.transactions.append(contentsOf: filteredInserted)
             }
             
             if let updated = changes.updated, !updated.isEmpty {
-                let filteredUpdated = updated.filter { $0.coinId == self?.coinId }
+                let filteredUpdated = updated.filter { $0.uniqueId == uniqueId }
                 
                 filteredUpdated.forEach { coinTransaction in
                     guard let index = self?.transactions.firstIndex(where: {
@@ -133,7 +142,7 @@ private extension AdamantCoinStorageService {
             entityName: CoinTransaction.entityCoinName
         )
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "coinId = %@", coinId)
+            NSPredicate(format: "uniqueId = %@", coinId + coinAddress)
         ])
         request.sortDescriptors = [
             NSSortDescriptor(key: "date", ascending: true),
@@ -154,7 +163,7 @@ private extension AdamantCoinStorageService {
     /// - Returns: Transaction, if found
     func getTransactionFromDB(id: String, context: NSManagedObjectContext) -> CoinTransaction? {
         let request = NSFetchRequest<CoinTransaction>(entityName: CoinTransaction.entityCoinName)
-        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.predicate = NSPredicate(format: "transactionId == %@ AND uniqueId == %@", String(id), coinId + coinAddress)
         request.fetchLimit = 1
         
         do {

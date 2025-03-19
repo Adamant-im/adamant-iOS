@@ -170,6 +170,7 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -361,6 +362,7 @@ extension DogeWalletService {
         
         Task {
             await self.update()
+            self.addTransactionObserver()
         }
         
         guard storeInKVC else { return eWallet }
@@ -419,8 +421,6 @@ extension DogeWalletService: SwinjectDependentService {
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         chatsProvider = container.resolve(ChatsProvider.self)
-        
-        addTransactionObserver()
     }
 }
 
