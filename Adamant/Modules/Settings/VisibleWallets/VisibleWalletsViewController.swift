@@ -306,7 +306,6 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         let walletsTokenUniqueID = wallets.map { $0.tokenUniqueID }
         visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: true)
         visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: false)
-        NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -338,7 +337,6 @@ extension VisibleWalletsViewController: AdamantVisibleWalletsCellDelegate {
         let walletsTokenUniqueID = wallets.map { $0.tokenUniqueID }
         visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: true)
         visibleWalletsService.setIndexPositionWallets(walletsTokenUniqueID, includeInvisible: false)
-        NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
 }
 
