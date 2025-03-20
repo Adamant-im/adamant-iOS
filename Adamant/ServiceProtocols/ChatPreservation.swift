@@ -42,61 +42,56 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         forAddress address: String
     ) {
         var shouldNotify = false
-
+        
         if let message = message, !message.isEmpty {
             preservedMessages[address] = message
             shouldNotify = true
+        } else if preservedMessages[address] != nil {
+            preservedMessages.removeValue(forKey: address)
+            shouldNotify = true
         }
-
+        
         if let replyMessage = replyMessage {
             preservedReplayMessage[address] = replyMessage
             shouldNotify = true
+        } else if preservedReplayMessage[address] != nil {
+            preservedReplayMessage.removeValue(forKey: address)
+            shouldNotify = true
         }
-
+        
         if let files = files {
             preservedFiles[address] = files
             shouldNotify = true
+            
+        } else if preservedFiles[address] != nil {
+            preservedFiles.removeValue(forKey: address)
+            shouldNotify = true
         }
-
+        
         if shouldNotify {
             updateNotifier.send()
         }
     }
     
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+    func getPreservedMessageFor(address: String) -> String? {
         guard let message = preservedMessages[address] else {
             return nil
-        }
-        
-        if thenRemoveIt {
-            preservedMessages.removeValue(forKey: address)
-            updateNotifier.send()
         }
         
         return message
     }
     
-    func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
+    func getReplyMessage(address: String) -> MessageModel? {
         guard let replyMessage = preservedReplayMessage[address] else {
             return nil
-        }
-        
-        if thenRemoveIt {
-            preservedReplayMessage.removeValue(forKey: address)
-            updateNotifier.send()
         }
         
         return replyMessage
     }
     
-    func getPreservedFiles(for address: String, thenRemoveIt: Bool) -> [FileResult]? {
+    func getPreservedFiles(for address: String) -> [FileResult]? {
         guard let files = preservedFiles[address] else {
             return nil
-        }
-        
-        if thenRemoveIt {
-            preservedFiles.removeValue(forKey: address)
-            updateNotifier.send()
         }
         
         return files

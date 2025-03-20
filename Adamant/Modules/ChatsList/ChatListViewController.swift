@@ -76,6 +76,7 @@ final class ChatListViewController: KeyboardObservingViewController {
             setBadgeValue(unreadController?.fetchedObjects?.count)
         }
     }
+    private var chatDeselectedIndex: IndexPath?
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
@@ -342,9 +343,10 @@ final class ChatListViewController: KeyboardObservingViewController {
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                guard let indexPaths = self?.tableView.indexPathsForSelectedRows else { return }
-                self?.tableView.reloadRowsAndPreserveSelection(at: indexPaths)
-                print("send()")
+                guard let deselectedIndex = self?.chatDeselectedIndex,
+                      let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+                      let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
+                self?.configureCell(cell, for: chatroom)
             }
             .store(in: &subscriptions)
     }
@@ -566,6 +568,9 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         return UIView()
     }
     
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        chatDeselectedIndex = indexPath
+    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
@@ -1068,14 +1073,14 @@ extension ChatListViewController {
     private func shortDescription(for address: String) -> NSAttributedString? {
         var descriptionParts: [NSAttributedString] = []
 
-        if chatPreservation.getReplyMessage(address: address, thenRemoveIt: false) != nil {
+        if chatPreservation.getReplyMessage(address: address) != nil {
                 let replyImageAttachment = NSTextAttachment()
                 replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
                 replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
 
                 descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
             }
-        if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
+        if let files = chatPreservation.getPreservedFiles(for: address), !files.isEmpty {
                 let mediaCount = files.count(where: { $0.type.isMedia })
                 let otherCount = files.count(where: { !$0.type.isMedia })
 
@@ -1096,7 +1101,7 @@ extension ChatListViewController {
                 }
             }
 
-        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address, thenRemoveIt: false) {
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address) {
             let processedMessage = MessageProcessHelper.process(preservedMessage)
             descriptionParts.append(NSAttributedString(string: processedMessage))
         }

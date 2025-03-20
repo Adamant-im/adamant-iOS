@@ -238,20 +238,16 @@ final class ChatViewModel: NSObject {
         
         if let partnerAddress = chatroom.partner?.address {
             chatPreservation.getPreservedMessageFor(
-                address: partnerAddress,
-                thenRemoveIt: true
+                address: partnerAddress
             ).map { inputText = $0 }
             
             let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
             messages = cachedMessages ?? []
             fullscreenLoading = cachedMessages == nil
             
-            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
+            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress)
             
-            filesPicked = chatPreservation.getPreservedFiles(
-                for: partnerAddress,
-                thenRemoveIt: true
-            )
+            filesPicked = chatPreservation.getPreservedFiles(for: partnerAddress)
         }
         if isNewChat && !(accountService.account?.isEnoughMoneyForTransaction ?? false) {
             dialog.send(.freeTokenAlert)
