@@ -25,5 +25,9 @@ extension ChatTransaction {
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?
     @NSManaged public var isFake: Bool
+    @NSManaged public var richMessageTransactions: Set<RichMessageTransaction>?
 
+    func addToRichMessageTransactions(_ transaction: RichMessageTransaction) {
+        self.mutableSetValue(forKey: "richMessageTransactions").add(transaction)
+    }
 }

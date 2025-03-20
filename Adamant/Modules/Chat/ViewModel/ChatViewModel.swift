@@ -52,6 +52,9 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
+    var separatorIndex: Int?
+    var separatorId: String?
+    var didAddSeparator: Bool = false
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -1096,9 +1099,15 @@ private extension ChatViewModel {
             .removeDuplicates()
             .sink { [weak self] unreadIndexes in
                 self?.unreadMesaggesIndexes = unreadIndexes
+                self?.updateSeparatorId()
             }
             .store(in: &subscriptions)
-        
+        $messages
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateSeparatorIndex()
+            }
+            .store(in: &subscriptions)
         chatFileService.updateFileFields
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
@@ -1134,10 +1143,11 @@ private extension ChatViewModel {
         
         $unreadMessagesIds
             .removeDuplicates()
-            .sink { newValue in
-                self.updateScrolledMessageState(newUnreadIds: newValue)
+            .sink { [weak self] newValue in
+                self?.updateScrolledMessageState(newUnreadIds: newValue)
             }
             .store(in: &subscriptions)
+        
         NotificationCenter.default
             .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
             .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
@@ -1702,6 +1712,31 @@ private extension ChatViewModel {
         if newUnreadIds.isEmpty {
             shouldScrollToBottom = true
         }
+    }
+    
+    func updateSeparatorId() {
+        guard !didAddSeparator, !messages.isEmpty else { return }
+        
+        guard let firstUnreadId = unreadMessagesIds?.first else {
+            separatorId = nil
+            separatorIndex = nil
+            return
+        }
+        
+        didAddSeparator = true
+        separatorId = firstUnreadId
+        updateSeparatorIndex()
+    }
+
+    func updateSeparatorIndex() {
+        guard let separatorId = separatorId,
+              let index = messages.firstIndex(where: { $0.id == separatorId })
+        else {
+            separatorIndex = nil
+            return
+        }
+        
+        separatorIndex = index - 1
     }
 }
 

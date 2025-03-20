@@ -268,6 +268,7 @@
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
 		6F030E1C2D4C0E950077ACA2 /* EthBIP32Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */; };
+		6F15B2432D8456C000ACE834 /* NewMessagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F15B2422D8456C000ACE834 /* NewMessagesCell.swift */; };
 		6FB686162D3AAE8800CAB6DD /* AdamantWalletsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6FB686152D3AAE8800CAB6DD /* AdamantWalletsKit */; };
 		6FB686182D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB686172D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift */; };
 		6FB6861A2D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB686192D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift */; };
@@ -1004,6 +1005,7 @@
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthBIP32Service.swift; sourceTree = "<group>"; };
+		6F15B2422D8456C000ACE834 /* NewMessagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessagesCell.swift; sourceTree = "<group>"; };
 		6FB686172D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTokenInfoProtocol.swift; sourceTree = "<group>"; };
 		6FB686192D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletStaticCoreProtocol.swift; sourceTree = "<group>"; };
 		6FB6861B2D3ABE0200CAB6DD /* DashWalletService+Transactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+Transactions.swift"; sourceTree = "<group>"; };
@@ -2249,6 +2251,7 @@
 				41A1995029D42C160031AD75 /* ChatBaseMessage */,
 				413AD21A29CDDD750025F255 /* ChatReply */,
 				9377FBE0296C2AB700C9211B /* ChatTransaction */,
+				6F15B2422D8456C000ACE834 /* NewMessagesCell.swift */,
 				938F7D652955C966001915CA /* ChatInputBar.swift */,
 				93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */,
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
@@ -4100,6 +4103,7 @@
 				3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountFactory.swift in Sources */,
 				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
+				6F15B2432D8456C000ACE834 /* NewMessagesCell.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				934FD9BA2C78565400336841 /* InfoServiceApiService.swift in Sources */,
 				9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */,
