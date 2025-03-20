@@ -1185,9 +1185,10 @@ extension ChatListViewController {
     }
     func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
         swipedIndex = nil
-        if let indexPath {
-            tableView.reloadRowsAndPreserveSelection(at: [indexPath])
-        }
+        guard let deselectedIndex = indexPath,
+              let cell = tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+              let chatroom = chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
+        configureCell(cell, for: chatroom)
     }
     private func blockChat(with address: String, for chatroom: Chatroom?) {
         Task {
@@ -1596,3 +1597,4 @@ private extension UITableView {
         selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
     }
 }
+
