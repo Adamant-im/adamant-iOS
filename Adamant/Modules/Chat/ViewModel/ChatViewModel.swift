@@ -67,7 +67,12 @@ final class ChatViewModel: NSObject {
     
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
-    private(set) var chatTransactions: [ChatTransaction] = []
+    private(set) var chatTransactions: [ChatTransaction] = [] {
+        didSet {
+            updatePositionIfNeeded()
+        }
+    }
+    
     private var tempCancellables = Set<AnyCancellable>()
     private var hideHeaderTimer: AnyCancellable?
     private let minDiffCountForOffset = 5
@@ -220,12 +225,10 @@ final class ChatViewModel: NSObject {
         messageIdToShow: String?,
         isNewChat: Bool = false
     ) {
+        self.messageIdToShow = messageIdToShow
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
-        if let messageIdToShow = messageIdToShow {
-            scroll(to: messageIdToShow)
-        }
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -290,6 +293,12 @@ final class ChatViewModel: NSObject {
                 await loadMessages(address: address, offset: .zero)
             }
         }.stored(in: tasksStorage)
+    }
+    
+    func updatePositionIfNeeded() {
+        if let messageIdToShow = messageIdToShow {
+            scroll(to: messageIdToShow)
+        }
     }
     
     func loadMoreMessagesIfNeeded() {
