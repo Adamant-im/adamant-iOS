@@ -342,7 +342,9 @@ final class ChatListViewController: KeyboardObservingViewController {
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                self?.tableView.reloadData()
+                guard let indexPaths = self?.tableView.indexPathsForSelectedRows else { return }
+                self?.tableView.reloadRowsAndPreserveSelection(at: indexPaths)
+                print("send()")
             }
             .store(in: &subscriptions)
     }

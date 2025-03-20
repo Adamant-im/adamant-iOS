@@ -371,17 +371,7 @@ final class ChatViewModel: NSObject {
     
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveMessage(message, forAddress: partnerAddress)
-    }
-    
-    func preserveFiles() {
-        guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveFiles(filesPicked, forAddress: partnerAddress)
-    }
-    
-    func preserveReplayMessage() {
-        guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.setReplyMessage(replyMessage, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
     }
     
     func blockChat() {
