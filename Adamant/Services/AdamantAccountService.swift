@@ -20,10 +20,11 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
+    private let coreDataStack: CoreDataStack
 
     weak var notificationsService: NotificationsService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
-    weak var visibleWalletService: VisibleWalletsService?
+    var walletsStoreService: WalletStoreServiceProtocol?
     
     // MARK: Properties
     
@@ -44,6 +45,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
+        coreDataStack: CoreDataStack,
         connection: AnyObservable<Bool>
     ) {
         self.apiService = apiService
@@ -51,6 +53,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
         self.currencyInfoService = currencyInfoService
+        self.coreDataStack = coreDataStack
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -236,7 +239,7 @@ extension AdamantAccountService {
             return
         }
         
-        let wallets = walletServiceCompose.getWallets().map { $0.core }
+        let wallets = walletServiceCompose.getWallets()
         
         Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
@@ -260,8 +263,8 @@ extension AdamantAccountService {
                 state = .loggedIn
                 completion?(.success(account: account, alert: nil))
                 
-                if let adm = wallets.first(where: { $0 is AdmWalletService }) {
-                    adm.update()
+                if let adm = wallets.first(where: { $0.core is AdmWalletService }) {
+                    adm.core.update()
                 }
                 
             case .failure(let error):
@@ -270,13 +273,9 @@ extension AdamantAccountService {
             }
         }
         
-        if updateOnlyVisible {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet.tokenUniqueID) ?? false) {
-                wallet.update()
-            }
-        } else {
-            for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-                wallet.update()
+        for wallet in wallets where !(wallet.core is AdmWalletService) {
+            if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
+                wallet.core.update()
             }
         }
     }
@@ -409,10 +408,8 @@ extension AdamantAccountService {
         }
     }
     
-    func reloadWallets() {
-        Task {
-            _ = await initWallets()
-        }
+    func reloadWallets() async {
+        _ = await initWallets()
     }
     
     func initWallets() async -> [WalletAccount?] {
@@ -457,6 +454,8 @@ extension AdamantAccountService {
         keypair = nil
         passphrase = nil
         state = .notLogged
+        apiService.cancelCurrentTasks()
+        coreDataStack.clearCoreData()
         
         guard wasLogged else { return }
         NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)

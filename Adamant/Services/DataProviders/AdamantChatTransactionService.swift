@@ -93,14 +93,15 @@ actor AdamantChatTransactionService: ChatTransactionService {
         removedMessages: [String],
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
-        let messageTransaction: ChatTransaction
+        let chatTransaction: ChatTransaction
         guard let chat = transaction.asset.chat else {
             if transaction.type == .send {
-                messageTransaction = transferTransaction(from: transaction, isOut: isOutgoing, partner: partner, context: context)
-                return messageTransaction
+                chatTransaction = transferTransaction(from: transaction, isOut: isOutgoing, partner: partner, context: context)
+                return chatTransaction
             }
             return nil
         }
+        
         
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(
@@ -129,11 +130,11 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         }
                         
                         trs.comment = decodedMessage
-                        messageTransaction = trs
+                        chatTransaction = trs
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
-                        messageTransaction = trs
+                        chatTransaction = trs
                         
                         let markdown = markdownParser.parse(decodedMessage)
                         
@@ -147,7 +148,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
                     
@@ -156,7 +157,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
                     
@@ -165,7 +166,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
                     
@@ -174,7 +175,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
                     
@@ -183,19 +184,19 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
                     
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
-                    messageTransaction = trs
+                    chatTransaction = trs
                 }
             } else {
                 let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                 trs.message = ""
                 trs.isHidden = true
-                messageTransaction = trs
+                chatTransaction = trs
             }
         }
         // MARK: Failed to decode, or message was empty
@@ -203,30 +204,31 @@ actor AdamantChatTransactionService: ChatTransactionService {
             let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
             trs.message = ""
             trs.isHidden = true
-            messageTransaction = trs
+            chatTransaction = trs
         }
         
-        messageTransaction.amount = transaction.amount as NSDecimalNumber
-        messageTransaction.date = transaction.date as NSDate
-        messageTransaction.recipientId = transaction.recipientId
-        messageTransaction.senderId = transaction.senderId
-        messageTransaction.transactionId = String(transaction.id)
-        messageTransaction.type = Int16(chat.type.rawValue)
-        messageTransaction.height = Int64(transaction.height)
-        messageTransaction.isConfirmed = true
-        messageTransaction.isOutgoing = isOutgoing
-        messageTransaction.blockId = transaction.blockId
-        messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = String(transaction.id)
-        messageTransaction.fee = transaction.fee as NSDecimalNumber
-        messageTransaction.statusEnum = MessageStatus.delivered
-        messageTransaction.partner = partner
-        messageTransaction.senderPublicKey = transaction.senderPublicKey
+        chatTransaction.date = transaction.date as NSDate
+        chatTransaction.timestampMs = Int64(transaction.timestampMs)
+        chatTransaction.amount = transaction.amount as NSDecimalNumber
+        chatTransaction.recipientId = transaction.recipientId
+        chatTransaction.senderId = transaction.senderId
+        chatTransaction.transactionId = String(transaction.id)
+        chatTransaction.type = Int16(chat.type.rawValue)
+        chatTransaction.height = Int64(transaction.height)
+        chatTransaction.isConfirmed = true
+        chatTransaction.isOutgoing = isOutgoing
+        chatTransaction.blockId = transaction.blockId
+        chatTransaction.confirmations = transaction.confirmations
+        chatTransaction.chatMessageId = String(transaction.id)
+        chatTransaction.fee = transaction.fee as NSDecimalNumber
+        chatTransaction.statusEnum = MessageStatus.delivered
+        chatTransaction.partner = partner
+        chatTransaction.senderPublicKey = transaction.senderPublicKey
         
-        let transactionId = messageTransaction.transactionId
-        messageTransaction.isHidden = removedMessages.contains(transactionId)
+        let transactionId = chatTransaction.transactionId
+        chatTransaction.isHidden = removedMessages.contains(transactionId)
         
-        return messageTransaction
+        return chatTransaction
     }
     
     func transferTransaction(
@@ -246,8 +248,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.blockId = transaction.blockId
         } else {
             transfer = TransferTransaction(context: context)
-            transfer.amount = transaction.amount as NSDecimalNumber
             transfer.date = transaction.date as NSDate
+            transfer.timestampMs = Int64(transaction.timestampMs)
+            transfer.amount = transaction.amount as NSDecimalNumber
             transfer.recipientId = transaction.recipientId
             transfer.senderId = transaction.senderId
             transfer.transactionId = String(transaction.id)

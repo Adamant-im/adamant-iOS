@@ -712,6 +712,8 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+"chat.NewMessages" = "新消息";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "保持文件加密";
 
@@ -1349,6 +1351,7 @@
 "Chat.unknown.title" = "未知";
 
 /* No active nodes */
+"Chat.Alert.Title.NoActiveNodes" = "無活動 ADM 節點";
 "Chat.Alert.NoActiveNodes" = "无法请求新消息 - 没有活动的 ADM 区块链节点。由于您已停用部分节点，请考虑查看节点列表。";
 
 /* Review Nodes List */

@@ -14,11 +14,11 @@ import Combine
 final class AccountWalletsViewModel {
     @ObservableValue var state: AccountWalletsState = .default
     
-    private let walletsService: VisibleWalletsService
+    private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
     
-    init(walletsService: VisibleWalletsService) {
-        self.walletsService = walletsService
+    init(walletsStoreService: WalletStoreServiceProviderProtocol) {
+        self.walletsStoreService = walletsStoreService
         setup()
     }
 }
@@ -29,7 +29,7 @@ private extension AccountWalletsViewModel {
     }
     
     func addObservers() {
-        for wallet in walletsService.sorted(includeInvisible: false) {
+        for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
                 .sink(
@@ -48,9 +48,8 @@ private extension AccountWalletsViewModel {
             state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
-            let network = ERC20Token.supportedTokens.contains(where: { $0.symbol == coreService.tokenSymbol })
-                ? type(of: coreService).tokenNetworkSymbol
-                : ""
+            let network = type(of: coreService).tokenNetworkSymbol
+            
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,

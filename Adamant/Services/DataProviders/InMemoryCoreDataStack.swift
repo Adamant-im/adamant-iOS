@@ -25,24 +25,22 @@ final class InMemoryCoreDataStack: CoreDataStack {
         container.persistentStoreDescriptions = [description]
         container.loadPersistentStores { (_, _) in }
         container.viewContext.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
+    }
+    
+    func clearCoreData() {
+        let context = container.viewContext
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let context = self?.container.viewContext else {
-                return
+        let fetch = NSFetchRequest<NSManagedObject>(entityName: "BaseAccount")
+        
+        do {
+            let result = try context.fetch(fetch)
+            for account in result {
+                context.delete(account)
             }
             
-            let fetch = NSFetchRequest<NSManagedObject>(entityName: "BaseAccount")
-            
-            do {
-                let result = try context.fetch(fetch)
-                for account in result {
-                    context.delete(account)
-                }
-                
-                try context.save()
-            } catch {
-                print("Got error saving context after reset")
-            }
+            try context.save()
+        } catch {
+            print("Got error saving context after reset")
         }
     }
 }

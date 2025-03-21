@@ -37,7 +37,7 @@ extension String.adamant.alert {
 final class AccountViewController: FormViewController {
     // MARK: - Dependencies
     
-    private let visibleWalletsService: VisibleWalletsService
+    private let walletStoreServiceProvider: WalletStoreServiceProviderProtocol
     private let screensFactory: ScreensFactory
     private let notificationsService: NotificationsService
     private let transfersProvider: TransfersProvider
@@ -45,7 +45,7 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let apiServiceCompose: ApiServiceComposeProtocol
-    private lazy var viewModel: AccountWalletsViewModel = .init(walletsService: visibleWalletsService)
+    private lazy var viewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
     
     let accountService: AccountService
     let dialogService: DialogService
@@ -100,7 +100,7 @@ final class AccountViewController: FormViewController {
     // MARK: - Init
     
     init(
-        visibleWalletsService: VisibleWalletsService,
+        walletStoreServiceProvider: WalletStoreServiceProviderProtocol,
         accountService: AccountService,
         dialogService: DialogService,
         screensFactory: ScreensFactory,
@@ -113,7 +113,7 @@ final class AccountViewController: FormViewController {
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol
     ) {
-        self.visibleWalletsService = visibleWalletsService
+        self.walletStoreServiceProvider = walletStoreServiceProvider
         self.accountService = accountService
         self.dialogService = dialogService
         self.screensFactory = screensFactory
@@ -204,10 +204,12 @@ final class AccountViewController: FormViewController {
         
         viewModel.$state
             .removeDuplicates()
+            .debounce(for: .nanoseconds(500_000_000), scheduler: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.pagingViewController.reloadMenu()
+                self.pagingViewController.select(index: currentWalletIndex, animated: false)
             }
             .store(in: &notificationsSet)
         
@@ -894,18 +896,14 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
-        availableServices.forEach { walletService in
+        for walletService in walletStoreServiceProvider.sorted(includeInvisible: false) {
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }
     }
     
     private func updatePagingItemHeight() {
-        if walletViewControllers.count > 0 {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
-        } else {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
-        }
+        let itemHeight: CGFloat = walletViewControllers.count > .zero ? 114 : .zero
+        pagingViewController.menuItemSize = .fixed(width: 110, height: itemHeight)
         
         updateHeaderSize(with: pagingViewController.menuItemSize.height, animated: true)
     }
@@ -979,9 +977,9 @@ final class AccountViewController: FormViewController {
             )
         }
         
-        refreshControl.endRefreshing()
-        DispatchQueue.background.async { [accountService] in
-            accountService.reloadWallets()
+        Task { @MainActor in
+            await accountService.reloadWallets()
+            refreshControl.endRefreshing()
         }
     }
 }

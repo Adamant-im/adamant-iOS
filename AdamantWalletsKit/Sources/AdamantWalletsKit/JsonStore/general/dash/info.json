@@ -1,0 +1,88 @@
+{
+  "name": "Dash",
+  "website": "https://dash.org",
+  "description": "Dash (DASH) is digital cash designed to offer financial freedom to everyone. Payments are instant, easy and secure, with near-zero fees.",
+  "explorer": "https://dashblockexplorer.com",
+  "explorerTx": "https://dashblockexplorer.com/tx/${ID}",
+  "explorerAddress": "https://dashblockexplorer.com/address/${ID}",
+  "regexAddress": "^[7X][1-9A-HJ-NP-Za-km-z]{33,}$",
+  "research": "https://research.binance.com/en/projects/dash",
+  "symbol": "DASH",
+  "type": "coin",
+  "decimals": 8,
+  "minBalance": 0.0001,
+  "cryptoTransferDecimals": 8,
+  "minTransferAmount": 0.00002,
+  "fixedFee": 0.0001,
+  "qqPrefix": "dash",
+  "status": "active",
+  "createCoin": true,
+  "defaultVisibility": true,
+  "defaultOrdinalLevel": 70,
+  "consensus": "PoW",
+  "blockTimeAvg": 160000,
+  "txFetchInfo": {
+    "newPendingInterval": 5000,
+    "oldPendingInterval": 3000,
+    "registeredInterval": 30000,
+    "newPendingAttempts": 20,
+    "oldPendingAttempts": 4
+  },
+  "txConsistencyMaxTime": 800000,
+  "nodes": {
+    "displayName": "dash-node",
+    "list": [
+      {
+        "url": "https://dashnode1.adamant.im",
+        "alt_ip": "http://45.85.147.224:44099"
+      },
+      {
+        "url": "https://dashnode2.adamant.im",
+        "alt_ip": "http://207.180.210.95:44099"
+      }
+    ],
+    "healthCheck": {
+      "normalUpdateInterval": 210000,
+      "crucialUpdateInterval": 30000,
+      "onScreenUpdateInterval": 10000,
+      "threshold": 3
+    }
+  },
+  "links": [
+    {
+      "name": "github",
+      "url": "https://github.com/dashpay/dash"
+    },
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/Dashpay"
+    },
+    {
+      "name": "reddit",
+      "url": "https://reddit.com/r/dashpay"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://github.com/dashpay/dash/wiki/Whitepaper"
+    }
+  ],
+  "tor": {
+    "nodes": {
+      "displayName": "dash-node",
+      "list": [
+        {
+          "url": "http://ldod53womnlwjmd4noq5yuq26xx3mmbrr4uogkfymuakhofjcuqeygad.onion"
+        },
+        {
+          "url": "http://eq2blda45h4kakbuq3g4stcgatiwqaefgmxzfsfuiahpdbt2pvbbepad.onion"
+        }
+      ],
+      "healthCheck": {
+        "normalUpdateInterval": 210000,
+        "crucialUpdateInterval": 30000,
+        "onScreenUpdateInterval": 10000,
+        "threshold": 3
+      }
+    }
+  }
+}

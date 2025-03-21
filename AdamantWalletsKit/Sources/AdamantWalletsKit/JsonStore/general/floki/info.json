@@ -1,0 +1,37 @@
+{
+  "name": "Floki",
+  "website": "https://floki.com",
+  "description": "FLOKI is the utility token of the Floki ecosystem",
+  "symbol": "FLOKI",
+  "type": "token",
+  "decimals": 9,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/RealFlokiInu"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/floki-inu"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://docs.floki.com/floki-whitepaper"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/Floki"
+    },
+    {
+      "name": "discord",
+      "url": "https://discord.gg/floki"
+    },
+    {
+      "name": "telegram",
+      "url": "https://t.me/FlokiInuToken"
+    }
+  ]
+}

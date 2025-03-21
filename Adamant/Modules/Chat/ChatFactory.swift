@@ -25,7 +25,7 @@ struct ChatFactory {
     let accountProvider: AccountsProvider
     let richTransactionStatusService: TransactionsStatusServiceComposeProtocol
     let addressBookService: AddressBookService
-    let visibleWalletService: VisibleWalletsService
+    let walletsStoreService: WalletStoreServiceProtocol
     let avatarService: AvatarService
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
@@ -36,6 +36,7 @@ struct ChatFactory {
     let apiServiceCompose: ApiServiceComposeProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
+    let coreDataRealationMapper: CoreDataRealationMapperProtocol
    
     init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -45,7 +46,7 @@ struct ChatFactory {
         accountProvider = assembler.resolve(AccountsProvider.self)!
         richTransactionStatusService = assembler.resolve(TransactionsStatusServiceComposeProtocol.self)!
         addressBookService = assembler.resolve(AddressBookService.self)!
-        visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
+        walletsStoreService = assembler.resolve(WalletStoreServiceProtocol.self)!
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
@@ -56,6 +57,7 @@ struct ChatFactory {
         apiServiceCompose = assembler.resolve(ApiServiceComposeProtocol.self)!
         reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
         filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
+        coreDataRealationMapper = assembler.resolve(CoreDataRealationMapperProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -115,10 +117,10 @@ private extension ChatFactory {
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                walletServiceCompose: walletServiceCompose 
-            )),
+                walletServiceCompose: walletServiceCompose),
+            coreDataRelationMapper: coreDataRealationMapper),
             addressBookService: addressBookService,
-            visibleWalletService: visibleWalletService,
+            walletsStoreService: walletsStoreService,
             accountService: accountService,
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,

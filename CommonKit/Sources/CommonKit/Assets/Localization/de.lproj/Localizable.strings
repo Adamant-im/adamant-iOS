@@ -769,6 +769,8 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+"chat.NewMessages" = "Neue Nachrichten";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Die Datei verschlüsselt aufbewahren";
 
@@ -1382,6 +1384,7 @@
 "Chat.unknown.title" = "Unbekannt";
 
 /* No active nodes */
+"Chat.Alert.Title.NoActiveNodes" = "Keine aktiven ADM-Knoten";
 "Chat.Alert.NoActiveNodes" = "Es können keine neuen Nachrichten angefordert werden - Keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
 
 /* Review Nodes List */

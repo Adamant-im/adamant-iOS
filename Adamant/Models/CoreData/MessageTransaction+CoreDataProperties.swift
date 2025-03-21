@@ -20,6 +20,7 @@ extension MessageTransaction {
     @NSManaged public var message: String?
     @NSManaged public var reactionsData: Data?
     
+    
     var reactions: Set<Reaction>? {
         get {
             guard let data = reactionsData else {
