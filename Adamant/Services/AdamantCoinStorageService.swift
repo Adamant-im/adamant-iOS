@@ -23,7 +23,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     private var subscriptions = Set<AnyCancellable>()
     
     @ObservableValue private var transactions: [TransactionDetails] = []
-
+    
     var transactionsPublisher: any Observable<[TransactionDetails]> {
         $transactions
     }
@@ -107,7 +107,7 @@ private extension AdamantCoinStorageService {
         )
         .sink { [weak self] notification in
             let changes = notification.managedObjectContextChanges(of: CoinTransaction.self)
-
+            
             guard self != nil, self?.coinId != nil && self?.coinAddress != nil else {
                 return
             }
@@ -130,7 +130,26 @@ private extension AdamantCoinStorageService {
                     })
                     else { return }
                     
-                    self?.transactions[index] = coinTransaction
+                    /*
+                     Workaround to correctly set isOutgoing when multiple transactions share the same txId across different accounts.
+                     
+                     This situation can happen when sending funds from a regular account to a secret one — technically two different transactions, but with the same txId.
+                     Currently, there's no reliable way to assign a truly unique ID to each TransactionDetails instance, so this workaround helps distinguish them for now.
+                     PR - https://github.com/Adamant-im/adamant-iOS/pull/741
+                     */
+                    self?.transactions[index] = SimpleTransactionDetails(
+                        defaultCurrencySymbol: coinTransaction.defaultCurrencySymbol,
+                        txId: coinTransaction.txId,
+                        senderAddress: coinTransaction.senderAddress,
+                        recipientAddress: coinTransaction.recipientAddress,
+                        dateValue: coinTransaction.dateValue,
+                        amountValue: coinTransaction.amountValue,
+                        feeValue: coinTransaction.feeValue,
+                        confirmationsValue: coinTransaction.confirmationsValue,
+                        blockValue: coinTransaction.blockValue,
+                        isOutgoing: self?.coinAddress == coinTransaction.senderAddress ? true : false,
+                        transactionStatus: coinTransaction.transactionStatus,
+                        nonceRaw: coinTransaction.nonceRaw)
                 }
             }
         }
