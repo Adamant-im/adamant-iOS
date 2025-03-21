@@ -24,19 +24,35 @@ public final class AdamantApiService: @unchecked Sendable {
     
     public func request<Output>(
         waitsForConnectivity: Bool = false,
+        timeout: TimeInterval? = nil,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
         let task = AdamantApiTask<Output>(task: Task {
-            await service.request(
-                waitsForConnectivity: waitsForConnectivity
-            ) { admApiCore, origin in
-                let result = await request(admApiCore.apiCore, origin)
-                do {
-                    try Task.checkCancellation()
-                } catch {
-                    return .failure(.requestCancelled)
+            if let timeout {
+                await service.request(
+                    waitsForConnectivity: waitsForConnectivity,
+                    timeout: timeout
+                ) { admApiCore, origin in
+                    let result = await request(admApiCore.apiCore, origin)
+                    do {
+                        try Task.checkCancellation()
+                    } catch {
+                        return .failure(.requestCancelled)
+                    }
+                    return result
                 }
-                return result
+            } else {
+                await service.request(
+                    waitsForConnectivity: waitsForConnectivity
+                ) { admApiCore, origin in
+                    let result = await request(admApiCore.apiCore, origin)
+                    do {
+                        try Task.checkCancellation()
+                    } catch {
+                        return .failure(.requestCancelled)
+                    }
+                    return result
+                }
             }
         })
         task.storeIn(taskStorage: &adamantApiTaskStorage)

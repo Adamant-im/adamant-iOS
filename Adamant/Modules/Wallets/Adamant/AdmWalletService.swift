@@ -40,6 +40,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
         return Self.currencySymbol
     }
     
+    static var timeouts: MessageTimeouts {
+        MessageTimeouts(message: 300, attachment: 300)
+    }
+    
     var tokenContract: String {
         return ""
     }

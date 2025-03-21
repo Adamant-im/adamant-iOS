@@ -538,6 +538,7 @@
 		AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */; };
 		AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */; };
 		AAFB3CAB2D3997DD000CCCE9 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */; };
+		D3C625522D8D3CF60083D72E /* AdmWalletService+Timeouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C625512D8D3CF60083D72E /* AdmWalletService+Timeouts.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1239,6 +1240,7 @@
 		AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
+		D3C625512D8D3CF60083D72E /* AdmWalletService+Timeouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+Timeouts.swift"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -2892,6 +2894,7 @@
 				E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */,
 				E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */,
 				E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */,
+				D3C625512D8D3CF60083D72E /* AdmWalletService+Timeouts.swift */,
 				64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */,
 				E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */,
 				E96BBE3221F71290009AA738 /* BuyAndSellViewController.swift */,
@@ -4093,6 +4096,7 @@
 				E90847372196FEA80095825D /* Chatroom+CoreDataProperties.swift in Sources */,
 				648CE3A8229AD1E20070A2CC /* DashWalletService+RichMessageProvider.swift in Sources */,
 				AAC641392D4039ED00619DFE /* KlyTransactionFactory.swift in Sources */,
+				D3C625522D8D3CF60083D72E /* AdmWalletService+Timeouts.swift in Sources */,
 				9332C3A52C76C4EC00164B80 /* ApiServiceCompose.swift in Sources */,
 				E90055FB20ECE78A00D0CB2D /* SecurityViewController+notifications.swift in Sources */,
 				938F7D662955C966001915CA /* ChatInputBar.swift in Sources */,
