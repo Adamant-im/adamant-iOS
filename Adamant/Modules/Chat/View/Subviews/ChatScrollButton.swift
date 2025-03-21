@@ -23,14 +23,9 @@ final class ChatScrollButton: UIView {
         case .up:
             button.setImage(.asset(named: "scrollUp"), for: .normal)
         case .down:
-            let config = UIImage.SymbolConfiguration.init(paletteColors: [.lightGray, .gray])
-            let image = UIImage(systemName: "chevron.down.circle.fill")?.withConfiguration(config)
-            button.setImage(image, for: .normal)
-            button.imageView?.contentMode = .scaleAspectFit
-            button.contentVerticalAlignment = .fill
-            button.contentHorizontalAlignment = .fill
+            button.setImage(.asset(named: "ScrollDown"), for: .normal)
         case .reaction:
-            let config = UIImage.SymbolConfiguration.init(paletteColors: [.lightGray, .gray])
+            let config = UIImage.SymbolConfiguration.init(paletteColors: [.adamant.imageBlack, .adamant.imageBackground])
             let image = UIImage(systemName: "heart.circle.fill")?.withConfiguration(config)
             button.setImage(image, for: .normal)
             button.imageView?.contentMode = .scaleAspectFit
