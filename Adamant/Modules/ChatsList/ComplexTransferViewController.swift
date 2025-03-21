@@ -238,3 +238,22 @@ extension ComplexTransferViewController: TransferViewControllerDelegate {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: transfer, detailsViewController: detailsViewController)
     }
 }
+
+// MARK: - Hardware keyboard handling
+
+extension ComplexTransferViewController {
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        for press in presses {
+            guard let key = press.key else { continue }
+            if key.keyCode == UIKeyboardHIDUsage.keyboardEscape {
+                return cancel()
+            }
+        }
+        
+        super.pressesBegan(presses, with: event)
+    }
+}
