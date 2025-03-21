@@ -846,7 +846,7 @@ final class AccountViewController: FormViewController {
         }
         
         visibleWalletsService.statePublisher
-            .debounce(for: .nanoseconds(500_000_000), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }

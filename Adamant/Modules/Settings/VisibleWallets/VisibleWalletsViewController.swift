@@ -108,7 +108,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
                 NotificationCenter.default.publisher(for: wallet.walletUpdatedNotification, object: wallet)
             }
             .receive(on: DispatchQueue.main)
-            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
             }
