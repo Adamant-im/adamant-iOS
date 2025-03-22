@@ -1076,7 +1076,8 @@ private extension ChatViewController {
     }
     
     func didTapShowTimeSettings() {
-        if let appSettings = URL(string: "App-prefs:SCREEN_TIME"),
+        let settingsURL = isMacOS ? "x-apple.systempreferences:com.apple.preference.datetime" : "App-prefs:root=General&path=DATE_AND_TIME"
+        if let appSettings = URL(string: settingsURL),
             UIApplication.shared.canOpenURL(appSettings) {
             UIApplication.shared.open(appSettings)
         }
