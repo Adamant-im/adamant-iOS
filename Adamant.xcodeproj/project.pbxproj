@@ -273,6 +273,7 @@
 		6FCF2D532D54F2B600F64D20 /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */; };
 		6FF9F08C2D6CEB340013A3B1 /* CoreDataRealationMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */; };
 		851FF2762D7B3E6B00276625 /* ChatViewController+NavigationControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */; };
+		85930FFC2D8EF68300AC9D65 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */; };
 		85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
@@ -1007,6 +1008,7 @@
 		6FF9F08B2D6CEB150013A3B1 /* CoreDataRealationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRealationMapper.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+NavigationControllerDelegate.swift"; sourceTree = "<group>"; };
+		85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesSortDescriptor.swift; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
@@ -2679,6 +2681,7 @@
 		E913C9101FFFAA4B001A83F7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */,
 				AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */,
 				AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */,
 				AA7202E22D6B4A4B00CCAC20 /* PasteInterceptingPasswordCell.swift */,
@@ -3702,6 +3705,7 @@
 				3A26D9472C3D37B5003AD832 /* KlyWalletViewController.swift in Sources */,
 				3A53BD462C6B7AF100BB1EE6 /* DownloadPolicy.swift in Sources */,
 				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
+				85930FFC2D8EF68300AC9D65 /* UserDefaultsManager.swift in Sources */,
 				41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* AppAssembly.swift in Sources */,
 				64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */,

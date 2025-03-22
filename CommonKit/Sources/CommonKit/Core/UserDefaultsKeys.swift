@@ -1,0 +1,10 @@
+//
+//  UserDefaultsKeys.swift
+//  CommonKit
+//
+//  Created by Sergei Veretennikov on 22.03.2025.
+//
+
+public enum UserDefaultsKey: String {
+    case needToShowNoActiveNodesAlert
+}
