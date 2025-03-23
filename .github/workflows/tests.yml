@@ -23,7 +23,9 @@ jobs:
     - name: Print Current Xcode
       run: xcode-select -p
     - uses: actions/checkout@v3
+    - name: Run Cocoapods
+      run: pod install
     - name: Run tests
-      run: swift test
+      run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16'
 
  
