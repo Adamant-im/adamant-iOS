@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
-  macos_build:
+  run_tests:
     runs-on: macos-15
     steps:
     - name: Set Xcode 16.2.0
