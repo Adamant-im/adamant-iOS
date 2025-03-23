@@ -198,8 +198,11 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: animated)
+            }
         }
     }
     override func viewDidLayoutSubviews() {
@@ -361,7 +364,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private func updateUITitles() {
         updatingIndicatorView.updateTitle(title:  String.adamant.chatList.title)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
         searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
@@ -412,7 +415,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         areMessagesLoaded = true
         performOnMessagesLoadedActions()
         setIsBusy(!synced)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     // MARK: IB Actions
@@ -483,7 +486,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         switch result {
         case .success:
-            tableView.reloadData()
+            tableView.reloadDataPreservingSelection()
         case .failure(let error):
             dialogService.showRichError(error: error)
         }
@@ -571,6 +574,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         chatDeselectedIndex = indexPath
     }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
@@ -726,7 +730,7 @@ extension ChatListViewController {
     
     private func insertReloadRow() {
         lastSystemChatPositionRow = getBottomSystemChatIndex()
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     @MainActor
@@ -734,8 +738,7 @@ extension ChatListViewController {
         loadNewChatTask = Task {
             await chatsProvider.getChatRooms(offset: offset)
             isBusy = false
-            tableView.reloadData()
-        }
+            tableView.reloadDataPreservingSelection()        }
     }
 }
 
@@ -1601,5 +1604,13 @@ private extension UITableView {
         let selectedRowIndexPath = indexPathForSelectedRow
         reloadRows(at: indexPaths, with: .none)
         selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
+    }
+    
+    func reloadDataPreservingSelection() {
+        let selectedRow = indexPathForSelectedRow
+        reloadData()
+        if let selectedRow = selectedRow {
+            selectRow(at: selectedRow, animated: false, scrollPosition: .none)
+        }
     }
 }
