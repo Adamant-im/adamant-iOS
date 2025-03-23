@@ -85,9 +85,27 @@ private extension ChatScrollButton {
                 $0.width.height.equalTo(18)
             }
         }
+        if traitCollection.userInterfaceIdiom == .pad || traitCollection.userInterfaceIdiom == .mac {
+            let hover = UIHoverGestureRecognizer(target: self, action: #selector(handleHover(_:)))
+            addGestureRecognizer(hover)
+        }
     }
     
     @objc func onTap() {
         action?()
     }
+    @objc func handleHover(_ gesture: UIHoverGestureRecognizer) {
+            switch gesture.state {
+            case .began, .changed:
+                button.alpha = 1.0
+                button.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+            case .ended:
+                UIView.animate(withDuration: 0.2) {
+                    self.button.alpha = 0.5
+                    self.button.transform = .identity
+                }
+            default:
+                break
+            }
+        }
 }
