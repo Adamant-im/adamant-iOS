@@ -318,6 +318,12 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
+        viewModel.didTapShowTimeSettings
+            .sink { [weak self] in
+                self?.didTapShowTimeSettings()
+            }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in
@@ -1068,6 +1074,14 @@ private extension ChatViewController {
     func didTapReviewAdmNodes() {
         let vc = screensFactory.makeNodesList()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapShowTimeSettings() {
+        let settingsURL = isMacOS ? "x-apple.systempreferences:com.apple.preference.datetime" : "App-prefs:root=General&path=DATE_AND_TIME"
+        if let appSettings = URL(string: settingsURL),
+            UIApplication.shared.canOpenURL(appSettings) {
+            UIApplication.shared.open(appSettings)
+        }
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
