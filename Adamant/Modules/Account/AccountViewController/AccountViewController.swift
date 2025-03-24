@@ -89,10 +89,10 @@ final class AccountViewController: FormViewController {
     
     private var walletViewControllers: [WalletViewController] = []
     
-    private var currentWalletCoinId: String = ""
+    private var currentWalletCoinID: String = ""
     private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
         viewModel.state.wallets.first { wallet in
-            wallet.coinID == currentWalletCoinId
+            wallet.coinID == currentWalletCoinID
         }
     }
 
@@ -984,10 +984,10 @@ final class AccountViewController: FormViewController {
     }
     
     private func selectCurrentWallet() {
-        if let index = viewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinId }) {
+        if let index = viewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinID }) {
             pagingViewController.select(index: index, animated: false)
-        } else if viewModel.state.wallets.count > 0 {
-            currentWalletCoinId = viewModel.state.wallets.first!.coinID
+        } else if let firstWalletID = viewModel.state.wallets.first?.coinID {
+                currentWalletCoinID = firstWalletID
         }
     }
 }
@@ -1089,7 +1089,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         didSelectItem pagingItem: PagingItem
     ) {
         Task { @MainActor in
-            currentWalletCoinId = viewModel.state.wallets.first(where: { wallet in
+            currentWalletCoinID = viewModel.state.wallets.first(where: { wallet in
                 wallet.index == pagingItem.identifier
             })?.coinID ?? ""
         }
