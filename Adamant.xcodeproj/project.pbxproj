@@ -188,7 +188,7 @@
 		48B6A8EB2D5738D800326EE8 /* WalletsStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EA2D5738D800326EE8 /* WalletsStoreService.swift */; };
 		48B6A8ED2D57390400326EE8 /* AdamantWalletsStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */; };
 		48B6A8EF2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6A8EE2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift */; };
-		48B799A82D84144C00BFD6A4 /* AdamantSecretWalletsManager+SecretWalletsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B799A72D84144C00BFD6A4 /* AdamantSecretWalletsManager+SecretWalletsFactory.swift */; };
+		48B799A82D84144C00BFD6A4 /* SecretWalletsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B799A72D84144C00BFD6A4 /* SecretWalletsFactory.swift */; };
 		48C034F92D81560800F50E35 /* SecretWalletsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48C034F82D81560800F50E35 /* SecretWalletsState.swift */; };
 		48C034FF2D81587800F50E35 /* SecretWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48C034FE2D81587800F50E35 /* SecretWalletsViewModel.swift */; };
 		48DA2FCF2D4A0519008F9FC1 /* AccountWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */; };
@@ -923,7 +923,7 @@
 		48B6A8EA2D5738D800326EE8 /* WalletsStoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletsStoreService.swift; sourceTree = "<group>"; };
 		48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletsStoreService.swift; sourceTree = "<group>"; };
 		48B6A8EE2D573A3C00326EE8 /* AdamantWalletStoreServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletStoreServiceProvider.swift; sourceTree = "<group>"; };
-		48B799A72D84144C00BFD6A4 /* AdamantSecretWalletsManager+SecretWalletsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantSecretWalletsManager+SecretWalletsFactory.swift"; sourceTree = "<group>"; };
+		48B799A72D84144C00BFD6A4 /* SecretWalletsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsFactory.swift; sourceTree = "<group>"; };
 		48C034F82D81560800F50E35 /* SecretWalletsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsState.swift; sourceTree = "<group>"; };
 		48C034FE2D81587800F50E35 /* SecretWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretWalletsViewModel.swift; sourceTree = "<group>"; };
 		48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsViewModel.swift; sourceTree = "<group>"; };
@@ -2648,7 +2648,7 @@
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
 				4815586F2D65A7660011B470 /* SecretWalletsManager.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
-				48B799A72D84144C00BFD6A4 /* AdamantSecretWalletsManager+SecretWalletsFactory.swift */,
+				48B799A72D84144C00BFD6A4 /* SecretWalletsFactory.swift */,
 				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,
 				48B6A8EC2D57390400326EE8 /* AdamantWalletsStoreService.swift */,
 				3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */,
@@ -3663,7 +3663,7 @@
 				4184F1732A33102800D7B8B9 /* AdamantCrashlysticsService.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */,
-				48B799A82D84144C00BFD6A4 /* AdamantSecretWalletsManager+SecretWalletsFactory.swift in Sources */,
+				48B799A82D84144C00BFD6A4 /* SecretWalletsFactory.swift in Sources */,
 				93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */,
 				9332C39D2C76BE7500164B80 /* FileApiServiceResult.swift in Sources */,
 				9322E877297042FA00B8357C /* ChatMessage.swift in Sources */,

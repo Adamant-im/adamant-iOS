@@ -134,6 +134,10 @@ extension AdamantAccountService {
         return securedStore.get(.passphrase)
     }
     
+    func getCurrentPassphrase() -> String? {
+        passphrase
+    }
+    
     func dropSavedAccount() {
         useBiometry = false
         isBalanceExpired = true

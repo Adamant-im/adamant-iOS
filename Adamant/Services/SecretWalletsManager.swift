@@ -10,7 +10,7 @@ import Foundation
 import Swinject
 import CommonKit
 
-extension AdamantSecretWalletsManager {
+private extension AdamantSecretWalletsManager {
     struct State: SecretWalletsManagerStateProtocol {
         var currentWallet: WalletStoreServiceProtocol
         var regularWallet: WalletStoreServiceProtocol
