@@ -9,9 +9,9 @@
 import CommonKit
 
 struct UserDefaultsManager {
-    @UserDefaultsStorage(.needToShowNoActiveNodesAlert) static var needToShowNoActiveNodesAlert: Bool?
+    @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) static var needsToShowNoActiveNodesAlert: Bool?
     
     static func setInitialUserDefaults() {
-        needToShowNoActiveNodesAlert = true
+        needsToShowNoActiveNodesAlert = true
     }
 }

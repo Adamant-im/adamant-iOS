@@ -16,7 +16,11 @@ public struct UserDefaultsStorage<T> {
         get {
             defaults.object(forKey: key) as? T
         } set {
-            defaults.set(newValue, forKey: key)
+            if newValue == nil {
+                defaults.removeObject(forKey: key)
+            } else {
+                defaults.set(newValue, forKey: key)
+            }
         }
     }
     

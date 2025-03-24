@@ -6,5 +6,5 @@
 //
 
 public enum UserDefaultsKey: String {
-    case needToShowNoActiveNodesAlert
+    case needsToShowNoActiveNodesAlert
 }
