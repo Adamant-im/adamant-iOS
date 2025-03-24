@@ -71,7 +71,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     var searchController: UISearchController?
     
     private var transactionsRequiringBalanceUpdate: [String] = []
-    private var chatsManuallyMarkedAsUnread: Set<Int> = Set() {
+    private var chatsManuallyMarkedAsUnread: Set<String> = Set() {
         didSet {
             setBadgeValue(unreadController?.fetchedObjects?.count)
         }
@@ -278,6 +278,13 @@ final class ChatListViewController: KeyboardObservingViewController {
     }
     
     // MARK: Add Observers
+    @MainActor
+    private func updateChatsManuallyMarkedAsUnread() async {
+        let addresses = await chatsProvider.getMarkAdressesFromChain()
+        self.chatsManuallyMarkedAsUnread = addresses
+
+        setBadgeValue(unreadController?.fetchedObjects?.count)
+    }
     
     private func addObservers() {
         // Login/Logout
@@ -406,6 +413,9 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
         
         areMessagesLoaded = true
+        Task {
+            await updateChatsManuallyMarkedAsUnread()
+        }
         performOnMessagesLoadedActions()
         setIsBusy(!synced)
         tableView.reloadData()
@@ -469,7 +479,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             }
             
             tableView.reloadData()
-            setBadgeValue(unreadController?.fetchedObjects?.count)
         }
     }
     
@@ -577,7 +586,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if let chatroom = chatsController?.fetchedObjects?[safe: nIndexPath.row] {
             let vc = chatViewController(for: chatroom)
             vc.hidesBottomBarWhenPushed = true
-            chatsManuallyMarkedAsUnread.remove(indexPath.row)
+            removeManualAdress(adress: chatroom.partner?.address)
             
             if let split = self.splitViewController {
                 let chat = UINavigationController(rootViewController:vc)
@@ -1178,11 +1187,14 @@ extension ChatListViewController {
         
         var actions: [UIContextualAction] = []
       
-        let markAsRead = makeMarkAsReadContextualAction(for: chatroom, index: indexPath.row)
-        actions.append(markAsRead)
+        if let adress = chatroom.partner?.address {
+            let markAsRead = makeMarkAsReadContextualAction(for: chatroom, adress: adress)
+            actions.append(markAsRead)
+        }
         
         return UISwipeActionsConfiguration(actions: actions)
     }
+    
     func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
         swipedIndex = nil
         guard let deselectedIndex = indexPath,
@@ -1190,6 +1202,7 @@ extension ChatListViewController {
               let chatroom = chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
         configureCell(cell, for: chatroom)
     }
+    
     private func blockChat(with address: String, for chatroom: Chatroom?) {
         Task {
             chatroom?.isHidden = true
@@ -1237,17 +1250,23 @@ extension ChatListViewController {
         return block
     }
     
-    private func makeMarkAsReadContextualAction(for chatroom: Chatroom, index: Int) -> UIContextualAction {
+    private func makeMarkAsReadContextualAction(for chatroom: Chatroom, adress: String) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
             title: "👀"
         ) { (_, _, completionHandler) in
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
-                self.chatsManuallyMarkedAsUnread.remove(index)
+                self.chatsManuallyMarkedAsUnread.remove(adress)
+                Task {
+                    await self.chatsProvider.removeManualMarkChatAsUnread(chatroomId: adress)
+                }
             } else {
                 chatroom.markAsUnread()
-                self.chatsManuallyMarkedAsUnread.insert(index)
+                self.chatsManuallyMarkedAsUnread.insert(adress)
+                Task {
+                    await self.chatsProvider.setManualMarkChatAsUnread(chatroomId: adress)
+                }
             }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
@@ -1402,6 +1421,12 @@ extension ChatListViewController {
             style: .cancel
         ) { _ in
             completion?()
+        }
+    }
+    
+    private func removeManualAdress(adress: String?) {
+        if let adress {
+            chatsManuallyMarkedAsUnread.remove(adress)
         }
     }
 }
