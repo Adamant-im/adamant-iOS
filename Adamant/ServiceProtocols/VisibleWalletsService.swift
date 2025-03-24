@@ -6,17 +6,12 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 
-// MARK: - Notifications
-extension Notification.Name {
-    struct AdamantVisibleWalletsService {
-        /// Raised when user has changed visible wallets
-        static let visibleWallets = Notification.Name("adamant.visibleWallets.update")
-        
-    }
-}
 protocol VisibleWalletsService: AnyObject, Sendable {
+    var statePublisher: AnyObservable<Void> { get }
+    
     func addToInvisibleWallets(_ walletID: String)
     func removeFromInvisibleWallets(_ walletID: String)
     func getSortedWallets(includeInvisible: Bool) -> [String]
