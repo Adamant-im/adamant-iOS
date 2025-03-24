@@ -738,7 +738,8 @@ extension ChatListViewController {
         loadNewChatTask = Task {
             await chatsProvider.getChatRooms(offset: offset)
             isBusy = false
-            tableView.reloadDataPreservingSelection()        }
+            tableView.reloadDataPreservingSelection()
+        }
     }
 }
 

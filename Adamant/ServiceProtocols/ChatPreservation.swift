@@ -35,6 +35,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         
         updateNotifier.send()
     }
+    
     func preserveChatState(
         message: String?,
         replyMessage: MessageModel?,
