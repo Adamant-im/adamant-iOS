@@ -413,7 +413,7 @@ private extension ChatViewController {
                 guard let toId = $0
                 else { return }
                 
-                self?.scrollToPosition(.messageId(toId), animated: true)
+                self?.scrollToPosition(.messageId(toId), animated: false)
             }
             .store(in: &subscriptions)
         
@@ -666,6 +666,7 @@ private extension ChatViewController {
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
         phPickerVC.delegate = viewModel.mediaPickerDelegate
+        phPickerVC.view.tintColor = .systemBlue
         present(phPickerVC, animated: true)
     }
     
