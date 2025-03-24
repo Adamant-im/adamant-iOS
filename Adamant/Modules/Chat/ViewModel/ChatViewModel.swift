@@ -41,6 +41,7 @@ final class ChatViewModel: NSObject {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
+    private let visibleWalletsService: VisibleWalletsService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -191,7 +192,8 @@ final class ChatViewModel: NSObject {
         filesStorageProprieties: FilesStorageProprietiesProtocol,
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
-        filesPicker: FilesPickerProtocol
+        filesPicker: FilesPickerProtocol,
+        visibleWalletsService: VisibleWalletsService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -214,6 +216,7 @@ final class ChatViewModel: NSObject {
         self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
+        self.visibleWalletsService = visibleWalletsService
         
         super.init()
         setupObservers()
@@ -1157,9 +1160,9 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
-        NotificationCenter.default
-            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
-            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
+        visibleWalletsService.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {

@@ -194,6 +194,7 @@
 		48DA2FCF2D4A0519008F9FC1 /* AccountWalletsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */; };
 		48DA2FD12D4A054E008F9FC1 /* AccountWalletsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */; };
 		48DA2FD62D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */; };
+		48F338A42D8BF2E8005C2E4A /* AdamantVisibleWalletsServiceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F338A32D8BF2E8005C2E4A /* AdamantVisibleWalletsServiceState.swift */; };
 		4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		557AC306287B10D8004699D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 557AC305287B10D8004699D7 /* SnapKit */; };
@@ -929,6 +930,7 @@
 		48DA2FCE2D4A0519008F9FC1 /* AccountWalletsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsViewModel.swift; sourceTree = "<group>"; };
 		48DA2FD02D4A054E008F9FC1 /* AccountWalletsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWalletsState.swift; sourceTree = "<group>"; };
 		48DA2FD52D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletCollectionViewCell+Model.swift"; sourceTree = "<group>"; };
+		48F338A32D8BF2E8005C2E4A /* AdamantVisibleWalletsServiceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVisibleWalletsServiceState.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -1822,6 +1824,15 @@
 			path = AccountWallets;
 			sourceTree = "<group>";
 		};
+		48F338A22D8BF2E0005C2E4A /* AdamantVisibleWalletsService */ = {
+			isa = PBXGroup;
+			children = (
+				48F338A32D8BF2E8005C2E4A /* AdamantVisibleWalletsServiceState.swift */,
+				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
+			);
+			path = AdamantVisibleWalletsService;
+			sourceTree = "<group>";
+		};
 		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
 			isa = PBXGroup;
 			children = (
@@ -2645,8 +2656,8 @@
 				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
-				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
-				4815586F2D65A7660011B470 /* SecretWalletsManager.swift */,
+				48F338A22D8BF2E0005C2E4A /* AdamantVisibleWalletsService */,
+				4815586F2D65A7660011B470 /* SecretWalletsService.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
 				48B799A72D84144C00BFD6A4 /* SecretWalletsFactory.swift */,
 				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,
@@ -3969,6 +3980,7 @@
 				3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */,
 				93A91FD1297972B7001DB1F8 /* ChatScrollButton.swift in Sources */,
 				3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */,
+				48F338A42D8BF2E8005C2E4A /* AdamantVisibleWalletsServiceState.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
 				9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */,
 				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
