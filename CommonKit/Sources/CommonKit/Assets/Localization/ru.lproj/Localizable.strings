@@ -1373,14 +1373,14 @@
 "Chat.Timestamp.InFuture.Error" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит.\nПроверьте время на устройстве или попробуйте отправить сообщение снова.";
 
 /* Secret Wallets */
-"SecretWallets.Menu.Regular" = "Обычный";
+"SecretWallets.Menu.Regular" = "💰 Обычный";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ Секретный 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ Секретный 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ Секретный 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ Секретный 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Секретный 5";
-"SecretWallets.Menu.AddSecretWallet" = "Добавить секретный";
-"SecretWallets.Menu.TellMeMore" = "О кошельках";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 Добавить секретный";
+"SecretWallets.Menu.TellMeMore" = "💡 О кошельках";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
 "SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
 "SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";

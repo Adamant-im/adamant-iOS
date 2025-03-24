@@ -1363,14 +1363,14 @@
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
 
 /* Secret Wallets */
-"SecretWallets.Menu.Regular" = "普通";
+"SecretWallets.Menu.Regular" = "💰 普通";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ 秘密 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ 秘密 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ 秘密 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ 秘密 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ 秘密 5";
-"SecretWallets.Menu.AddSecretWallet" = "添加秘密";
-"SecretWallets.Menu.TellMeMore" = "关于钱包";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 添加秘密";
+"SecretWallets.Menu.TellMeMore" = "💡 关于钱包";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
 "SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
 "SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";

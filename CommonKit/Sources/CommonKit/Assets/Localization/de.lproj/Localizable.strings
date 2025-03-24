@@ -1396,14 +1396,14 @@
 "Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";
 
 /* Secret Wallets */
-"SecretWallets.Menu.Regular" = "Normal";
+"SecretWallets.Menu.Regular" = "💰 Normal";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ Geheim 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ Geheim 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ Geheim 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ Geheim 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Geheim 5";
-"SecretWallets.Menu.AddSecretWallet" = "Geheimen hinzufügen";
-"SecretWallets.Menu.TellMeMore" = "Über Wallets";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 Geheimen hinzufügen";
+"SecretWallets.Menu.TellMeMore" = "💡 Über Wallets";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
 "SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
 "SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
