@@ -2657,7 +2657,7 @@
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				48F338A22D8BF2E0005C2E4A /* AdamantVisibleWalletsService */,
-				4815586F2D65A7660011B470 /* SecretWalletsService.swift */,
+				4815586F2D65A7660011B470 /* SecretWalletsManager.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
 				48B799A72D84144C00BFD6A4 /* SecretWalletsFactory.swift */,
 				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,

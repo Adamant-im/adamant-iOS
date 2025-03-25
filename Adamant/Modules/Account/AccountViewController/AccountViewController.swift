@@ -46,8 +46,6 @@ final class AccountViewController: FormViewController {
     private let languageService: LanguageStorageProtocol
     private let apiServiceCompose: ApiServiceComposeProtocol
     private let visibleWalletsService: VisibleWalletsService
-    private lazy var viewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
-    private let secretWalletsManager: SecretWalletsManagerProtocol
     private lazy var walletsViewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
     private let secretWalletsAlertService: SecretWalletsAlertMenuView
     private let secretWalletsViewModel: SecretWalletsViewModel
@@ -95,7 +93,7 @@ final class AccountViewController: FormViewController {
     
     private var currentWalletCoinID: String = ""
     private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
-        viewModel.state.wallets.first { wallet in
+        walletsViewModel.state.wallets.first { wallet in
             wallet.coinID == currentWalletCoinID
         }
     }
@@ -117,8 +115,7 @@ final class AccountViewController: FormViewController {
         languageService: LanguageStorageProtocol,
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol,
-        visibleWalletsService: VisibleWalletsService
-        secretWalletsManager: SecretWalletsManagerProtocol,
+        visibleWalletsService: VisibleWalletsService,
         secretWalletsAlertService: SecretWalletsAlertMenuView,
         secretWalletsViewModel: SecretWalletsViewModel
     ) {
@@ -134,7 +131,6 @@ final class AccountViewController: FormViewController {
         self.languageService = languageService
         self.apiServiceCompose = apiServiceCompose
         self.visibleWalletsService = visibleWalletsService
-        self.secretWalletsManager = secretWalletsManager
         self.secretWalletsAlertService = secretWalletsAlertService
         self.secretWalletsViewModel = secretWalletsViewModel
         
@@ -189,7 +185,7 @@ final class AccountViewController: FormViewController {
                 guard let self = self else { return }
                 self.setupWalletsVC()
                 self.pagingViewController.reloadData()
-                self.pagingViewController.select(index: currentWalletIndex, animated: false)
+                selectCurrentWallet()
                 guard index >= 0 else { return }
                 self.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
             }
@@ -234,6 +230,7 @@ final class AccountViewController: FormViewController {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.pagingViewController.reloadMenu()
+                self.selectCurrentWallet()
             }
             .store(in: &notificationsSet)
         
@@ -355,7 +352,6 @@ final class AccountViewController: FormViewController {
             self.secretWalletsAlertService.presentSecretWalletsActionSheet(from: cell)
         }
         
-        // Добавление строки в секцию
         appSection.append(secretWalletsRow)
         
         // Node list
@@ -1028,10 +1024,10 @@ final class AccountViewController: FormViewController {
     }
     
     private func selectCurrentWallet() {
-        if let index = viewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinID }) {
+        if let index = walletsViewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinID }) {
             pagingViewController.select(index: index, animated: false)
-        } else if let firstWalletID = viewModel.state.wallets.first?.coinID {
-                currentWalletCoinID = firstWalletID
+        } else if let firstWalletID = walletsViewModel.state.wallets.first?.coinID {
+            currentWalletCoinID = firstWalletID
         }
     }
 }
@@ -1117,6 +1113,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
                   first.height != second.height else {
                 return
             }
+            
             updateHeaderSize(with: second, animated: true)
         }
     }
@@ -1126,7 +1123,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         didSelectItem pagingItem: PagingItem
     ) {
         Task { @MainActor in
-            currentWalletCoinID = viewModel.state.wallets.first(where: { wallet in
+            currentWalletCoinID = walletsViewModel.state.wallets.first(where: { wallet in
                 wallet.index == pagingItem.identifier
             })?.coinID ?? ""
         }
