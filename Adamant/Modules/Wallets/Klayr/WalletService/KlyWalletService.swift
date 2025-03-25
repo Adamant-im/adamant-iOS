@@ -39,6 +39,14 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     static let currencyLogo = UIImage.asset(named: "klayr_wallet") ?? .init()
     static let kvsAddress = "kly:address"
     static let defaultFee: BigUInt = 141000
+    static var serviceNodes: [CommonKit.Node] {
+        coinInfo?.services?.klyService?.list.map { serviceNode in
+            Node.makeDefaultNode(
+                url: URL(string: serviceNode.url)!,
+                altUrl: serviceNode.altIP.flatMap { URL(string: $0) }
+            )
+        } ?? []
+    }
     
     @MainActor
     var hasEnabledNode: Bool {
