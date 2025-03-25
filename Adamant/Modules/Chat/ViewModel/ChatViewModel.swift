@@ -66,6 +66,7 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) private var needsToShowNoActiveNodesAlert: Bool?
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = [] {
@@ -1003,7 +1004,18 @@ final class ChatViewModel: NSObject {
     
     func checkForADMNodesAvailability() {
         if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
+            guard needsToShowNoActiveNodesAlert == true else { return }
             dialog.send(.noActiveNodesAlert)
+            needsToShowNoActiveNodesAlert = false
+        } else {
+            needsToShowNoActiveNodesAlert = true
+        }
+    }
+    
+    func checkUpdateState() {
+        Task { @MainActor in
+            let isUpdating = await chatsProvider.state.isUpdating
+            self.isHeaderLoading = isUpdating
         }
     }
 }

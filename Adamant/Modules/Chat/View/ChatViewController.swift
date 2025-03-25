@@ -161,6 +161,9 @@ final class ChatViewController: MessagesViewController {
         }
         viewModel.updatePartnerName()
         updateScrollDownButtonVisibility()
+        
+        // Needs to check the current state of the chats update to present or hide spinner on appear instantly
+        viewModel.checkUpdateState()
     }
     
     override func viewDidAppear(_ animated: Bool) {
