@@ -172,6 +172,7 @@ final class ChatViewController: MessagesViewController {
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
         
+        updateUnreadMessages()
         if !viewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
         }
