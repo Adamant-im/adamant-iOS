@@ -91,12 +91,6 @@ final class AdamantNotificationsService: NSObject, NotificationsService {
             .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
             .sink { @MainActor [weak self] _ in self?.onUserLoggedOut() }
             .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .notifications(named: .AdamantAccountService.stayInChanged, object: nil)
-            .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
-            .sink { @MainActor [weak self] in self?.onStayInChanged($0) }
-            .store(in: &subscriptions)
     }
     
     func setInAppSound(_ value: Bool) {
@@ -269,16 +263,6 @@ extension AdamantNotificationsService {
     }
     
     func setBadge(number: Int?) {
-        setBadge(number: number, force: false)
-    }
-    
-    private func setBadge(number: Int?, force: Bool) {
-        if !force {
-            guard let stayIn = accountService?.hasStayInAccount, stayIn else {
-                preservedBadgeNumber = number
-                return
-            }
-        }
         
         let appIconBadgeNumber: Int
         
@@ -368,15 +352,6 @@ private extension AdamantNotificationsService {
         preservedBadgeNumber = nil
         
         resetUnreadController()
-    }
-    
-    func onStayInChanged(_ stayIn: Bool) {
-        if stayIn {
-            setBadge(number: preservedBadgeNumber, force: false)
-        } else {
-            preservedBadgeNumber = nil
-            setBadge(number: nil, force: true)
-        }
     }
     
     func setupUnreadController() async {
