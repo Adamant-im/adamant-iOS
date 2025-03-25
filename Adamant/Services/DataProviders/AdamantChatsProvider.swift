@@ -162,6 +162,7 @@ actor AdamantChatsProvider: ChatsProvider {
         } else {
             store.remove(StoreKey.chatProvider.receivedLastHeight)
             store.remove(StoreKey.chatProvider.readedLastHeight)
+            store.remove(StoreKey.chatProvider.markedChatsAsUnread)
             self.dropStateData()
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
         }
