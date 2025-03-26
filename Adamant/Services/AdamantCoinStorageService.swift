@@ -108,24 +108,24 @@ private extension AdamantCoinStorageService {
         .sink { [weak self] notification in
             let changes = notification.managedObjectContextChanges(of: CoinTransaction.self)
             
-            guard self != nil, self?.coinId != nil && self?.coinAddress != nil else {
+            guard let self else {
                 return
             }
             
-            let uniqueId = self!.coinId + self!.coinAddress
+            let uniqueId = self.coinId + self.coinAddress
             
             if let inserted = changes.inserted, !inserted.isEmpty {
                 let filteredInserted: [TransactionDetails] = inserted.filter {
                     $0.uniqueId == uniqueId
                 }
-                self?.transactions.append(contentsOf: filteredInserted)
+                self.transactions.append(contentsOf: filteredInserted)
             }
             
             if let updated = changes.updated, !updated.isEmpty {
                 let filteredUpdated = updated.filter { $0.uniqueId == uniqueId }
                 
                 filteredUpdated.forEach { coinTransaction in
-                    guard let index = self?.transactions.firstIndex(where: {
+                    guard let index = self.transactions.firstIndex(where: {
                         $0.txId == coinTransaction.txId
                     })
                     else { return }
@@ -133,11 +133,12 @@ private extension AdamantCoinStorageService {
                     /*
                      Workaround to correctly set isOutgoing when multiple transactions share the same txId across different accounts.
                      
-                     This situation can happen when sending funds from a regular account to a secret one — technically two different transactions, but with the same txId.
+                     This situation can happen when sending funds from a regular account to a secret one or vica versa — technically is the same transaction, but it should show different isOutgoing for sender and reciever.
+                     
                      Currently, there's no reliable way to assign a truly unique ID to each TransactionDetails instance, so this workaround helps distinguish them for now.
                      PR - https://github.com/Adamant-im/adamant-iOS/pull/741
                      */
-                    self?.transactions[index] = SimpleTransactionDetails(
+                    self.transactions[index] = SimpleTransactionDetails(
                         defaultCurrencySymbol: coinTransaction.defaultCurrencySymbol,
                         txId: coinTransaction.txId,
                         senderAddress: coinTransaction.senderAddress,
@@ -147,7 +148,7 @@ private extension AdamantCoinStorageService {
                         feeValue: coinTransaction.feeValue,
                         confirmationsValue: coinTransaction.confirmationsValue,
                         blockValue: coinTransaction.blockValue,
-                        isOutgoing: self?.coinAddress == coinTransaction.senderAddress ? true : false,
+                        isOutgoing: self.coinAddress == coinTransaction.senderAddress ? true : false,
                         transactionStatus: coinTransaction.transactionStatus,
                         nonceRaw: coinTransaction.nonceRaw)
                 }
