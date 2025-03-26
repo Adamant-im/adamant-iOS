@@ -17,6 +17,7 @@ protocol SecretWalletsManagerProtocol {
     func getSecretWallets() -> [WalletStoreServiceProtocol]
     func activateSecretWallet(at index: Int)
     func activateDefaultWallet()
+    func removeAllSecretWallets()
 }
 
 protocol SecretWalletsManagerStateProtocol {

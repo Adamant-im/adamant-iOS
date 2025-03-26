@@ -178,8 +178,8 @@ final class AccountViewController: FormViewController {
         accountHeaderView.delegate = self
         
         secretWalletsViewModel.$state
-            .map { $0.currentActiveIndex }
             .removeDuplicates()
+            .map { $0.currentActiveIndex }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] index in
                 guard let self = self else { return }
