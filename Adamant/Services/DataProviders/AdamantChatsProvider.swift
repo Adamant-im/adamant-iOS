@@ -1304,6 +1304,7 @@ extension AdamantChatsProvider {
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
             transaction.statusEnum = .delivered
+            transaction.chatroom?.updatedAt = NSDate()
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
