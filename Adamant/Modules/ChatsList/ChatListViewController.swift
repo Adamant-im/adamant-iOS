@@ -282,8 +282,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     private func updateChatsManuallyMarkedAsUnread() async {
         let addresses = await chatsProvider.getMarkAdressesFromChain()
         self.chatsManuallyMarkedAsUnread = addresses
-
-        setBadgeValue(unreadController?.fetchedObjects?.count)
     }
     
     private func addObservers() {
