@@ -28,7 +28,6 @@ final class ChatTableViewCell: UITableViewCell {
         Task { @MainActor in
             badgeView.layer.cornerRadius = badgeView.bounds.height / 2
             clockView.contentMode = .scaleAspectFit
-            clockView.image = UIImage.asset(named: "status_pending")
             clockView.tintColor = .adamant.secondary
         }
     }
@@ -77,17 +76,22 @@ final class ChatTableViewCell: UITableViewCell {
             badgeView.backgroundColor = newValue
         }
     }
-    var isClockVisible: Bool {
-        get {
-            return !clockView.isHidden
-        }
-        set {
-            if newValue {
+    var messageStatus: MessageStatus = .delivered {
+        didSet {
+            switch messageStatus {
+            case .pending:
                 clockView.isHidden = false
+                clockView.image = .asset(named: "status_pending")
+                clockView.tintColor = .adamant.secondary
                 lastMessageLeadingAnchor.constant = 27
-            } else {
-                self.clockView.isHidden = true
-                self.lastMessageLeadingAnchor.constant = 10
+            case .failed:
+                clockView.isHidden = false
+                clockView.image = .asset(named: "status_failed")
+                clockView.tintColor = .adamant.attention
+                lastMessageLeadingAnchor.constant = 27
+            case .delivered:
+                clockView.isHidden = true
+                lastMessageLeadingAnchor.constant = 10
             }
         }
     }
