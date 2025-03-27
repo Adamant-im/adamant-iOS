@@ -9,7 +9,6 @@
 import Foundation
 import Swinject
 import CommonKit
-import Combine
 
 private extension AdamantSecretWalletsManager {
     struct State: SecretWalletsManagerStateProtocol {
@@ -28,7 +27,6 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     var wallets: [WalletStoreServiceProtocol] { [state.regularWallet] + state.secretWallets }
     
     private let lock = NSLock()
-    private var subscriptions = Set<AnyCancellable>()
     
     init(
         walletsStoreService: WalletStoreServiceProtocol,

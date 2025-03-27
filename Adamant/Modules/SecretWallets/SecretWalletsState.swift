@@ -17,7 +17,15 @@ struct SecretWalletsState: Equatable {
         return wallets[currentActiveIndex]
     }
     
-    static let `default` = Self(wallets: [], currentActiveIndex: -1)
+    static let `default` = Self(
+        wallets: [WalletItem(
+            name: String.localized(
+                "SecretWallets.Menu.Regular",
+                comment: "Secret wallet menu: regular wallet"
+            )
+        )],
+        currentActiveIndex: 0
+    )
 }
 
 struct WalletItem: Equatable, Identifiable {

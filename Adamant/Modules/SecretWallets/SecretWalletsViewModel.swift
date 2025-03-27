@@ -45,9 +45,6 @@ final class SecretWalletsViewModel: ObservableObject {
 
 private extension SecretWalletsViewModel {
     func setup() {
-        self.state.currentActiveIndex = 0
-        self.state.wallets.append(WalletItem(name: String.localized("SecretWallets.Menu.Regular", comment: "Secret wallet menu: regular wallet")))
-        
         NotificationCenter.default.notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in await self?.removeAllSecretWallets() }
             .store(in: &subscriptions)        
