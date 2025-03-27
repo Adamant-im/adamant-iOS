@@ -278,12 +278,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     }
     
     // MARK: Add Observers
-    @MainActor
-    private func updateChatsManuallyMarkedAsUnread() async {
-        let addresses = await chatsProvider.getMarkAdressesFromChain()
-        self.chatsManuallyMarkedAsUnread = addresses
-    }
-    
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
@@ -350,6 +344,12 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.tableView.reloadData()
             }
             .store(in: &subscriptions)
+    }
+    
+    @MainActor
+    private func updateChatsManuallyMarkedAsUnread() async {
+        let addresses = await chatsProvider.getMarkAdressesFromChain()
+        self.chatsManuallyMarkedAsUnread = addresses
     }
     
     private func closeDetailVC() {
