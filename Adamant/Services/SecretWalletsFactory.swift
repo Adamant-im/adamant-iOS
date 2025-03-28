@@ -70,7 +70,7 @@ struct SecretWalletsFactory {
                     _ = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
                         withPassword: password,
-                        storeInKVC: false
+                        storeInKVS: false
                     )
                 }
             }
