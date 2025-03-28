@@ -450,7 +450,7 @@ struct AppAssembly: MainThreadAssembly {
             .loadTokens()
         
         // MARK: Wallet Service Compose
-        container.register(WalletServiceCompose.self) { r in
+        container.register(WalletServiceCompose.self) { _ in
             var wallets: [WalletCoreProtocol] = [
                 AdmWalletService(),
                 BtcWalletService(),
