@@ -1,5 +1,5 @@
 //
-//  VibrationSelectionView.swift
+//  SettingsView.swift
 //  Adamant
 //
 //  Created by Stanislav Jelezoglo on 07.09.2023.
@@ -9,26 +9,43 @@
 import SwiftUI
 import CommonKit
 
-struct VibrationSelectionView: View {
-    @StateObject var viewModel: VibrationSelectionViewModel
+struct SettingsView: View {
+    enum SettingsType: String, CaseIterable {
+        case adamantWallets = "Adamant-Wallets"
+    }
     
-    init(viewModel: @escaping () -> VibrationSelectionViewModel) {
+    @StateObject var viewModel: VibrationSelectionViewModel
+    private let onSettingsSelect: (SettingsType) -> Void
+    
+    init(viewModel: @escaping () -> VibrationSelectionViewModel, onSettingsSelect: @escaping (SettingsType) -> Void) {
         _viewModel = .init(wrappedValue: viewModel())
+        self.onSettingsSelect = onSettingsSelect
     }
     
     var body: some View {
         List {
-            ForEach(AdamantVibroType.allCases, id: \.self) { type in
-                Button {
-                    viewModel.type = type
-                } label: {
-                    Text(vibrationTypeDescription(type))
+            Section("Vibrations") {
+                ForEach(AdamantVibroType.allCases, id: \.self) { type in
+                    Button {
+                        viewModel.type = type
+                    } label: {
+                        Text(vibrationTypeDescription(type))
+                    }
+                }
+            }
+            Section("Adamant-Wallets") {
+                ForEach(SettingsType.allCases, id: \.rawValue) { type in
+                    Button {
+                        onSettingsSelect(type)
+                    } label: {
+                        Text(type.rawValue)
+                    }
                 }
             }
         }
         .withoutListBackground()
         .background(Color(.adamant.secondBackgroundColor))
-        .navigationTitle("Vibrations")
+        .navigationTitle("Preferrences")
         .navigationBarTitleDisplayMode(.inline)
     }
     

@@ -414,20 +414,20 @@ private extension AboutViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.screensFactory.makeVibrationSelection()
+            guard let vc = self?.screensFactory.makeVibrationSelection(
+                onSettingsSelect: { [weak self] settingType in
+                    switch settingType {
+                    case .adamantWallets:
+                        let vc = TokensAndCoinsViewController(dialogService: self?.dialogService)
+                        self?.showViewController(vc)
+                    }
+                }
+            )
             else {
                 return
             }
             
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
+            self?.showViewController(vc)
         }
         
         appSection.append(vibrationRow)
@@ -440,5 +440,17 @@ private extension AboutViewController {
                 .adamant.about.commit(.init($0.prefix(20)))
             }
         )
+    }
+    
+    private func showViewController(_ vc: UIViewController) {
+        if let split = self.splitViewController {
+            let details = UINavigationController(rootViewController:vc)
+            split.showDetailViewController(details, sender: self)
+        } else if let nav = self.navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            vc.modalPresentationStyle = .overFullScreen
+            self.present(vc, animated: true, completion: nil)
+        }
     }
 }
