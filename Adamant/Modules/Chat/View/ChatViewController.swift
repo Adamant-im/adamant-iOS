@@ -161,6 +161,9 @@ final class ChatViewController: MessagesViewController {
         }
         viewModel.updatePartnerName()
         updateScrollDownButtonVisibility()
+        
+        // Needs to check the current state of the chats update to present or hide spinner on appear instantly
+        viewModel.checkUpdateState()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -315,6 +318,12 @@ private extension ChatViewController {
         viewModel.didTapAdmNodesList
             .sink { [weak self] in
                 self?.didTapReviewAdmNodes()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapShowTimeSettings
+            .sink { [weak self] in
+                self?.didTapShowTimeSettings()
             }
             .store(in: &subscriptions)
         
@@ -1068,6 +1077,14 @@ private extension ChatViewController {
     func didTapReviewAdmNodes() {
         let vc = screensFactory.makeNodesList()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapShowTimeSettings() {
+        let settingsURL = isMacOS ? "x-apple.systempreferences:com.apple.preference.datetime" : "App-prefs:root=General&path=DATE_AND_TIME"
+        if let appSettings = URL(string: settingsURL),
+            UIApplication.shared.canOpenURL(appSettings) {
+            UIApplication.shared.open(appSettings)
+        }
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
