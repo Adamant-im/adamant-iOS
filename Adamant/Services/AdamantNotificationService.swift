@@ -263,7 +263,6 @@ extension AdamantNotificationsService {
     }
     
     func setBadge(number: Int?) {
-        
         let appIconBadgeNumber: Int
         
         if let number = number {
