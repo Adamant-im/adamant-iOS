@@ -557,6 +557,7 @@ extension AdamantChatsProvider {
         guard isInitiallySynced,
               state != .updating
         else {
+            stateNotifier = state
             return nil
         }
         

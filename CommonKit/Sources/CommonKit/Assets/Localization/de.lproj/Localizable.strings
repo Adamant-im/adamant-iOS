@@ -1384,6 +1384,11 @@
 "Chat.Alert.Title.NoActiveNodes" = "Keine aktiven ADM-Knoten";
 "Chat.Alert.NoActiveNodes" = "Es können keine neuen Nachrichten angefordert werden - Keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
 
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Gerätezeit prüfen";
+"Chat.Alert.TimestampIsInTheFuture" = "Es können keine neuen Nachrichten angefordert werden - keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+"Chat.Alert.TimeSettings" = "Zeiteinstellung";
+
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "ADM-Knotenliste überprüfen";
 

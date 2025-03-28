@@ -754,7 +754,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         switch controller {
         case let c where c == chatsController:
             tableView.endUpdates()
-            updatingIndicatorView.stopAnimate()
             
         case let c where c == unreadController:
             setBadgeValue(controller.fetchedObjects?.count)
