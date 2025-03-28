@@ -978,7 +978,7 @@ final class AccountViewController: FormViewController {
         }
         
         Task { @MainActor in
-            await accountService.reloadWallets()
+            accountService.update()
             refreshControl.endRefreshing()
         }
     }
