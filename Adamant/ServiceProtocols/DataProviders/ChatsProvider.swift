@@ -210,7 +210,7 @@ extension StoreKey {
     }
 }
 
-// MARK: - Protocol
+// sourcery: AutoMockable
 protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }

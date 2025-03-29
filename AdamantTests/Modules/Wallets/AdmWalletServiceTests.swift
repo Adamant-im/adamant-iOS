@@ -255,7 +255,7 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
         adamantCoreMock.stubbedSignResult = "signature"
-        admApiServiceMock.stubbedSendMessageTransactionResult = .failure(.accountNotFound)
+        admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
         // when
         let result = await Result {
@@ -268,10 +268,19 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // then
-        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionCount, 1)
-        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.amount, Constants.sendAmount)
-        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.recipientId, Constants.recipientAddress)
-        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.senderId, Constants.accountAddress)
+        
+        admApiServiceMock.verify(.sendMessageTransaction(transaction: .value(
+            UnregisteredTransaction(
+                type: .chatMessage,
+                timestamp: 0,
+                senderPublicKey: "",
+                senderId: Constants.accountAddress,
+                recipientId: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                signature: "",
+                asset: TransactionAsset(),
+                requesterPublicKey: nil)
+        )), count: 1)
         
         let transactions: [TransferTransaction] = try stack.container.viewContext.fetch(TransferTransaction.fetchRequest())
         XCTAssertEqual(transactions.count, 1)
@@ -294,7 +303,7 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
         adamantCoreMock.stubbedSignResult = "signature"
-        admApiServiceMock.stubbedSendMessageTransactionResult = .success(1234)
+        admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .success(1234)))
         
         // when
         let result = await Result {
@@ -494,7 +503,7 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
         adamantCoreMock.stubbedSignResult = "signature"
-        admApiServiceMock.stubbedSendMessageTransactionResult = .failure(.accountNotFound)
+        admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
         // when
         let result = await Result {
@@ -507,6 +516,21 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // then
+        admApiServiceMock.verify(.sendMessageTransaction(transaction: .value(
+            UnregisteredTransaction(
+                type: <#T##TransactionType#>,
+                timestamp: <#T##UInt64#>,
+                senderPublicKey: <#T##String#>,
+                senderId: <#T##String#>,
+                recipientId: <#T##String?#>,
+                amount: <#T##Decimal#>,
+                signature: <#T##String#>,
+                asset: <#T##TransactionAsset#>,
+                requesterPublicKey: <#T##String?#>
+            )
+        )), count: 1)
+        
+        
         XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionCount, 1)
         XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.amount, Constants.sendAmount)
         XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.recipientId, Constants.recipientAddress)

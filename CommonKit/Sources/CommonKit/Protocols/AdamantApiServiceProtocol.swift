@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 
+// sourcery: AutoMockable
 public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - Accounts
     func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount>
