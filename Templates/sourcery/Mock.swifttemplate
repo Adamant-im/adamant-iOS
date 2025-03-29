@@ -647,7 +647,7 @@ class MethodWrapper {
     var filteredParameters: [MethodParameter] {
         return method.parameters.filter { $0.name != "" }
     }
-    var functionPrototype: String {
+    func functionPrototype(_ forceAsync: Bool) -> String {
         let throwing: String = {
             if method.throws {
                 return "throws "
@@ -1757,7 +1757,7 @@ func generate(type: Type, idx: Int, methodRegistrar: MethodRegistrar, subscriptR
 
   <%# ================================================== STATIC STUBS -%><%_ -%>
     <%_ for method in wrappedStaticMethods { -%>
-    <%= method.functionPrototype _%> {
+    <%= method.functionPrototype() _%> {
         <%= method.stubBody() _%>
     }
 
@@ -1765,15 +1765,27 @@ func generate(type: Type, idx: Int, methodRegistrar: MethodRegistrar, subscriptR
     <%_ -%>
   <%# ================================================== INITIALIZERS -%><%_ -%>
     <%_ for method in wrappedInitializers { -%>
-    <%= method.functionPrototype _%> { }
+    <%= method.functionPrototype() _%> { }
 
     <%_ } -%><%_ -%>
     <%_ -%><%_ -%>
   <%# ================================================== STUBS -%><%_ -%>
     <%_ for method in wrappedMethods { -%>
-    <%= method.functionPrototype _%> {
+    <%= method.functionPrototype() _%> {
         <%= method.stubBody() _%>
     }
+
+    <%_ if method.isMainActorInActor { -%>
+
+    <%= method.functionPrototype() _%> {
+        fatalError("This method is not implemented. Use async version instead.")
+    }
+
+    <%= method.functionPrototype(true) _%> {
+        <%= method.stubBody() _%>
+    }
+
+    <%_ } -%>
 
     <%_ } -%>
     <%_ for wrapped in wrappedSubscripts { -%>

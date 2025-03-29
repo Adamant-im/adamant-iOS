@@ -1408,7 +1408,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    @MainActor func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
+    func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()
         }

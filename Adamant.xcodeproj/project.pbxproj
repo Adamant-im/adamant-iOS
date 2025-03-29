@@ -536,6 +536,7 @@
 		AAFB3CA72D385BBE000CCCE9 /* EthRequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA62D385BBB000CCCE9 /* EthRequestBody.swift */; };
 		AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CA82D3860EC000CCCE9 /* EthResponseBody.swift */; };
 		AAFB3CAB2D3997DD000CCCE9 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3CAA2D3997D8000CCCE9 /* EthApiServiceProtocol.swift */; };
+		B18F4D712D986CD300F6917F /* SwiftyMockyXCTest in Frameworks */ = {isa = PBXBuildFile; productRef = B18F4D702D986CD300F6917F /* SwiftyMockyXCTest */; };
 		B1C2BA6D2D90BCF3001FE840 /* Mock.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2BA692D90BCF3001FE840 /* Mock.generated.swift */; };
 		B1C2BA6E2D90BCF3001FE840 /* Mock+ChatsProvider.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2BA6B2D90BCF3001FE840 /* Mock+ChatsProvider.generated.swift */; };
 		B1C2BA6F2D90BCF3001FE840 /* Mock+AdamantApiServiceProtocol.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2BA6A2D90BCF3001FE840 /* Mock+AdamantApiServiceProtocol.generated.swift */; };
@@ -1517,6 +1518,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B1C2BA722D90BF34001FE840 /* SwiftyMocky in Frameworks */,
+				B18F4D712D986CD300F6917F /* SwiftyMockyXCTest in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5086,6 +5088,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA8FFFC82D4E6435001D8576 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
+		};
+		B18F4D702D986CD300F6917F /* SwiftyMockyXCTest */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B1C2BA702D90BF34001FE840 /* XCRemoteSwiftPackageReference "SwiftyMocky" */;
+			productName = SwiftyMockyXCTest;
 		};
 		B1C2BA712D90BF34001FE840 /* SwiftyMocky */ = {
 			isa = XCSwiftPackageProductDependency;

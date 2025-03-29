@@ -8,6 +8,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 public protocol AdamantCore: AnyObject, Sendable {
     // MARK: - Keys
     func createSeedFor(passphrase: String, password: String) -> [UInt8]?
