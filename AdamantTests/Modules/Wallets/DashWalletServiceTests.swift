@@ -57,7 +57,7 @@ final class DashWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_throwsErrorWhenHasLastTransactionIdAndNotEnoughConfirmations() async throws {
-        // given
+        // GIVEN
         lastTransactionStorageMock.stubbedLastTransactionId = Constants.lastTransactionId
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicResult = APIResponseModel(
@@ -67,12 +67,12 @@ final class DashWalletServiceTests: XCTestCase {
             )
         }
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.create(recipient: Constants.invalidDashAddress, amount: 10)
         }
         
-        // then
+        // THEN
         switch result.error as? WalletServiceError {
         case .remoteServiceError?:
             break
@@ -82,41 +82,41 @@ final class DashWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_throwsErrorWhenNoWallet() async throws {
-        // given
+        // GIVEN
         lastTransactionStorageMock.stubbedLastTransactionId = nil
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.create(recipient: Constants.invalidDashAddress, amount: 10)
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_createTransaction_throwsErrorWhenInvalidRecipient() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         lastTransactionStorageMock.stubbedLastTransactionId = nil
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.create(recipient: Constants.invalidDashAddress, amount: 10)
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
     
     func test_createTransaction_badUnspentTransactionResponseDataThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTransactionsCorruptedData
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
         }
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.validDashAddress,
@@ -125,19 +125,19 @@ final class DashWalletServiceTests: XCTestCase {
                 comment: nil)
         })
         
-        // then
+        // THEN
         XCTAssertNotNil(result.error)
     }
     
     func test_createTransaction_notEnoughMoneyThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
         }
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.validDashAddress,
@@ -146,19 +146,19 @@ final class DashWalletServiceTests: XCTestCase {
                 comment: nil)
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notEnoughMoney)
     }
     
     func test_createTransaction_enoughMoneyReturnsRealTransaction() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
         }
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.validDashAddress,
@@ -168,7 +168,7 @@ final class DashWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertNil(result.error)
         XCTAssertEqual(result.value?.version, Constants.expectedTransaction.version)
         XCTAssertEqual(result.value?.outputs, Constants.expectedTransaction.outputs)
@@ -196,14 +196,14 @@ final class DashWalletServiceTests: XCTestCase {
     }
     
     func test_createAndSendTransaction_updatesLastTransactionId() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
         }
         
-        // when 1
+        // WHEN 1
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.validDashAddress,
@@ -213,11 +213,11 @@ final class DashWalletServiceTests: XCTestCase {
             )
         })
         
-        // then 1
+        // THEN 1
         XCTAssertNil(result.error)
         let transaction = try XCTUnwrap(result.value)
         
-        // given 2
+        // GIVEN 2
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(
                 result: .success(Constants.sendTransactionResponseData),
@@ -226,12 +226,12 @@ final class DashWalletServiceTests: XCTestCase {
             )
         }
         
-        // when 2
+        // WHEN 2
         let result2 = await Result(catchingAsync: {
             try await self.sut.sendTransaction(transaction)
         })
         
-        // then 2
+        // THEN 2
         XCTAssertNil(result2.error)
         XCTAssertEqual(lastTransactionStorageMock.invokedSetLastTransactionIdCount, 1)
         XCTAssertEqual(lastTransactionStorageMock.invokedSetLastTransactionIdParameters, transaction.txID)

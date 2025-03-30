@@ -14,7 +14,7 @@ final class AdmWalletServiceTests: XCTestCase {
     
     var sut: AdmWalletService!
     var transfersProvider: AdamantTransfersProvider!
-    var accountService: AccountServiceMock!
+    var accountServiceMock: AccountServiceMock!
     var accountsProviderMock: AccountsProviderMock!
     var admApiServiceMock: AdamantApiServiceProtocolMock!
     var chatProviderMock: ChatsProviderMock!
@@ -24,7 +24,7 @@ final class AdmWalletServiceTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         
-        accountService = AccountServiceMock()
+        accountServiceMock = AccountServiceMock()
         accountsProviderMock = await AccountsProviderMock()
         admApiServiceMock = AdamantApiServiceProtocolMock()
         chatProviderMock = ChatsProviderMock()
@@ -34,7 +34,7 @@ final class AdmWalletServiceTests: XCTestCase {
             apiService: admApiServiceMock,
             stack: stack,
             adamantCore: adamantCoreMock,
-            accountService: accountService,
+            accountService: accountServiceMock,
             accountsProvider: accountsProviderMock,
             securedStore: SecuredStoreMock(),
             transactionService: ChatTransactionServiceMock(),
@@ -47,7 +47,7 @@ final class AdmWalletServiceTests: XCTestCase {
     override func tearDown() async throws {
         sut = nil
         transfersProvider = nil
-        accountService = nil
+        accountServiceMock = nil
         accountsProviderMock = nil
         admApiServiceMock = nil
         chatProviderMock = nil
@@ -58,133 +58,10 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendMoney_isNotLoggedInThrowsError() async throws {
-        // given
-        accountService.account = nil
+        // GIVEN
+        accountServiceMock.given(.account(getter: nil))
         
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
-    }
-    
-    func test_sendMoney_noKeyPairThrowsError() async throws {
-        // given
-        accountService.account = makeAccount()
-        accountService.keypair = nil
-        
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
-    }
-    
-    func test_sendMoney_notEnoughMoneyThrowsError() async throws {
-        // given
-        setupAccountService()
-        
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: 20,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .notEnoughMoney)
-    }
-    
-    func test_sendMoney_invalidRecipientThrowsError() async throws {
-        // given
-        setupAccountService()
-        await MainActor.run {
-            accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.notFound(address: "")))
-        }
-        
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
-    }
-    
-    func test_sendMoney_invalidRecipientPublicKeyThrowsError() async throws {
-        // given
-        setupAccountService()
-        await MainActor.run {
-            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount()))
-        }
-        
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
-    }
-    
-    func test_sendMoney_emptyRecipientChatroomThrowsError() async throws {
-        // given
-        setupAccountService()
-        await MainActor.run {
-            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount(publicKey: "public key")))
-        }
-        
-        // when
-        let result = await Result {
-            try await self.sut.sendMoney(
-                recipient: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                comments: Constants.comment,
-                replyToMessageId: nil
-            )
-        }
-        
-        // then
-        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
-    }
-    
-    func test_sendMoney_correctRecipientBadMessageEncodeThrowsError() async throws {
-        // given
-        setupAccountService()
-        let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
-        await MainActor.run {
-            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
-        }
-        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
-        
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -195,7 +72,130 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // THEN
-        let privateKey = try XCTUnwrap(accountService.keypair)
+        XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
+    }
+    
+    func test_sendMoney_noKeyPairThrowsError() async throws {
+        // GIVEN
+        accountServiceMock.given(.account(getter: makeAccount()))
+        accountServiceMock.given(.keypair(getter: nil))
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
+    }
+    
+    func test_sendMoney_notEnoughMoneyThrowsError() async throws {
+        // GIVEN
+        setupAccountService()
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: 20,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        XCTAssertEqual(result.error as? WalletServiceError, .notEnoughMoney)
+    }
+    
+    func test_sendMoney_invalidRecipientThrowsError() async throws {
+        // GIVEN
+        setupAccountService()
+        await MainActor.run {
+            accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.notFound(address: "")))
+        }
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
+    }
+    
+    func test_sendMoney_invalidRecipientPublicKeyThrowsError() async throws {
+        // GIVEN
+        setupAccountService()
+        await MainActor.run {
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount()))
+        }
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
+    }
+    
+    func test_sendMoney_emptyRecipientChatroomThrowsError() async throws {
+        // GIVEN
+        setupAccountService()
+        await MainActor.run {
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount(publicKey: "public key")))
+        }
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
+    }
+    
+    func test_sendMoney_correctRecipientBadMessageEncodeThrowsError() async throws {
+        // GIVEN
+        setupAccountService()
+        let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
+        await MainActor.run {
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
+        }
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
+        
+        // WHEN
+        let result = await Result {
+            try await self.sut.sendMoney(
+                recipient: Constants.recipientAddress,
+                amount: Constants.sendAmount,
+                comments: Constants.comment,
+                replyToMessageId: nil
+            )
+        }
+        
+        // THEN
+        let privateKey = try XCTUnwrap(accountServiceMock.keypair)
         adamantCoreMock.verify(
             .encodeMessage(
                 .value(Constants.comment),
@@ -214,7 +214,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendMoney_signTransactionFailureThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -223,7 +223,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -234,7 +234,7 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // THEN
-        let keyPair = try XCTUnwrap(accountService.keypair)
+        let keyPair = try XCTUnwrap(accountServiceMock.keypair)
         adamantCoreMock.verify(.sign(
             transaction: .matching {
                 $0.type == .chatMessage
@@ -255,7 +255,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendMoney_sendTransactionFailureThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -265,7 +265,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -275,7 +275,7 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         
         admApiServiceMock.verify(.sendMessageTransaction(
             transaction: .matching {
@@ -301,7 +301,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendMoney_sendTransactionSuccess() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -311,7 +311,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .success(1234)))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -321,7 +321,7 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then        
+        // THEN        
         let transaction = try XCTUnwrap(result.value as? TransferTransaction)
         XCTAssertEqual(transaction.transactionId, "1234")
         XCTAssertEqual(transaction.statusEnum, .pending)
@@ -331,10 +331,10 @@ final class AdmWalletServiceTests: XCTestCase {
     // AdmWalletService have different logic for just sending money and sending money with comments
     
     func test_sendJustMoney_isNotLoggedInThrowsError() async throws {
-        // given
-        accountService.account = nil
+        // GIVEN
+        accountServiceMock.given(.account(getter: makeAccount()))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -344,16 +344,16 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_sendJustMoney_noKeyPairThrowsError() async throws {
-        // given
-        accountService.account = makeAccount()
-        accountService.keypair = nil
+        // GIVEN
+        accountServiceMock.given(.account(getter: makeAccount()))
+        accountServiceMock.given(.keypair(getter: nil))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -363,15 +363,15 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_sendJustMoney_notEnoughMoneyThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -381,18 +381,18 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notEnoughMoney)
     }
     
     func test_sendJustMoney_invalidRecipientThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         await MainActor.run {
             accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.invalidAddress(address: "")))
         }
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -402,19 +402,19 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
     
     func test_sendJustMoney_invalidRecipientQueriesDummyAndThrowsErrorWhenFails() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         await MainActor.run {
             accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.notFound(address: "")))
             accountsProviderMock.given(.getDummyAccount(for: .any, willThrow: AccountsProviderDummyAccountError.invalidAddress(address: "")))
         }
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -424,7 +424,7 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
         await MainActor.run {
             accountsProviderMock.verify(.getAccount(byAddress: .any), count: 1)
@@ -433,7 +433,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendJustMoney_correctRecipientBadMessageEncodeThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -462,7 +462,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendJustMoney_signTransactionFailureThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -471,7 +471,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -481,8 +481,8 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
-        let keyPair = try XCTUnwrap(accountService.keypair)
+        // THEN
+        let keyPair = try XCTUnwrap(accountServiceMock.keypair)
         adamantCoreMock.verify(.sign(
             transaction: .matching {
                 $0.type == .send
@@ -503,7 +503,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendJustMoney_sendTransactionFailureThrowsError() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -513,7 +513,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -523,7 +523,7 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         admApiServiceMock.verify(.sendMessageTransaction(
             transaction: .matching {
                 $0.type == .chatMessage
@@ -548,7 +548,7 @@ final class AdmWalletServiceTests: XCTestCase {
     }
     
     func test_sendJustMoney_sendTransactionSuccess() async throws {
-        // given
+        // GIVEN
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
@@ -558,7 +558,7 @@ final class AdmWalletServiceTests: XCTestCase {
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .success(1234)))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -568,7 +568,7 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
+        // THEN
         let transaction = try XCTUnwrap(result.value as? TransferTransaction)
         XCTAssertEqual(transaction.transactionId, "1234")
         XCTAssertEqual(transaction.statusEnum, .pending)
@@ -593,8 +593,8 @@ private extension AdmWalletServiceTests {
     }
     
     func setupAccountService() {
-        accountService.account = makeAccount()
-        accountService.keypair = makeKeypair(passphrase: Constants.passphrase)
+        accountServiceMock.given(.account(getter: makeAccount()))
+        accountServiceMock.given(.keypair(getter: makeKeypair(passphrase: Constants.passphrase)))
     }
     
     func setupCoreDataEntities(accountPublicKey: String? = nil) -> (Chatroom, CoreDataAccount) {

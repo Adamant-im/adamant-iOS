@@ -53,10 +53,10 @@ final class DogeWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_noWalletThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(nil)
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -66,16 +66,16 @@ final class DogeWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_createTransaction_accountNotFoundThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         addressConverterMock.stubbedInvokedConvertAddressResult = .failure(NSError())
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -85,12 +85,12 @@ final class DogeWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
     
     func test_createTransaction_notEnoughMoneyThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
@@ -102,7 +102,7 @@ final class DogeWalletServiceTests: XCTestCase {
         }
         addressConverterMock.stubbedInvokedConvertAddressResult = .success(try makeDefaultAddress())
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -111,12 +111,12 @@ final class DogeWalletServiceTests: XCTestCase {
                 comment: nil)
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notEnoughMoney)
     }
     
     func test_createTransaction_badUnspentTransactionResponseDataThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsCorruptedData
         await apiCoreMock.isolated { mock in
@@ -124,7 +124,7 @@ final class DogeWalletServiceTests: XCTestCase {
         }
         addressConverterMock.stubbedInvokedConvertAddressResult = .success(try makeDefaultAddress())
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -133,7 +133,7 @@ final class DogeWalletServiceTests: XCTestCase {
                 comment: nil)
         })
         
-        // then
+        // THEN
         switch result.error as? WalletServiceError {
         case .remoteServiceError?:
             break
@@ -143,7 +143,7 @@ final class DogeWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_enoughMoneyReturnsRealTransaction() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet(address: Constants.anotherDogeAddress))
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
@@ -152,7 +152,7 @@ final class DogeWalletServiceTests: XCTestCase {
         let expectedToAddress = try makeDefaultAddress()
         addressConverterMock.stubbedInvokedConvertAddressResult = .success(expectedToAddress)
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -162,7 +162,7 @@ final class DogeWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertNil(result.error)
         XCTAssertEqual(result.value, Constants.expectedTransaction)
         XCTAssertEqual(
@@ -188,18 +188,18 @@ final class DogeWalletServiceTests: XCTestCase {
     }
     
     func test_sendTransaction_successIfTxIdMatches() async throws {
-        // given
+        // GIVEN
         let txData = try XCTUnwrap(Constants.transactionId.data(using: .utf8))
         await apiCoreMock.isolated { mock in
             mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
         }
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendTransaction(BitcoinKit.Transaction.deserialize(Data(hex: Constants.transactionHex)!))
         }
         
-        // then
+        // THEN
         XCTAssertNil(result.error)
     }
 }

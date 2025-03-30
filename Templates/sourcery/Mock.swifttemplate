@@ -2185,7 +2185,7 @@ if contents.isEmpty {
 <%_ for (name, content) in contents { -%>
 // sourcery:file:Mock+<%= name %>.generated.swift
 // Generated with SwiftyMocky 4.2.1
-// Required Sourcery: 2.2.4
+// Required Sourcery: 2.2.6
 // swiftlint:disable all
 
 <%_ for rule in swiftLintRules(argument) { -%>
