@@ -116,7 +116,7 @@ final class AdmWalletServiceTests: XCTestCase {
         // given
         setupAccountService()
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .failure(AccountsProviderError.notFound(address: ""))
+            accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.notFound(address: "")))
         }
         
         // when
@@ -137,7 +137,7 @@ final class AdmWalletServiceTests: XCTestCase {
         // given
         setupAccountService()
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(createCoreDataAccount())
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount()))
         }
         
         // when
@@ -158,7 +158,7 @@ final class AdmWalletServiceTests: XCTestCase {
         // given
         setupAccountService()
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(createCoreDataAccount(publicKey: "public key"))
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: createCoreDataAccount(publicKey: "public key")))
         }
         
         // when
@@ -180,7 +180,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
         
@@ -218,7 +218,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
@@ -259,7 +259,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
@@ -305,7 +305,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
@@ -389,7 +389,7 @@ final class AdmWalletServiceTests: XCTestCase {
         // given
         setupAccountService()
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .failure(AccountsProviderError.invalidAddress(address: ""))
+            accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.invalidAddress(address: "")))
         }
         
         // when
@@ -410,8 +410,8 @@ final class AdmWalletServiceTests: XCTestCase {
         // given
         setupAccountService()
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .failure(AccountsProviderError.notFound(address: ""))
-            accountsProviderMock.stubbedGetDummyAccountResult = .failure(AccountsProviderDummyAccountError.invalidAddress(address: ""))
+            accountsProviderMock.given(.getAccount(byAddress: .any, willThrow: AccountsProviderError.notFound(address: "")))
+            accountsProviderMock.given(.getDummyAccount(for: .any, willThrow: AccountsProviderDummyAccountError.invalidAddress(address: "")))
         }
         
         // when
@@ -427,8 +427,8 @@ final class AdmWalletServiceTests: XCTestCase {
         // then
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
         await MainActor.run {
-            XCTAssertEqual(accountsProviderMock.invokedGetAccountCount, 1)
-            XCTAssertEqual(accountsProviderMock.invokedGetDummyAccountCount, 1)
+            accountsProviderMock.verify(.getAccount(byAddress: .any), count: 1)
+            accountsProviderMock.verify(.getDummyAccount(for: .any), count: 1)
         }
     }
     
@@ -437,7 +437,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
         
@@ -466,7 +466,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
@@ -507,7 +507,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
@@ -552,7 +552,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
-            accountsProviderMock.stubbedGetAccountResult = .success(account)
+            accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
         adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))

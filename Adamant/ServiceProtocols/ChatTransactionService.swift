@@ -12,6 +12,7 @@ import CommonKit
 
 // - MARK: SocketService
 
+// sourcery: AutoMockable
 protocol ChatTransactionService: AnyObject, Actor {
     
     /// Make operations serial
