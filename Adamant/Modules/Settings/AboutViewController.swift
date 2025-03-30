@@ -82,7 +82,7 @@ final class AboutViewController: FormViewController {
             case .email: return .localized("About.Row.WriteUs", comment: "About scene: Write us row")
             case .blog: return .localized("About.Row.Blog", comment: "About scene: Our blog row")
             case .twitter: return .localized("About.Row.Twitter", comment: "About scene: Twitter row")
-            case .vibration: return "Vibrations"
+            case .vibration: return "Developer"
             }
         }
         
@@ -109,7 +109,7 @@ final class AboutViewController: FormViewController {
             case .website: return .asset(named: "row_website")
             case .welcomeScreens: return .asset(named: "row_logo")
             case .twitter: return .asset(named: "row_twitter")
-            case .vibration: return .asset(named: "row_vibration")
+            case .vibration: return .asset(named: "row_crashlytics")
             }
         }
     }
