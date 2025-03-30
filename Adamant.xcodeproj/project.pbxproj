@@ -506,7 +506,6 @@
 		AAC641472D404D8400619DFE /* URLSessionSwizzlingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */; };
 		AAC641492D417B0D00619DFE /* DashLastTransactionStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641482D417AF400619DFE /* DashLastTransactionStorageProtocol.swift */; };
 		AAC6414B2D417B5300619DFE /* DashLastTransactionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414A2D417B4D00619DFE /* DashLastTransactionStorage.swift */; };
-		AAC6414D2D4180B600619DFE /* DashLastTransactionStorageProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */; };
 		AAC6414F2D41829900619DFE /* DashWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC6414E2D41829300619DFE /* DashWalletServiceTests.swift */; };
 		AAC641512D42D67B00619DFE /* DashApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641502D42D67700619DFE /* DashApiServiceProtocol.swift */; };
 		AAC641532D42D70100619DFE /* DashApiServiceProtocolMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */; };
@@ -541,6 +540,7 @@
 		D32506D72D991CF800484460 /* Mock+AccountsProvider.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */; };
 		D32506D92D991F2000484460 /* Mock+AccountService.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */; };
 		D32506DD2D993CBF00484460 /* Mock+SecureStore.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */; };
+		D32506E12D995E8400484460 /* Mock+DashLastTransactionStorageProtocol.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506E02D995E8400484460 /* Mock+DashLastTransactionStorageProtocol.generated.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1208,7 +1208,6 @@
 		AAC641462D404D7000619DFE /* URLSessionSwizzlingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionSwizzlingMock.swift; sourceTree = "<group>"; };
 		AAC641482D417AF400619DFE /* DashLastTransactionStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorageProtocol.swift; sourceTree = "<group>"; };
 		AAC6414A2D417B4D00619DFE /* DashLastTransactionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorage.swift; sourceTree = "<group>"; };
-		AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashLastTransactionStorageProtocolMock.swift; sourceTree = "<group>"; };
 		AAC6414E2D41829300619DFE /* DashWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletServiceTests.swift; sourceTree = "<group>"; };
 		AAC641502D42D67700619DFE /* DashApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashApiServiceProtocol.swift; sourceTree = "<group>"; };
 		AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashApiServiceProtocolMock.swift; sourceTree = "<group>"; };
@@ -1243,6 +1242,7 @@
 		D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+AccountsProvider.generated.swift"; sourceTree = "<group>"; };
 		D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+AccountService.generated.swift"; sourceTree = "<group>"; };
 		D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+SecureStore.generated.swift"; sourceTree = "<group>"; };
+		D32506E02D995E8400484460 /* Mock+DashLastTransactionStorageProtocol.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+DashLastTransactionStorageProtocol.generated.swift"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -2456,7 +2456,6 @@
 				AA8FFFD12D50DBF2001D8576 /* RequestStubs */,
 				AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */,
 				AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */,
-				AAC6414C2D4180B200619DFE /* DashLastTransactionStorageProtocolMock.swift */,
 				AAC641442D404ADA00619DFE /* KlyTransactionSubmitModel.swift */,
 				AAC641402D4049D400619DFE /* RpsRequestBody.swift */,
 				AAC6413E2D40464600619DFE /* KlyNodeApiServiceProtocolMock.swift */,
@@ -2512,6 +2511,7 @@
 				D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */,
 				D32506D22D99170300484460 /* Mock+AdamantCore.generated.swift */,
 				D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */,
+				D32506E02D995E8400484460 /* Mock+DashLastTransactionStorageProtocol.generated.swift */,
 				D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */,
 				D32506D42D991BEA00484460 /* Mock+ChatTransactionService.generated.swift */,
 				B1C2BA6B2D90BCF3001FE840 /* Mock+ChatsProvider.generated.swift */,
@@ -4163,6 +4163,7 @@
 				AAFB3CA52D3854BB000CCCE9 /* MockURLProtocol.swift in Sources */,
 				AAC641352D40325400619DFE /* KlyWalletServiceTests.swift in Sources */,
 				AAC641412D4049DA00619DFE /* RpsRequestBody.swift in Sources */,
+				D32506E12D995E8400484460 /* Mock+DashLastTransactionStorageProtocol.generated.swift in Sources */,
 				AAC641592D44F81700619DFE /* ERC20WalletServiceTests.swift in Sources */,
 				AAFB3C9B2D383BB1000CCCE9 /* EthWalletServiceTests.swift in Sources */,
 				AAC641332D3ED1BB00619DFE /* DogeWalletServiceIntegrationTests.swift in Sources */,
@@ -4185,7 +4186,6 @@
 				AAFB3C8B2D31C0DD000CCCE9 /* Actor+Extensions.swift in Sources */,
 				AAFB3CA32D384F52000CCCE9 /* IEthMock.swift in Sources */,
 				AAFB3C952D31C58B000CCCE9 /* BitcoinKitTransactionFactoryProtocolMock.swift in Sources */,
-				AAC6414D2D4180B600619DFE /* DashLastTransactionStorageProtocolMock.swift in Sources */,
 				AAFB3CA12D384AF7000CCCE9 /* IncreaseFeeServiceMock.swift in Sources */,
 				AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */,
 			);

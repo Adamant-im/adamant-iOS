@@ -6,6 +6,7 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
+// sourcery: AutoMockable
 protocol DashLastTransactionStorageProtocol: AnyObject {
     func getLastTransactionId() -> String?
     func setLastTransactionId(_ id: String?)
