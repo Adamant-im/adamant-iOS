@@ -182,7 +182,7 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = nil
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
         
         // when
         let result = await Result {
@@ -194,11 +194,17 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
-        XCTAssertEqual(adamantCoreMock.invokedEncodeMessageCount, 1)
-        XCTAssertEqual(adamantCoreMock.invokedEncodeMessageParameters?.message, Constants.comment)
-        XCTAssertEqual(adamantCoreMock.invokedEncodeMessageParameters?.privateKey, accountService.keypair?.privateKey)
-        XCTAssertEqual(adamantCoreMock.invokedEncodeMessageParameters?.recipientPublicKey, Constants.recipientPublicKeyAddress)
+        // THEN
+        let privateKey = try XCTUnwrap(accountService.keypair)
+        adamantCoreMock.verify(
+            .encodeMessage(
+                .value(Constants.comment),
+                recipientPublicKey: .value(Constants.recipientPublicKeyAddress),
+                privateKey: .value(privateKey.privateKey)
+            ),
+            count: 1
+        )
+        
         switch result.error as? WalletServiceError {
         case .internalError:
             break
@@ -214,8 +220,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = nil
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
         
         // when
         let result = await Result {
@@ -227,16 +233,18 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
-        XCTAssertEqual(adamantCoreMock.invokedSignCount, 1)
-        let signParameters = try XCTUnwrap(adamantCoreMock.invokedSignParameters)
-        XCTAssertEqual(signParameters.senderId, Constants.accountAddress)
-        XCTAssertEqual(signParameters.keypair.publicKey, accountService.keypair?.publicKey)
-        XCTAssertEqual(signParameters.keypair.privateKey, accountService.keypair?.privateKey)
-        
-        XCTAssertEqual(signParameters.transaction.type, .chatMessage)
-        XCTAssertEqual(signParameters.transaction.amount, Constants.sendAmount)
-        XCTAssertEqual(signParameters.transaction.recipientId, Constants.recipientAddress)
+        // THEN
+        let keyPair = try XCTUnwrap(accountService.keypair)
+        adamantCoreMock.verify(.sign(
+            transaction: .matching {
+                $0.type == .chatMessage
+                && $0.amount == Constants.sendAmount
+                && $0.recipientId == Constants.recipientAddress
+            },
+            senderId: .value(Constants.accountAddress),
+            keypair: .value(keyPair)),
+                               count: 1
+        )
         
         switch result.error as? WalletServiceError {
         case .internalError:
@@ -253,8 +261,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = "signature"
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
         // when
@@ -299,8 +307,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = "signature"
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .success(1234)))
         
         // when
@@ -431,9 +439,9 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = nil
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: nil))
         
-        // when
+        // WHEN
         let result = await Result {
             try await self.sut.sendMoney(
                 recipient: Constants.recipientAddress,
@@ -443,8 +451,8 @@ final class AdmWalletServiceTests: XCTestCase {
             )
         }
         
-        // then
-        XCTAssertEqual(adamantCoreMock.invokedEncodeMessageCount, 0)
+        // THEN
+        adamantCoreMock.verify(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any), count: 0)
         switch result.error as? WalletServiceError {
         case .internalError:
             break
@@ -460,8 +468,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = nil
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: nil))
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         
         // when
         let result = await Result {
@@ -474,16 +482,18 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // then
-        XCTAssertEqual(adamantCoreMock.invokedSignCount, 1)
-        let signParameters = try XCTUnwrap(adamantCoreMock.invokedSignParameters)
-        XCTAssertEqual(signParameters.senderId, Constants.accountAddress)
-        XCTAssertEqual(signParameters.keypair.publicKey, accountService.keypair?.publicKey)
-        XCTAssertEqual(signParameters.keypair.privateKey, accountService.keypair?.privateKey)
-        
-        XCTAssertEqual(signParameters.transaction.type, .send)
-        XCTAssertEqual(signParameters.transaction.amount, Constants.sendAmount)
-        XCTAssertEqual(signParameters.transaction.recipientId, Constants.recipientAddress)
-        
+        let keyPair = try XCTUnwrap(accountService.keypair)
+        adamantCoreMock.verify(.sign(
+            transaction: .matching {
+                $0.type == .send
+                && $0.amount == Constants.sendAmount
+                && $0.recipientId == Constants.recipientAddress
+            },
+            senderId: .value(Constants.accountAddress),
+            keypair: .value(keyPair)),
+                               count: 1
+        )
+
         switch result.error as? WalletServiceError {
         case .internalError:
             break
@@ -499,8 +509,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = "signature"
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .failure(.accountNotFound)))
         
         // when
@@ -544,8 +554,8 @@ final class AdmWalletServiceTests: XCTestCase {
         await MainActor.run {
             accountsProviderMock.stubbedGetAccountResult = .success(account)
         }
-        adamantCoreMock.stubbedEncodeMessageResult = ("message", "nonce")
-        adamantCoreMock.stubbedSignResult = "signature"
+        adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
+        adamantCoreMock.given(.encodeMessage(.any, recipientPublicKey: .any, privateKey: .any, willReturn: ("message", "nonce")))
         admApiServiceMock.given(.sendMessageTransaction(transaction: .any, willReturn: .success(1234)))
         
         // when
