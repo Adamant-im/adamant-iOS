@@ -269,18 +269,16 @@ final class AdmWalletServiceTests: XCTestCase {
         
         // then
         
-        admApiServiceMock.verify(.sendMessageTransaction(transaction: .value(
-            UnregisteredTransaction(
-                type: .chatMessage,
-                timestamp: 0,
-                senderPublicKey: "",
-                senderId: Constants.accountAddress,
-                recipientId: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                signature: "",
-                asset: TransactionAsset(),
-                requesterPublicKey: nil)
-        )), count: 1)
+        admApiServiceMock.verify(.sendMessageTransaction(
+            transaction: .matching {
+                $0.type == .chatMessage
+                && $0.senderPublicKey == "8eefafa8d2f6a51bde207bcdc9029f3725f5d6aaa8f9b8fe3cd6d65d1f315a54"
+                && $0.senderId == Constants.accountAddress
+                && $0.recipientId == Constants.recipientAddress
+                && $0.amount == Constants.sendAmount
+                && $0.signature == "signature"
+            }
+        ), count: 1)
         
         let transactions: [TransferTransaction] = try stack.container.viewContext.fetch(TransferTransaction.fetchRequest())
         XCTAssertEqual(transactions.count, 1)
@@ -516,25 +514,16 @@ final class AdmWalletServiceTests: XCTestCase {
         }
         
         // then
-        admApiServiceMock.verify(.sendMessageTransaction(transaction: .value(
-            UnregisteredTransaction(
-                type: .chatMessage,
-                timestamp: 0,
-                senderPublicKey: "",
-                senderId: Constants.accountAddress,
-                recipientId: Constants.recipientAddress,
-                amount: Constants.sendAmount,
-                signature: "",
-                asset: .init(),
-                requesterPublicKey: nil
-            )
-        )), count: 1)
-        
-        
-//        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionCount, 1)
-//        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.amount, Constants.sendAmount)
-//        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.recipientId, Constants.recipientAddress)
-//        XCTAssertEqual(admApiServiceMock.invokedSendMessageTransactionParameters?.senderId, Constants.accountAddress)
+        admApiServiceMock.verify(.sendMessageTransaction(
+            transaction: .matching {
+                $0.type == .chatMessage
+                && $0.senderPublicKey == "8eefafa8d2f6a51bde207bcdc9029f3725f5d6aaa8f9b8fe3cd6d65d1f315a54"
+                && $0.senderId == Constants.accountAddress
+                && $0.recipientId == Constants.recipientAddress
+                && $0.amount == Constants.sendAmount
+                && $0.signature == "signature"
+            }
+        ), count: 1)
         
         let transactions: [TransferTransaction] = try stack.container.viewContext.fetch(TransferTransaction.fetchRequest())
         XCTAssertEqual(transactions.count, 1)

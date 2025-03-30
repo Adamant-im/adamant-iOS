@@ -647,7 +647,7 @@ class MethodWrapper {
     var filteredParameters: [MethodParameter] {
         return method.parameters.filter { $0.name != "" }
     }
-    func functionPrototype(_ forceAsync: Bool) -> String {
+    func functionPrototype(_ forceAsync: Bool = false) -> String {
         let throwing: String = {
             if method.throws {
                 return "throws "
@@ -662,7 +662,7 @@ class MethodWrapper {
         let params = replacingSelf(parametersForStubSignature(), current: current)
         var attributes = self.methodAttributes
         attributes = attributes.isEmpty ? "" : "\(attributes)\n\t"
-        var asyncModifier = self.isAsync ? "async " : ""
+        var asyncModifier = (self.isAsync || forceAsync) ? "async " : ""
 
         if method.isInitializer {
             return "\(attributes)public required \(method.name) \(asyncModifier)\(throwing)"
@@ -695,7 +695,7 @@ class MethodWrapper {
         let defaultValue = method.returnTypeName.isOptional ? " = nil" : ""
         return method.returnTypeName.isVoid
         ? ""
-        : "\n\t\tvar __value: \(returnType)\(defaultValue)\n"
+        : "var __value: \(returnType)\(defaultValue)\n"
     }
     var givenValue: String {
         guard !method.isInitializer else { return "" }
@@ -833,26 +833,26 @@ class MethodWrapper {
         return front ? ", \(returning)" : "\(returning), "
     }
 
-    var taskPrefix: String {
-        isMainActorInActor ? "Task {\n" : ""
+    func taskPrefix(_ forceAsync: Bool = false) -> String {
+        isMainActorInActor && !forceAsync ? "Task {\n\t\t" : "\t\t"
     }
 
-    var taskSuffix: String {
-        isMainActorInActor ? "\n}" : ""
+    func taskSuffix(_ forceAsync: Bool = false) -> String {
+        isMainActorInActor && !forceAsync ? "\n}" : ""
     }
 
     // Stub
-    func stubBody() -> String {
+    func stubBody(_ forceAsync: Bool = false) -> String {
         let body: String = {
             if method.isInitializer || !returnsSelf {
                 return
                 givenDeclaration
-                + taskPrefix
+                + taskPrefix(forceAsync)
                 + invocation 
                 + performCall()
                 + givenValue
                 + throwValue
-                + taskSuffix
+                + taskSuffix(forceAsync)
                 + returnValue
             } else {
                 return wrappedStubPrefix()
@@ -1771,9 +1771,6 @@ func generate(type: Type, idx: Int, methodRegistrar: MethodRegistrar, subscriptR
     <%_ -%><%_ -%>
   <%# ================================================== STUBS -%><%_ -%>
     <%_ for method in wrappedMethods { -%>
-    <%= method.functionPrototype() _%> {
-        <%= method.stubBody() _%>
-    }
 
     <%_ if method.isMainActorInActor { -%>
 
@@ -1782,11 +1779,13 @@ func generate(type: Type, idx: Int, methodRegistrar: MethodRegistrar, subscriptR
     }
 
     <%= method.functionPrototype(true) _%> {
+        <%= method.stubBody(true) _%>
+    }
+    <%_ } else { -%>
+    <%= method.functionPrototype() _%> {
         <%= method.stubBody() _%>
     }
-
     <%_ } -%>
-
     <%_ } -%>
     <%_ for wrapped in wrappedSubscripts { -%>
     <%= wrapped.subscriptCall() _%>
