@@ -11,7 +11,7 @@ import Foundation
 import RNCryptor
 import CryptoKit
 
-public final class KeychainStore: SecuredStore, @unchecked Sendable {
+public final class KeychainStore: SecureStore, @unchecked Sendable {
     // MARK: - Properties
     private static let keychain = Keychain(service: "\(AdamantSecret.appIdentifierPrefix).im.adamant.messenger")
     
@@ -34,7 +34,7 @@ public final class KeychainStore: SecuredStore, @unchecked Sendable {
         migrateIfNeeded()
     }
     
-    // MARK: - SecuredStore
+    // MARK: - SecureStore
     
     public func get<T: Decodable>(_ key: String) -> T? {
         guard let data = getValue(key) else { return nil }
@@ -164,7 +164,7 @@ private extension KeychainStore {
     
     func purgeStore() {
         try? KeychainStore.keychain.removeAll()
-        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
+        NotificationCenter.default.post(name: Notification.Name.SecureStore.securedStorePurged, object: self)
     }
 }
 

@@ -13,7 +13,7 @@ import CommonKit
 final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Sendable {
     
     // MARK: Dependencies
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     let accountService: AccountService
     let walletsServiceCompose: WalletServiceCompose
     
@@ -37,7 +37,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     
     // MARK: Lifecycle
     init(
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         accountService: AccountService,
         walletsServiceCompose: WalletServiceCompose
     ) {

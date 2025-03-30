@@ -9,9 +9,9 @@ import Combine
 
 public struct ExtensionsApiFactory {
     public let core: AdamantCore
-    public let securedStore: SecuredStore
+    public let securedStore: SecureStore
     
-    public init(core: AdamantCore, securedStore: SecuredStore) {
+    public init(core: AdamantCore, securedStore: SecureStore) {
         self.core = core
         self.securedStore = securedStore
     }

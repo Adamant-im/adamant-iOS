@@ -199,7 +199,7 @@ extension AdamantUserInfoKey {
     }
 }
 
-// MARK: - SecuredStore keys
+// MARK: - SecureStore keys
 extension StoreKey {
     struct chatProvider {
         static let address = "chatProvider.address"

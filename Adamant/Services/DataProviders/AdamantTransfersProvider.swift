@@ -21,7 +21,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     private let accountsProvider: AccountsProvider
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
@@ -66,7 +66,7 @@ actor AdamantTransfersProvider: TransfersProvider {
         adamantCore: AdamantCore,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         transactionService: ChatTransactionService,
         chatsProvider: ChatsProvider
     ) {

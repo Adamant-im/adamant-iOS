@@ -8,7 +8,7 @@
 
 import Foundation
 
-// MARK: - SecuredStore keys
+// MARK: - SecureStore keys
 public extension StoreKey {
     enum NodesStorage {
         public static let nodes = "nodesStorage.nodes"

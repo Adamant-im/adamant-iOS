@@ -14,7 +14,7 @@ import CommonKit
 final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol, Sendable {
     // MARK: Dependencies
     
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     
     // MARK: Proprieties
     
@@ -36,7 +36,7 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol, Sen
     
     // MARK: Lifecycle
     
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecureStore) {
         self.securedStore = securedStore
                 
         NotificationCenter.default

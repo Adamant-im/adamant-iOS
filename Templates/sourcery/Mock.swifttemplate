@@ -55,6 +55,21 @@ func areThereCollisions(between methods: [MethodWrapper]) -> Bool {
 
 // herlpers
 func uniques(methods: [SourceryRuntime.Method]) -> [SourceryRuntime.Method] {
+    var filteredMethods: [SourceryRuntime.Method] = []
+    for method in methods {
+        var isParentPrivate: Bool = false
+        if let typeModifiers = method.definedInTypeName?.modifiers {
+            isParentPrivate = typeModifiers.contains { 
+                $0.name == "private"
+                || $0.name == "fileprivate"
+            }
+        } 
+        if !isParentPrivate 
+        && method.accessLevel != "private" 
+        && method.accessLevel != "fileprivate" {
+            filteredMethods.append(method)
+        }
+    }
     func returnTypeStripped(_ method: SourceryRuntime.Method) -> String {
         let returnTypeRaw = "\(method.returnTypeName)"
         var stripped: String = {
@@ -91,13 +106,28 @@ func uniques(methods: [SourceryRuntime.Method]) -> [SourceryRuntime.Method] {
         return m1.returnTypeName == m2.returnTypeName
     }
 
-    return methods.reduce([], { (result, element) -> [SourceryRuntime.Method] in
+    return filteredMethods.reduce([], { (result, element) -> [SourceryRuntime.Method] in
         guard !result.contains(where: { areSameMethods($0,element) }) else { return result }
         return result + [element]
     })
 }
 
 func uniquesWithoutGenericConstraints(methods: [SourceryRuntime.Method]) -> [SourceryRuntime.Method] {
+    var filteredMethods: [SourceryRuntime.Method] = []
+    for method in methods {
+        var isParentPrivate: Bool = false
+        if let typeModifiers = method.definedInTypeName?.modifiers {
+            isParentPrivate = typeModifiers.contains { 
+                $0.name == "private"
+                || $0.name == "fileprivate"
+            }
+        } 
+        if !isParentPrivate 
+        && method.accessLevel != "private" 
+        && method.accessLevel != "fileprivate" {
+            filteredMethods.append(method)
+        }
+    }
     func returnTypeStripped(_ method: SourceryRuntime.Method) -> String {
         let returnTypeRaw = "\(method.returnTypeName)"
         var stripped: String = {
@@ -134,7 +164,7 @@ func uniquesWithoutGenericConstraints(methods: [SourceryRuntime.Method]) -> [Sou
         return returnTypeStripped(m1) == returnTypeStripped(m2)
     }
 
-    return methods.reduce([], { (result, element) -> [SourceryRuntime.Method] in
+    return filteredMethods.reduce([], { (result, element) -> [SourceryRuntime.Method] in
         guard !result.contains(where: { areSameMethods($0,element) }) else { return result }
         return result + [element]
     })

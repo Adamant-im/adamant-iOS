@@ -14,7 +14,7 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
     
     // MARK: Dependencies
     
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     
     // MARK: Proprieties
     
@@ -22,7 +22,7 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
   
     // MARK: Lifecycle
     
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecureStore) {
         self.securedStore = securedStore
         
         NotificationCenter.default

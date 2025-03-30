@@ -82,7 +82,7 @@ final class NodesListViewController: FormViewController {
     // MARK: Dependencies
     
     private let dialogService: DialogService
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let screensFactory: ScreensFactory
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
@@ -103,7 +103,7 @@ final class NodesListViewController: FormViewController {
     
     init(
         dialogService: DialogService,
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         screensFactory: ScreensFactory,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,

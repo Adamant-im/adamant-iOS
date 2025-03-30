@@ -45,7 +45,7 @@ enum NotificationTarget: CaseIterable {
 @MainActor
 final class AdamantNotificationsService: NSObject, NotificationsService {
     // MARK: Dependencies
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let vibroService: VibroService
     weak var accountService: AccountService?
     weak var chatsProvider: ChatsProvider?
@@ -75,7 +75,7 @@ final class AdamantNotificationsService: NSObject, NotificationsService {
     
     // MARK: Lifecycle
     init(
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         vibroService: VibroService
     ) {
         self.securedStore = securedStore

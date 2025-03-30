@@ -478,7 +478,6 @@
 		AA7202E52D6B4ABB00CCAC20 /* PasteInterceptingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */; };
 		AA7202E72D6B4B3500CCAC20 /* PasteInterceptingPasswordRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */; };
 		AA8FFFB02D497175001D8576 /* AdmWalletServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */; };
-		AA8FFFB22D49726F001D8576 /* SecuredStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */; };
 		AA8FFFC42D4C1174001D8576 /* NativeAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */; };
 		AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA8FFFC92D4E6435001D8576 /* CryptoSwift */; };
 		AA8FFFCC2D50D503001D8576 /* NodeOrigin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */; };
@@ -541,6 +540,7 @@
 		D32506D52D991BEA00484460 /* Mock+ChatTransactionService.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506D42D991BEA00484460 /* Mock+ChatTransactionService.generated.swift */; };
 		D32506D72D991CF800484460 /* Mock+AccountsProvider.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */; };
 		D32506D92D991F2000484460 /* Mock+AccountService.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */; };
+		D32506DD2D993CBF00484460 /* Mock+SecureStore.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1181,7 +1181,6 @@
 		AA7202E42D6B4AAF00CCAC20 /* PasteInterceptingTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteInterceptingTextField.swift; sourceTree = "<group>"; };
 		AA7202E62D6B4B2E00CCAC20 /* PasteInterceptingPasswordRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteInterceptingPasswordRow.swift; sourceTree = "<group>"; };
 		AA8FFFAF2D49716D001D8576 /* AdmWalletServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletServiceTests.swift; sourceTree = "<group>"; };
-		AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStoreMock.swift; sourceTree = "<group>"; };
 		AA8FFFC32D4C1168001D8576 /* NativeAdamantCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCoreTests.swift; sourceTree = "<group>"; };
 		AA8FFFCB2D50D4F8001D8576 /* NodeOrigin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeOrigin+Extensions.swift"; sourceTree = "<group>"; };
 		AA8FFFD22D50DC0C001D8576 /* dash_unspent_transaction_intergration_test.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dash_unspent_transaction_intergration_test.json; sourceTree = "<group>"; };
@@ -1243,6 +1242,7 @@
 		D32506D42D991BEA00484460 /* Mock+ChatTransactionService.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+ChatTransactionService.generated.swift"; sourceTree = "<group>"; };
 		D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+AccountsProvider.generated.swift"; sourceTree = "<group>"; };
 		D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+AccountService.generated.swift"; sourceTree = "<group>"; };
+		D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mock+SecureStore.generated.swift"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -2453,7 +2453,6 @@
 			isa = PBXGroup;
 			children = (
 				B1C2BA6C2D90BCF3001FE840 /* Generated */,
-				AA8FFFB12D49726B001D8576 /* SecuredStoreMock.swift */,
 				AA8FFFD12D50DBF2001D8576 /* RequestStubs */,
 				AAC6415C2D44FD5400619DFE /* ERC20ApiServiceProtocolMock.swift */,
 				AAC641522D42D6FB00619DFE /* DashApiServiceProtocolMock.swift */,
@@ -2512,6 +2511,7 @@
 				B1C2BA6A2D90BCF3001FE840 /* Mock+AdamantApiServiceProtocol.generated.swift */,
 				D32506D62D991CF800484460 /* Mock+AccountsProvider.generated.swift */,
 				D32506D22D99170300484460 /* Mock+AdamantCore.generated.swift */,
+				D32506DC2D993CBF00484460 /* Mock+SecureStore.generated.swift */,
 				D32506D82D991F2000484460 /* Mock+AccountService.generated.swift */,
 				D32506D42D991BEA00484460 /* Mock+ChatTransactionService.generated.swift */,
 				B1C2BA6B2D90BCF3001FE840 /* Mock+ChatsProvider.generated.swift */,
@@ -4144,6 +4144,7 @@
 			files = (
 				AA8FFFD72D50DD0E001D8576 /* Data+Extensions.swift in Sources */,
 				AAFB3C972D31CB72000CCCE9 /* UnspentTransaction+Equatable.swift in Sources */,
+				D32506DD2D993CBF00484460 /* Mock+SecureStore.generated.swift in Sources */,
 				AAFB3CA92D3860F2000CCCE9 /* EthResponseBody.swift in Sources */,
 				AAC6414F2D41829900619DFE /* DashWalletServiceTests.swift in Sources */,
 				AAFB3C9D2D383F7D000CCCE9 /* EthApiServiceProtocolMock.swift in Sources */,
@@ -4178,7 +4179,6 @@
 				D32506D72D991CF800484460 /* Mock+AccountsProvider.generated.swift in Sources */,
 				AAB01CB32D3AF0B4007D6BF4 /* DogeApiServiceProtocolMock.swift in Sources */,
 				AA33BEB62D303E240083E59C /* APICoreProtocolMock.swift in Sources */,
-				AA8FFFB22D49726F001D8576 /* SecuredStoreMock.swift in Sources */,
 				AAFB3C912D31C14A000CCCE9 /* BitcoinKitTransaction+Equatable.swift in Sources */,
 				AAC641452D404AE100619DFE /* KlyTransactionSubmitModel.swift in Sources */,
 				AA8FFFB02D497175001D8576 /* AdmWalletServiceTests.swift in Sources */,

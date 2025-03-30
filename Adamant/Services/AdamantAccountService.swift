@@ -17,7 +17,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
     private let coreDataStack: CoreDataStack
@@ -42,7 +42,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
         coreDataStack: CoreDataStack,
@@ -180,8 +180,8 @@ extension AdamantAccountService {
             useBiometry = false
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
-            guard let store = notification.object as? SecuredStore else {
+        NotificationCenter.default.addObserver(forName: Notification.Name.SecureStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
+            guard let store = notification.object as? SecureStore else {
                 return
             }
             
@@ -486,13 +486,13 @@ private enum Key: CaseIterable {
     }
 }
 
-private extension SecuredStore {
+private extension SecureStore {
     func set(_ value: String, for key: Key) {
         set(value, for: key.stringValue)
     }
     
     func get(_ key: Key) -> String? {
-        return get(key.stringValue)
+        get(key.stringValue)
     }
     
     func remove(_ key: Key) {

@@ -13,7 +13,7 @@ struct InfoServiceAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
         container.register(InfoServiceProtocol.self) { r in
             InfoService(
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
                 api: r.resolve(InfoServiceApiServiceProtocol.self)!
             )

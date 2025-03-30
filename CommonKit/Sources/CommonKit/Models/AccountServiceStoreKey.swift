@@ -1,5 +1,5 @@
 //
-//  SecuredStore+Account.swift
+//  SecureStore+Account.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 21.11.2022.

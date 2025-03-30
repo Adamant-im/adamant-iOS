@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService, @unchecked Sendable {
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
@@ -20,7 +20,7 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService,
     private let securedStoreSemaphore = DispatchSemaphore(value: 1)
     
     init(
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService
@@ -202,7 +202,7 @@ private extension AdamantPushNotificationsTokenService {
     }
 }
 
-// MARK: - SecuredStore
+// MARK: - SecureStore
 
 private extension AdamantPushNotificationsTokenService {
     func setTokenToStorage(_ token: String?) {

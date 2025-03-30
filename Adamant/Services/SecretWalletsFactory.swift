@@ -11,12 +11,12 @@ import CommonKit
 struct SecretWalletsFactory {
     private let visibleWalletsService: VisibleWalletsService
     private let accountService: AccountService
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
-        securedStore: SecuredStore
+        securedStore: SecureStore
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService

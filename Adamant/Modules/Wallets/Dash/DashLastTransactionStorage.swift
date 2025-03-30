@@ -11,9 +11,9 @@ import Foundation
 
 final class DashLastTransactionStorage: DashLastTransactionStorageProtocol {
     
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecureStore) {
         self.securedStore = securedStore
     }
     

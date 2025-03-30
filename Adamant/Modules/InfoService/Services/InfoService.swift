@@ -14,7 +14,7 @@ import UIKit
 final class InfoService: InfoServiceProtocol {
     typealias Rates = [InfoServiceTicker: Decimal]
     
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let api: InfoServiceApiServiceProtocol
     private let rateCoins: [String]
     
@@ -29,7 +29,7 @@ final class InfoService: InfoServiceProtocol {
     }
     
     init(
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         walletServiceCompose: WalletServiceCompose,
         api: InfoServiceApiServiceProtocol
     ) {
