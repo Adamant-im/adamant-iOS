@@ -6,10 +6,8 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-extension AccountViewController {
-    struct AccountWalletsState: Equatable {
-        var wallets: [WalletCollectionViewCell.Model]
-        
-        static let `default` = Self(wallets: [])
-    }
+struct AccountWalletsState: Equatable {
+    var wallets: [WalletCollectionViewCell.Model]
+    
+    static let `default` = Self(wallets: [])
 }
