@@ -161,6 +161,9 @@ final class ChatViewController: MessagesViewController {
         }
         viewModel.updatePartnerName()
         updateScrollDownButtonVisibility()
+        
+        // Needs to check the current state of the chats update to present or hide spinner on appear instantly
+        viewModel.checkUpdateState()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -169,6 +172,7 @@ final class ChatViewController: MessagesViewController {
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
         
+        updateUnreadMessages()
         if !viewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
         }
@@ -186,9 +190,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
-        viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
             ? nil
@@ -315,6 +317,12 @@ private extension ChatViewController {
         viewModel.didTapAdmNodesList
             .sink { [weak self] in
                 self?.didTapReviewAdmNodes()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapShowTimeSettings
+            .sink { [weak self] in
+                self?.didTapShowTimeSettings()
             }
             .store(in: &subscriptions)
         
@@ -528,17 +536,17 @@ private extension ChatViewController {
     }
     
     func configureLayout() {
-        view.addSubview(scrollToUnreadReactButton)
         view.addSubview(scrollDownButton)
+        view.addSubview(scrollToUnreadReactButton)
         scrollDownButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
             $0.bottom.equalTo(inputBar.snp.top).offset(-scrollDownButtonInset)
             $0.size.equalTo(scrollButtonHeight)
         }
         scrollToUnreadReactButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
+            $0.centerX.equalTo(scrollDownButton.snp.centerX)
             self.scrollToUnreadBottomConstraint = $0.bottom.equalTo(scrollDownButton.snp.bottom).constraint
-            $0.size.equalTo(scrollButtonHeight)
+            $0.size.equalTo(scrollButtonHeight + 6)
         }
         
         view.addSubview(loadingView)
@@ -1070,6 +1078,14 @@ private extension ChatViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    func didTapShowTimeSettings() {
+        let settingsURL = isMacOS ? "x-apple.systempreferences:com.apple.preference.datetime" : "App-prefs:root=General&path=DATE_AND_TIME"
+        if let appSettings = URL(string: settingsURL),
+            UIApplication.shared.canOpenURL(appSettings) {
+            UIApplication.shared.open(appSettings)
+        }
+    }
+    
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
         let vc = screensFactory.makeAdmTransactionDetails(transaction: transaction)
         navigationController?.pushViewController(vc, animated: true)
@@ -1207,8 +1223,8 @@ extension ChatViewController {
 }
 
 private let scrollToUnreadInset: CGFloat = 10
-private let scrollDownButtonInset: CGFloat = 10
+private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
-private let scrollButtonHeight: CGFloat = 38
+private let scrollButtonHeight: CGFloat = 30

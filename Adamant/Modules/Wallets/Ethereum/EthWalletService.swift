@@ -403,7 +403,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, Smar
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService {
-    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVC: Bool) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
         }
@@ -450,7 +450,7 @@ extension EthWalletService {
             self.addTransactionObserver()
         }
         
-        guard storeInKVC else { return eWallet }
+        guard storeInKVS else { return eWallet }
         
         // MARK: 4. Save into KVS
         let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)

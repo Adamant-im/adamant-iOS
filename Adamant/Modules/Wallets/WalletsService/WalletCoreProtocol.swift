@@ -305,7 +305,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     func updateStatus(for id: String, status: TransactionStatus?)
     func isExist(address: String) async throws -> Bool
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
-    func initWallet(withPassphrase: String, withPassword: String, storeInKVC: Bool) async throws -> WalletAccount
+    func initWallet(withPassphrase: String, withPassword: String, storeInKVS: Bool) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     func getFee(comment: String) -> Decimal

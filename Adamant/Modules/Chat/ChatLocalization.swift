@@ -108,6 +108,15 @@ extension String.adamant {
         static var noActiveNodes: String {
             String.localized("Chat.Alert.NoActiveNodes", comment: "No active nodes")
         }
+        static var timestampIsInTheFutureTitle: String {
+            String.localized("Chat.Alert.Title.TimestampIsInTheFuture", comment: "Timestamp is in the future title")
+        }
+        static var timestampIsInTheFuture: String {
+            String.localized("Chat.Alert.TimestampIsInTheFuture", comment: "Timestamp is in the future text")
+        }
+        static var timeSettings: String {
+            String.localized("Chat.Alert.TimeSettings", comment: "Timestamp is in the future text")        
+        }
         static var reviewNodesList: String {
             String.localized("Chat.Alert.ReviewNodesList", comment: "Review Nodes List")
         }
