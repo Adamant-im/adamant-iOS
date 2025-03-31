@@ -11,6 +11,6 @@ import MessageKit
 struct ChatSender: SenderType, Equatable {
     let senderId: String
     let displayName: String
-    
+
     static let `default` = Self(senderId: "", displayName: "")
 }

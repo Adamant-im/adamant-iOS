@@ -6,50 +6,50 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 import BitcoinKit
+import Foundation
 
 final class DogeMainnet: Network {
     override var name: String {
         return "livenet"
     }
-    
+
     override var alias: String {
         return "mainnet"
     }
-    
+
     override var scheme: String {
         return "dogecoin"
     }
-    
+
     override var magic: UInt32 {
-        return 0xc0c0c0c0
+        return 0xc0c0_c0c0
     }
-    
+
     override var pubkeyhash: UInt8 {
         return 0x1e
     }
-    
+
     override var privatekey: UInt8 {
         return 0x9e
     }
-    
+
     override var scripthash: UInt8 {
         return 0x16
     }
-    
+
     override var xpubkey: UInt32 {
-        return 0x02facafd
+        return 0x02fa_cafd
     }
-    
+
     override var xprivkey: UInt32 {
-        return 0x02fac398
+        return 0x02fa_c398
     }
-    
+
     override var port: UInt32 {
         return 22556
     }
-    
+
     override var dnsSeeds: [String] {
         return [
             "dogenode1.adamant.im"

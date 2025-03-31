@@ -44,7 +44,7 @@ extension Peers {
         public var hashValue: Int {
             return ip.hashValue
         }
-        
+
         public func hash(into hasher: inout Hasher) {
             hasher.combine(ip)
         }

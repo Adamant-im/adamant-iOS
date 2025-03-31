@@ -28,8 +28,8 @@ struct CoinsNodesListMapper {
     }
 }
 
-private extension CoinsNodesListMapper {
-    func map(
+extension CoinsNodesListMapper {
+    fileprivate func map(
         node: Node,
         group: NodeGroup,
         isRest: Bool
@@ -37,18 +37,19 @@ private extension CoinsNodesListMapper {
         let indicatorString = node.indicatorString(isRest: isRest, isWs: false)
         var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
         indicatorAttrString.foregroundColor = .init(uiColor: node.indicatorColor)
-        
+
         var titleAttrString = AttributedString(stringLiteral: node.title)
         titleAttrString.foregroundColor = .init(uiColor: node.titleColor)
-        
-        let subtitleString = node.statusString(
-            showVersion: true,
-            heightType: group.heightType
-        ) ?? .empty
-        
+
+        let subtitleString =
+            node.statusString(
+                showVersion: true,
+                heightType: group.heightType
+            ) ?? .empty
+
         var subtitleAttrString = AttributedString(stringLiteral: subtitleString)
         subtitleAttrString.foregroundColor = .init(uiColor: node.statusStringColor)
-        
+
         return .init(
             id: node.id,
             group: group,

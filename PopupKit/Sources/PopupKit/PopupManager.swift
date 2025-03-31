@@ -1,15 +1,15 @@
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 @MainActor
 public final class PopupManager {
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
     private let coordinatorModel = PopupCoordinatorModel()
-    
+
     private lazy var autoDismissManager = AutoDismissManager(
         popupCoordinatorModel: coordinatorModel
     )
-    
+
     public func setup() {
         let rootView = PopupCoordinatorView(model: coordinatorModel)
         let rootVC = UIHostingController(rootView: rootView)
@@ -17,31 +17,31 @@ public final class PopupManager {
         window.rootViewController = rootVC
         window.isHidden = false
     }
-    
+
     public init() {}
 }
 
 // MARK: - Toast
 
-public extension PopupManager {
-    func showToastMessage(_ message: String) {
+extension PopupManager {
+    public func showToastMessage(_ message: String) {
         coordinatorModel.toastMessage = message
         autoDismissManager.dismissToast()
     }
-    
-    func dismissToast() {
+
+    public func dismissToast() {
         coordinatorModel.toastMessage = nil
     }
 }
 
 // MARK: - Alert
 
-public extension PopupManager {
-    func dismissAlert() {
+extension PopupManager {
+    public func dismissAlert() {
         coordinatorModel.alert = nil
     }
-    
-    func showProgressAlert(message: String?, userInteractionEnabled: Bool) {
+
+    public func showProgressAlert(message: String?, userInteractionEnabled: Bool) {
         autoDismissManager.alertDismissSubscription?.cancel()
         coordinatorModel.alert = .init(
             icon: .loading,
@@ -49,8 +49,8 @@ public extension PopupManager {
             userInteractionEnabled: userInteractionEnabled
         )
     }
-    
-    func showSuccessAlert(message: String?) {
+
+    public func showSuccessAlert(message: String?) {
         coordinatorModel.alert = .init(
             icon: .image(successImage),
             message: message,
@@ -58,8 +58,8 @@ public extension PopupManager {
         )
         autoDismissManager.dismissAlert()
     }
-    
-    func showWarningAlert(message: String?) {
+
+    public func showWarningAlert(message: String?) {
         coordinatorModel.alert = .init(
             icon: .image(warningImage),
             message: message,
@@ -71,8 +71,8 @@ public extension PopupManager {
 
 // MARK: - Notification
 
-public extension PopupManager {
-    func showNotification(
+extension PopupManager {
+    public func showNotification(
         icon: UIImage?,
         title: String?,
         description: String?,
@@ -84,31 +84,34 @@ public extension PopupManager {
             title: title,
             description: description,
             tapHandler: tapHandler.map { .init(id: .empty, value: $0) },
-            cancelAutoDismiss: .init(id: .empty, value: { [weak self] in
-                self?.autoDismissManager.notificationDismissSubscription?.cancel()
-            })
+            cancelAutoDismiss: .init(
+                id: .empty,
+                value: { [weak self] in
+                    self?.autoDismissManager.notificationDismissSubscription?.cancel()
+                }
+            )
         )
-        
+
         if autoDismiss {
             autoDismissManager.dismissNotification()
         } else {
             autoDismissManager.notificationDismissSubscription?.cancel()
         }
     }
-    
-    func dismissNotification() {
+
+    public func dismissNotification() {
         coordinatorModel.notification = nil
     }
 }
 
 // MARK: - Advanced alert
 
-public extension PopupManager {
-    func dismissAdvancedAlert() {
+extension PopupManager {
+    public func dismissAdvancedAlert() {
         coordinatorModel.advancedAlert = nil
     }
-    
-    func showAdvancedAlert(model: AdvancedAlertModel) {
+
+    public func showAdvancedAlert(model: AdvancedAlertModel) {
         coordinatorModel.advancedAlert = model
     }
 }

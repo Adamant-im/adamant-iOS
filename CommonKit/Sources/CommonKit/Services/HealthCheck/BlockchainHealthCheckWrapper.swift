@@ -10,7 +10,7 @@ import Foundation
 
 public protocol BlockchainHealthCheckableService {
     associatedtype Error: HealthCheckableError
-    
+
     func getStatusInfo(origin: NodeOrigin) async -> Result<NodeStatusInfo, Error>
 }
 
@@ -21,7 +21,7 @@ public final class BlockchainHealthCheckWrapper<
     private let nodesStorage: NodesStorageProtocol
     private let params: BlockchainHealthCheckParams
     private var currentRequests = Set<UUID>()
-    
+
     nonisolated public init(
         service: Service,
         nodesStorage: NodesStorageProtocol,
@@ -32,7 +32,7 @@ public final class BlockchainHealthCheckWrapper<
     ) {
         self.nodesStorage = nodesStorage
         self.params = params
-        
+
         super.init(
             service: service,
             isActive: isActive,
@@ -42,52 +42,52 @@ public final class BlockchainHealthCheckWrapper<
             connection: connection,
             nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
-        
+
         Task { @HealthCheckActor [self] in
             configure(nodesAdditionalParamsStorage: nodesAdditionalParamsStorage)
         }
     }
-    
+
     public override func healthCheckInternal() async {
         await super.healthCheckInternal()
         updateNodesAvailability(update: nil)
-        
+
         try? await withThrowingTaskGroup(of: Void.self, returning: Void.self) { group in
             nodes.filter { $0.isEnabled }.forEach { node in
                 group.addTask { @HealthCheckActor [weak self] in
                     guard let self, !currentRequests.contains(node.id) else { return }
-                    
+
                     currentRequests.insert(node.id)
                     defer { currentRequests.remove(node.id) }
-                    
+
                     let update = await updateNodeStatusInfo(node: node)
                     try Task.checkCancellation()
                     updateNodesAvailability(update: update)
                 }
             }
-            
+
             try await group.waitForAll()
             healthCheckPostProcessing()
         }
     }
 }
 
-private extension BlockchainHealthCheckWrapper {
-    struct NodeUpdate {
+extension BlockchainHealthCheckWrapper {
+    fileprivate struct NodeUpdate {
         let id: UUID
         let info: NodeStatusInfo?
         let preferMainOrigin: Bool?
     }
-    
-    func configure(nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol) {
+
+    fileprivate func configure(nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol) {
         nodesAdditionalParamsStorage
             .fastestNodeMode(group: params.group)
             .values
             .sink { [weak self] in await self?.setFastestMode($0) }
             .store(in: &subscriptions)
     }
-    
-    func updateNodeStatusInfo(node: Node) async -> NodeUpdate {
+
+    fileprivate func updateNodeStatusInfo(node: Node) async -> NodeUpdate {
         guard
             node.preferMainOrigin == nil,
             let altOrigin = node.altOrigin
@@ -98,7 +98,7 @@ private extension BlockchainHealthCheckWrapper {
                 preferMainOrigin: nil
             )
         }
-        
+
         switch await service.getStatusInfo(origin: node.mainOrigin) {
         case let .success(info):
             return .init(
@@ -123,90 +123,93 @@ private extension BlockchainHealthCheckWrapper {
             }
         }
     }
-    
-    func applyUpdate(update: NodeUpdate) {
+
+    fileprivate func applyUpdate(update: NodeUpdate) {
         updateNode(id: update.id) { node in
             if let preferMainOrigin = update.preferMainOrigin {
                 node.preferMainOrigin = preferMainOrigin
             }
-            
-            guard let info = update.info else { return node.connectionStatus = .offline }
+
+            guard let info = update.info else {
+                node.connectionStatus = .offline
+                return
+            }
             node.wsEnabled = info.wsEnabled
             node.updateWsPort(info.wsPort)
             node.version = info.version
             node.height = info.height
             node.ping = info.ping
-            
+
             guard
                 let version = info.version,
                 let minNodeVersion = params.minNodeVersion,
                 version < minNodeVersion
             else { return }
-            
+
             node.connectionStatus = .notAllowed(.outdatedApiVersion)
         }
     }
-    
-    func updateNodesAvailability(update: NodeUpdate?) {
+
+    fileprivate func updateNodesAvailability(update: NodeUpdate?) {
         let forceIncludeId = update?.info != nil ? update?.id : nil
-        
+
         if let update = update {
             applyUpdate(update: update)
         }
-        
+
         let workingNodes = nodes.filter {
             $0.isEnabled && ($0.isWorkingStatus) || $0.id == forceIncludeId
         }
-        
+
         let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.height },
             group: params.group,
             nodeHeightEpsilon: params.nodeHeightEpsilon
         )
-        
+
         workingNodes.forEach { node in
             var status: NodeConnectionStatus?
-            
-            if
-                let version = node.version,
+
+            if let version = node.version,
                 let minNodeVersion = params.minNodeVersion,
                 version < minNodeVersion
             {
                 status = .notAllowed(.outdatedApiVersion)
             } else {
-                status = node.height.map { height in
-                    actualHeightsRange?.contains(height) ?? false
-                        ? .allowed
-                        : .synchronizing(isFinal: !node.connectionStatus.notFinalSync)
-                } ?? .none
+                status =
+                    node.height.map { height in
+                        actualHeightsRange?.contains(height) ?? false
+                            ? .allowed
+                            : .synchronizing(isFinal: !node.connectionStatus.notFinalSync)
+                    } ?? .none
             }
-            
+
             updateNode(id: node.id) { $0.connectionStatus = status }
         }
     }
-    
-    func updateNode(id: UUID, mutate: (inout Node) -> Void) {
+
+    fileprivate func updateNode(id: UUID, mutate: (inout Node) -> Void) {
         nodesStorage.updateNode(
             id: id,
             group: params.group,
             mutate: mutate
         )
     }
-    
-    func healthCheckPostProcessing() {
+
+    fileprivate func healthCheckPostProcessing() {
         nodes.forEach { node in
             guard
                 case let .synchronizing(isFinal) = node.connectionStatus,
                 !isFinal
             else { return }
-            
+
             updateNode(id: node.id) { $0.connectionStatus = .synchronizing(isFinal: true) }
         }
     }
 }
 
-private extension Node {
-    var isWorkingStatus: Bool {
+extension Node {
+    fileprivate var isWorkingStatus: Bool {
         switch connectionStatus {
         case .allowed, .synchronizing, .none:
             return isEnabled
@@ -228,28 +231,28 @@ private func getActualNodeHeightsRange(
 ) -> ClosedRange<Int>? {
     let heights = heights.sorted()
     var bestInterval: NodeHeightsInterval?
-    
+
     for i in heights.indices {
         var currentInterval = NodeHeightsInterval(
-            range: heights[i] ... heights[i] + nodeHeightEpsilon - 1,
+            range: heights[i]...heights[i] + nodeHeightEpsilon - 1,
             count: 1
         )
-        
-        for j in i + 1 ..< heights.endIndex {
+
+        for j in i + 1..<heights.endIndex {
             guard currentInterval.range.contains(heights[j]) else { break }
             currentInterval.count += 1
         }
-        
+
         if currentInterval.count >= bestInterval?.count ?? .zero {
             bestInterval = currentInterval
         }
     }
-    
+
     return bestInterval?.range
 }
 
-private extension Optional where Wrapped == NodeConnectionStatus {
-    var notFinalSync: Bool {
+extension Optional where Wrapped == NodeConnectionStatus {
+    fileprivate var notFinalSync: Bool {
         switch self {
         case .offline, .notAllowed, .none:
             false

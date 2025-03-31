@@ -10,7 +10,6 @@ import BitcoinKit
 
 extension UnspentTransaction: Equatable {
     public static func == (lhs: UnspentTransaction, rhs: UnspentTransaction) -> Bool {
-        lhs.output == rhs.output &&
-        lhs.outpoint == rhs.outpoint
+        lhs.output == rhs.output && lhs.outpoint == rhs.outpoint
     }
 }

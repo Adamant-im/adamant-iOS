@@ -6,18 +6,18 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Swinject
 import SwiftUI
+import Swinject
 
 @MainActor
 struct ContributeFactory {
     private let parent: Assembler
     private let assemblies = [ContributeAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     func makeViewController() -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = { assembler.resolver.resolve(ContributeViewModel.self)! }

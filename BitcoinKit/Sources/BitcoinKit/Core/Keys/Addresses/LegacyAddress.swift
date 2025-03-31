@@ -32,15 +32,15 @@ public final class LegacyAddress: Address, Equatable {
 
     public var scriptType: ScriptType {
         switch type {
-            case .pubkeyHash: return .p2pkh
-            case .scriptHash: return .p2sh
+        case .pubkeyHash: return .p2pkh
+        case .scriptHash: return .p2sh
         }
     }
-    
+
     public var qrcodeString: String {
         stringValue
     }
-    
+
     public var lockingScript: Data {
         switch type {
         case .pubkeyHash: return OpCode.p2pkhStart + OpCode.push(lockingScriptPayload) + OpCode.p2pkhFinish
@@ -54,7 +54,7 @@ public final class LegacyAddress: Address, Equatable {
         self.stringValue = base58
     }
 
-    public static func ==<T: Address>(lhs: LegacyAddress, rhs: T) -> Bool {
+    public static func == <T: Address>(lhs: LegacyAddress, rhs: T) -> Bool {
         guard let rhs = rhs as? LegacyAddress else {
             return false
         }

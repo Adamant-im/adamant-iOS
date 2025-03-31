@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
-import SnapKit
 import CommonKit
+import SnapKit
+import UIKit
 
 final class SpinnerView: UIView {
     static let size = CGSize(squareSize: 50)
@@ -42,8 +42,8 @@ extension SpinnerView: ReusableView {
     }
 }
 
-private extension SpinnerView {
-    func configure() {
+extension SpinnerView {
+    fileprivate func configure() {
         addSubview(spinner)
         spinner.snp.makeConstraints {
             $0.center.equalToSuperview()

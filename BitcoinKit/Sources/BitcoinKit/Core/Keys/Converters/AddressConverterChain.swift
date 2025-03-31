@@ -2,7 +2,7 @@ import Foundation
 
 final class AddressConverterChain: AddressConverter {
     private let concreteConverters: [AddressConverter]
-    
+
     init(concreteConverters: [AddressConverter]) {
         self.concreteConverters = concreteConverters
     }
@@ -36,7 +36,7 @@ final class AddressConverterChain: AddressConverter {
 
         throw BitcoinError.list(errors: errors)
     }
-    
+
     public func convert(publicKey: PublicKey, type: ScriptType) throws -> Address {
         var errors = [Error]()
 

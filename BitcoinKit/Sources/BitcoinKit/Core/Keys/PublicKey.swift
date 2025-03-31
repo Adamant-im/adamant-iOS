@@ -24,10 +24,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public struct PublicKey {
@@ -45,11 +46,13 @@ public struct PublicKey {
         let header = data[0]
         self.isCompressed = (header == 0x02 || header == 0x03)
         hashP2pkh = Crypto.sha256ripemd160(data)
-        
-        hashP2wpkhWrappedInP2sh = Crypto.sha256ripemd160(OpCode.segWitOutputScript(
-            hashP2pkh,
-            versionByte: .zero
-        ))
+
+        hashP2wpkhWrappedInP2sh = Crypto.sha256ripemd160(
+            OpCode.segWitOutputScript(
+                hashP2pkh,
+                versionByte: .zero
+            )
+        )
     }
 }
 
@@ -66,5 +69,5 @@ extension PublicKey: CustomStringConvertible {
 }
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-extension PublicKey: QRCodeConvertible {}
+    extension PublicKey: QRCodeConvertible {}
 #endif

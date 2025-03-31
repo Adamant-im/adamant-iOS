@@ -10,10 +10,10 @@ import Foundation
 
 final class ChatMessagesListViewModel {
     // MARK: Dependencies
-    
+
     let avatarService: AvatarService
     let emojiService: EmojiService
-    
+
     init(
         avatarService: AvatarService,
         emojiService: EmojiService

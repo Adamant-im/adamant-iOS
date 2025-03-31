@@ -6,8 +6,8 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 import BitcoinKit
+import Foundation
 
 final class DashTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { DashWalletService.currencySymbol }
@@ -17,16 +17,16 @@ struct BtcBlock: Decodable {
     let hash: String
     let height: Int64
     let time: Int64
-    
+
     enum CodingKeys: String, CodingKey {
         case hash
         case height
         case time
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.hash = try container.decode(String.self, forKey: .hash)
         self.height = try container.decode(Int64.self, forKey: .height)
         self.time = try container.decode(Int64.self, forKey: .time)
@@ -40,7 +40,7 @@ struct DashUnspentTransaction: Decodable {
     let script: String
     let amount: UInt64
     let height: UInt64
-    
+
     enum CodingKeys: String, CodingKey {
         case address
         case txid
@@ -49,10 +49,10 @@ struct DashUnspentTransaction: Decodable {
         case amount = "satoshis"
         case height
     }
-    
+
     func asUnspentTransaction(lockScript: Data) -> UnspentTransaction {
         let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-        
+
         let unspentOutput = TransactionOutput(value: amount, lockingScript: lockScript)
         let unspentOutpoint = TransactionOutPoint(hash: txHash, index: outputIndex)
         let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)

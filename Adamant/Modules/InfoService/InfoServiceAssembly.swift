@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Swinject
 import CommonKit
+import Swinject
 
 struct InfoServiceAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
@@ -18,13 +18,14 @@ struct InfoServiceAssembly: MainThreadAssembly {
                 api: r.resolve(InfoServiceApiServiceProtocol.self)!
             )
         }.inObjectScope(.container)
-        
+
         container.register(InfoServiceApiServiceProtocol.self) { r in
             InfoServiceApiService(
                 core: .init(
                     service: .init(
                         apiCore: r.resolve(APICoreProtocol.self)!,
-                        mapper: r.resolve(InfoServiceMapperProtocol.self)!),
+                        mapper: r.resolve(InfoServiceMapperProtocol.self)!
+                    ),
                     nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                     nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
                     isActive: true,
@@ -34,11 +35,11 @@ struct InfoServiceAssembly: MainThreadAssembly {
                 mapper: r.resolve(InfoServiceMapperProtocol.self)!
             )
         }.inObjectScope(.container)
-        
+
         container.register(InfoServiceMapperProtocol.self) { _ in
             InfoServiceMapper()
         }.inObjectScope(.transient)
-        
+
         container.register(InfoServiceApiCore.self) { r in
             InfoServiceApiCore(
                 apiCore: r.resolve(APICoreProtocol.self)!,

@@ -14,9 +14,9 @@ protocol EthBIP32ServiceProtocol {
 actor EthBIP32Service: EthBIP32ServiceProtocol {
     private var passphrase: String?
     private var keystore: BIP32Keystore?
-    
+
     private var ethApiService: EthApiServiceProtocol
-    
+
     init(ethApiService: EthApiServiceProtocol) {
         self.ethApiService = ethApiService
     }
@@ -25,11 +25,15 @@ actor EthBIP32Service: EthBIP32ServiceProtocol {
             return keystore
         }
         do {
-            guard let store = try BIP32Keystore(mnemonics: passphrase,
-                                                password: EthWalletService.walletPassword,
-                                                mnemonicsPassword: "",
-                                                language: .english,
-                                                prefixPath: EthWalletService.walletPath) else {
+            guard
+                let store = try BIP32Keystore(
+                    mnemonics: passphrase,
+                    password: EthWalletService.walletPassword,
+                    mnemonicsPassword: "",
+                    language: .english,
+                    prefixPath: EthWalletService.walletPath
+                )
+            else {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             self.passphrase = passphrase

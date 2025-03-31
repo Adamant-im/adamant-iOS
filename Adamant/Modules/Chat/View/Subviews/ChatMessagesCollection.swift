@@ -6,43 +6,43 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
+import CommonKit
 import MessageKit
 import UIKit
-import CommonKit
 
 final class ChatMessagesCollectionView: MessagesCollectionView {
     private var currentIds = [String]()
-    
+
     var fixedBottomOffset: CGFloat?
-    
+
     var bottomOffset: CGFloat {
         contentSize.height + fullInsets.bottom - bounds.maxY
     }
-    
+
     var fullInsets: UIEdgeInsets {
         safeAreaInsets + contentInset
     }
-    
+
     // To prevent value changes by MessageKit. Insets can be set via `setFullBottomInset` only
     override var contentInset: UIEdgeInsets {
         get { super.contentInset }
         set {}
     }
-    
+
     // To prevent value changes by MessageKit. Insets can be set via `setFullBottomInset` only
     override var verticalScrollIndicatorInsets: UIEdgeInsets {
         get { super.verticalScrollIndicatorInsets }
         set {}
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+
         if let fixedBottomOffset = fixedBottomOffset, bottomOffset != fixedBottomOffset {
             setBottomOffset(fixedBottomOffset, safely: true)
         }
     }
-    
+
     func reloadData(newIds: [String], isOnBottom: Bool) {
         let hasNewMessagesAtTop = newIds.first != currentIds.first
         let hasNewMessagesAtBottom = newIds.last != currentIds.last
@@ -58,46 +58,47 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
         }
     }
-    
+
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
-        let bottomOffset = contentSize.height < bounds.height
-        ? 0
-        : self.bottomOffset
-        
+        let bottomOffset =
+            contentSize.height < bounds.height
+            ? 0
+            : self.bottomOffset
+
         super.contentInset.bottom = inset
         super.verticalScrollIndicatorInsets.bottom = inset
 
         guard !hasActiveScrollGestures else { return }
         setBottomOffset(bottomOffset, safely: false)
     }
-    
+
     func setBottomOffset(_ newValue: CGFloat, safely: Bool) {
         setVerticalContentOffset(
             maxVerticalOffset - newValue,
             safely: safely
         )
     }
-    
+
     func stopDecelerating() {
         setContentOffset(contentOffset, animated: false)
     }
 }
 
-private extension ChatMessagesCollectionView {
-    var maxVerticalOffset: CGFloat {
+extension ChatMessagesCollectionView {
+    fileprivate var maxVerticalOffset: CGFloat {
         contentSize.height + fullInsets.bottom - bounds.height
     }
-    
-    var minVerticalOffset: CGFloat {
+
+    fileprivate var minVerticalOffset: CGFloat {
         -fullInsets.top
     }
-    
-    var scrollGestureRecognizers: [UIGestureRecognizer] {
+
+    fileprivate var scrollGestureRecognizers: [UIGestureRecognizer] {
         [panGestureRecognizer, pinchGestureRecognizer].compactMap { $0 }
     }
-    
-    var hasActiveScrollGestures: Bool {
+
+    fileprivate var hasActiveScrollGestures: Bool {
         scrollGestureRecognizers.contains {
             switch $0.state {
             case .began, .changed:
@@ -109,16 +110,16 @@ private extension ChatMessagesCollectionView {
             }
         }
     }
-    
-    func applyNewIds(_ newIds: [String]) {
+
+    fileprivate func applyNewIds(_ newIds: [String]) {
         reloadData()
         layoutIfNeeded()
         currentIds = newIds
     }
-    
-    func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
+
+    fileprivate func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
         guard maxVerticalOffset > minVerticalOffset else { return }
-        
+
         var offset = offset
         if safely {
             if offset > maxVerticalOffset {
@@ -127,7 +128,7 @@ private extension ChatMessagesCollectionView {
                 offset = minVerticalOffset
             }
         }
-        
+
         contentOffset.y = offset
     }
 }

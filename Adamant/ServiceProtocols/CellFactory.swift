@@ -12,7 +12,7 @@ struct SharedCell: Equatable, Hashable {
     let cellIdentifier: String
     let defaultXibName: String
     let defaultRowHeight: CGFloat
-    
+
     init(cellIdentifier: String, xibName: String, rowHeight: CGFloat) {
         self.cellIdentifier = cellIdentifier
         self.defaultXibName = xibName

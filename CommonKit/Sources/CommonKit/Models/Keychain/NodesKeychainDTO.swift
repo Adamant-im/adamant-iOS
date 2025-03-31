@@ -10,7 +10,7 @@ import Foundation
 struct NodesKeychainDTO: Codable {
     let version: String
     let data: SafeDecodingDictionary<NodeGroup, SafeDecodingArray<NodeKeychainDTO>>
-    
+
     init(_ data: [NodeGroup: [NodeKeychainDTO]]) {
         self.version = "1.0.0"
         self.data = .init(data.mapValues { .init($0) })

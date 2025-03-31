@@ -10,14 +10,16 @@ import CommonKit
 
 struct DefaultNodesProvider: Sendable {
     func get(_ groups: Set<NodeGroup>) -> [NodeGroup: [Node]] {
-        .init(uniqueKeysWithValues: groups.map {
-            ($0, defaultItems(group: $0))
-        })
+        .init(
+            uniqueKeysWithValues: groups.map {
+                ($0, defaultItems(group: $0))
+            }
+        )
     }
 }
 
-private extension DefaultNodesProvider {
-    func defaultItems(group: NodeGroup) -> [Node] {
+extension DefaultNodesProvider {
+    fileprivate func defaultItems(group: NodeGroup) -> [Node] {
         switch group {
         case .btc:
             return BtcWalletService.nodes

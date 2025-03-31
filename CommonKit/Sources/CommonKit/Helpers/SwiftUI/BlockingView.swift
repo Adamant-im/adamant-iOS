@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //
@@ -12,9 +12,9 @@ public struct BlockingView: UIViewRepresentable {
     public func makeUIView(context _: Context) -> some UIView {
         UIBlockingView()
     }
-    
+
     public func updateUIView(_: UIViewType, context _: Context) {}
-    
+
     public init() {}
 }
 

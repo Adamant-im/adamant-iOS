@@ -7,15 +7,15 @@
 //
 
 import Foundation
+import SwiftUI
 import Swinject
 import UIKit
-import SwiftUI
 
 struct ChatSelectTextViewFactory {
     @MainActor
     func makeViewController(text: String) -> UIViewController {
         let view = SelectTextView(text: text)
-        
+
         return UIHostingController(
             rootView: view
         )

@@ -6,17 +6,17 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Swinject
 import SwiftUI
+import Swinject
 
 struct PKGeneratorFactory {
     private let parent: Assembler
     private let assemblies = [PKGeneratorAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     func makeViewController() -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = { assembler.resolver.resolve(PKGeneratorViewModel.self)! }

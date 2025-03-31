@@ -15,7 +15,7 @@ final class CircularProgressState: ObservableObject {
     let progressColor: UIColor
     @Published var progress: Double = 0
     @Published var hidden: Bool = false
-    
+
     init(
         lineWidth: CGFloat = 6,
         backgroundColor: UIColor = .lightGray,
@@ -33,11 +33,11 @@ final class CircularProgressState: ObservableObject {
 
 struct CircularProgressView: View {
     @StateObject private var state: CircularProgressState
-    
+
     init(state: @escaping () -> CircularProgressState) {
         _state = .init(wrappedValue: state())
     }
-    
+
     var body: some View {
         ZStack {
             Circle()

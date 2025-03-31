@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 enum InfoServiceApiError: Error, Sendable {
     case unknown
@@ -29,7 +29,7 @@ extension InfoServiceApiError: RichError {
             error.message
         }
     }
-    
+
     var internalError: Error? {
         switch self {
         case .unknown, .parsingError, .inconsistentData:
@@ -38,7 +38,7 @@ extension InfoServiceApiError: RichError {
             error
         }
     }
-    
+
     var level: ErrorLevel {
         switch self {
         case .unknown, .parsingError, .inconsistentData:

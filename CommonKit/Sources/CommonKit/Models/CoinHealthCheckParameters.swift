@@ -1,6 +1,6 @@
 //
 //  CoinHealthCheckParameters.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 28.12.2023.
 //
@@ -15,7 +15,7 @@ public struct CoinHealthCheckParameters: Sendable {
     public let normalServiceUpdateInterval: TimeInterval
     public let crucialServiceUpdateInterval: TimeInterval
     public let onScreenServiceUpdateInterval: TimeInterval
-    
+
     public init(
         normalUpdateInterval: TimeInterval,
         crucialUpdateInterval: TimeInterval,

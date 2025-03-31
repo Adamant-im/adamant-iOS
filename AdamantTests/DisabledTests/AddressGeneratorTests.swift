@@ -7,6 +7,7 @@
 //
 
 import XCTest
+
 @testable import Adamant
 
 private struct PublicKeyAndAddress {
@@ -18,39 +19,39 @@ class AddressGeneratorTests: XCTestCase {
     func test_0() {
         test(index: 0)
     }
-    
+
     func test_1() {
         test(index: 1)
     }
-    
+
     func test_2() {
         test(index: 2)
     }
-    
+
     func test_3() {
         test(index: 3)
     }
-    
+
     func test_4() {
         test(index: 4)
     }
-    
+
     func test_5() {
         test(index: 5)
     }
-    
+
     func test_6() {
         test(index: 6)
     }
-    
+
     func test_7() {
         test(index: 7)
     }
-    
+
     func test_8() {
         test(index: 8)
     }
-    
+
     func test_9() {
         test(index: 9)
     }

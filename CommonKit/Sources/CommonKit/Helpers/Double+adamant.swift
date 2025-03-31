@@ -8,8 +8,8 @@
 
 import Foundation
 
-public extension Double {
-    func format(with formatter: NumberFormatter) -> String {
+extension Double {
+    public func format(with formatter: NumberFormatter) -> String {
         let number = NSNumber(value: self)
         let formattedValue = formatter.string(from: number) ?? "\(number)"
         return formattedValue

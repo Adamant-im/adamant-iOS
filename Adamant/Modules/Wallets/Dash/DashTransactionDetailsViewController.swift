@@ -6,56 +6,56 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import Eureka
-import CommonKit
 import Combine
+import CommonKit
+import Eureka
+import UIKit
 
 final class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
-    
+
     weak var service: DashWalletService? {
         walletService?.core as? DashWalletService
     }
-    
+
     // MARK: - Properties
-    
+
     private var cachedBlockInfo: (hash: String, height: String)?
-    
+
     private let autoupdateInterval: TimeInterval = 5.0
     private var timerSubscription: AnyCancellable?
-    
+
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         currencySymbol = DashWalletService.currencySymbol
-        
+
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
-        
+
         refresh(silent: true)
-        
+
         // MARK: Start update
         if transaction != nil {
             startUpdate()
         }
     }
-    
+
     // MARK: - Overrides
-    
+
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
-        
+
         return URL(string: "\(DashWalletService.explorerTx)\(id)")
     }
-    
+
     @MainActor
     @objc func refresh(silent: Bool = false) {
         refreshTask = Task { [weak self] in
@@ -66,11 +66,12 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
             else {
                 return
             }
-        
+
             do {
                 let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 if let blockInfo = self?.cachedBlockInfo,
-                   blockInfo.hash == trs.blockHash {
+                    blockInfo.hash == trs.blockHash
+                {
                     self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo.height)
 
                     self?.tableView.reloadData()
@@ -97,24 +98,25 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
                     )
                     self?.tableView.reloadData()
                 }
-                
+
                 self?.updateIncosinstentRowIfNeeded()
                 self?.refreshControl.endRefreshing()
             } catch {
                 self?.refreshControl.endRefreshing()
                 self?.updateTransactionStatus()
-                
+
                 guard !silent else { return }
                 self?.dialogService.showRichError(error: error)
             }
         }
     }
-    
+
     // MARK: Autoupdate
-    
+
     func startUpdate() {
         refresh(silent: true)
-        timerSubscription = Timer
+        timerSubscription =
+            Timer
             .publish(every: autoupdateInterval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in

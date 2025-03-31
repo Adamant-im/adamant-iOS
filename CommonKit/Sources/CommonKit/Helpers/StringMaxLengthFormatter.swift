@@ -14,16 +14,16 @@ public class StringMaxLengthFormatter: Formatter {
         self.maxLength = maxLength
         super.init()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     public override func string(for obj: Any?) -> String? {
         guard let string = obj as? String else {
             return nil
         }
-        
+
         return String(string.prefix(maxLength))
     }
 
@@ -35,7 +35,7 @@ public class StringMaxLengthFormatter: Formatter {
         if let obj = obj {
             obj.pointee = self.string(for: string) as AnyObject?
         }
-    
+
         return true
     }
 }

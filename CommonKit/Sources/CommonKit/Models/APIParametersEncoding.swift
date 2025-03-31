@@ -14,7 +14,7 @@ public enum APIParametersEncoding {
     case json
     case bodyString
     case forceQueryItems([URLQueryItem])
-    
+
     public var parametersEncoding: ParameterEncoding {
         switch self {
         case .url:

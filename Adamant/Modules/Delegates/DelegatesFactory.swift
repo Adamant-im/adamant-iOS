@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Swinject
 import CommonKit
+import Swinject
+import UIKit
 
 @MainActor
 struct DelegatesFactory {
     let assembler: Assembler
-    
+
     func makeDelegatesListVC(screensFactory: ScreensFactory) -> UIViewController {
         DelegatesListViewController(
             apiService: assembler.resolve(AdamantApiServiceProtocol.self)!,
@@ -22,7 +22,7 @@ struct DelegatesFactory {
             screensFactory: screensFactory
         )
     }
-    
+
     func makeDelegateDetails() -> DelegateDetailsViewController {
         let c = DelegateDetailsViewController(nibName: "DelegateDetailsViewController", bundle: nil)
         c.apiService = assembler.resolve(AdamantApiServiceProtocol.self)

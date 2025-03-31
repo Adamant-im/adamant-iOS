@@ -24,10 +24,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public class HDPublicKey {
@@ -66,13 +67,23 @@ public class HDPublicKey {
 
     public func derived(at index: UInt32) throws -> HDPublicKey {
         // As we use explicit parameter "hardened", do not allow higher bit set.
-        if (0x80000000 & index) != 0 {
+        if (0x8000_0000 & index) != 0 {
             fatalError("invalid child index")
         }
-        guard let derivedKey = _HDKey(privateKey: nil, publicKey: raw, chainCode: chainCode, depth: depth, fingerprint: fingerprint, childIndex: childIndex).derived(at: index, hardened: false) else {
+        guard
+            let derivedKey = _HDKey(privateKey: nil, publicKey: raw, chainCode: chainCode, depth: depth, fingerprint: fingerprint, childIndex: childIndex)
+                .derived(at: index, hardened: false)
+        else {
             throw DerivationError.derivationFailed
         }
-        return HDPublicKey(raw: derivedKey.publicKey!, chainCode: derivedKey.chainCode, network: network, depth: derivedKey.depth, fingerprint: derivedKey.fingerprint, childIndex: derivedKey.childIndex)
+        return HDPublicKey(
+            raw: derivedKey.publicKey!,
+            chainCode: derivedKey.chainCode,
+            network: network,
+            depth: derivedKey.depth,
+            fingerprint: derivedKey.fingerprint,
+            childIndex: derivedKey.childIndex
+        )
     }
 }
 
@@ -82,5 +93,5 @@ extension HDPublicKey: CustomStringConvertible {
     }
 }
 #if os(iOS) || os(tvOS) || os(watchOS)
-extension HDPublicKey: QRCodeConvertible {}
+    extension HDPublicKey: QRCodeConvertible {}
 #endif

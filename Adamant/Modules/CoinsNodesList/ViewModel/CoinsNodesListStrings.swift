@@ -22,14 +22,14 @@ extension String.adamant {
         static var resetAlert: String {
             String.localized("NodesList.ResetNodeListAlert", comment: .empty)
         }
-        
+
         static var preferTheFastestNode: String {
             String.localized(
                 "NodesList.PreferTheFastestNode",
                 comment: .empty
             )
         }
-        
+
         static var fastestNodeTip: String {
             String.localized(
                 "NodesList.PreferTheFastestNode.Footer",

@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-public extension ApiCommands {
-    static let States = (
+extension ApiCommands {
+    public static let States = (
         root: "/api/states",
         get: "/api/states/get",
         store: "/api/states/store"
@@ -19,7 +19,7 @@ public extension ApiCommands {
 
 extension AdamantApiService {
     public static let KvsFee: Decimal = 0.001
-    
+
     public func store(_ model: KVSValueModel, date: Date) async -> ApiServiceResult<UInt64> {
         let transaction = NormalizedTransaction(
             type: .state,
@@ -28,31 +28,35 @@ extension AdamantApiService {
             requesterPublicKey: nil,
             date: date,
             recipientId: nil,
-            asset: TransactionAsset(state: StateAsset(
-                key: model.key,
-                value: model.value,
-                type: .keyValue
-            ))
+            asset: TransactionAsset(
+                state: StateAsset(
+                    key: model.key,
+                    value: model.value,
+                    type: .keyValue
+                )
+            )
         )
-        
-        guard let transaction = adamantCore.makeSignedTransaction(
-            transaction: transaction,
-            senderId: AdamantUtilities.generateAddress(
-                publicKey: model.keypair.publicKey
-            ),
-            keypair: model.keypair
-        ) else {
+
+        guard
+            let transaction = adamantCore.makeSignedTransaction(
+                transaction: transaction,
+                senderId: AdamantUtilities.generateAddress(
+                    publicKey: model.keypair.publicKey
+                ),
+                keypair: model.keypair
+            )
+        else {
             return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
-        
+
         // MARK: Send
-        
+
         return await sendTransaction(
             path: ApiCommands.States.store,
             transaction: transaction
         )
     }
-    
+
     public func get(key: String, sender: String) async -> ApiServiceResult<String?> {
         // MARK: 1. Prepare
         let parameters = [
@@ -60,7 +64,7 @@ extension AdamantApiService {
             "orderBy": "timestamp:desc",
             "key": key
         ]
-        
+
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
         response = await request { [parameters] core, origin in
             await core.sendRequestJsonResponse(
@@ -71,8 +75,9 @@ extension AdamantApiService {
                 encoding: .url
             )
         }
-        
-        return response
+
+        return
+            response
             .flatMap { $0.resolved() }
             .map { $0.first?.asset.state?.value }
     }

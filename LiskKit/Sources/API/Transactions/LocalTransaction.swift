@@ -161,14 +161,7 @@ extension LocalTransaction {
 
     var bytes: [UInt8] {
         return
-            typeBytes +
-            timestampBytes +
-            senderPublicKeyBytes +
-            recipientIdBytes +
-            amountBytes +
-            assetBytes +
-            signatureBytes +
-            signSignatureBytes
+            typeBytes + timestampBytes + senderPublicKeyBytes + recipientIdBytes + amountBytes + assetBytes + signatureBytes + signSignatureBytes
     }
 
     var typeBytes: [UInt8] {
@@ -186,7 +179,8 @@ extension LocalTransaction {
     var recipientIdBytes: [UInt8] {
         guard
             let value = recipientId?.replacingOccurrences(of: "L", with: ""),
-            let number = UInt64(value) else { return [UInt8](repeating: 0, count: 8) }
+            let number = UInt64(value)
+        else { return [UInt8](repeating: 0, count: 8) }
         return BytePacker.pack(number, byteOrder: .bigEndian)
     }
 
@@ -207,7 +201,7 @@ extension LocalTransaction {
             let data = asset as? [String: [String: String]],
             let signature = data["signature"],
             let publicKey = signature["publicKey"]
-            else { return [] }
+        else { return [] }
         return publicKey.hexBytes()
     }
 }
@@ -228,20 +222,20 @@ extension LocalTransaction {
             "asset": asset ?? Asset(),
             "signature": signature ?? NSNull()
         ]
-        
+
         if let value = signSignature { options["signSignature"] = value }
-        
+
         return options
     }
 }
 
 protocol BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data
-    static func +=(lhs: inout Data, rhs: Self)
+    static func + (lhs: Data, rhs: Self) -> Data
+    static func += (lhs: inout Data, rhs: Self)
 }
 
 extension BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data {
+    static func + (lhs: Data, rhs: Self) -> Data {
         var value = rhs
         let data = withUnsafePointer(to: &value) { ptr -> Data in
             return Data(buffer: UnsafeBufferPointer(start: ptr, count: 1))
@@ -249,7 +243,7 @@ extension BinaryConvertible {
         return lhs + data
     }
 
-    static func +=(lhs: inout Data, rhs: Self) {
+    static func += (lhs: inout Data, rhs: Self) {
         lhs = lhs + rhs
     }
 }
@@ -265,20 +259,20 @@ extension Int64: BinaryConvertible {}
 extension Int: BinaryConvertible {}
 
 extension Bool: BinaryConvertible {
-    static func +(lhs: Data, rhs: Bool) -> Data {
+    static func + (lhs: Data, rhs: Bool) -> Data {
         return lhs + (rhs ? UInt8(0x01) : UInt8(0x00)).littleEndian
     }
 }
 
 extension String: BinaryConvertible {
-    static func +(lhs: Data, rhs: String) -> Data {
+    static func + (lhs: Data, rhs: String) -> Data {
         guard let data = rhs.data(using: .utf8) else { return lhs }
         return lhs + data
     }
 }
 
 extension Data: BinaryConvertible {
-    static func +(lhs: Data, rhs: Data) -> Data {
+    static func + (lhs: Data, rhs: Data) -> Data {
         var data = Data()
         data.append(lhs)
         data.append(rhs)

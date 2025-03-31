@@ -10,7 +10,7 @@ import UIKit
 
 public protocol RichMessageNotificationProvider {
     static var richMessageType: String { get }
-    
+
     func notificationContent(
         for transaction: Transaction,
         partnerAddress: String,

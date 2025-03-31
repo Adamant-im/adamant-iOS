@@ -11,7 +11,7 @@ import Foundation
 struct DashGetAddressTransactionIds: Codable {
     let method: String
     let params: [String]
-    
+
     init(address: String) {
         self.method = "getaddresstxids"
         self.params = [address]

@@ -14,7 +14,7 @@ final class CheckmarkRowView: UIView {
     private let titleLabel = makeTitleLabel()
     private let subtitleLabel = makeSubtitleLabel()
     private let captionLabel = makeCaptionLabel()
-    
+
     private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [captionLabel, subtitleLabel])
         stack.axis = .horizontal
@@ -22,96 +22,96 @@ final class CheckmarkRowView: UIView {
         stack.spacing = 6
         return stack
     }()
-    
+
     var title: String? {
         get { titleLabel.text }
         set { titleLabel.text = newValue }
     }
-    
+
     var titleColor: UIColor {
         get { titleLabel.textColor }
         set { titleLabel.textColor = newValue }
     }
-    
+
     var subtitle: String? {
         get { subtitleLabel.text }
         set { subtitleLabel.text = newValue }
     }
-    
+
     var subtitleColor: UIColor {
         get { subtitleLabel.textColor }
         set { subtitleLabel.textColor = newValue }
     }
-    
+
     var caption: String? {
         get { captionLabel.text }
         set { captionLabel.text = newValue }
     }
-    
+
     var captionColor: UIColor {
         get { captionLabel.textColor }
         set { captionLabel.textColor = newValue }
     }
-    
+
     var onCheckmarkTap: (() -> Void)? {
         get { checkmarkView.onCheckmarkTap }
         set { checkmarkView.onCheckmarkTap = newValue }
     }
-    
+
     var checkmarkImage: UIImage? {
         get { checkmarkView.image }
         set { checkmarkView.image = newValue }
     }
-    
+
     var isChecked: Bool {
         checkmarkView.isChecked
     }
-    
+
     var isUpdating: Bool {
         checkmarkView.isUpdating
     }
-    
+
     var checkmarkImageBorderColor: CGColor? {
         get { checkmarkView.imageBorderColor }
         set { checkmarkView.imageBorderColor = newValue }
     }
-    
+
     var checkmarkImageTintColor: UIColor? {
         get { checkmarkView.imageTintColor }
         set { checkmarkView.imageTintColor = newValue }
     }
-    
+
     init() {
         super.init(frame: .zero)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
     }
-    
+
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
         checkmarkView.setIsChecked(isChecked, animated: animated)
     }
-    
+
     func setIsUpdating(_ isUpdating: Bool, animated: Bool) {
         checkmarkView.setIsUpdating(isUpdating, animated: animated)
     }
-    
+
     private func setupView() {
         addSubview(checkmarkView)
         checkmarkView.snp.makeConstraints {
             $0.size.equalTo(44)
             $0.top.leading.bottom.equalToSuperview().inset(2)
         }
-        
+
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(checkmarkView)
             $0.leading.equalTo(checkmarkView.snp.trailing).offset(4)
         }
-        
+
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(2)

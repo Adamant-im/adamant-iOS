@@ -10,21 +10,21 @@ import Foundation
 
 public enum TransactionType: Hashable, Sendable {
     case unknown(raw: Int)
-    case send        // 0
-    case signature    // 1
-    case delegate    // 2
-    case vote        // 3
-    case multi        // 4
-    case dapp        // 5
-    case inTransfer    // 6
-    case outTransfer // 7
-    case chatMessage // 8
-    case state        // 9
-    
+    case send  // 0
+    case signature  // 1
+    case delegate  // 2
+    case vote  // 3
+    case multi  // 4
+    case dapp  // 5
+    case inTransfer  // 6
+    case outTransfer  // 7
+    case chatMessage  // 8
+    case state  // 9
+
     public init(from int: Int) {
         self = int.toTransactionType()
     }
-    
+
     public var rawValue: Int {
         switch self {
         case .send: return 0
@@ -37,7 +37,7 @@ public enum TransactionType: Hashable, Sendable {
         case .outTransfer: return 7
         case .chatMessage: return 8
         case .state: return 9
-        
+
         case .unknown(let raw): return raw
         }
     }
@@ -49,7 +49,7 @@ extension TransactionType: Codable {
         let type = try container.decode(Int.self)
         self = type.toTransactionType()
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -62,8 +62,8 @@ extension TransactionType: Equatable {
     }
 }
 
-private extension Int {
-    func toTransactionType() -> TransactionType {
+extension Int {
+    fileprivate func toTransactionType() -> TransactionType {
         switch self {
         case 0: return .send
         case 1: return .signature
@@ -75,7 +75,7 @@ private extension Int {
         case 7: return .outTransfer
         case 8: return .chatMessage
         case 9: return .state
-        
+
         default: return .unknown(raw: self)
         }
     }

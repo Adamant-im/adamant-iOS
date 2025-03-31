@@ -23,7 +23,17 @@ public struct Peers: APIService {
 extension Peers {
 
     /// List peers
-    public func peers(ip: String? = nil, state: PeerModel.State? = nil, version: String? = nil, os: String? = nil, height: Int? = nil, limit: UInt? = nil, offset: UInt? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<PeersResponse>) -> Void) {
+    public func peers(
+        ip: String? = nil,
+        state: PeerModel.State? = nil,
+        version: String? = nil,
+        os: String? = nil,
+        height: Int? = nil,
+        limit: UInt? = nil,
+        offset: UInt? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Response<PeersResponse>) -> Void
+    ) {
         var options: RequestOptions = [:]
         if let value = ip { options["ip"] = value }
         if let value = state?.rawValue { options["state"] = value }

@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import BigInt
+import Foundation
 import LiskKit
 
 struct LskAccount {

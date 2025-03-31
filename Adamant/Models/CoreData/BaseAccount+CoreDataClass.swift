@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(BaseAccount)
 public class BaseAccount: NSManagedObject, @unchecked Sendable {

@@ -15,22 +15,24 @@ public struct BodyStringEncoding: ParameterEncoding {
         with parameters: Parameters?
     ) throws -> URLRequest {
         var urlRequest = try urlRequest.asURLRequest()
-        
+
         guard
             let string = parameters?.first?.value as? String,
             let data = string.data(using: .utf8)
         else {
             throw AFError.parameterEncodingFailed(
-                reason: .customEncodingFailed(error: AdamantError(
-                    message: "String encoding problem"
-                ))
+                reason: .customEncodingFailed(
+                    error: AdamantError(
+                        message: "String encoding problem"
+                    )
+                )
             )
         }
-        
+
         if parameters?.count != 1 {
             assertionFailure("BodyStringEncoding uses just first parameter for encoding")
         }
-        
+
         urlRequest.httpBody = data
         return urlRequest
     }

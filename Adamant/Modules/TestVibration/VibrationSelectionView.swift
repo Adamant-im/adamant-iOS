@@ -6,16 +6,16 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct VibrationSelectionView: View {
     @StateObject var viewModel: VibrationSelectionViewModel
-    
+
     init(viewModel: @escaping () -> VibrationSelectionViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
-    
+
     var body: some View {
         List {
             ForEach(AdamantVibroType.allCases, id: \.self) { type in
@@ -31,7 +31,7 @@ struct VibrationSelectionView: View {
         .navigationTitle("Vibrations")
         .navigationBarTitleDisplayMode(.inline)
     }
-    
+
     private func vibrationTypeDescription(_ type: AdamantVibroType) -> String {
         switch type {
         case .light:
