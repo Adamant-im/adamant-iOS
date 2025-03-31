@@ -1044,7 +1044,25 @@ extension AccountViewController: AccountHeaderViewDelegate {
         }
         
         let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-        dialogService.presentShareAlertFor(title: nil, stringForPasteboard: address, stringForShare: encodedAddress, stringForQR: encodedAddress, types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)], excludedActivityTypes: ShareContentType.address.excludedActivityTypes, animated: true, from: from, completion: nil)
+        dialogService.presentShareAlertFor(
+            title: nil,
+            stringForPasteboard: address,
+            stringForShare: encodedAddress,
+            stringForQR: encodedAddress,
+            types: [
+                .copyToPasteboard,
+                .share,
+                .generateQr(
+                    encodedContent: encodedAddress,
+                    sharingTip: address,
+                    withLogo: true
+                )
+            ],
+            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+            animated: true,
+            from: from,
+            completion: nil
+        )
     }
 }
 
