@@ -1139,13 +1139,13 @@ class MethodWrapper {
         }
         return isAsync ?
         """
-            var result: Any?
-            let semaphore = DispatchSemaphore(value: .zero)    
-            Task {
-                result = \(isThrowing ? "try " : "")await \(performCall)
-                semaphore.signal()
-            }
-            semaphore.wait()
+        var result: Any?
+                let semaphore = DispatchSemaphore(value: .zero)    
+                Task {
+                    result = \(isThrowing ? "try " : "")await \(performCall)
+                    semaphore.signal()
+                }
+                semaphore.wait()
         """
         : performCall
     }
