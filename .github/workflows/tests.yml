@@ -25,6 +25,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Run Cocoapods
       run: pod install
+    - name: Install xcbeautify
+      run: brew install xcbeautify
     - name: Sourcery
       run: |
         brew install sourcery
@@ -38,6 +40,6 @@ jobs:
             static let oldKeychainPass: String = "random.string.three"
         }' > CommonKit/Sources/CommonKit/AdamantSecret.swift
     - name: Run tests
-      run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16'
+      run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16' | xcbeautify
 
  
