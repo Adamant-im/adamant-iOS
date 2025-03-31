@@ -77,6 +77,8 @@ public struct Hooks: ParsableCommand {
             
             // Copy the file from source to destination
             try FileManager.default.copyItem(atPath: sourcePath, toPath: destinationPath)
+            // Make the copied file executable
+            try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: destinationPath)
             print("✅ Successfully copied \(sourcePath) to \(destinationPath)")
         } catch {
             print("🚨 Error: \(error.localizedDescription) at path: \(sourcePath)")
