@@ -36,7 +36,7 @@ jobs:
             static let appIdentifierPrefix: String = "random.string"
             static let keychainValuePassword: String = "random.string.two"
             static let oldKeychainPass: String = "random.string.three"
-        }' > AdamantSecret.swift
+        }' > CommonKit/Sources/CommonKit/AdamantSecret.swift
     - name: Run tests
       run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16'
 
