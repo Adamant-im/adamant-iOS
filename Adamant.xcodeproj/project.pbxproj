@@ -3281,6 +3281,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E9EC344B20066D4A00C0E546 /* Build configuration list for PBXNativeTarget "AdamantTests" */;
 			buildPhases = (
+				D332166F2D9AB16700D70FF8 /* Sourcery */,
 				E9EC344020066D4A00C0E546 /* Sources */,
 				E9EC344120066D4A00C0E546 /* Frameworks */,
 				E9EC344220066D4A00C0E546 /* Resources */,
@@ -3613,6 +3614,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "$SCRIPT_INPUT_FILE_0 xcode\n";
+		};
+		D332166F2D9AB16700D70FF8 /* Sourcery */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Sourcery;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -x /opt/homebrew/bin/sourcery ]; then\n    /opt/homebrew/bin/sourcery --config .sourcery.yml\nelse\n    echo \"🚨 Sourcery is not installed. Please install it to proceed.\" >&2\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
