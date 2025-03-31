@@ -172,6 +172,7 @@ final class ChatViewController: MessagesViewController {
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
         
+        updateUnreadMessages()
         if !viewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
         }
@@ -189,9 +190,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
-        viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
             ? nil
@@ -537,17 +536,17 @@ private extension ChatViewController {
     }
     
     func configureLayout() {
-        view.addSubview(scrollToUnreadReactButton)
         view.addSubview(scrollDownButton)
+        view.addSubview(scrollToUnreadReactButton)
         scrollDownButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
             $0.bottom.equalTo(inputBar.snp.top).offset(-scrollDownButtonInset)
             $0.size.equalTo(scrollButtonHeight)
         }
         scrollToUnreadReactButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
+            $0.centerX.equalTo(scrollDownButton.snp.centerX)
             self.scrollToUnreadBottomConstraint = $0.bottom.equalTo(scrollDownButton.snp.bottom).constraint
-            $0.size.equalTo(scrollButtonHeight)
+            $0.size.equalTo(scrollButtonHeight + 6)
         }
         
         view.addSubview(loadingView)
@@ -1224,8 +1223,8 @@ extension ChatViewController {
 }
 
 private let scrollToUnreadInset: CGFloat = 10
-private let scrollDownButtonInset: CGFloat = 10
+private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
-private let scrollButtonHeight: CGFloat = 38
+private let scrollButtonHeight: CGFloat = 30

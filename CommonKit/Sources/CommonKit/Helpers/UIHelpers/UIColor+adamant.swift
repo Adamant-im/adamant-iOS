@@ -26,6 +26,8 @@ extension UIColor {
         public static let success = #colorLiteral(red: 0.2102436721, green: 0.8444728255, blue: 0.6537195444, alpha: 1) //#32d296
         public static let warning = #colorLiteral(red: 0.9622407556, green: 0.4130832553, blue: 0.5054324269, alpha: 1) //#f0506e
         public static let inactive = #colorLiteral(red: 0.5025414228, green: 0.5106091499, blue: 0.5218499899, alpha: 1) //#6d6f72
+        public static let imageBackground = #colorLiteral(red: 0.8470588235, green: 0.8470588235, blue: 0.8470588235, alpha: 1)
+        public static let imageBlack = #colorLiteral(red: 0.0117647059, green: 0.0039215686, blue: 0.0156862745, alpha: 1)
         
         public static var background: UIColor {
             let colorWhiteTheme  = #colorLiteral(red: 0.9590962529, green: 0.9721178412, blue: 0.9845080972, alpha: 1) //f2f6fa

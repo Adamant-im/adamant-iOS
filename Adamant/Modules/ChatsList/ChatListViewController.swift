@@ -76,6 +76,7 @@ final class ChatListViewController: KeyboardObservingViewController {
             setBadgeValue(unreadController?.fetchedObjects?.count)
         }
     }
+    private var chatDeselectedIndex: IndexPath?
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
@@ -197,8 +198,11 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: animated)
+            }
         }
     }
     override func viewDidLayoutSubviews() {
@@ -342,7 +346,10 @@ final class ChatListViewController: KeyboardObservingViewController {
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                self?.tableView.reloadData()
+                guard let deselectedIndex = self?.chatDeselectedIndex,
+                      let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+                      let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
+                self?.configureCell(cell, for: chatroom)
             }
             .store(in: &subscriptions)
     }
@@ -357,7 +364,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private func updateUITitles() {
         updatingIndicatorView.updateTitle(title:  String.adamant.chatList.title)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
         searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
@@ -408,7 +415,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         areMessagesLoaded = true
         performOnMessagesLoadedActions()
         setIsBusy(!synced)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     // MARK: IB Actions
@@ -479,7 +486,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         switch result {
         case .success:
-            tableView.reloadData()
+            tableView.reloadDataPreservingSelection()
         case .failure(let error):
             dialogService.showRichError(error: error)
         }
@@ -562,6 +569,10 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        chatDeselectedIndex = indexPath
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -719,7 +730,7 @@ extension ChatListViewController {
     
     private func insertReloadRow() {
         lastSystemChatPositionRow = getBottomSystemChatIndex()
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     @MainActor
@@ -727,7 +738,7 @@ extension ChatListViewController {
         loadNewChatTask = Task {
             await chatsProvider.getChatRooms(offset: offset)
             isBusy = false
-            tableView.reloadData()
+            tableView.reloadDataPreservingSelection()
         }
     }
 }
@@ -1065,14 +1076,14 @@ extension ChatListViewController {
     private func shortDescription(for address: String) -> NSAttributedString? {
         var descriptionParts: [NSAttributedString] = []
 
-        if chatPreservation.getReplyMessage(address: address, thenRemoveIt: false) != nil {
+        if chatPreservation.getReplyMessage(address: address) != nil {
                 let replyImageAttachment = NSTextAttachment()
                 replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
                 replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
 
                 descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
             }
-        if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
+        if let files = chatPreservation.getPreservedFiles(for: address), !files.isEmpty {
                 let mediaCount = files.count(where: { $0.type.isMedia })
                 let otherCount = files.count(where: { !$0.type.isMedia })
 
@@ -1093,7 +1104,7 @@ extension ChatListViewController {
                 }
             }
 
-        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address, thenRemoveIt: false) {
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address) {
             let processedMessage = MessageProcessHelper.process(preservedMessage)
             descriptionParts.append(NSAttributedString(string: processedMessage))
         }
@@ -1596,6 +1607,14 @@ private extension UITableView {
         let selectedRowIndexPath = indexPathForSelectedRow
         reloadRows(at: indexPaths, with: .none)
         selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
+    }
+    
+    func reloadDataPreservingSelection() {
+        let selectedRow = indexPathForSelectedRow
+        reloadData()
+        if let selectedRow = selectedRow {
+            selectRow(at: selectedRow, animated: false, scrollPosition: .none)
+        }
     }
 }
 
