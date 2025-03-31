@@ -42,10 +42,11 @@ struct Format: ParsableCommand {
   var files: [String] = []
 
   func run() throws {
+    let configurationFilename = ".swiftformat"
     let fileManager = FileManager.default
     let currentDirectory = fileManager.currentDirectoryPath
     let swiftFormatConfigPath = (currentDirectory as NSString).appendingPathComponent(
-      ".swiftformat")
+      configurationFilename)
 
     guard fileManager.fileExists(atPath: swiftFormatConfigPath) else {
       throw ValidationError(
@@ -65,7 +66,7 @@ struct Format: ParsableCommand {
 
       let process = Process()
       process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
-      process.arguments = ["swift", "format", "--recursive"] + directories.flatMap { ["-i", $0] }
+      process.arguments = ["swift", "format", "--recursive", "--configuration", configurationFilename] + directories.flatMap { ["-i", $0] }
 
       try process.run()
       process.waitUntilExit()
@@ -84,7 +85,7 @@ struct Format: ParsableCommand {
 
       let process = Process()
       process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
-      process.arguments = ["swift", "format"] + files.flatMap { ["-i", $0] }
+      process.arguments = ["swift", "format", "--configuration", configurationFilename] + files.flatMap { ["-i", $0] }
 
       try process.run()
       process.waitUntilExit()
