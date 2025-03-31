@@ -19,7 +19,7 @@ extension MessageTransaction {
     @NSManaged public var isMarkdown: Bool
     @NSManaged public var message: String?
     @NSManaged public var reactionsData: Data?
-    @NSManaged public var richMessageTransactions: Set<RichMessageTransaction>?
+    
     
     var reactions: Set<Reaction>? {
         get {
@@ -39,9 +39,5 @@ extension MessageTransaction {
             let data = try? PropertyListEncoder().encode(value)
             reactionsData = data
         }
-    }
-    
-    func addToRichMessageTransactions(_ transaction: RichMessageTransaction) {
-        self.mutableSetValue(forKey: "richMessageTransactions").add(transaction)
     }
 }

@@ -9,7 +9,6 @@
 import CommonKit
 import Combine
 
-//TODO: Consider logout
 @MainActor
 final class SecretWalletsViewModel: ObservableObject {
     @Published private(set) var state: SecretWalletsState = .default

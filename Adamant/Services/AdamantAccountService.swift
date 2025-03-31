@@ -134,6 +134,10 @@ extension AdamantAccountService {
         return securedStore.get(.passphrase)
     }
     
+    func getCurrentPassphrase() -> String? {
+        passphrase
+    }
+    
     func dropSavedAccount() {
         useBiometry = false
         isBalanceExpired = true
@@ -424,7 +428,7 @@ extension AdamantAccountService {
                     let result = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
                         withPassword: .empty,
-                        storeInKVC: true
+                        storeInKVS: true
                     )
                     return result
                 }

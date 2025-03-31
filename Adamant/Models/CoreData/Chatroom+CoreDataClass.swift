@@ -29,19 +29,12 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
         }
         message.isUnread = false
         
-        if let messageTransaction = message as? MessageTransaction {
-            messageTransaction.richMessageTransactions?.forEach { $0.isUnread = false }
-            
-            if let context = messageTransaction.managedObjectContext, context.hasChanges {
-                try? context.save()
-            }
-        } else if let transferTransaction = message as? TransferTransaction {
-            transferTransaction.richMessageTransactions?.forEach { $0.isUnread = false }
-            
-            if let context = transferTransaction.managedObjectContext, context.hasChanges {
-                try? context.save()
-            }
+        message.richMessageTransactions?.forEach { $0.isUnread = false }
+        
+        if let context = message.managedObjectContext, context.hasChanges {
+            try? context.save()
         }
+        
         updateLastTransaction()
     }
     

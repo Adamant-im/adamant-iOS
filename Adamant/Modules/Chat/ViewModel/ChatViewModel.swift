@@ -41,6 +41,7 @@ final class ChatViewModel: NSObject {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
+    private let visibleWalletsService: VisibleWalletsService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -52,6 +53,9 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
+    var separatorIndex: Int?
+    var separatorId: String?
+    var didAddSeparator: Bool = false
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -62,9 +66,15 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) private var needsToShowNoActiveNodesAlert: Bool?
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
-    private(set) var chatTransactions: [ChatTransaction] = []
+    private(set) var chatTransactions: [ChatTransaction] = [] {
+        didSet {
+            updatePositionIfNeeded()
+        }
+    }
+    
     private var tempCancellables = Set<AnyCancellable>()
     private var hideHeaderTimer: AnyCancellable?
     private let minDiffCountForOffset = 5
@@ -90,6 +100,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let didTapAdmNodesList = ObservableSender<Void>()
+    let didTapShowTimeSettings = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
@@ -183,7 +194,8 @@ final class ChatViewModel: NSObject {
         filesStorageProprieties: FilesStorageProprietiesProtocol,
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
-        filesPicker: FilesPickerProtocol
+        filesPicker: FilesPickerProtocol,
+        visibleWalletsService: VisibleWalletsService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -206,6 +218,7 @@ final class ChatViewModel: NSObject {
         self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
+        self.visibleWalletsService = visibleWalletsService
         
         super.init()
         setupObservers()
@@ -217,12 +230,10 @@ final class ChatViewModel: NSObject {
         messageIdToShow: String?,
         isNewChat: Bool = false
     ) {
+        self.messageIdToShow = messageIdToShow
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
-        if let messageIdToShow = messageIdToShow {
-            scroll(to: messageIdToShow)
-        }
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -235,20 +246,16 @@ final class ChatViewModel: NSObject {
         
         if let partnerAddress = chatroom.partner?.address {
             chatPreservation.getPreservedMessageFor(
-                address: partnerAddress,
-                thenRemoveIt: true
+                address: partnerAddress
             ).map { inputText = $0 }
             
             let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
             messages = cachedMessages ?? []
             fullscreenLoading = cachedMessages == nil
             
-            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
+            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress)
             
-            filesPicked = chatPreservation.getPreservedFiles(
-                for: partnerAddress,
-                thenRemoveIt: true
-            )
+            filesPicked = chatPreservation.getPreservedFiles(for: partnerAddress)
         }
         if isNewChat && !(accountService.account?.isEnoughMoneyForTransaction ?? false) {
             dialog.send(.freeTokenAlert)
@@ -287,6 +294,12 @@ final class ChatViewModel: NSObject {
                 await loadMessages(address: address, offset: .zero)
             }
         }.stored(in: tasksStorage)
+    }
+    
+    func updatePositionIfNeeded() {
+        if let messageIdToShow = messageIdToShow {
+            scroll(to: messageIdToShow)
+        }
     }
     
     func loadMoreMessagesIfNeeded() {
@@ -368,17 +381,7 @@ final class ChatViewModel: NSObject {
     
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveMessage(message, forAddress: partnerAddress)
-    }
-    
-    func preserveFiles() {
-        guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveFiles(filesPicked, forAddress: partnerAddress)
-    }
-    
-    func preserveReplayMessage() {
-        guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.setReplyMessage(replyMessage, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
     }
     
     func blockChat() {
@@ -505,6 +508,12 @@ final class ChatViewModel: NSObject {
                 switch error as? ChatsProviderError {
                 case .invalidTransactionStatus:
                     break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.richError(error))
+                    }
                 default:
                     dialog.send(.richError(error))
                 }
@@ -981,7 +990,18 @@ final class ChatViewModel: NSObject {
     
     func checkForADMNodesAvailability() {
         if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
+            guard needsToShowNoActiveNodesAlert == true else { return }
             dialog.send(.noActiveNodesAlert)
+            needsToShowNoActiveNodesAlert = false
+        } else {
+            needsToShowNoActiveNodesAlert = true
+        }
+    }
+    
+    func checkUpdateState() {
+        Task { @MainActor in
+            let isUpdating = await chatsProvider.state.isUpdating
+            self.isHeaderLoading = isUpdating
         }
     }
 }
@@ -1096,9 +1116,15 @@ private extension ChatViewModel {
             .removeDuplicates()
             .sink { [weak self] unreadIndexes in
                 self?.unreadMesaggesIndexes = unreadIndexes
+                self?.updateSeparatorId()
             }
             .store(in: &subscriptions)
-        
+        $messages
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateSeparatorIndex()
+            }
+            .store(in: &subscriptions)
         chatFileService.updateFileFields
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
@@ -1134,13 +1160,14 @@ private extension ChatViewModel {
         
         $unreadMessagesIds
             .removeDuplicates()
-            .sink { newValue in
-                self.updateScrolledMessageState(newUnreadIds: newValue)
+            .sink { [weak self] newValue in
+                self?.updateScrolledMessageState(newUnreadIds: newValue)
             }
             .store(in: &subscriptions)
-        NotificationCenter.default
-            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
-            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
+        
+        visibleWalletsService.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {
@@ -1433,7 +1460,7 @@ private extension ChatViewModel {
             }
         case let .serverError(error):
             if case .timestampIsInTheFuture = error {
-                dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
+                dialog.send(.timestampIsInTheFuture)
             }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break
@@ -1702,6 +1729,31 @@ private extension ChatViewModel {
         if newUnreadIds.isEmpty {
             shouldScrollToBottom = true
         }
+    }
+    
+    func updateSeparatorId() {
+        guard !didAddSeparator, !messages.isEmpty else { return }
+        
+        guard let firstUnreadId = unreadMessagesIds?.first else {
+            separatorId = nil
+            separatorIndex = nil
+            return
+        }
+        
+        didAddSeparator = true
+        separatorId = firstUnreadId
+        updateSeparatorIndex()
+    }
+
+    func updateSeparatorIndex() {
+        guard let separatorId = separatorId,
+              let index = messages.firstIndex(where: { $0.id == separatorId })
+        else {
+            separatorIndex = nil
+            return
+        }
+        
+        separatorIndex = index - 1
     }
 }
 

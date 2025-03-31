@@ -83,8 +83,8 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Secret Wallets
-        container.register(AdamantSecretWalletsManager.SecretWalletsFactory.self) { r in
-            AdamantSecretWalletsManager.SecretWalletsFactory(
+        container.register(SecretWalletsFactory.self) { r in
+            SecretWalletsFactory(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
@@ -95,7 +95,7 @@ struct AppAssembly: MainThreadAssembly {
         container.register(SecretWalletsManagerProtocol.self) { r in
             AdamantSecretWalletsManager(
                 walletsStoreService: r.resolve(WalletStoreServiceProtocol.self)!,
-                secretWalletsFactory: r.resolve(AdamantSecretWalletsManager.SecretWalletsFactory.self)!
+                secretWalletsFactory: r.resolve(SecretWalletsFactory.self)!
             )
         }.inObjectScope(.container)
         
@@ -104,6 +104,17 @@ struct AppAssembly: MainThreadAssembly {
                 secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
             )
         }.inObjectScope(.container)
+        
+        container.register(SecretWalletsViewModel.self) { r in
+            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
+        }.inObjectScope(.container)
+        
+        container.register(SecretWalletsAlertMenuView.self) { r in
+            SecretWalletsAlertMenuView(
+                dialogService: r.resolve(DialogService.self)!,
+                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
+            )
+        }.inObjectScope(.transient)
         
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
@@ -495,18 +506,5 @@ struct AppAssembly: MainThreadAssembly {
         container.register(CoreDataRealationMapperProtocol.self) { r in
             CoreDataRealationMapper(stack: r.resolve(CoreDataStack.self)!)
         }.inObjectScope(.container)
-
-        // MARK: SecretWalletsViewModel
-        container.register(SecretWalletsViewModel.self) { r in
-            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
-        }.inObjectScope(.container)
-        
-        // MARK: SecretWalletsAlertService
-        container.register(SecretWalletsAlertMenuView.self) { r in
-            SecretWalletsAlertMenuView(
-                dialogService: r.resolve(DialogService.self)!,
-                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
-            )
-        }.inObjectScope(.transient)
     }
 }

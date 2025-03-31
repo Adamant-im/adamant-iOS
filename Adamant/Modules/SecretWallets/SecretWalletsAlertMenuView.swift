@@ -75,7 +75,7 @@ final class SecretWalletsAlertMenuView {
     
     private func showEnableSecretWalletAlert() {
         let passwordAlert = UIAlertController(
-            title: "Enter password to add secret wallet",
+            title: String.localized("SecretWallets.Menu.AddSecretWallet.Title", comment: "Add secret wallet title"),
             message: nil,
             preferredStyle: .alert
         )
@@ -85,10 +85,10 @@ final class SecretWalletsAlertMenuView {
             textField.placeholder = "Password"
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: String.localized("Cancel", comment:  "Cancel adding password"), style: .cancel)
         passwordAlert.addAction(cancelAction)
         
-        let enableAction = UIAlertAction(title: "Enable", style: .default) { [weak self] _ in
+        let enableAction = UIAlertAction(title: String.localized("SecretWallets.Menu.AddSecretWallet.Add", comment: "Confirm adding secret password"), style: .default) { [weak self] _ in
             guard
                 let self = self,
                 let password = passwordAlert.textFields?.first?.text,
@@ -105,11 +105,18 @@ final class SecretWalletsAlertMenuView {
     
     private func showSecretWalletInfoAlert() {
         let infoAlert = UIAlertController(
-            title: "Secret Wallets",
-            message: "Secret wallets are encrypted and require a password...",
+            title: String.localized("SecretWallets.Menu.TellMeMore.Title", comment: "Tell me more about secret wallets"),
+            message: String.localized("SecretWallets.Menu.TellMeMore.Subtitle", comment: "Subtitle for tell me more alert"),
             preferredStyle: .alert
         )
-        infoAlert.addAction(.init(title: "Got it", style: .default))
+        infoAlert.addAction(.init(title: String.localized("Cancel"), style: .cancel))
+        
+        let learnMoreAction = UIAlertAction(title: String.localized("SecretWallets.Menu.TellMeMore.LearnMore", comment: "Learn more about secret wallets") , style: .default) { _ in
+            if let url = URL(string: "http://news.adamant.im/") {
+                UIApplication.shared.open(url)
+            }
+        }
+        infoAlert.addAction(learnMoreAction)
         
         dialogService.present(infoAlert, animated: true, completion: nil)
     }

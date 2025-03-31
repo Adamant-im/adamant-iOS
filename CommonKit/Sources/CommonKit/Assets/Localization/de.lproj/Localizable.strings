@@ -766,6 +766,8 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+"chat.NewMessages" = "Neue Nachrichten";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Die Datei verschlüsselt aufbewahren";
 
@@ -1394,21 +1396,32 @@
 "Chat.Alert.Title.NoActiveNodes" = "Keine aktiven ADM-Knoten";
 "Chat.Alert.NoActiveNodes" = "Es können keine neuen Nachrichten angefordert werden - Keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
 
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Gerätezeit prüfen";
+"Chat.Alert.TimestampIsInTheFuture" = "Es können keine neuen Nachrichten angefordert werden - keine aktiven ADM-Blockchain-Knoten. Da Sie einige von ihnen deaktiviert haben, sollten Sie die Knotenliste überprüfen.";
+"Chat.Alert.TimeSettings" = "Zeiteinstellung";
+
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "ADM-Knotenliste überprüfen";
 
 "Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";
 
 /* Secret Wallets */
-"SecretWallets.Menu.Regular" = "Normal";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ Geheim 1";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ Geheim 2";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ Geheim 3";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ Geheim 4";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ Geheim 5";
-"SecretWallets.Menu.AddSecretWallet" = "Geheimen hinzufügen";
-"SecretWallets.Menu.TellMeMore" = "Über Wallets";
+"SecretWallets.Menu.Regular" = "💰 Normal";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ Geheim 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ Geheim 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ Geheim 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ Geheim 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ Geheim 5";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 Geheimen hinzufügen";
+"SecretWallets.Menu.TellMeMore" = "💡 Über Wallets";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
 "SecretWallets.Menu.Title" = "Aktive Wallets";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Geben Sie das Passwort ein, um eine geheime Wallet hinzuzufügen";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Passwort";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Hinzufügen";
 "SecretWallets.Row.Title" = "Geheime Geldbörsen";
 
 /* Secret Wallets Coins name*/

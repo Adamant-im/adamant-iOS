@@ -709,6 +709,8 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+"chat.NewMessages" = "新消息";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "保持文件加密";
 
@@ -1361,21 +1363,32 @@
 "Chat.Alert.Title.NoActiveNodes" = "無活動 ADM 節點";
 "Chat.Alert.NoActiveNodes" = "无法请求新消息 - 没有活动的 ADM 区块链节点。由于您已停用部分节点，请考虑查看节点列表。";
 
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "檢查裝置時間";
+"Chat.Alert.TimestampIsInTheFuture" = "無法請求新訊息-沒有活動的 ADM 區塊鏈節點。由於您已停用部分節點，請考慮檢視節點清單。";
+"Chat.Alert.TimeSettings" = "時間設定";
+
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
 
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
 
 /* Secret Wallets */
-"SecretWallets.Menu.Regular" = "普通";
-"SecretWallets.Menu.Secret" = "🔐1️⃣ 秘密 1";
-"SecretWallets.Menu.Secret" = "🔐2️⃣ 秘密 2";
-"SecretWallets.Menu.Secret" = "🔐3️⃣ 秘密 3";
-"SecretWallets.Menu.Secret" = "🔐4️⃣ 秘密 4";
-"SecretWallets.Menu.Secret" = "🔐5️⃣ 秘密 5";
-"SecretWallets.Menu.AddSecretWallet" = "添加秘密";
-"SecretWallets.Menu.TellMeMore" = "关于钱包";
+"SecretWallets.Menu.Regular" = "💰 普通";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ 秘密 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ 秘密 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ 秘密 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ 秘密 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ 秘密 5";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 添加秘密";
+"SecretWallets.Menu.TellMeMore" = "💡 关于钱包";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
 "SecretWallets.Menu.Title" = "活动钱包";
+"SecretWallets.Menu.AddSecretWallet.Title" = "输入密码以添加秘密钱包";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "密码";
+"SecretWallets.Menu.AddSecretWallet.Add" = "添加";
 "SecretWallets.Row.Title" = "秘密钱包";
 
 /* Secret Wallets Coins name*/

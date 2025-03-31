@@ -20,7 +20,6 @@ extension TransferTransaction {
     @NSManaged public var replyToId: String?
     @NSManaged public var decodedReplyMessage: String?
     @NSManaged public var reactionsData: Data?
-    @NSManaged public var richMessageTransactions: Set<RichMessageTransaction>?
     
     var reactions: Set<Reaction>? {
         get {
@@ -62,9 +61,5 @@ extension TransferTransaction: AdamantTransactionDetails {
     var chatRoom: Chatroom? {
         let partner = partner as? CoreDataAccount
         return partner?.chatroom
-    }
-    
-    func addToRichMessageTransactions(_ transaction: RichMessageTransaction) {
-        self.mutableSetValue(forKey: "richMessageTransactions").add(transaction)
     }
 }

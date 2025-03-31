@@ -553,6 +553,7 @@ extension AdamantChatsProvider {
         guard isInitiallySynced,
               state != .updating
         else {
+            stateNotifier = state
             return nil
         }
         
@@ -992,6 +993,7 @@ extension AdamantChatsProvider {
             transaction.statusEnum = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             chatroom.lastTransaction = transaction
+            chatroom.updatedAt = transaction.date
             chatroom.addToTransactions(transaction)
             
             do {
@@ -1048,6 +1050,7 @@ extension AdamantChatsProvider {
             
             chatroom.addToTransactions(transaction)
             chatroom.lastTransaction = transaction
+            chatroom.updatedAt = transaction.date
             do {
                 try context.save()
                 return transaction

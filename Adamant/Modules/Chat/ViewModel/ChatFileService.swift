@@ -733,7 +733,7 @@ private extension ChatFileService {
         
         let storageProtocol = NetworkFileProtocolType.ipfs
         let files = fileMessage.files
-        var richFiles = createRichFiles(from: files)
+        let richFiles = createRichFiles(from: files)
         
         let messageLocally = createAdamantMessage(
             with: richFiles,
@@ -776,7 +776,7 @@ private extension ChatFileService {
             else {
                 return await chatsProvider.removeMessage(with: txId)
             }
-            
+
             _ = try await chatsProvider.sendFileMessage(
                 adamantMessage,
                 recipientId: partnerAddress,
@@ -1086,6 +1086,8 @@ private extension ChatFileService {
         }
         
         richMessage.files = richFiles
+        fileMessage.adamantMessage = .richMessage(payload: richMessage)
+        uploadingFilesDictionary[txId] = fileMessage
         
         try? await chatsProvider.updateTxMessageContent(
             txId: txId,

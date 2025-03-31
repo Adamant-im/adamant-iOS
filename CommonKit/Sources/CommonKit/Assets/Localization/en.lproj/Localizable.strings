@@ -758,6 +758,8 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+"chat.NewMessages" = "New Messages";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Store files encrypted";
 
@@ -1370,6 +1372,11 @@
 "Chat.Alert.Title.NoActiveNodes" = "No active ADM nodes";
 "Chat.Alert.NoActiveNodes" = "Unable to request new messages—No active ADM blockchain nodes. As you’ve deactivated some of them, consider reviewing the node list.";
 
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Check device time";
+"Chat.Alert.TimestampIsInTheFuture" = "A network node rejected the message because the time on your device is ahead. Check the device's time or try sending a message again.";
+"Chat.Alert.TimeSettings" = "Time setting";
+
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "Review ADM node list";
 
@@ -1384,7 +1391,13 @@
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
 "SecretWallets.Menu.Title" = "Active wallets";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Enter password to add secret wallet";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Password";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Add";
 "SecretWallets.Row.Title" = "Secret wallets";
 
 /* Secret Wallets Coins name*/

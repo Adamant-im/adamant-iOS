@@ -45,7 +45,7 @@ final class AccountViewController: FormViewController {
     private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let apiServiceCompose: ApiServiceComposeProtocol
-    private let secretWalletsManager: SecretWalletsManagerProtocol
+    private let visibleWalletsService: VisibleWalletsService
     private lazy var walletsViewModel: AccountWalletsViewModel = .init(walletsStoreService: walletStoreServiceProvider)
     private let secretWalletsAlertService: SecretWalletsAlertMenuView
     private let secretWalletsViewModel: SecretWalletsViewModel
@@ -91,13 +91,13 @@ final class AccountViewController: FormViewController {
     
     private var walletViewControllers: [WalletViewController] = []
     
-    private var currentWalletIndex: Int = .zero
+    private var currentWalletCoinID: String = ""
     private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
         walletsViewModel.state.wallets.first { wallet in
-            wallet.index == currentWalletIndex
+            wallet.coinID == currentWalletCoinID
         }
     }
-    
+
     private var initiated = false
     
     // MARK: - Init
@@ -115,7 +115,7 @@ final class AccountViewController: FormViewController {
         languageService: LanguageStorageProtocol,
         walletServiceCompose: WalletServiceCompose,
         apiServiceCompose: ApiServiceComposeProtocol,
-        secretWalletsManager: SecretWalletsManagerProtocol,
+        visibleWalletsService: VisibleWalletsService,
         secretWalletsAlertService: SecretWalletsAlertMenuView,
         secretWalletsViewModel: SecretWalletsViewModel
     ) {
@@ -130,7 +130,7 @@ final class AccountViewController: FormViewController {
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
         self.apiServiceCompose = apiServiceCompose
-        self.secretWalletsManager = secretWalletsManager
+        self.visibleWalletsService = visibleWalletsService
         self.secretWalletsAlertService = secretWalletsAlertService
         self.secretWalletsViewModel = secretWalletsViewModel
         
@@ -185,7 +185,7 @@ final class AccountViewController: FormViewController {
                 guard let self = self else { return }
                 self.setupWalletsVC()
                 self.pagingViewController.reloadData()
-                self.pagingViewController.select(index: currentWalletIndex, animated: false)
+                selectCurrentWallet()
                 guard index >= 0 else { return }
                 self.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
             }
@@ -210,9 +210,7 @@ final class AccountViewController: FormViewController {
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        if walletViewControllers.count > 0 {
-            pagingViewController.select(index: currentWalletIndex)
-        }
+        selectCurrentWallet()
         
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
@@ -232,7 +230,7 @@ final class AccountViewController: FormViewController {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.pagingViewController.reloadMenu()
-                self.pagingViewController.select(index: currentWalletIndex, animated: false)
+                self.selectCurrentWallet()
             }
             .store(in: &notificationsSet)
         
@@ -354,7 +352,6 @@ final class AccountViewController: FormViewController {
             self.secretWalletsAlertService.presentSecretWalletsActionSheet(from: cell)
         }
         
-        // Добавление строки в секцию
         appSection.append(secretWalletsRow)
         
         // Node list
@@ -889,14 +886,11 @@ final class AccountViewController: FormViewController {
             }
         }
         
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name.AdamantVisibleWalletsService.visibleWallets,
-            object: nil,
-            queue: OperationQueue.main
-        ) { [weak self] _ in
-            MainActor.assumeIsolatedSafe {
+        visibleWalletsService.statePublisher
+            .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
                 guard let self = self else { return }
-                
                 self.setupWalletsVC()
                 self.walletsViewModel.updateState()
                 self.updatePagingItemHeight()
@@ -905,8 +899,10 @@ final class AccountViewController: FormViewController {
                 let collectionView = self.pagingViewController.collectionView
                 collectionView.reloadData()
                 self.tableView.reloadData()
+                
+                selectCurrentWallet()
             }
-        }
+            .store(in: &notificationsSet)
     }
     
     private func updateUI() {
@@ -1026,6 +1022,14 @@ final class AccountViewController: FormViewController {
             refreshControl.endRefreshing()
         }
     }
+    
+    private func selectCurrentWallet() {
+        if let index = walletsViewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinID }) {
+            pagingViewController.select(index: index, animated: false)
+        } else if let firstWalletID = walletsViewModel.state.wallets.first?.coinID {
+            currentWalletCoinID = firstWalletID
+        }
+    }
 }
 
 // MARK: - AccountHeaderViewDelegate
@@ -1119,7 +1123,9 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         didSelectItem pagingItem: PagingItem
     ) {
         Task { @MainActor in
-            currentWalletIndex = pagingItem.identifier
+            currentWalletCoinID = walletsViewModel.state.wallets.first(where: { wallet in
+                wallet.index == pagingItem.identifier
+            })?.coinID ?? ""
         }
     }
     
