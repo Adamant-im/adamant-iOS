@@ -5,10 +5,10 @@ STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(swi
 
 if [ -n "$STAGED_FILES" ]; then
     echo "Formatting staged files..."
-    echo "$STAGED_FILES" | xargs scripts/AdamantCLI/adamant-cli format staged
-
-    # Add formatted files back to staging
-    echo "$STAGED_FILES" | xargs git add
+    echo "$STAGED_FILES" | while read -r file; do
+        scripts/AdamantCLI/adamant-cli format staged --files "$file"
+        git add "$file"
+    done
 else
     echo "No staged files to format."
 fi

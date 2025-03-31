@@ -77,23 +77,23 @@ struct Format: ParsableCommand {
       }
 
     case .staged:
-        guard !files.isEmpty else {
-            print("✅ No files specified for formatting.")
-            return
-        }
-        
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
-        process.arguments = ["swift", "format"] + files.flatMap { ["-i", $0] }
-        
-        try process.run()
-        process.waitUntilExit()
-        
-        if process.terminationStatus == 0 {
-            print("✅ Specified Swift files formatted successfully.")
-        } else {
-            print("🚨 Failed to format specified Swift files. Exit code: \(process.terminationStatus)")
-        }
+      guard !files.isEmpty else {
+        print("✅ No files specified for formatting.")
+        return
+      }
+
+      let process = Process()
+      process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
+      process.arguments = ["swift", "format"] + files.flatMap { ["-i", $0] }
+
+      try process.run()
+      process.waitUntilExit()
+
+      if process.terminationStatus == 0 {
+        print("✅ Specified Swift files formatted successfully.")
+      } else {
+        print("🚨 Failed to format specified Swift files. Exit code: \(process.terminationStatus)")
+      }
     }
   }
 }
