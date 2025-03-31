@@ -28,8 +28,6 @@ jobs:
     - name: Sourcery
       run: |
         brew install sourcery
-        pwd
-        ls
         sourcery --config .sourcery.yml
     - name: Run tests
       run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16'
