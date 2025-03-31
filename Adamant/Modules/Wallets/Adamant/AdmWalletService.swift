@@ -225,7 +225,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
         .init(sentDate: nil, status: .notInitiated)
     }
     
-    func initWallet(withPassphrase: String, withPassword: String, storeInKVC: Bool) async throws -> WalletAccount {
+    func initWallet(withPassphrase: String, withPassword: String, storeInKVS: Bool) async throws -> WalletAccount {
         throw InternalAPIError.unknownError
     }
     
