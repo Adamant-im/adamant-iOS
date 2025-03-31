@@ -85,7 +85,7 @@ extension WalletStaticCoreProtocol {
     }
     
     var consistencyMaxTime: Double {
-        Double(Self.coinInfo?.txFetchInfo?.newPendingInterval ?? 0) / 1000.0
+        Double(Self.coinInfo?.txConsistencyMaxTime ?? 0) / 1000.0
     }
     
     var minBalance: Decimal {
