@@ -6,7 +6,7 @@ STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(swi
 if [ -n "$STAGED_FILES" ]; then
     echo "Formatting staged files..."
     echo "$STAGED_FILES" | while read -r file; do
-        scripts/AdamantCLI/adamant-cli format staged --files "$file"
+        scripts/AdamantCLI/adamant-cli format staged "$file"
         git add "$file"
     done
 else
