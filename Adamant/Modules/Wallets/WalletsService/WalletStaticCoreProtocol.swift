@@ -113,10 +113,10 @@ extension WalletStaticCoreProtocol {
     }
     
     static var explorerAddress: String {
-        coinInfo?.explorerAddress ?? ""
+        coinInfo?.explorerAddress?.replacingOccurrences(of: "${ID}", with: "") ?? ""
     }
     static var explorerTx: String {
-        coinInfo?.explorer ?? ""
+        coinInfo?.explorerTx?.replacingOccurrences(of: "${ID}", with: "") ?? ""
     }
     
     static var nodes: [Node] {
