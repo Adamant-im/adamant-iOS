@@ -38,6 +38,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private let chatTransactionsLimit = 50
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private var unconfirmedTransactionsBySignature: [String] = []
+    private var chatsMarkAsUnread: Set<String>? = Set()
     
     @MainActor private var chatPositon: [String : Double] = [:]
     private(set) var blockList: [String] = []
@@ -148,6 +149,7 @@ actor AdamantChatsProvider: ChatsProvider {
             store.remove(StoreKey.chatProvider.address)
             store.remove(StoreKey.chatProvider.receivedLastHeight)
             store.remove(StoreKey.chatProvider.readedLastHeight)
+            store.remove(StoreKey.chatProvider.markedChatsAsUnread)
             self.dropStateData()
             return
         }
@@ -160,6 +162,7 @@ actor AdamantChatsProvider: ChatsProvider {
         } else {
             store.remove(StoreKey.chatProvider.receivedLastHeight)
             store.remove(StoreKey.chatProvider.readedLastHeight)
+            store.remove(StoreKey.chatProvider.markedChatsAsUnread)
             self.dropStateData()
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
         }
@@ -305,6 +308,7 @@ extension AdamantChatsProvider {
         securedStore.remove(StoreKey.chatProvider.address)
         securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
         securedStore.remove(StoreKey.chatProvider.readedLastHeight)
+        securedStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
         
         // Set State
         setState(.empty, previous: prevState, notify: notify)
@@ -650,6 +654,20 @@ extension AdamantChatsProvider {
         }
     }
     
+    func setManualMarkChatAsUnread(chatroomId: String) {
+        chatsMarkAsUnread?.insert(chatroomId)
+        securedStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
+    }
+    
+    func removeManualMarkChatAsUnread(chatroomId: String) {
+        chatsMarkAsUnread?.remove(chatroomId)
+        securedStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
+    }
+    
+    func getMarkAdressesFromChain() -> Set<String> {
+        return securedStore.get(StoreKey.chatProvider.markedChatsAsUnread) ?? Set()
+    }
+                                
     func isChatLoading(with addressRecipient: String) -> Bool {
         chatLoadingStatusDictionary[addressRecipient] == .loading
     }
@@ -1862,14 +1880,23 @@ extension AdamantChatsProvider {
         receivedLastHeight = height
     }
     
-    @MainActor 
-    func updateLastTransactionForChatrooms(_ rooms: [Chatroom]) {
+    @MainActor
+    func updateLastTransactionForChatrooms(_ rooms: [Chatroom]) async {
         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
         }
         
         for chatroom in viewContextChatrooms {
             chatroom.updateLastTransaction()
+        }
+        let addresses = await getMarkAdressesFromChain()
+        
+        for chatroom in viewContextChatrooms {
+            if let address = chatroom.partner?.address,
+               addresses.contains(address) {
+                chatroom.markAsUnread()
+                try? chatroom.managedObjectContext?.save()
+            }
         }
     }
 }
