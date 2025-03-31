@@ -13,12 +13,11 @@ import AdamantWalletsKit
 
 protocol WalletStaticCoreProtocol {
     static var currencySymbol: String { get }
-    static var currencyLogo: UIImage { get }
-    static var qqPrefix: String { get }
 }
+
 extension WalletStaticCoreProtocol {
     static var coinInfo: CoinInfoDTO? {
-        CoinInfoProvider.coins[currencySymbol]
+        CoinInfoProvider.storage?[currencySymbol]
     }
     
     static var fixedFee: Decimal {

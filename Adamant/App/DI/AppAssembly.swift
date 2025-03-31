@@ -11,6 +11,7 @@ import BitcoinKit
 import CommonKit
 import FilesStorageKit
 import FilesPickerKit
+import AdamantWalletsKit
 
 struct AppAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
@@ -435,8 +436,21 @@ struct AppAssembly: MainThreadAssembly {
             ChatPreservation()
         }.inObjectScope(.container)
         
+        // MARK: Wallet storage
+        // Should be registered before WalletServiceCompose
+        container.register(AnyTokensStorage.self) { _ in
+            TokensStorage()
+        }
+        .inObjectScope(.container)
+        .initCompleted { _, storage in
+            ERC20Token.supportedTokens = ERC20TokenAssembly.getERC20Tokens(tokensStorage: storage)
+            CoinInfoProvider.storage = storage
+        }
+        container.resolve(AnyTokensStorage.self)?
+            .loadTokens()
+        
         // MARK: Wallet Service Compose
-        container.register(WalletServiceCompose.self) { r in
+        container.register(WalletServiceCompose.self) { _ in
             var wallets: [WalletCoreProtocol] = [
                 AdmWalletService(),
                 BtcWalletService(),
