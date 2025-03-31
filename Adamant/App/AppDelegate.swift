@@ -60,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - Lifecycle
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {        
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // MARK: 1. Initiating Swinject
         container = AppContainer()
         screensFactory = AdamantScreensFactory(assembler: container.assembler)
@@ -290,6 +290,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: 9. Notifications
         pushNotificationsTokenService.sendTokenDeletionTransactions()
         UNUserNotificationCenter.current().delegate = self
+        
+        setupInitialUserDefaults()
         
         return true
     }
@@ -703,6 +705,10 @@ extension AppDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             newChat.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
         }
+    }
+    
+    func setupInitialUserDefaults() {
+        UserDefaultsManager.setInitialUserDefaults()
     }
 }
 

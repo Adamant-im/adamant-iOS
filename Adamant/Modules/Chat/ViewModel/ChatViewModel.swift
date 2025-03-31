@@ -41,6 +41,7 @@ final class ChatViewModel: NSObject {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
+    private let visibleWalletsService: VisibleWalletsService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -65,6 +66,7 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) private var needsToShowNoActiveNodesAlert: Bool?
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = [] {
@@ -98,6 +100,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let didTapAdmNodesList = ObservableSender<Void>()
+    let didTapShowTimeSettings = ObservableSender<Void>()
     let closeScreen = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
@@ -191,7 +194,8 @@ final class ChatViewModel: NSObject {
         filesStorageProprieties: FilesStorageProprietiesProtocol,
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
-        filesPicker: FilesPickerProtocol
+        filesPicker: FilesPickerProtocol,
+        visibleWalletsService: VisibleWalletsService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -214,6 +218,7 @@ final class ChatViewModel: NSObject {
         self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
+        self.visibleWalletsService = visibleWalletsService
         
         super.init()
         setupObservers()
@@ -517,6 +522,12 @@ final class ChatViewModel: NSObject {
                 switch error as? ChatsProviderError {
                 case .invalidTransactionStatus:
                     break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.richError(error))
+                    }
                 default:
                     dialog.send(.richError(error))
                 }
@@ -993,7 +1004,18 @@ final class ChatViewModel: NSObject {
     
     func checkForADMNodesAvailability() {
         if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
+            guard needsToShowNoActiveNodesAlert == true else { return }
             dialog.send(.noActiveNodesAlert)
+            needsToShowNoActiveNodesAlert = false
+        } else {
+            needsToShowNoActiveNodesAlert = true
+        }
+    }
+    
+    func checkUpdateState() {
+        Task { @MainActor in
+            let isUpdating = await chatsProvider.state.isUpdating
+            self.isHeaderLoading = isUpdating
         }
     }
 }
@@ -1157,9 +1179,9 @@ private extension ChatViewModel {
             }
             .store(in: &subscriptions)
         
-        NotificationCenter.default
-            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
-            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
+        visibleWalletsService.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {
@@ -1452,7 +1474,7 @@ private extension ChatViewModel {
             }
         case let .serverError(error):
             if case .timestampIsInTheFuture = error {
-                dialog.send(.error(.adamant.alert.timeAheadError, supportEmail: false))
+                dialog.send(.timestampIsInTheFuture)
             }
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
             break

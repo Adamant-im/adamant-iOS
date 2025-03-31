@@ -77,6 +77,8 @@ private extension ChatDialogManager {
             showFreeTokenAlert()
         case .noActiveNodesAlert:
             showNoActiveNodesAlert()
+        case .timestampIsInTheFuture:
+            showTimestampAlert()
         case let .removeMessageAlert(id):
             showRemoveMessageAlert(id: id)
         case let .reportMessageAlert(id):
@@ -211,6 +213,25 @@ private extension ChatDialogManager {
         alert.addAction(cancelButton)
         alert.modalPresentationStyle = .overFullScreen
         dialogService.present(alert, animated: true, completion: nil)
+    }
+    
+    func showTimestampAlert() {
+        dialogService.showAlert(
+            title: .adamant.chat.timestampIsInTheFutureTitle,
+            message: .adamant.chat.timestampIsInTheFuture,
+            style: .alert,
+            actions: [
+                .init(
+                    title: .adamant.chat.timeSettings,
+                    style: .destructive,
+                    handler: { [weak self] _ in
+                        self?.viewModel.didTapShowTimeSettings.send(())
+                    }
+                ),
+                UIAlertAction(title: .adamant.alert.cancel, style: .default)
+            ],
+            from: nil
+        )
     }
     
     func showFreeTokenAlert() {
