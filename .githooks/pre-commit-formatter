@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Format staged files using adamant-cli
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(swift|m|h|c|cpp|js|ts|json|py)$')
+
+if [ -n "$STAGED_FILES" ]; then
+    echo "Formatting staged files..."
+    echo "$STAGED_FILES" | xargs adamant-cli format staged
+
+    # Add formatted files back to staging
+    echo "$STAGED_FILES" | xargs git add
+else
+    echo "No staged files to format."
+fi
+
+exit 0
