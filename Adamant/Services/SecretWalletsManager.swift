@@ -76,8 +76,8 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     }
     
     func removeAllSecretWallets() {
-        lock.lock()
-        defer { lock.unlock() }
-        state.secretWallets.removeAll()
+        _state.mutate {
+            $0.secretWallets.removeAll()
+        }
     }
 }
