@@ -507,6 +507,7 @@ final class AdmWalletServiceTests: XCTestCase {
         setupAccountService()
         let (room, account) = setupCoreDataEntities(accountPublicKey: Constants.recipientPublicKeyAddress)
         await MainActor.run {
+            
             accountsProviderMock.given(.getAccount(byAddress: .any, willReturn: account))
         }
         adamantCoreMock.given(.sign(transaction: .any, senderId: .any, keypair: .any, willReturn: "signature"))
