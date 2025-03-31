@@ -329,6 +329,11 @@ private extension ChatViewController {
             .removeDuplicates()
             .sink { [weak self] _ in
                 self?.updateMessages()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.messagesUpdated
+            .sink { [weak self] _ in
                 self?.updateMessagesPosition()
             }
             .store(in: &subscriptions)
@@ -415,12 +420,14 @@ private extension ChatViewController {
             .sink { [weak self] in self?.processFileToolbarView($0) }
             .store(in: &subscriptions)
         
-        viewModel.$scrollToMessage
+        viewModel.$scrollToIdAndPosition
             .sink { [weak self] in
-                guard let toId = $0
+                guard let idAndPosition = $0
                 else { return }
                 
-                self?.scrollToPosition(.messageId(toId), animated: false)
+                self?.scrollToPosition = idAndPosition.position
+                self?.scrollToPosition(.messageId(idAndPosition.id), animated: false, setExtraOffset: self?.scrollToPosition == .top)
+                self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
         
@@ -762,10 +769,12 @@ private extension ChatViewController {
     func updateMessagesPosition() {
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
         messagesLoaded = true
-        if let position = viewModel.startPosition {
-            scrollToPosition(position)
-        } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-            scrollToPosition(.messageId(unreadMessage), animated: false)
+        if viewModel.messageIdToShow == nil {
+            if let unreadMessage = viewModel.unreadMessagesIds?.first {
+                scrollToPosition(.messageId(unreadMessage), setExtraOffset: true)
+            } else if let position = viewModel.startPosition {
+                scrollToPosition(position)
+            }
         }
     }
     
@@ -921,7 +930,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -945,6 +954,10 @@ private extension ChatViewController {
                 animated: animated
             )
             
+            if setExtraOffset {
+                setExtraOffsetForNewMessages()
+            }
+            
             viewModel.needToAnimateCellIndex = needToAnimateCell
             ? index
             : nil
@@ -959,6 +972,17 @@ private extension ChatViewController {
         
         guard !viewAppeared else { return }
         chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
+    }
+    
+    func setExtraOffsetForNewMessages() {
+        //extra scroll to 120 to see newMessage line and 2 strings from previus message
+        let newOffsetY = max(
+            messagesCollectionView.contentOffset.y - 120,
+            0
+        )
+        let newOffset = CGPoint(x: messagesCollectionView.contentOffset.x, y: newOffsetY)
+        
+        messagesCollectionView.setContentOffset(newOffset, animated: false)
     }
     
     func scrollDownOnNewMessageIfNeeded(previousBottomMessageId: String?) {
