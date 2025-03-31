@@ -26,6 +26,7 @@ public struct CoinInfoDTO: Codable {
     public let blockTimeFixed: Int?
     public let reliabilityGasPricePercent: Int?
     public let reliabilityGasLimitPercent: Int?
+    public let increasedGasPricePercent: Int?
     public let defaultGasPriceGwei: Int?
     public let defaultGasLimit: Int?
     public let warningGasPriceGwei: Int?
@@ -36,7 +37,8 @@ public struct CoinInfoDTO: Codable {
     public let tor: Tor?
     public let txFetchInfo: TxFetchInfo?
     public let timeout: Timeout?
-
+    public let contractId: String?
+    
     public struct Node: Codable {
         public let url: String
         public let altIP: String?
@@ -64,6 +66,7 @@ public struct CoinInfoDTO: Codable {
 
     public struct Services: Codable {
         public let infoService: Service?
+        public let klyService: Service?
         public let ipfsNode: Service?
     }
 
