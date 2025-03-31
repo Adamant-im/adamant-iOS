@@ -38,6 +38,7 @@ public struct CoinInfoDTO: Codable {
     public let txFetchInfo: TxFetchInfo?
     public let timeout: Timeout?
     public let contractId: String?
+    public let txConsistencyMaxTime: Int?
     
     public struct Node: Codable {
         public let url: String

@@ -85,7 +85,7 @@ extension WalletStaticCoreProtocol {
     }
     
     var consistencyMaxTime: Double {
-        Double(Self.coinInfo?.txFetchInfo?.newPendingInterval ?? 0) / 1000.0
+        Double(Self.coinInfo?.txConsistencyMaxTime ?? 0) / 1000.0
     }
     
     var minBalance: Decimal {
@@ -113,10 +113,10 @@ extension WalletStaticCoreProtocol {
     }
     
     static var explorerAddress: String {
-        coinInfo?.explorerAddress ?? ""
+        coinInfo?.explorerAddress?.replacingOccurrences(of: "${ID}", with: "") ?? ""
     }
     static var explorerTx: String {
-        coinInfo?.explorer ?? ""
+        coinInfo?.explorerTx?.replacingOccurrences(of: "${ID}", with: "") ?? ""
     }
     
     static var nodes: [Node] {
