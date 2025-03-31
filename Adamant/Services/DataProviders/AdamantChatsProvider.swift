@@ -23,7 +23,7 @@ actor AdamantChatsProvider: ChatsProvider {
     
     let accountService: AccountService
     let accountsProvider: AccountsProvider
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     let apiService: AdamantApiServiceProtocol
     let stack: CoreDataStack
     
@@ -79,7 +79,7 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         walletServiceCompose: WalletServiceCompose
     ) {
         self.accountService = accountService
@@ -1409,7 +1409,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    @MainActor func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
+    func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()
         }

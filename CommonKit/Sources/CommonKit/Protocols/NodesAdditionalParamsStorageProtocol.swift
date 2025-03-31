@@ -6,7 +6,7 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-// MARK: - SecuredStore keys
+// MARK: - SecureStore keys
 public extension StoreKey {
     enum NodesAdditionalParamsStorage {
         public static let fastestNodeMode = "nodesAdditionalParamsStorage.fastestNodeMode"

@@ -1,5 +1,5 @@
 //
-//  SecuredStore.swift
+//  SecureStore.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 04.03.2018.
@@ -14,9 +14,9 @@ public enum StoreKey {}
 // MARK: - Notifications
 
 public extension Notification.Name {
-    enum SecuredStore {
+    enum SecureStore {
         /// Raised when store is purged
-        public static let securedStorePurged = Notification.Name("adamant.SecuredStore.purged")
+        public static let securedStorePurged = Notification.Name("adamant.SecureStore.purged")
     }
 }
 
@@ -68,7 +68,8 @@ public extension StoreKey {
     }
 }
 
-public protocol SecuredStore: AnyObject, Sendable {
+// sourcery: AutoMockable
+public protocol SecureStore: AnyObject, Sendable {
     func get<T: Decodable>(_ key: String) -> T?
     func set<T: Encodable>(_ value: T, for key: String)
 

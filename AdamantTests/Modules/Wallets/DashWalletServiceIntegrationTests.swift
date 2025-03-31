@@ -42,14 +42,18 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
     }
     
     func test_createAndSendTransaction_createsValidTxIdAndHash() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashGetUnspentTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(data),
+                data: data,
+                code: 200
+            )))
         }
         
-        // when 1
+        // WHEN 1
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.recipient,
@@ -59,25 +63,30 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
             )
         })
         
-        // then 1
+        // THEN 1
         let transaction = try XCTUnwrap(result.value)
         XCTAssertEqual(transaction.serialized().hex, Constants.expectedTransactionHex)
         XCTAssertEqual(transaction.txID, Constants.expectedTransactionID)
         
-        // given 2
+        // GIVEN 2
         let txData = Constants.sendTransactionResponseData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashSendRawTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(txData),
+                data: txData,
+                code: 200
+            )))
         }
         
-        // when 2
+        // WHEN 2
         let result2 = await Result {
             try await self.sut.sendTransaction(transaction)
         }
-        // then 2
+        // THEN 2
         XCTAssertNil(result2.error)
         await apiCoreMock.isolated { mock in
-            XCTAssertEqual(mock.invokedSendRequestBasicGenericCount, 2)
+            mock.verify(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashGetUnspentTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any), count: 1)
+            mock.verify(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashSendRawTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any), count: 1)
         }
     }
 }

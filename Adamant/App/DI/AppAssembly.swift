@@ -31,7 +31,7 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Secured Store
-        container.register(SecuredStore.self) { _ in
+        container.register(SecureStore.self) { _ in
             KeychainStore(secureStorage: AdamantSecureStorage())
         }.inObjectScope(.container)
         
@@ -56,7 +56,7 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: Notifications
         container.register(NotificationsService.self) { r in
             AdamantNotificationsService(
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 vibroService: r.resolve(VibroService.self)!
             )
         }.initCompleted { (r, c) in    // Weak reference
@@ -68,7 +68,7 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: VisibleWalletsService
         container.register(VisibleWalletsService.self) { r in
             AdamantVisibleWalletsService(
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
@@ -87,7 +87,7 @@ struct AppAssembly: MainThreadAssembly {
             SecretWalletsFactory(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
                 accountService: r.resolve(AccountService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -107,14 +107,14 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
         
         // MARK: EmojiService
         container.register(EmojiService.self) { r in
             AdamantEmojiService(
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -126,14 +126,14 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: CrashlysticsService
         container.register(CrashlyticsService.self) { r in
             AdamantCrashlyticsService(
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
         
         // MARK: PushNotificationsTokenService
         container.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!
@@ -143,7 +143,7 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: NodesStorage
         container.register(NodesStorageProtocol.self) { r in
             NodesStorage(
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 nodesMergingService: r.resolve(NodesMergingServiceProtocol.self)!,
                 defaultNodes: { [provider = r.resolve(DefaultNodesProvider.self)!] groups in
                     provider.get(groups)
@@ -153,7 +153,7 @@ struct AppAssembly: MainThreadAssembly {
         
         // MARK: NodesAdditionalParamsStorage
         container.register(NodesAdditionalParamsStorageProtocol.self) { r in
-            NodesAdditionalParamsStorage(securedStore: r.resolve(SecuredStore.self)!)
+            NodesAdditionalParamsStorage(securedStore: r.resolve(SecureStore.self)!)
         }.inObjectScope(.container)
         
         // MARK: ApiCore
@@ -237,7 +237,7 @@ struct AppAssembly: MainThreadAssembly {
         
         // MARK: DashLastTransactionStorage
         container.register(DashLastTransactionStorageProtocol.self) { r in
-            DashLastTransactionStorage(securedStore: r.resolve(SecuredStore.self)!)
+            DashLastTransactionStorage(securedStore: r.resolve(SecureStore.self)!)
         }.inObjectScope(.container)
         
         // MARK: LskNodeApiService
@@ -298,7 +298,7 @@ struct AppAssembly: MainThreadAssembly {
             AdamantAccountService(
                 apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
                 currencyInfoService: r.resolve(InfoServiceProtocol.self)!,
                 coreDataStack: r.resolve(CoreDataStack.self)!,
@@ -349,7 +349,7 @@ struct AppAssembly: MainThreadAssembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
             )
@@ -369,7 +369,7 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: FilesStorageProprietiesService
         container.register(FilesStorageProprietiesProtocol.self) { r in
             FilesStorageProprietiesService(
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -383,7 +383,7 @@ struct AppAssembly: MainThreadAssembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!,
+                securedStore: r.resolve(SecureStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)

@@ -49,6 +49,7 @@ final class EthWalletServiceTests: XCTestCase {
         sut.increaseFeeService = increaseFeeServiceMock
         sut.setWalletForTests(walletStorage.getWallet())
         sut.ethApiService = ethApiMock
+        increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
     }
     
     override func tearDown() {
@@ -65,10 +66,10 @@ final class EthWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_noWalletThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(nil)
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -78,12 +79,12 @@ final class EthWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_createTransaction_invalidAddressThrowsError() async throws {
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.invalidEthAddress,
@@ -93,12 +94,12 @@ final class EthWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
     
     func test_createTransaction_invalidAmountThrowsError() async throws {
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -108,12 +109,12 @@ final class EthWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .invalidAmount(.nan))
     }
     
     func test_createTransaction_noKeystoreManagerThrowsError() async throws {
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -123,7 +124,7 @@ final class EthWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         switch result.error as? WalletServiceError {
         case .internalError?:
             break
@@ -133,11 +134,11 @@ final class EthWalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_correctFields() async throws {
-        // given
+        // GIVEN
         await setupKeyStoreManager()
         makeTransactionsCountMock()
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -147,7 +148,7 @@ final class EthWalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertNil(result.error)
         let transaction = try XCTUnwrap(result.value)
         XCTAssertEqual(transaction.from?.address, Constants.ethAddress)
@@ -159,12 +160,12 @@ final class EthWalletServiceTests: XCTestCase {
     }
     
     func test_createAndSendTransaction_sendsCorrectData() async throws {
-        // given
+        // GIVEN
         var didCallSendMock = false
         await setupKeyStoreManager()
         makeTransactionsCountMock()
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -183,7 +184,7 @@ final class EthWalletServiceTests: XCTestCase {
             try await self.sut.sendTransaction(transaction)
         }
         
-        // then
+        // THEN
         XCTAssertNil(sendResult.error)
         XCTAssertTrue(ethMock.invokedSendRaw)
         XCTAssertTrue(didCallSendMock)

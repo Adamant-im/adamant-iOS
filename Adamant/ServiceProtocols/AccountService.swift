@@ -147,6 +147,7 @@ extension AccountServiceError: RichError {
 }
 
 // MARK: - Protocol
+// sourcery: AutoMockable
 protocol AccountService: AnyObject, Sendable {
     // MARK: State
     

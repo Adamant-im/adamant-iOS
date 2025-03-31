@@ -22,7 +22,7 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
     }
     
     private var subscription: AnyCancellable?
-    private let securedStore: SecuredStore
+    private let securedStore: SecureStore
     private let defaultNodes: DefaultNodesGetter
     
     public func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
@@ -99,7 +99,7 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
     }
     
     public init(
-        securedStore: SecuredStore,
+        securedStore: SecureStore,
         nodesMergingService: NodesMergingServiceProtocol,
         defaultNodes: @escaping DefaultNodesGetter
     ) {
@@ -138,7 +138,7 @@ private extension NodesStorage {
     }
 }
 
-private func migrateOldNodesData(securedStore: SecuredStore) -> [NodeGroup: [Node]]? {
+private func migrateOldNodesData(securedStore: SecureStore) -> [NodeGroup: [Node]]? {
     let dto: SafeDecodingArray<OldNodeKeychainDTO>? = securedStore.get(StoreKey.NodesStorage.nodes)
     guard let dto = dto else { return nil }
     var result: [NodeGroup: [Node]] = [:]

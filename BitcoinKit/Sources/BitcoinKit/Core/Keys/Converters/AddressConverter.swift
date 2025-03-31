@@ -7,6 +7,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 public protocol AddressConverter {
     func convert(address: String) throws -> Address
     func convert(lockingScriptPayload: Data, type: ScriptType) throws -> Address

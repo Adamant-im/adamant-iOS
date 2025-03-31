@@ -22,7 +22,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return AdamantProvider()
     }()
     
-    private lazy var keychain: SecuredStore = {
+    private lazy var keychain: SecureStore = {
         KeychainStore(secureStorage: AdamantSecureStorage())
     }()
     

@@ -48,6 +48,7 @@ enum AccountsProviderDummyAccountError: Error {
     case internalError(Error)
 }
 
+// sourcery: AutoMockable
 @MainActor
 protocol AccountsProvider: Sendable {
     
@@ -60,12 +61,6 @@ protocol AccountsProvider: Sendable {
     ///
     /// - Returns: Account, if found, created in main viewContext
     func getAccount(byAddress address: String, publicKey: String) async throws -> CoreDataAccount
-    
-    /* That one bugged. Will be fixed later. Maybe. */
-    /// Search for fetched account, if not found, asks server for account.
-    ///
-    /// - Returns: Account, if found, created in main viewContext
-//    func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Check locally if has account with specified address
     func hasAccount(address: String) async -> Bool

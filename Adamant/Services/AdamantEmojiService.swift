@@ -13,7 +13,7 @@ import CommonKit
 final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     // MARK: Dependencies
     
-    let securedStore: SecuredStore
+    let securedStore: SecureStore
     
     // MARK: Proprieties
     
@@ -25,7 +25,7 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     
     // MARK: Lifecycle
     
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecureStore) {
         self.securedStore = securedStore
         
         NotificationCenter.default

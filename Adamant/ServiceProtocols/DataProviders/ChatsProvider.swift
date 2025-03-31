@@ -199,7 +199,7 @@ extension AdamantUserInfoKey {
     }
 }
 
-// MARK: - SecuredStore keys
+// MARK: - SecureStore keys
 extension StoreKey {
     struct chatProvider {
         static let address = "chatProvider.address"
@@ -210,7 +210,7 @@ extension StoreKey {
     }
 }
 
-// MARK: - Protocol
+// sourcery: AutoMockable
 protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }

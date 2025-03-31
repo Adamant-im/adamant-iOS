@@ -18,7 +18,7 @@ class NotificationService: UNNotificationServiceExtension {
         return AdamantProvider()
     }()
     
-    private lazy var securedStore: SecuredStore = {
+    private lazy var securedStore: SecureStore = {
         KeychainStore(secureStorage: AdamantSecureStorage())
     }()
 
@@ -323,7 +323,7 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
     
-    private func getSound(securedStore: SecuredStore, isReaction: Bool) -> UNNotificationSound? {
+    private func getSound(securedStore: SecureStore, isReaction: Bool) -> UNNotificationSound? {
         let key = isReaction 
         ? StoreKey.notificationsService.notificationsReactionSound
         : StoreKey.notificationsService.notificationsSound

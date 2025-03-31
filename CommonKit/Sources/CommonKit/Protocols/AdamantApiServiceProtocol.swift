@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 
+// sourcery: AutoMockable
 public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - Accounts
     func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount>
@@ -21,27 +22,27 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     
     // MARK: - Transactions
     
-    func getTransaction(id: UInt64) async -> ApiServiceResult<Transaction>
-    func getTransaction(id: UInt64, withAsset: Bool) async -> ApiServiceResult<Transaction>
+    func getTransaction(id: UInt64) async -> ApiServiceResult<CommonKit.Transaction>
+    func getTransaction(id: UInt64, withAsset: Bool) async -> ApiServiceResult<CommonKit.Transaction>
     
     func getTransactions(
         forAccount: String,
-        type: TransactionType,
+        type: CommonKit.TransactionType,
         fromHeight: Int64?,
         offset: Int?,
         limit: Int?,
         waitsForConnectivity: Bool
-    ) async -> ApiServiceResult<[Transaction]>
+    ) async -> ApiServiceResult<[CommonKit.Transaction]>
     
     func getTransactions(
         forAccount account: String,
-        type: TransactionType,
+        type: CommonKit.TransactionType,
         fromHeight: Int64?,
         offset: Int?,
         limit: Int?,
         orderByTime: Bool?,
         waitsForConnectivity: Bool
-    ) async -> ApiServiceResult<[Transaction]>
+    ) async -> ApiServiceResult<[CommonKit.Transaction]>
     
     // MARK: - Chats Rooms
     
@@ -89,7 +90,7 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         height: Int64?,
         offset: Int?,
         waitsForConnectivity: Bool
-    ) async -> ApiServiceResult<[Transaction]>
+    ) async -> ApiServiceResult<[CommonKit.Transaction]>
     
     func sendTransaction(
         path: String,

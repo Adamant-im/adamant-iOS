@@ -57,6 +57,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         web3ProviderMock.session = session
         increaseFeeServiceMock = IncreaseFeeServiceMock()
 
+        increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
         sut = ERC20WalletService(token: Constants.token)
         sut.setWalletForTests(eWallet)
         sut.increaseFeeService = increaseFeeServiceMock
@@ -76,10 +77,10 @@ final class ERC20WalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_noWalletThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(nil)
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -89,12 +90,12 @@ final class ERC20WalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
     
     func test_createTransaction_invalidRecipientAddressThrowsError() async throws {
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.invalidEthAddress,
@@ -104,15 +105,15 @@ final class ERC20WalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
     
     func test_createTransaction_noKeystoreThrowsError() async throws {
-        // given
+        // GIVEN
         erc20ApiMock.keystoreManager = nil
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -122,7 +123,7 @@ final class ERC20WalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         switch result.error as? WalletServiceError {
         case .internalError:
             break
@@ -132,14 +133,14 @@ final class ERC20WalletServiceTests: XCTestCase {
     }
     
     func test_createTransaction_correctFields() async throws {
-        // given
+        // GIVEN
         makeTransactionsCountMock()
         var calledMakeDecimals = false
         makeDecimalsMock {
             calledMakeDecimals = true
         }
         
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -149,7 +150,7 @@ final class ERC20WalletServiceTests: XCTestCase {
             )
         })
         
-        // then
+        // THEN
         XCTAssertTrue(calledMakeDecimals)
         XCTAssertNil(result.error)
         let transaction = try XCTUnwrap(result.value)
