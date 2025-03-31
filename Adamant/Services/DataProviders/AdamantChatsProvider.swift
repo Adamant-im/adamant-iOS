@@ -1319,6 +1319,7 @@ extension AdamantChatsProvider {
                     || text.contains("Transaction is already processed")
             else {
                 transaction.statusEnum = .failed
+                transaction.chatroom?.updatedAt = NSDate()
                 throw handleTransactionError(error, recipientId: recipientId)
             }
             
