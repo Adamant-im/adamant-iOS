@@ -1,6 +1,7 @@
 sources:
   - ./Adamant/
   - ./CommonKit/
+  - ./BitcoinKit/
 templates:
   - ./Templates/sourcery/Mock.swifttemplate
 output:
@@ -10,6 +11,9 @@ args:
     - CommonKit
     - CoreData
     - XCTest
+    - Alamofire
+    - BitcoinKit
+    - LiskKit
   testable:
     - Adamant
     - SwiftyMocky

@@ -49,6 +49,7 @@ final class EthWalletServiceTests: XCTestCase {
         sut.increaseFeeService = increaseFeeServiceMock
         sut.setWalletForTests(walletStorage.getWallet())
         sut.ethApiService = ethApiMock
+        increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
     }
     
     override func tearDown() {

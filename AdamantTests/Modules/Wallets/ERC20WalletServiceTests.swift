@@ -57,6 +57,7 @@ final class ERC20WalletServiceTests: XCTestCase {
         web3ProviderMock.session = session
         increaseFeeServiceMock = IncreaseFeeServiceMock()
 
+        increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
         sut = ERC20WalletService(token: Constants.token)
         sut.setWalletForTests(eWallet)
         sut.increaseFeeService = increaseFeeServiceMock

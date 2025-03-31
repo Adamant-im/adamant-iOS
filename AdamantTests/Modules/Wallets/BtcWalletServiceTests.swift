@@ -11,6 +11,7 @@ import XCTest
 import Swinject
 import BitcoinKit
 import CommonKit
+import SwiftyMocky
 
 final class BtcWalletServiceTests: XCTestCase {
     
@@ -31,16 +32,12 @@ final class BtcWalletServiceTests: XCTestCase {
         sut.addressConverter = addressConverterMock
         sut.btcApiService = btcApiServiceProtocolMock
         transactionFactoryMock = BitcoinKitTransactionFactoryProtocolMock()
-        transactionFactoryMock.stubbedTransactionFactory = {
-            BitcoinKit.Transaction.createNewTransaction(
-                toAddress: $0,
-                amount: $1,
-                fee: $2,
-                changeAddress: $3,
-                utxos: $4,
-                lockTime: $5,
-                keys: $6
-            )
+        Matcher.default.register((AddressProtocol & QRCodeConvertible).self) {
+            $0.lockingScript == $1.lockingScript
+            && $0.lockingScriptPayload == $1.lockingScriptPayload
+            && $0.scriptType == $1.scriptType
+            && $0.stringValue == $1.stringValue
+            && $0.qrcodeString == $1.qrcodeString
         }
         sut.btcTransactionFactory = transactionFactoryMock
     }
@@ -75,7 +72,7 @@ final class BtcWalletServiceTests: XCTestCase {
     func test_createTransaction_accountNotFoundThrowsError() async throws {
         // GIVEN
         sut.setWalletForTests(try makeWallet())
-        addressConverterMock.stubbedInvokedConvertAddressResult = .failure(NSError())
+        addressConverterMock.given(.convert(address: .any, willThrow: NSError()))
         
         // WHEN
         let result = await Result(catchingAsync: {
@@ -96,13 +93,13 @@ final class BtcWalletServiceTests: XCTestCase {
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
                 result: .success(data),
                 data: data,
                 code: 200
-            )
+            )))
         }
-        addressConverterMock.stubbedInvokedConvertAddressResult = .success(try makeDefaultAddress())
+        addressConverterMock.given(.convert(address: .any, willReturn: try makeDefaultAddress()))
         
         // WHEN
         let result = await Result(catchingAsync: {
@@ -122,9 +119,13 @@ final class BtcWalletServiceTests: XCTestCase {
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsCorruptedData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(data),
+                data: data,
+                code: 200
+            )))
         }
-        addressConverterMock.stubbedInvokedConvertAddressResult = .success(try makeDefaultAddress())
+        addressConverterMock.given(.convert(address: .any, willReturn: try makeDefaultAddress()))
         
         // WHEN
         let result = await Result(catchingAsync: {
@@ -149,10 +150,25 @@ final class BtcWalletServiceTests: XCTestCase {
         sut.setWalletForTests(try makeWallet(address: Constants.anotherBtcAddress))
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(data),
+                data: data,
+                code: 200
+            )))
         }
         let expectedToAddress = try makeDefaultAddress()
-        addressConverterMock.stubbedInvokedConvertAddressResult = .success(expectedToAddress)
+        let changeAddress = try XCTUnwrap(sut.btcWallet?.addressEntity)
+        let expectedTransaction = BitcoinKit.Transaction.createNewTransaction(
+            toAddress: expectedToAddress,
+            amount: 10,
+            fee: 1,
+            changeAddress: changeAddress,
+            utxos: Constants.expectedUnspentTransactions,
+            lockTime: 0,
+            keys: []
+        )
+        addressConverterMock.given(.convert(address: .any, willReturn: expectedToAddress))
+        transactionFactoryMock.given(.createTransaction(toAddress: .any, amount: .any, fee: .any, changeAddress: .any, utxos: .any, lockTime: .any, keys: .any, willReturn: expectedTransaction))
         
         // WHEN
         let result = await Result(catchingAsync: {
@@ -167,33 +183,27 @@ final class BtcWalletServiceTests: XCTestCase {
         // THEN
         XCTAssertNil(result.error)
         XCTAssertEqual(result.value, Constants.expectedTransaction)
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTransactionParameters?.amount,
-            10
-        )
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTransactionParameters?.fee,
-            1
-        )
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTransactionParameters?.utxos,
-            Constants.expectedUnspentTransactions
-        )
-        assertAddressesEqual(
-            try XCTUnwrap(transactionFactoryMock.invokedCreateTransactionParameters?.toAddress),
-            expectedToAddress
-        )
-        assertAddressesEqual(
-            try XCTUnwrap(transactionFactoryMock.invokedCreateTransactionParameters?.changeAddress),
-            try XCTUnwrap(sut.btcWallet?.addressEntity)
-        )
+
+        transactionFactoryMock.verify(.createTransaction(
+            toAddress: .value(expectedToAddress),
+            amount: .value(10),
+            fee: .value(1),
+            changeAddress: .value(changeAddress),
+            utxos: .value(Constants.expectedUnspentTransactions),
+            lockTime: .any,
+            keys: .any
+        ))
     }
     
     func test_sendTransaction_failIfTxIdCorrupted() async throws {
         // GIVEN
         let txData = try XCTUnwrap(Constants.anotherTransactionId.data(using: .utf8))
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(txData),
+                data: txData,
+                code: 200
+            )))
         }
         
         // WHEN
@@ -212,7 +222,11 @@ final class BtcWalletServiceTests: XCTestCase {
         // GIVEN
         let txData = try XCTUnwrap(Constants.transactionId.data(using: .utf8))
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(txData),
+                data: txData,
+                code: 200
+            )))
         }
         
         // WHEN

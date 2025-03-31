@@ -82,6 +82,16 @@ final class KlyWalletServiceTests: XCTestCase {
         // GIVEN
         let wallet = try makeWallet()
         sut.setWalletForTests(wallet)
+//        let binaryAddress = try XCTUnwrap(LiskKit.Crypto.getBinaryAddressFromBase32(Constants.validKlyAddress))
+        let expectedTransaction = TransactionEntity().createTx(
+            amount: 10,
+            fee: 0.1,
+            nonce: 0,
+            senderPublicKey: Constants.senderPublicKey,
+            recipientAddressBinary: Constants.validKlyAddressBinary,
+            comment: ""
+        )
+        transactionFactoryMock.given(.createTx(amount: .any, fee: .any, nonce: .any, senderPublicKey: .any, recipientAddressBinary: .any, comment: .any, willReturn: expectedTransaction))
         
         // WHEN
         let result = await Swift.Result(catchingAsync: {
@@ -105,6 +115,26 @@ final class KlyWalletServiceTests: XCTestCase {
         // GIVEN
         let wallet = try makeWallet()
         sut.setWalletForTests(wallet)
+        
+        let binaryAddress = try XCTUnwrap(LiskKit.Crypto.getBinaryAddressFromBase32(Constants.validKlyAddress))
+        let expectedTransaction = TransactionEntity().createTx(
+            amount: 10,
+            fee: 0.1,
+            nonce: 0,
+            senderPublicKey: "",
+            recipientAddressBinary: binaryAddress,
+            comment: ""
+        )
+        transactionFactoryMock.given(.createTx(amount: .any, fee: .any, nonce: .any, senderPublicKey: .any, recipientAddressBinary: .any, comment: .any, willReturn: expectedTransaction))
+
+        let apiClient = APIClient.mainnet
+        
+        let json = #"{"transactionId": "txId"}"#
+        let submitModel = try JSONDecoder().decode(Transactions.TransactionSubmitModel.self, from: json.data(using: .utf8)!)
+        apiServiceMock.given(.requestTransactionsApi(.any(((Transactions) async throws -> Transactions.TransactionSubmitModel).self), willReturn: .success(submitModel)))
+        apiServiceMock.perform(.requestTransactionsApi(.any(((Transactions) async throws -> Transactions.TransactionSubmitModel).self), perform: { closure in
+            try await closure(Transactions.init(client: apiClient))
+        }))
         
         // WHEN 1
         let result = await Swift.Result(catchingAsync: {
@@ -200,28 +230,14 @@ private extension KlyWalletServiceTests {
         file: StaticString = #file,
         line: UInt = #line
     ) {
-        XCTAssertEqual(transactionFactoryMock.invokedCreateTxCount, 1, file: file, line: line)
-        XCTAssertEqual(transactionFactoryMock.invokedCreateTxParameters?.amount, 10, file: file, line: line)
-        XCTAssertEqual(transactionFactoryMock.invokedCreateTxParameters?.fee, 0.1, file: file, line: line)
-        XCTAssertEqual(transactionFactoryMock.invokedCreateTxParameters?.nonce, nonce, file: file, line: line)
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTxParameters?.recipientAddressBinary,
-            Constants.validKlyAddressBinary,
-            file: file,
-            line: line
-        )
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTxParameters?.senderPublicKey,
-            Constants.senderPublicKey,
-            file: file,
-            line: line
-        )
-        XCTAssertEqual(
-            transactionFactoryMock.invokedCreateTxParameters?.comment,
-            "",
-            file: file,
-            line: line
-        )
+        transactionFactoryMock.verify(.createTx(
+            amount: .value(10),
+            fee: .value(0.1),
+            nonce: .value(nonce),
+            senderPublicKey: .value(Constants.senderPublicKey),
+            recipientAddressBinary: .value(Constants.validKlyAddressBinary),
+            comment: .value("")
+        ), count: 1)
     }
     
     func checkTransaction(

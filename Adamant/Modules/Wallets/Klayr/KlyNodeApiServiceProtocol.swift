@@ -9,6 +9,7 @@
 import CommonKit
 import LiskKit
 
+// sourcery: AutoMockable
 protocol KlyNodeApiServiceProtocol: ApiServiceProtocol {
     
     func requestTransactionsApi<Output>(

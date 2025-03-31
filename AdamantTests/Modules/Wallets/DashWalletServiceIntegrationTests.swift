@@ -46,7 +46,11 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashGetUnspentTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(data),
+                data: data,
+                code: 200
+            )))
         }
         
         // WHEN 1
@@ -67,7 +71,11 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
         // GIVEN 2
         let txData = Constants.sendTransactionResponseData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashSendRawTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(txData),
+                data: txData,
+                code: 200
+            )))
         }
         
         // WHEN 2
@@ -77,7 +85,8 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
         // THEN 2
         XCTAssertNil(result2.error)
         await apiCoreMock.isolated { mock in
-            XCTAssertEqual(mock.invokedSendRequestBasicGenericCount, 2)
+            mock.verify(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashGetUnspentTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any), count: 1)
+            mock.verify(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any(DashSendRawTransactionDTO.self), encoding: .any, timeout: .any, downloadProgress: .any), count: 1)
         }
     }
 }

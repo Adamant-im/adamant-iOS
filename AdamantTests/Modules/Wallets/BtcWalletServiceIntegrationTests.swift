@@ -42,7 +42,11 @@ final class BtcWalletServiceIntegrationTests: XCTestCase {
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(data),
+                data: data,
+                code: 200
+            )))
         }
         
         // WHEN 1
@@ -63,7 +67,11 @@ final class BtcWalletServiceIntegrationTests: XCTestCase {
         // GIVEN 2
         let txData = try XCTUnwrap(transaction.txID.data(using: .utf8))
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any, willReturn: APIResponseModel(
+                result: .success(txData),
+                data: txData,
+                code: 200
+            )))
         }
         
         // WHEN 2
@@ -73,7 +81,7 @@ final class BtcWalletServiceIntegrationTests: XCTestCase {
         // THEN 3
         XCTAssertNil(result2.error)
         await apiCoreMock.isolated { mock in
-            XCTAssertEqual(mock.invokedSendRequestBasicGenericCount, 2)
+            mock.verify(.sendRequestBasic(origin: .any, path: .any, method: .any, parameters: .any([String: String].self), encoding: .any, timeout: .any, downloadProgress: .any), count: 2)
         }
     }
     

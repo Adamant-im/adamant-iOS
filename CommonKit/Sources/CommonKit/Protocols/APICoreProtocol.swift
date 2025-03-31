@@ -16,6 +16,7 @@ public enum TimeoutSize: CaseIterable, Hashable {
     case extended
 }
 
+// sourcery: AutoMockable
 public protocol APICoreProtocol: Actor {
     func sendRequestMultipartFormData(
         origin: NodeOrigin,
@@ -28,7 +29,7 @@ public protocol APICoreProtocol: Actor {
     func sendRequestBasic<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
         timeout: TimeoutSize,
@@ -39,7 +40,7 @@ public protocol APICoreProtocol: Actor {
     func sendRequestBasic(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         jsonParameters: Any,
         timeout: TimeoutSize
     ) async -> APIResponseModel
@@ -51,7 +52,7 @@ public extension APICoreProtocol {
     func sendRequest<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<Data> {
@@ -69,7 +70,7 @@ public extension APICoreProtocol {
     func sendRequest<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
         timeout: TimeoutSize,
@@ -89,7 +90,7 @@ public extension APICoreProtocol {
     func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<JSONOutput> {
@@ -165,7 +166,7 @@ public extension APICoreProtocol {
     func sendRequestJsonResponse<JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         jsonParameters: Any
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestBasic(

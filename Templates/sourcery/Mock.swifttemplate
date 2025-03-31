@@ -1059,6 +1059,33 @@ class MethodWrapper {
         }
     }
 
+    var isAnyParameterAsync: Bool {
+        var isAsync: Bool = false
+        for parameter in filteredParameters {
+            let typeName = parameter.typeName
+            if let closure = typeName.closure {
+                if closure.isAsync {
+                    isAsync = true
+                }
+            }
+        }
+        return isAsync
+    }
+
+    var isAnyParameterThrowing: Bool {
+        var isThrowing: Bool = false
+        for parameter in filteredParameters {
+            let typeName = parameter.typeName
+            if let closure = typeName.closure {
+                if closure.throws {
+                    isThrowing = true
+                    break
+                }
+            }
+        }
+        return isThrowing
+    }
+
     // Perform
     func performProxyConstructorName(prefix: String = "") -> String {
         let body: String = {
@@ -1082,19 +1109,24 @@ class MethodWrapper {
     }
 
     func performProxyClosureType() -> String {
+        let isAsync = isAnyParameterAsync
+        let isThrowing = isAnyParameterThrowing
         if filteredParameters.isEmpty {
-            return "() -> Void"
+            return "()\(isAsync ? " async" : "")\(isThrowing ? " throws" : "") -> Void"
         } else {
             let parameters = self.parameters
                 .map { "\($0.justPerformType)" }
                 .joined(separator: ", ")
-            return "(\(parameters)) -> Void"
+            return "(\(parameters))\(isAsync ? " async" : "")\(isThrowing ? " throws" : "") -> Void"
         }
     }
 
     func performProxyClosureCall() -> String {
+        let isAsync = isAnyParameterAsync
+        let isThrowing = isAnyParameterThrowing
+        let performCall: String
         if filteredParameters.isEmpty {
-            return "perform?()"
+            performCall = "perform?()"
         } else {
             let parameters = filteredParameters
                 .map { p in
@@ -1103,8 +1135,19 @@ class MethodWrapper {
                     return "\(p.inout ? "&" : "")`\(p.name)`\(isAutolosure ? "()" : "")"
                 }
                 .joined(separator: ", ")
-            return "perform?(\(parameters))"
+            performCall = "perform?(\(parameters))"
         }
+        return isAsync ?
+        """
+            var result: Any?
+            let semaphore = DispatchSemaphore(value: .zero)    
+            Task {
+                result = \(isThrowing ? "try " : "")await \(performCall)
+                semaphore.signal()
+            }
+            semaphore.wait()
+        """
+        : performCall
     }
 
     func performCall() -> String {
@@ -2178,7 +2221,6 @@ func generate(type: Type, idx: Int, methodRegistrar: MethodRegistrar, subscriptR
 
 <%_ } else { -%>
 <%_ } -%>
-// sourcery:end
 <%_ return (idx, sourceryBuffer) -%>
 <%_ } -%>
 
@@ -2232,7 +2274,6 @@ if contents.isEmpty {
             <%_ %><%= projectImport %>
         <%_ } -%>
     <%_ } -%>
-
 <%= content %>
 // sourcery:end
 <%_ } -%>
