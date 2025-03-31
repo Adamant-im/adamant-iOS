@@ -1323,6 +1323,7 @@ extension AdamantChatsProvider {
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
             transaction.statusEnum = .delivered
+            transaction.chatroom?.updatedAt = NSDate()
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
@@ -1337,6 +1338,7 @@ extension AdamantChatsProvider {
                     || text.contains("Transaction is already processed")
             else {
                 transaction.statusEnum = .failed
+                transaction.chatroom?.updatedAt = NSDate()
                 throw handleTransactionError(error, recipientId: recipientId)
             }
             

@@ -11,7 +11,6 @@ import FreakingSimpleRoundImageView
 import CommonKit
 
 final class ChatTableViewCell: UITableViewCell {
-    
     static var defaultAvatar: UIImage = .asset(named: "avatar-chat-placeholder") ?? .init()
     static let shortDescriptionTextSize: CGFloat = 15.0
     
@@ -23,15 +22,13 @@ final class ChatTableViewCell: UITableViewCell {
     @IBOutlet weak var badgeView: UIView!
     @IBOutlet weak var clockView: UIImageView!
     @IBOutlet weak var lastMessageLeadingAnchor: NSLayoutConstraint!
+    @IBOutlet weak var macOsImage: UIImageView!
     
     override func awakeFromNib() {
-        Task { @MainActor in
-            badgeView.layer.cornerRadius = badgeView.bounds.height / 2
-            clockView.contentMode = .scaleAspectFit
-            clockView.image = UIImage.asset(named: "status_pending")
-            clockView.tintColor = .adamant.secondary
-        }
+        badgeView.layer.cornerRadius = badgeView.bounds.height / 2
+        clockView.contentMode = .scaleAspectFit
     }
+    
     var avatarImage: UIImage? {
         get {
             return avatarImageView.image
@@ -77,17 +74,44 @@ final class ChatTableViewCell: UITableViewCell {
             badgeView.backgroundColor = newValue
         }
     }
-    var isClockVisible: Bool {
-        get {
-            return !clockView.isHidden
-        }
-        set {
-            if newValue {
-                clockView.isHidden = false
-                lastMessageLeadingAnchor.constant = 27
-            } else {
-                self.clockView.isHidden = true
-                self.lastMessageLeadingAnchor.constant = 10
+    
+    var messageStatus: MessageStatus = .delivered {
+        didSet {
+            let isPhone = UIDevice.current.userInterfaceIdiom == .phone
+            
+            switch messageStatus {
+            case .pending:
+                if isPhone {
+                    clockView.isHidden = false
+                    clockView.image = .asset(named: "status_pending")
+                    clockView.tintColor = .adamant.secondary
+                    macOsImage.isHidden = true
+                    lastMessageLeadingAnchor.constant = 27
+                } else {
+                    macOsImage.isHidden = false
+                    macOsImage.image = .asset(named: "status_pending")
+                    macOsImage.tintColor = .adamant.secondary
+                    clockView.isHidden = true
+                }
+                
+            case .failed:
+                if isPhone {
+                    clockView.isHidden = false
+                    clockView.image = .asset(named: "status_failed")
+                    clockView.tintColor = .adamant.attention
+                    macOsImage.isHidden = true
+                    lastMessageLeadingAnchor.constant = 27
+                } else {
+                    macOsImage.isHidden = false
+                    macOsImage.image = .asset(named: "status_failed")
+                    macOsImage.tintColor = .adamant.attention
+                    clockView.isHidden = true
+                }
+                
+            case .delivered:
+                clockView.isHidden = true
+                macOsImage.isHidden = true
+                lastMessageLeadingAnchor.constant = 10
             }
         }
     }

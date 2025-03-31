@@ -719,11 +719,10 @@ extension ChatListViewController {
            let preservedMessage = shortDescription(for: address) {
             cell.hasUnreadMessages = chatroom.hasUnreadMessages
             cell.lastMessageLabel.attributedText = preservedMessage
-            cell.isClockVisible = false
         } else if let lastTransaction = chatroom.lastTransaction {
             cell.hasUnreadMessages = chatroom.hasUnreadMessages
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
-            cell.isClockVisible = lastTransaction.statusEnum == .pending
+            cell.messageStatus = lastTransaction.statusEnum
         } else {
             cell.lastMessageLabel.text = nil
         }
