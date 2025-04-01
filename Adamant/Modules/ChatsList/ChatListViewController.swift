@@ -984,6 +984,7 @@ extension ChatListViewController {
         let buyAndSellVC = screensFactory.makeBuyAndSell()
         navigationController?.pushViewController(buyAndSellVC, animated: true)
     }
+    
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
@@ -992,15 +993,13 @@ extension ChatListViewController {
             }
             text = MessageProcessHelper.process(text)
             
-            var raw: String
-            if message.isOutgoing {
-                raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
-            } else {
-                raw = text
-            }
-            
-            var attributedText = markdownParser.parse(raw).resolveLinkColor()
+            var attributedText = markdownParser.parse(text).resolveLinkColor()
             attributedText = MessageProcessHelper.process(attributedText: attributedText)
+            
+            if message.isOutgoing {
+                let prefix = markdownParser.parse("\(String.adamant.chatList.sentMessagePrefix)")
+                attributedText.insert(prefix, at: 0)
+            }
             
             return attributedText
             
