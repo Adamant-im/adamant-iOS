@@ -103,12 +103,11 @@ private extension AccountHeaderView {
         badgeLabel.translatesAutoresizingMaskIntoConstraints = false
         bgView.addSubview(badgeLabel)
         
-        NSLayoutConstraint.activate([
-            badgeLabel.widthAnchor.constraint(equalToConstant: badgeSize),
-            badgeLabel.heightAnchor.constraint(equalToConstant: badgeSize),
-            badgeLabel.trailingAnchor.constraint(equalTo: bgView.trailingAnchor, constant: 0),
-            badgeLabel.bottomAnchor.constraint(equalTo: bgView.bottomAnchor, constant: 0)
-        ])
+        badgeLabel.snp.makeConstraints { make in
+            make.width.height.equalTo(badgeSize)
+            make.trailing.equalTo(bgView.snp.trailing)
+            make.bottom.equalTo(bgView.snp.bottom)
+        }
     }
 
     func addPersistentOutline() {
