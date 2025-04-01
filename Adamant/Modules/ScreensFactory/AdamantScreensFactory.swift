@@ -25,7 +25,7 @@ struct AdamantScreensFactory: ScreensFactory {
     private let onboardFactory: OnboardFactory
     private let shareQRFactory: ShareQRFactory
     private let accountFactory: AccountFactory
-    private let vibrationSelectionFactory: VibrationSelectionFactory
+    private let settingSelectionFactory: SettingSelectionFactory
     private let partnerQRFactory: PartnerQRFactory
     private let coinsNodesListFactory: CoinsNodesListFactory
     private let chatSelectTextFactory: ChatSelectTextViewFactory
@@ -46,7 +46,7 @@ struct AdamantScreensFactory: ScreensFactory {
         onboardFactory = .init()
         shareQRFactory = .init(assembler: assembler)
         accountFactory = .init(assembler: assembler)
-        vibrationSelectionFactory = .init(parent: assembler)
+        settingSelectionFactory = .init(parent: assembler)
         partnerQRFactory = .init(parent: assembler)
         coinsNodesListFactory = .init(parent: assembler)
         chatSelectTextFactory = .init()
@@ -193,8 +193,8 @@ struct AdamantScreensFactory: ScreensFactory {
         loginFactory.makeViewController(screenFactory: self)
     }
     
-    func makeVibrationSelection() -> UIViewController {
-        vibrationSelectionFactory.makeViewController()
+    func makeVibrationSelection(onSettingsSelect: @escaping (SettingsView.SettingsType) -> Void) -> UIViewController {
+        settingSelectionFactory.makeViewController(onSettingsSelect: onSettingsSelect)
     }
     
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController {

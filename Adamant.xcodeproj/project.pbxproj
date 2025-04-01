@@ -277,6 +277,9 @@
 		85930FFC2D8EF68300AC9D65 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */; };
 		85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
+		85DC0EA82D96C44A00B9CA2C /* TokensAndCoinsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DC0EA72D96C43A00B9CA2C /* TokensAndCoinsViewController.swift */; };
+		85DC0EAB2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DC0EAA2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift */; };
+		85DC0EAD2D96ED6000B9CA2C /* BlockchainTokensViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DC0EAC2D96ED5300B9CA2C /* BlockchainTokensViewController.swift */; };
 		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
 		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
@@ -395,8 +398,8 @@
 		93A91FD1297972B7001DB1F8 /* ChatScrollButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */; };
 		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */; };
-		93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06F2ACA66AF008ED641 /* VibrationSelectionView.swift */; };
-		93ADE0732ACA66AF008ED641 /* VibrationSelectionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE0702ACA66AF008ED641 /* VibrationSelectionFactory.swift */; };
+		93ADE0722ACA66AF008ED641 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06F2ACA66AF008ED641 /* SettingsView.swift */; };
+		93ADE0732ACA66AF008ED641 /* SettingSelectionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE0702ACA66AF008ED641 /* SettingSelectionFactory.swift */; };
 		93B28EC22B076D31007F268B /* DashApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC12B076D31007F268B /* DashApiService.swift */; };
 		93B28EC52B076E2C007F268B /* DashBlockchainInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC42B076E2C007F268B /* DashBlockchainInfoDTO.swift */; };
 		93B28EC82B076E68007F268B /* DashResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC72B076E68007F268B /* DashResponseDTO.swift */; };
@@ -1013,6 +1016,9 @@
 		85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesSortDescriptor.swift; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
+		85DC0EA72D96C43A00B9CA2C /* TokensAndCoinsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokensAndCoinsViewController.swift; sourceTree = "<group>"; };
+		85DC0EAA2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinInfoDTOViewController.swift; sourceTree = "<group>"; };
+		85DC0EAC2D96ED5300B9CA2C /* BlockchainTokensViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockchainTokensViewController.swift; sourceTree = "<group>"; };
 		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
 		9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationsTokenService.swift; sourceTree = "<group>"; };
@@ -1126,8 +1132,8 @@
 		93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionViewModel.swift; sourceTree = "<group>"; };
-		93ADE06F2ACA66AF008ED641 /* VibrationSelectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionView.swift; sourceTree = "<group>"; };
-		93ADE0702ACA66AF008ED641 /* VibrationSelectionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionFactory.swift; sourceTree = "<group>"; };
+		93ADE06F2ACA66AF008ED641 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		93ADE0702ACA66AF008ED641 /* SettingSelectionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingSelectionFactory.swift; sourceTree = "<group>"; };
 		93B28EC12B076D31007F268B /* DashApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashApiService.swift; sourceTree = "<group>"; };
 		93B28EC42B076E2C007F268B /* DashBlockchainInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashBlockchainInfoDTO.swift; sourceTree = "<group>"; };
 		93B28EC72B076E68007F268B /* DashResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashResponseDTO.swift; sourceTree = "<group>"; };
@@ -1940,6 +1946,16 @@
 			path = AccountViewController;
 			sourceTree = "<group>";
 		};
+		85DC0EA92D96EC9F00B9CA2C /* NodesAndTokensInfo */ = {
+			isa = PBXGroup;
+			children = (
+				85DC0EAA2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift */,
+				85DC0EAC2D96ED5300B9CA2C /* BlockchainTokensViewController.swift */,
+				85DC0EA72D96C43A00B9CA2C /* TokensAndCoinsViewController.swift */,
+			);
+			path = NodesAndTokensInfo;
+			sourceTree = "<group>";
+		};
 		9306E08E2CF8C4EF00A99BA4 /* PKGenerator */ = {
 			isa = PBXGroup;
 			children = (
@@ -2271,8 +2287,8 @@
 			isa = PBXGroup;
 			children = (
 				93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */,
-				93ADE06F2ACA66AF008ED641 /* VibrationSelectionView.swift */,
-				93ADE0702ACA66AF008ED641 /* VibrationSelectionFactory.swift */,
+				93ADE06F2ACA66AF008ED641 /* SettingsView.swift */,
+				93ADE0702ACA66AF008ED641 /* SettingSelectionFactory.swift */,
 			);
 			path = TestVibration;
 			sourceTree = "<group>";
@@ -3037,6 +3053,7 @@
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				85DC0EA92D96EC9F00B9CA2C /* NodesAndTokensInfo */,
 				9306E08E2CF8C4EF00A99BA4 /* PKGenerator */,
 				2621AB352C60E52900046D7A /* Notifications */,
 				411742FE2A39B1B1008CD98A /* Contribute */,
@@ -3625,7 +3642,7 @@
 				93A118532993241D00E144CC /* ChatMessagesListFactory.swift in Sources */,
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */,
-				93ADE0732ACA66AF008ED641 /* VibrationSelectionFactory.swift in Sources */,
+				93ADE0732ACA66AF008ED641 /* SettingSelectionFactory.swift in Sources */,
 				3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */,
 				937751AB2A68BB390054BD65 /* ChatTransactionCell.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
@@ -3677,10 +3694,12 @@
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
 				93FC16A12B01DE120062B507 /* ERC20ApiService.swift in Sources */,
 				AA7202E72D6B4B3500CCAC20 /* PasteInterceptingPasswordRow.swift in Sources */,
+				85DC0EA82D96C44A00B9CA2C /* TokensAndCoinsViewController.swift in Sources */,
 				3A299C692B838AA600B54C61 /* ChatMediaCell.swift in Sources */,
 				93294B9A2AAD624100911109 /* WalletFactoryCompose.swift in Sources */,
 				41C1698E29E7F36900FEB3CB /* AdamantRichTransactionReplyService.swift in Sources */,
 				649D6BF221C27D5C009E727B /* SearchResultsViewController.swift in Sources */,
+				85DC0EAB2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				3ACD30802BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift in Sources */,
 				AAC6414B2D417B5300619DFE /* DashLastTransactionStorage.swift in Sources */,
@@ -3752,6 +3771,7 @@
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				3A96E37C2AED27F8001F5A52 /* PartnerQRService.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
+				85DC0EAD2D96ED6000B9CA2C /* BlockchainTokensViewController.swift in Sources */,
 				3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */,
 				931224A92C7AA0E4009E0ED0 /* InfoServiceApiService+Extension.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
@@ -3999,7 +4019,7 @@
 				AA7202E52D6B4ABB00CCAC20 /* PasteInterceptingTextField.swift in Sources */,
 				93294B962AAD320B00911109 /* ScreensFactory.swift in Sources */,
 				3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */,
-				93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */,
+				93ADE0722ACA66AF008ED641 /* SettingsView.swift in Sources */,
 				931224B12C7ACFE6009E0ED0 /* InfoServiceAssembly.swift in Sources */,
 				648C696F22915A12006645F5 /* DashTransaction.swift in Sources */,
 				3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */,
