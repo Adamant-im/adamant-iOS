@@ -307,14 +307,16 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             wallet.balance = balance
             markBalanceAsFresh(wallet)
             
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
-            
             walletUpdateSender.send()
+        } else {
+            wallet.isBalanceInitialized = false
         }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
         
         setState(.upToDate)
         await calculateFee()
@@ -420,8 +422,6 @@ extension EthWalletService {
         
         let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
         walletStorage = .init(keystore: store, unicId: tokenUniqueID)
-        
-
         
         let eWallet = walletStorage?.getWallet()
         
