@@ -1003,9 +1003,9 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        let unavailableNodes: [NodeGroup] = NodeGroup.allCases.filter {
-            apiServiceCompose.get($0)?.hasEnabledNode == false
-        }
+        let unavailableNodes: Set<NodeGroup> = Set(NodeGroup.allCases.filter {
+            !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
+        })
         
         if unavailableNodes.contains(where: {
             $0.name == currentSelectedWalletItem?.currencyNetwork
@@ -1018,7 +1018,7 @@ final class AccountViewController: FormViewController {
         }
         
         Task { @MainActor in
-            await accountService.reloadWallets()
+            accountService.update()
             refreshControl.endRefreshing()
         }
     }
@@ -1044,7 +1044,25 @@ extension AccountViewController: AccountHeaderViewDelegate {
         }
         
         let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-        dialogService.presentShareAlertFor(title: nil, stringForPasteboard: address, stringForShare: encodedAddress, stringForQR: encodedAddress, types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)], excludedActivityTypes: ShareContentType.address.excludedActivityTypes, animated: true, from: from, completion: nil)
+        dialogService.presentShareAlertFor(
+            title: nil,
+            stringForPasteboard: address,
+            stringForShare: encodedAddress,
+            stringForQR: encodedAddress,
+            types: [
+                .copyToPasteboard,
+                .share,
+                .generateQr(
+                    encodedContent: encodedAddress,
+                    sharingTip: address,
+                    withLogo: true
+                )
+            ],
+            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+            animated: true,
+            from: from,
+            completion: nil
+        )
     }
 }
 

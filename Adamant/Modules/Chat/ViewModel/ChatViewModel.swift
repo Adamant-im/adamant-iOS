@@ -51,8 +51,8 @@ final class ChatViewModel: NSObject {
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
-    private var messageIdToShow: String?
     private var isLoading = false
+    var messageIdToShow: String?
     var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
@@ -115,6 +115,7 @@ final class ChatViewModel: NSObject {
     let enableScroll = ObservableSender<Bool>()
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
+    let messagesUpdated = ObservableSender<Void>()
     
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -133,7 +134,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToMessage: String?
+    @ObservableValue var scrollToIdAndPosition: (id: String, position: UICollectionView.ScrollPosition)?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -141,8 +142,8 @@ final class ChatViewModel: NSObject {
     }
     
     var startPosition: ChatStartPosition? {
-        if let messageIdToShow = messageIdToShow {
-            return .messageId(messageIdToShow, toBottomIfNotFound: false)
+        if messageIdToShow != nil {
+            return nil
         }
         
         guard let address = chatroom?.partner?.address else { return nil }
@@ -543,7 +544,11 @@ final class ChatViewModel: NSObject {
                 
                 await waitForMessage(withId: messageId)
                 
-                scrollToMessage = messageId
+                if let lastMessageId = messages.last?.id {
+                    let position: UICollectionView.ScrollPosition = (messageId == lastMessageId) ? .top : .bottom
+                    scrollToIdAndPosition = (id: messageId, position: position)
+                }
+                
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
                     markMessageAsRead(index: index)
@@ -1116,7 +1121,6 @@ private extension ChatViewModel {
             .removeDuplicates()
             .sink { [weak self] unreadIndexes in
                 self?.unreadMesaggesIndexes = unreadIndexes
-                self?.updateSeparatorId()
             }
             .store(in: &subscriptions)
         $messages
@@ -1279,15 +1283,17 @@ private extension ChatViewModel {
                 expirationTimestamp: &expirationTimestamp
             )
             
-            postProcess(messages: &messages)
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
+            postProcess(messages: &messages)
             
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            updateSeparatorId()
+            messagesUpdated.send()
         }
     }
     
@@ -1734,13 +1740,13 @@ private extension ChatViewModel {
     func updateSeparatorId() {
         guard !didAddSeparator, !messages.isEmpty else { return }
         
+        didAddSeparator = true
         guard let firstUnreadId = unreadMessagesIds?.first else {
             separatorId = nil
             separatorIndex = nil
             return
         }
         
-        didAddSeparator = true
         separatorId = firstUnreadId
         updateSeparatorIndex()
     }
