@@ -21,7 +21,7 @@ enum DefaultBtcTransferFee: Decimal {
 }
 
 struct BtcApiCommands {
-
+    
     static let blockchainInfoMethod: String = "getblockchaininfo"
     static let networkInfoMethod: String = "getnetworkinfo"
     
@@ -32,15 +32,15 @@ struct BtcApiCommands {
     static func getHeight() -> String {
         return "/blocks/tip/height"
     }
-
+    
     static func getFeeRate() -> String {
         return "/fee-estimates" //this._get('').then(estimates => estimates['2'])
     }
-
+    
     static func balance(for address: String) -> String {
         return "/address/\(address)"
     }
-
+    
     static func getTransactions(for address: String, fromTx: String? = nil) -> String {
         var url = "/address/\(address)/txs"
         if let fromTx = fromTx {
@@ -48,7 +48,7 @@ struct BtcApiCommands {
         }
         return url
     }
-
+    
     static func getTransaction(by hash: String) -> String {
         return "/tx/\(hash)"
     }
@@ -96,12 +96,12 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     
     var richMessageType: String {
         return Self.richMessageType
-	}
-
+    }
+    
     var qqPrefix: String {
         return Self.qqPrefix
-	}
-
+    }
+    
     var isSupportIncreaseFee: Bool {
         return true
     }
@@ -137,7 +137,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
-
+    
     @Atomic private(set) var currentHeight: Decimal?
     @Atomic private var feeRate: Decimal = 1
     @Atomic private(set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
@@ -181,7 +181,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     
     @ObservableValue private(set) var transactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
-
+    
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $transactions.eraseToAnyPublisher()
     }
@@ -300,15 +300,17 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-            
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
-            
-            walletUpdateSender.send()
+        } else {
+            wallet.isBalanceInitialized = false
         }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
+        
+        walletUpdateSender.send()
         
         setState(.upToDate)
         
@@ -350,29 +352,29 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             return .invalid(description: nil)
         }
     }
-
+    
     private func getBase58DecodeAsBytes(address: String, length: Int) -> [UTF8.CodeUnit]? {
         let b58Chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-
+        
         var output: [UTF8.CodeUnit] = Array(repeating: 0, count: length)
-
+        
         for i in 0..<address.count {
             let index = address.index(address.startIndex, offsetBy: i)
             let charAtIndex = address[index]
-
+            
             guard let charLoc = b58Chars.firstIndex(of: charAtIndex) else { continue }
-
+            
             var p = b58Chars.distance(from: b58Chars.startIndex, to: charLoc)
             for j in stride(from: length - 1, through: 0, by: -1) {
                 p += 58 * Int(output[j] & 0xFF)
                 output[j] = UTF8.CodeUnit(p % 256)
-
+                
                 p /= 256
             }
-
+            
             guard p == 0 else { return nil }
         }
-
+        
         return output
     }
     
@@ -393,7 +395,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             await walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
-
+    
     public func isValid(bitcoinAddress address: String) -> Bool {
         (try? addressConverter.convert(address: address)) != nil
     }
@@ -419,12 +421,12 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             )
         }
     }
-
+    
     private func isValid(bech32 address: String) -> Bool {
         guard let decoded = try? SegwitAddrCoder().decode(hrp: "bc", addr: address) else {
             return false
         }
-
+        
         do {
             let recoded = try SegwitAddrCoder().encode(
                 hrp: "bc",
@@ -436,7 +438,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             return false
         }
     }
-
+    
 }
 
 // MARK: - WalletInitiatedWithPassphrase
@@ -567,7 +569,7 @@ extension BtcWalletService {
         
         return response.value / BtcWalletService.multiplier
     }
-
+    
     func getFeeRate() async throws -> Decimal {
         let response: [String: Decimal] = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
@@ -575,11 +577,11 @@ extension BtcWalletService {
         
         return response["2"] ?? 1
     }
-
+    
     func getCurrentHeight() async throws -> Decimal {
         try await .init(btcApiService.getStatusInfo().get().height)
     }
-
+    
 }
 
 // MARK: - KVS
@@ -611,7 +613,7 @@ extension BtcWalletService {
             }
         }
     }
-
+    
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
@@ -707,7 +709,7 @@ extension BtcWalletService {
         
         return transactions
     }
-
+    
     private func getTransactions(
         for address: String,
         fromTx: String? = nil
@@ -722,7 +724,7 @@ extension BtcWalletService {
             )
         }.get()
     }
-
+    
     func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BtcTransaction {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
@@ -743,7 +745,7 @@ extension BtcWalletService {
             height: self.currentHeight
         )
     }
-
+    
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let trs = try await getTransactionsHistory(offset: offset, limit: limit)
         
@@ -753,7 +755,7 @@ extension BtcWalletService {
         }
         
         coinStorage.append(trs)
-    
+        
         return trs.count
     }
     
@@ -793,7 +795,7 @@ extension BtcWalletService: PrivateKeyGenerator {
         else {
             return nil
         }
-
+        
         let privateKey = PrivateKey(data: privateKeyData,
                                     network: self.network,
                                     isPublicKeyCompressed: true)

@@ -10,23 +10,21 @@ import Foundation
 import CommonKit
 import Combine
 
-extension AccountViewController {
-    @MainActor
-    final class AccountWalletsViewModel {
-        @ObservableValue var state: AccountWalletsState = .default
-        
-        private let walletsStoreService: WalletStoreServiceProviderProtocol
-        private var walletSubscriptions: Set<AnyCancellable> = []
-        private var currentWalletPublisherSubscription: Set<AnyCancellable> = []
-        
-        init(walletsStoreService: WalletStoreServiceProviderProtocol) {
-            self.walletsStoreService = walletsStoreService
-            setup()
-        }
+@MainActor
+final class AccountWalletsViewModel {
+    @ObservableValue var state: AccountWalletsState = .default
+    
+    private let walletsStoreService: WalletStoreServiceProviderProtocol
+    private var walletSubscriptions: Set<AnyCancellable> = []
+    private var currentWalletPublisherSubscription: Set<AnyCancellable> = []
+    
+    init(walletsStoreService: WalletStoreServiceProviderProtocol) {
+        self.walletsStoreService = walletsStoreService
+        setup()
     }
 }
 
-private extension AccountViewController.AccountWalletsViewModel {
+private extension AccountWalletsViewModel {
     func setup() {
         addObservers()
     }
@@ -79,7 +77,7 @@ private extension AccountViewController.AccountWalletsViewModel {
     }
 }
 
-extension AccountViewController.AccountWalletsViewModel {
+extension AccountWalletsViewModel {
     func updateState() {
         walletSubscriptions.removeAll()
         state.wallets.removeAll()

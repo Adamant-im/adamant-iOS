@@ -251,14 +251,17 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             wallet.balance = balance
             markBalanceAsFresh(wallet)
             
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
-            
             walletUpdateSender.send()
+        } else {
+            wallet.isBalanceInitialized = false
         }
+        
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
+        
         
         setState(.upToDate)
     }
