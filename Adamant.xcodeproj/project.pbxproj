@@ -271,7 +271,7 @@
 		6F030E1C2D4C0E950077ACA2 /* EthBIP32Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */; };
 		6F15B2432D8456C000ACE834 /* NewMessagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F15B2422D8456C000ACE834 /* NewMessagesCell.swift */; };
 		6FB686162D3AAE8800CAB6DD /* AdamantWalletsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6FB686152D3AAE8800CAB6DD /* AdamantWalletsKit */; };
-		6FB686182D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB686172D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift */; };
+		6FB686182D3AB9E200CAB6DD /* EthWalletService+CoinInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB686172D3AB9E200CAB6DD /* EthWalletService+CoinInfoExtension.swift */; };
 		6FB6861A2D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB686192D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift */; };
 		6FB6861C2D3ABE0200CAB6DD /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB6861B2D3ABE0200CAB6DD /* DashWalletService+Transactions.swift */; };
 		6FCF2D522D54F2B600F64D20 /* AdmDialogService+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCF2D502D54F2B600F64D20 /* AdmDialogService+Extension.swift */; };
@@ -1009,7 +1009,7 @@
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		6F030E1B2D4C0E770077ACA2 /* EthBIP32Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthBIP32Service.swift; sourceTree = "<group>"; };
 		6F15B2422D8456C000ACE834 /* NewMessagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessagesCell.swift; sourceTree = "<group>"; };
-		6FB686172D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTokenInfoProtocol.swift; sourceTree = "<group>"; };
+		6FB686172D3AB9E200CAB6DD /* EthWalletService+CoinInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+CoinInfoExtension.swift"; sourceTree = "<group>"; };
 		6FB686192D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletStaticCoreProtocol.swift; sourceTree = "<group>"; };
 		6FB6861B2D3ABE0200CAB6DD /* DashWalletService+Transactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+Transactions.swift"; sourceTree = "<group>"; };
 		6FCF2D4F2D54F2B600F64D20 /* AdamantDialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -1736,7 +1736,6 @@
 		3AFE7E502B1F6AFE00718739 /* WalletsService */ = {
 			isa = PBXGroup;
 			children = (
-				6FB686172D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift */,
 				6FB686192D3ABA1400CAB6DD /* WalletStaticCoreProtocol.swift */,
 				3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */,
 				E940086D2114AA2E00CD2D67 /* WalletCoreProtocol.swift */,
@@ -2909,6 +2908,7 @@
 				E993301D212EF39700CD5200 /* EthTransferViewController.swift */,
 				64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */,
 				E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */,
+				6FB686172D3AB9E200CAB6DD /* EthWalletService+CoinInfoExtension.swift */,
 			);
 			path = Ethereum;
 			sourceTree = "<group>";
@@ -3752,7 +3752,7 @@
 				3AA388052B67F4DD00125684 /* BtcBlockchainInfoDTO.swift in Sources */,
 				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
-				6FB686182D3AB9E200CAB6DD /* SmartTokenInfoProtocol.swift in Sources */,
+				6FB686182D3AB9E200CAB6DD /* EthWalletService+CoinInfoExtension.swift in Sources */,
 				AA8FFFE52D513787001D8576 /* EdgeInsetTextField.swift in Sources */,
 				3AE0A42A2BC6A64900BF7125 /* FilesNetworkManager.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,

@@ -5,7 +5,7 @@ public extension AdamantResources {
     // MARK: Nodes
     static var nodes: [Node] {
         guard
-            let admWallet = CoinInfoProvider.coins["ADM"],
+            let admWallet = CoinInfoProvider.storage?["ADM"],
             let walletNodes = admWallet.nodes?.toNodes()
         else {
             print("Error: Unable to fetch wallet nodes for ADM.")
@@ -16,7 +16,7 @@ public extension AdamantResources {
 }
 extension CoinInfoDTO.Nodes {
     func toNodes() -> [Node] {
-        return list.map { walletNode in
+        list.map { walletNode in
             Node.makeDefaultNode(
                 url: URL(string: walletNode.url)!,
                 altUrl: walletNode.altIP.flatMap { URL(string: $0) }

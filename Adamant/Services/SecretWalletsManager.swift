@@ -40,16 +40,12 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     // MARK: - Manage state
     func createSecretWallet(withPassword password: String) {
         let wallet = secretWalletsFactory.makeSecretWallet(withPassword: password)
-        _state.mutate {
-            $0.secretWallets.append(wallet)
-        }
+        state.secretWallets.append(wallet)
     }
     
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol? {
         guard state.secretWallets.indices.contains(index) else { return nil }
-        return _state.mutate {
-            return $0.secretWallets.remove(at: index)
-        }
+        return state.secretWallets.remove(at: index)
     }
     
     func getCurrentWallet() -> WalletStoreServiceProtocol {
@@ -66,16 +62,12 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     
     func activateSecretWallet(at index: Int) {
         guard index < state.secretWallets.count else { return }
-        _state.mutate {
-            $0.currentWallet = state.secretWallets[index]
-        }
+        state.currentWallet = state.secretWallets[index]
         statePublisher.send(state)
     }
     
     func activateDefaultWallet() {
-        _state.mutate {
-            $0.currentWallet = state.regularWallet
-        }
+        state.currentWallet = state.regularWallet
         statePublisher.send(state)
     }
 }

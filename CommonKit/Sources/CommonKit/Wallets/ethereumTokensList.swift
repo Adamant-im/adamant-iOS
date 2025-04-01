@@ -1,5 +1,6 @@
 import Foundation
-    
+import AdamantWalletsKit
+
 public extension ERC20Token {
-    static let supportedTokens: [ERC20Token] = ERC20TokenComparer.loadTokens()
+    static var supportedTokens: [ERC20Token] = []
 }

@@ -267,17 +267,14 @@ extension AdamantAccountService {
                 state = .loggedIn
                 completion?(.success(account: account, alert: nil))
                 
-                if let adm = wallets.first(where: { $0.core is AdmWalletService }) {
-                    adm.core.update()
-                }
-                
             case .failure(let error):
                 completion?(.failure(.apiError(error: error)))
+                isBalanceExpired = true
                 state = prevState
             }
         }
         
-        for wallet in wallets where !(wallet.core is AdmWalletService) {
+        for wallet in wallets {
             if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
                 wallet.core.update()
             }
