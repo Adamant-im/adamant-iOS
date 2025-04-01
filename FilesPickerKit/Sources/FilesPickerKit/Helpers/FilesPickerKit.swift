@@ -189,11 +189,12 @@ private extension FilesPickerKit {
         let fileSize = try storageKit.getFileSize(from: newUrl).get()
         let duration = getVideoDuration(from: newUrl)
         let mimeType = getMimeType(for: newUrl)
-        
+        let fileType = detectFileType(for: newUrl)
+
         return FileResult(
             assetId: url.absoluteString,
             url: newUrl,
-            type: .other,
+            type: fileType,
             preview: preview.image,
             previewUrl: preview.url,
             previewExtension: previewExtension,
@@ -284,6 +285,20 @@ private extension FilesPickerKit {
             return image
         } catch {
             return nil
+        }
+    }
+    
+    func detectFileType(for url: URL) -> FileType {
+        guard let typeIdentifier = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType else {
+            return .other
+        }
+        
+        if typeIdentifier.conforms(to: .image) {
+            return .image
+        } else if typeIdentifier.conforms(to: .movie) {
+            return .video
+        } else {
+            return .other
         }
     }
 }

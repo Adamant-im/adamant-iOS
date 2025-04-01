@@ -57,6 +57,10 @@ public extension Node {
             : altOrigin ?? mainOrigin
     }
     
+    var isSupported: Bool {
+        isEnabled && connectionStatus == .allowed && version != nil
+    }
+    
     static func makeDefaultNode(url: URL, altUrl: URL? = nil) -> Self {
         .init(
             id: .init(),

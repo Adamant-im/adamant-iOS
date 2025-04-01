@@ -207,6 +207,7 @@ extension StoreKey {
         static let readedLastHeight = "chatProvider.readedLastHeight"
         static let notifiedLastHeight = "chatProvider.notifiedLastHeight"
         static let notifiedMessagesCount = "chatProvider.notifiedCount"
+        static let markedChatsAsUnread = "adamant.chatsProvider.markedChatsAsUnread"
     }
 }
 
@@ -247,6 +248,9 @@ protocol ChatsProvider: DataProvider, Actor {
     
     // ForceUpdate chats
     func update(notifyState: Bool) async -> ChatsProviderResult?
+    func setManualMarkChatAsUnread(chatroomId: String)
+    func removeManualMarkChatAsUnread(chatroomId: String)
+    func getMarkAdressesFromChain() -> Set<String>
     
     // MARK: - Sending messages
     func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction
