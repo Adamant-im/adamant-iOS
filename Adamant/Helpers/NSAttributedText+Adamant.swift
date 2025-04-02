@@ -30,3 +30,9 @@ extension NSAttributedString {
         return mutableText
     }
 }
+
+extension Array where Element == NSAttributedString {
+    func joined() -> NSMutableAttributedString {
+        self.reduce(into: NSMutableAttributedString()) { $0.append($1) }
+    }
+}
