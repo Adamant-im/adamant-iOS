@@ -212,6 +212,22 @@ final class ChatViewController: MessagesViewController {
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        canPerformAction action: Selector,
+        forItemAt indexPath: IndexPath,
+        withSender sender: Any?
+    ) -> Bool {
+        return false
+    }
+    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        shouldShowMenuForItemAt indexPath: IndexPath
+    ) -> Bool {
+        return false
+    }
+    
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
         scrollDidStop()
     }

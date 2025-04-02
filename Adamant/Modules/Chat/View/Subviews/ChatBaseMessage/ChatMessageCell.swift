@@ -157,12 +157,20 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     func configureMenu() {
         containerView.layer.cornerRadius = 10
         
+        configureLongPressGesture()
         messageContainerView.removeFromSuperview()
         cellContainerView.addSubview(containerView)
         
         containerView.addSubview(messageContainerView)
         
         chatMenuManager.setup(for: containerView)
+    }
+    
+    private func configureLongPressGesture() {
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        longPress.minimumPressDuration = 0.2
+        messageContainerView.addGestureRecognizer(longPress)
+        messageContainerView.isUserInteractionEnabled = true
     }
     
     func updateOwnReaction() {
@@ -420,7 +428,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     }
 }
 
-extension ChatMessageCell {
+private extension ChatMessageCell {
     func makeContextMenu() -> AMenuSection {
         let remove = AMenuItem.action(
             title: .adamant.chat.remove,
@@ -466,6 +474,11 @@ extension ChatMessageCell {
     }
     
     @objc func tapReactionAction() {
+        chatMenuManager.presentMenuProgrammatically(for: containerView)
+    }
+    
+    @objc func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
 }
