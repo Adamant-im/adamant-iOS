@@ -275,7 +275,10 @@ private extension AdamantRichTransactionReplyService {
             
             if let richContent = trs.richContent,
                let _: [[String: Any]] = trs.getRichValue(for: RichContentKeys.file.files) {
-                message = FilePresentationHelper.getFilePresentationText(richContent)
+                let richContent = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
+                message = (richContent[RichContentKeys.file.comment] as? String).flatMap {
+                    $0.isEmpty ? nil : $0
+                } ?? .empty
                 break
             }
             
