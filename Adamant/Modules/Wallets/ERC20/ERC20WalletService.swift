@@ -16,7 +16,7 @@ import Alamofire
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
+final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
@@ -24,27 +24,27 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     var minAmount: Decimal = 0
     
     var tokenSymbol: String {
-        return token.symbol
+        token.symbol
     }
     
     var tokenName: String {
-        return token.name
+        token.name
     }
     
     var tokenLogo: UIImage {
-        return token.logo
+        token.logo
     }
     
     static var tokenNetworkSymbol: String {
-        return "ERC20"
+        "ERC20"
     }
     
     var consistencyMaxTime: Double {
-        return 1200
+        1200
     }
     
     var tokenContract: String {
-        return token.contractAddress
+        token.contractAddress
     }
    
     var tokenUniqueID: String {
@@ -52,27 +52,27 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var defaultVisibility: Bool {
-        return token.defaultVisibility
+        token.defaultVisibility
     }
     
     var defaultOrdinalLevel: Int? {
-        return token.defaultOrdinalLevel
+        token.defaultOrdinalLevel
     }
     
     var richMessageType: String {
-        return Self.richMessageType
+        Self.richMessageType
 	}
 
     var qqPrefix: String {
-        return EthWalletService.qqPrefix
+        EthWalletService.qqPrefix
 	}
 
     var isSupportIncreaseFee: Bool {
-        return true
+        true
     }
     
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
+        increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
     
     var nodeGroups: [NodeGroup] {
@@ -95,7 +95,19 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     private(set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
-        return ethWallet?.balance ?? 0 > transactionFee
+        ethWallet?.balance ?? 0 > transactionFee
+    }
+    
+    var reliabilityGasPricePercent: BigUInt {
+        BigUInt(token.reliabilityGasPricePercent)
+    }
+    
+    var reliabilityGasLimitPercent: BigUInt {
+        BigUInt(token.reliabilityGasLimitPercent)
+    }
+    
+    var increasedGasPricePercent: Decimal {
+        token.increasedGasPricePercent
     }
     
     static let transferGas: Decimal = 21000
@@ -283,42 +295,41 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     func calculateFee(for address: EthereumAddress? = nil) async {
-        let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit(to: address)
-        
-        var price = priceRaw ?? BigUInt(token.defaultGasPriceGwei).toWei()
-        var gasLimit = gasLimitRaw ?? BigUInt(token.defaultGasLimit)
-        
-        let pricePercent = price * BigUInt(token.reliabilityGasPricePercent) / 100
-        let gasLimitPercent = gasLimit * BigUInt(token.reliabilityGasLimitPercent) / 100
-        
-        price = priceRaw == nil
-        ? price
-        : price + pricePercent
-        
-        gasLimit = gasLimitRaw == nil
-        ? gasLimit
-        : gasLimit + gasLimitPercent
+        // Setting initial
+        async let pricePriceAsync = getGasPrices()
+        async let gasLimitAsync = getGasLimit(to: address)
+        var gasPriceCoeficient: Decimal = 1
+        if isIncreaseFeeEnabled {
+            gasPriceCoeficient += token.increasedGasPricePercent / 100
+        }
 
-        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        let gasPrice, gasLimit: BigUInt
 
-        newFee = isIncreaseFeeEnabled
-        ? newFee * defaultIncreaseFee
-        : newFee
+        // Getting gas data
+        do {
+            let (gasPriceFromChain, gasLimitFromChain) = try await (pricePriceAsync, gasLimitAsync)
+            try Task.checkCancellation()
+            gasPrice = gasPriceFromChain
+            gasLimit = gasLimitFromChain
+        } catch {
+            gasPrice = BigUInt(token.defaultGasPriceGwei).toWei()
+            gasLimit = BigUInt(token.defaultGasLimit)
+        }
         
-        guard transactionFee != newFee else { return }
-        
-        transactionFee = newFee
-        let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
-                
-        gasPrice = isIncreaseFeeEnabled
-        ? BigUInt(integerLiteral: incGasPrice)
-        : price
-        
-        isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
-        self.gasLimit = gasLimit
-        
-        NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        // Updating localy
+        updateGasAndFee(
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
+            gasPriceCoeficient: gasPriceCoeficient
+        ) { [weak self] gasPrice, gasLimit, newFee in
+            guard let self else { return }
+            self.gasPrice = gasPrice
+            self.gasLimit = gasLimit
+            guard transactionFee != newFee else { return }
+            transactionFee = newFee
+            isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        }
     }
     
     func validate(address: String) -> AddressValidationResult {

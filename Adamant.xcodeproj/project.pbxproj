@@ -276,6 +276,8 @@
 		851FF2762D7B3E6B00276625 /* ChatViewController+NavigationControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */; };
 		85930FFC2D8EF68300AC9D65 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */; };
 		85ACCA662D68DC57005658CE /* ChatMessagesSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */; };
+		85956E3A2D7096F5000453E7 /* ERC20ApiWalletService+GasAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85956E392D7096E4000453E7 /* ERC20ApiWalletService+GasAlgorithm.swift */; };
+		854B2F2C2D71DFCD00A0583E /* ERC20GasAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854B2F2B2D71DFA700A0583E /* ERC20GasAlgorithm.swift */; };
 		85B405022D3012D5000AB744 /* AccountViewController+Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B405012D3012C7000AB744 /* AccountViewController+Form.swift */; };
 		85DC0EA82D96C44A00B9CA2C /* TokensAndCoinsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DC0EA72D96C43A00B9CA2C /* TokensAndCoinsViewController.swift */; };
 		85DC0EAB2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DC0EAA2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift */; };
@@ -1015,6 +1017,8 @@
 		851FF2752D7B3E5B00276625 /* ChatViewController+NavigationControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+NavigationControllerDelegate.swift"; sourceTree = "<group>"; };
 		85930FFB2D8EF65800AC9D65 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		85ACCA652D68DC52005658CE /* ChatMessagesSortDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesSortDescriptor.swift; sourceTree = "<group>"; };
+		85956E392D7096E4000453E7 /* ERC20ApiWalletService+GasAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ERC20ApiWalletService+GasAlgorithm.swift"; sourceTree = "<group>"; };
+		854B2F2B2D71DFA700A0583E /* ERC20GasAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20GasAlgorithm.swift; sourceTree = "<group>"; };
 		85B405012D3012C7000AB744 /* AccountViewController+Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+Form.swift"; sourceTree = "<group>"; };
 		85DC0EA72D96C43A00B9CA2C /* TokensAndCoinsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokensAndCoinsViewController.swift; sourceTree = "<group>"; };
 		85DC0EAA2D96ECF000B9CA2C /* CoinInfoDTOViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinInfoDTOViewController.swift; sourceTree = "<group>"; };
@@ -1859,6 +1863,7 @@
 		6449BA5D235CA0930033B936 /* ERC20 */ = {
 			isa = PBXGroup;
 			children = (
+				854B2F2B2D71DFA700A0583E /* ERC20GasAlgorithm.swift */,
 				AAC6415A2D44FAFB00619DFE /* ERC20ApiServiceProtocol.swift */,
 				6449BA66235CA0930033B936 /* ERC20WalletFactory.swift */,
 				6449BA60235CA0930033B936 /* ERC20Wallet.swift */,
@@ -3913,6 +3918,7 @@
 				48DA2FD62D4A58D8008F9FC1 /* WalletCollectionViewCell+Model.swift in Sources */,
 				3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */,
 				3AF9DF0D2C049161009A43A8 /* CircularProgressView.swift in Sources */,
+				854B2F2C2D71DFCD00A0583E /* ERC20GasAlgorithm.swift in Sources */,
 				9306E0932CF8C50E00A99BA4 /* PKGeneratorView.swift in Sources */,
 				9306E0942CF8C50E00A99BA4 /* PKGeneratorFactory.swift in Sources */,
 				9306E0952CF8C50E00A99BA4 /* PKGeneratorViewModel.swift in Sources */,
