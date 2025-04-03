@@ -34,4 +34,18 @@ extension UIView {
         layer.masksToBounds = masksToBounds
         layer.cornerRadius = cornerRadius
     }
+    
+    func animatePressDown(duration: TimeInterval = 0.1) {
+        UIView.animate(withDuration: duration) {
+            self.transform = CGAffineTransform(scaleX: 0.96, y: 0.96)
+            self.alpha = 0.5
+        }
+    }
+    
+    func animatePressUp(duration: TimeInterval = 0.1) {
+        UIView.animate(withDuration: duration) {
+            self.transform = .identity
+            self.alpha = 1.0
+        }
+    }
 }

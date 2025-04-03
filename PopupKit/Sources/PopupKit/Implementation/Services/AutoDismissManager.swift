@@ -39,6 +39,11 @@ final class AutoDismissManager {
             self?.popupCoordinatorModel.toastMessage = nil
         }
     }
+    
+    func dismissPreviousToast() {
+        self.toastDismissSubscription = nil
+        self.popupCoordinatorModel.toastMessage = nil
+    }
 }
 
 private extension AutoDismissManager {

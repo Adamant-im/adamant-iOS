@@ -25,8 +25,11 @@ public final class PopupManager {
 
 public extension PopupManager {
     func showToastMessage(_ message: String) {
-        coordinatorModel.toastMessage = message
-        autoDismissManager.dismissToast()
+        autoDismissManager.dismissPreviousToast()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.coordinatorModel.toastMessage = message
+            self?.autoDismissManager.dismissToast()
+        }
     }
     
     func dismissToast() {

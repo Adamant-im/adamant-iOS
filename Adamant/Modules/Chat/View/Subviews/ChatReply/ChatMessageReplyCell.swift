@@ -150,6 +150,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
     }
     
+    var copyNotification: (() -> Void)?
+    
     var reactionsContanerViewWidth: CGFloat {
         if getReaction(for: model.address) == nil &&
             getReaction(for: model.opponentAddress) == nil {
@@ -219,6 +221,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.addSubview(verticalStack)
         messageLabel.numberOfLines = 0
         replyMessageLabel.numberOfLines = 1
+        configureReplyMessageGesture()
+        configureLongPressGesture()
         
         let leading = model.isFromCurrentSender ? smallHInset : longHInset
         let trailing = model.isFromCurrentSender ? longHInset : smallHInset
@@ -231,6 +235,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         configureMenu()
         
         cellContainerView.addSubview(reactionsContanerView)
+    }
+    
+    func configureReplyMessageGesture() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleReplyTap))
+        replyMessageLabel.isUserInteractionEnabled = true
+        verticalStack.isUserInteractionEnabled = true
+        messageContainerView.isUserInteractionEnabled = true
+        replyMessageLabel.addGestureRecognizer(tap)
     }
     
     func configureMenu() {
@@ -494,7 +506,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         switch true {
         case containerViewContains && canHandle:
             delegate?.didTapMessage(in: self)
-            actionHandler(.scrollTo(message: model))
         case avatarView.frame.contains(touchLocation):
             delegate?.didTapAvatar(in: self)
         case cellTopLabel.frame.contains(touchLocation):
@@ -518,7 +529,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     }
 }
 
-extension ChatMessageReplyCell {
+private extension ChatMessageReplyCell {
     func makeContextMenu() -> AMenuSection {
         let remove = AMenuItem.action(
             title: .adamant.chat.remove,
@@ -561,6 +572,30 @@ extension ChatMessageReplyCell {
     
     @objc func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
+    }
+    
+    @objc func handleReplyTap() {
+        actionHandler(.scrollTo(message: model))
+    }
+    
+    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            messageContainerView.animatePressDown()
+            
+        case .ended:
+            messageContainerView.animatePressUp()
+            if model.message.string != "" {
+                UIPasteboard.general.string = model.message.string
+                copyNotification?()
+            }
+            
+        case .cancelled, .failed:
+            messageContainerView.animatePressUp()
+            
+        default:
+            break
+        }
     }
 }
 
@@ -629,6 +664,13 @@ extension ChatMessageReplyCell {
             .curved
         )
         return cell
+    }
+    
+    func configureLongPressGesture() {
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        longPress.minimumPressDuration = 0.2
+        cellContainerView.addGestureRecognizer(longPress)
+        cellContainerView.isUserInteractionEnabled = true
     }
 }
 

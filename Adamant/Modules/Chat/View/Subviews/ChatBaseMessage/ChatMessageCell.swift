@@ -88,6 +88,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
     }
     
+    var copyNotification: (() -> Void)?
+    
     var reactionsContanerViewWidth: CGFloat {
         if getReaction(for: model.address) == nil &&
             getReaction(for: model.opponentAddress) == nil {
@@ -477,9 +479,22 @@ private extension ChatMessageCell {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
     
-    @objc func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began else { return }
-        chatMenuManager.presentMenuProgrammatically(for: containerView)
+    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            messageContainerView.animatePressDown()
+            
+        case .ended:
+            messageContainerView.animatePressUp()
+            UIPasteboard.general.string = model.text.string
+            copyNotification?()
+
+        case .cancelled, .failed:
+            messageContainerView.animatePressUp()
+
+        default:
+            break
+        }
     }
 }
 
