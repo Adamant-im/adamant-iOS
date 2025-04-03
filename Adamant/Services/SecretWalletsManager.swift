@@ -66,4 +66,8 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         state.currentWallet = state.regularWallet
         statePublisher.send(state)
     }
+    
+    func removeAllSecretWallets() {
+        state.secretWallets.removeAll()
+    }
 }

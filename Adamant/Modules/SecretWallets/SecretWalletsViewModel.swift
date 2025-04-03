@@ -6,6 +6,7 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
+import Foundation
 import CommonKit
 import Combine
 
@@ -20,11 +21,6 @@ final class SecretWalletsViewModel: ObservableObject {
         self.secretWalletsManager = secretWalletsManager
         
         setup()
-    }
-    
-    private func setup() {
-        self.state.currentActiveIndex = 0
-        self.state.wallets.append(WalletItem(name: String.localized("SecretWallets.Menu.Regular", comment: "Secret wallet menu: regular wallet")))
     }
     
     func pickWallet(at index: Int) {
@@ -44,5 +40,20 @@ final class SecretWalletsViewModel: ObservableObject {
         
         state.wallets.append(WalletItem(name: String.localized("SecretWallets.Menu.Secret\(index)", comment: "Secret wallet menu: regular wallet")))
         self.state.currentActiveIndex = index
+    }
+}
+
+private extension SecretWalletsViewModel {
+    func setup() {
+        NotificationCenter.default.notifications(named: .AdamantAccountService.userLoggedOut)
+            .sink { [weak self] _ in await self?.removeAllSecretWallets() }
+            .store(in: &subscriptions)        
+    }
+    
+    func removeAllSecretWallets() {
+        secretWalletsManager.removeAllSecretWallets()
+        secretWalletsManager.activateDefaultWallet()
+        state.currentActiveIndex = 0
+        state.wallets.removeLast(state.wallets.count - 1)
     }
 }

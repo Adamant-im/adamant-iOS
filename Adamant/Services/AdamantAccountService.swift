@@ -313,6 +313,14 @@ extension AdamantAccountService {
         
         _ = await initWallets()
         
+        let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
+        
+        NotificationCenter.default.post(
+            name: Notification.Name.AdamantAccountService.userLoggedIn,
+            object: self,
+            userInfo: userInfo
+        )
+        
         return .success(account: account, alert: nil)
     }
     
@@ -383,14 +391,6 @@ extension AdamantAccountService {
             self.account = account
             self.keypair = keypair
             markBalanceAsFresh()
-            
-            let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
-            
-            NotificationCenter.default.post(
-                name: Notification.Name.AdamantAccountService.userLoggedIn,
-                object: self,
-                userInfo: userInfo
-            )
             
             self.state = .loggedIn
             return account
