@@ -52,6 +52,10 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         state.currentWallet
     }
     
+    func getRegularWallet() -> WalletStoreServiceProtocol {
+        state.regularWallet
+    }
+    
     func getSecretWallets() -> [WalletStoreServiceProtocol] {
         state.secretWallets
     }

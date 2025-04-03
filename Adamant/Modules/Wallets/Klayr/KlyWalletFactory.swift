@@ -51,7 +51,9 @@ struct KlyWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            secretWalletManager: assembler.resolve(SecretWalletsManagerProtocol.self)!,
+            secretWalletViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
     
