@@ -80,6 +80,7 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -201,8 +202,6 @@ extension KlyWalletService: SwinjectDependentService {
         klyNodeApiService = container.resolve(KlyNodeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-        
-        addTransactionObserver()
     }
     
     func addTransactionObserver() {
@@ -478,7 +477,8 @@ private extension KlyWalletService {
         setState(.upToDate)
         
         Task {
-            await update()
+            await self.update()
+            self.addTransactionObserver()
         }
         
         guard storeInKVS else { return eWallet }

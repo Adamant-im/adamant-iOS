@@ -149,6 +149,7 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -345,7 +346,8 @@ extension DashWalletService {
         self.setState(.upToDate)
         
         Task {
-            self.update()
+            await self.update()
+            self.addTransactionObserver()
         }
         
         guard storeInKVS else { return eWallet }
@@ -406,8 +408,6 @@ extension DashWalletService: SwinjectDependentService {
         dashApiService = container.resolve(DashApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-        
-        addTransactionObserver()
     }
 }
 

@@ -33,7 +33,8 @@ struct ERC20WalletFactory: WalletFactory {
             walletService: service,
             dialogService: assembler.resolve(DialogService.self)!,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            screensFactory: screensFactory
+            screensFactory: screensFactory,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
     

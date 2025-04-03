@@ -42,7 +42,8 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         screensFactory: ScreensFactory,
         addressBookService: AddressBookService,
         walletService: WalletService,
-        reachabilityMonitor: ReachabilityMonitor
+        reachabilityMonitor: ReachabilityMonitor,
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.accountService = accountService
         self.transfersProvider = transfersProvider
@@ -54,7 +55,8 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             walletService: walletService,
             dialogService: dialogService,
             reachabilityMonitor: reachabilityMonitor,
-            screensFactory: screensFactory
+            screensFactory: screensFactory,
+            secretWalletsViewModel: secretWalletsViewModel
         )
     }
     

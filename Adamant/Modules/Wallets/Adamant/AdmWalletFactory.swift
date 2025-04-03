@@ -38,7 +38,8 @@ struct AdmWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             walletService: service,
-            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
     

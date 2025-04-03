@@ -23,7 +23,8 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
         dialogService: DialogService,
         reachabilityMonitor: ReachabilityMonitor,
         screensFactory: ScreensFactory,
-        addressBook: AddressBookService
+        addressBook: AddressBookService,
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.addressBook = addressBook
         
@@ -31,7 +32,8 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
             walletService: walletService,
             dialogService: dialogService,
             reachabilityMonitor: reachabilityMonitor,
-            screensFactory: screensFactory
+            screensFactory: screensFactory,
+            secretWalletsViewModel: secretWalletsViewModel
         )
     }
     

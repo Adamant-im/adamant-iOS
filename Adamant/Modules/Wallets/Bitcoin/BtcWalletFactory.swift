@@ -34,7 +34,8 @@ struct BtcWalletFactory: WalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             screensFactory: screensFactory,
-            addressBook: assembler.resolve(AddressBookService.self)!
+            addressBook: assembler.resolve(AddressBookService.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
     

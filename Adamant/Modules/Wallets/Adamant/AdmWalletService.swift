@@ -117,6 +117,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
