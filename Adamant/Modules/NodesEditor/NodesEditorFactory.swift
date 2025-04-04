@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Swinject
 import CommonKit
+import Swinject
+import UIKit
 
 @MainActor
 struct NodesEditorFactory {
     let assembler: Assembler
-    
+
     func makeNodesListVC(screensFactory: ScreensFactory) -> UIViewController {
         NodesListViewController(
             dialogService: assembler.resolve(DialogService.self)!,
@@ -25,7 +25,7 @@ struct NodesEditorFactory {
             socketService: assembler.resolve(SocketService.self)!
         )
     }
-    
+
     func makeNodeEditorVC() -> NodeEditorViewController {
         let c = NodeEditorViewController()
         c.dialogService = assembler.resolve(DialogService.self)

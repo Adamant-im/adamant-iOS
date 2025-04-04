@@ -10,7 +10,7 @@ import UIKit
 
 struct AdamantWalletFactoryCompose: WalletFactoryCompose {
     private let factories: [any WalletFactory]
-    
+
     init(
         klyWalletFactory: KlyWalletFactory,
         dogeWalletFactory: DogeWalletFactory,
@@ -30,79 +30,89 @@ struct AdamantWalletFactoryCompose: WalletFactoryCompose {
             admWalletFactory
         ]
     }
-    
+
     func makeWalletVC(service: WalletService, screensFactory: ScreensFactory) -> WalletViewController {
         for factory in factories {
-            guard let result = tryMakeWalletVC(
-                factory: factory,
-                service: service,
-                screensFactory: screensFactory
-            ) else { continue }
-            
+            guard
+                let result = tryMakeWalletVC(
+                    factory: factory,
+                    service: service,
+                    screensFactory: screensFactory
+                )
+            else { continue }
+
             return result
         }
-        
+
         fatalError("No suitable factory")
     }
-    
+
     func makeTransferListVC(service: WalletService, screenFactory: ScreensFactory) -> UIViewController {
         for factory in factories {
-            guard let result = tryMakeTransferListVC(
-                factory: factory,
-                service: service,
-                screenFactory: screenFactory
-            ) else { continue }
-            
+            guard
+                let result = tryMakeTransferListVC(
+                    factory: factory,
+                    service: service,
+                    screenFactory: screenFactory
+                )
+            else { continue }
+
             return result
         }
-        
+
         fatalError("No suitable factory")
     }
-    
+
     func makeTransferVC(service: WalletService, screenFactory: ScreensFactory) -> TransferViewControllerBase {
         for factory in factories {
-            guard let result = tryMakeTransferVC(
-                factory: factory,
-                service: service,
-                screenFactory: screenFactory
-            ) else { continue }
-            
+            guard
+                let result = tryMakeTransferVC(
+                    factory: factory,
+                    service: service,
+                    screenFactory: screenFactory
+                )
+            else { continue }
+
             return result
         }
-        
+
         fatalError("No suitable factory")
     }
-    
+
     func makeDetailsVC(service: WalletService) -> TransactionDetailsViewControllerBase {
         for factory in factories {
-            guard let result = tryMakeDetailsVC(
-                factory: factory,
-                service: service
-            ) else { continue }
-            
+            guard
+                let result = tryMakeDetailsVC(
+                    factory: factory,
+                    service: service
+                )
+            else { continue }
+
             return result
         }
-        
+
         fatalError("No suitable factory")
     }
-    
+
     func makeDetailsVC(service: WalletService, transaction: RichMessageTransaction) -> UIViewController? {
         for factory in factories {
-            guard let result = tryMakeDetailsVC(
-                factory: factory,
-                service: service,
-                transaction: transaction
-            ) else { continue }
-            
+            guard
+                let result = tryMakeDetailsVC(
+                    factory: factory,
+                    service: service,
+                    transaction: transaction
+                )
+            else { continue }
+
             return result
         }
-        
+
         fatalError("No suitable factory")
     }
 }
 
-private extension AdamantWalletFactoryCompose {
-    func tryMakeWalletVC<Factory: WalletFactory>(
+extension AdamantWalletFactoryCompose {
+    fileprivate func tryMakeWalletVC<Factory: WalletFactory>(
         factory: Factory,
         service: WalletService,
         screensFactory: ScreensFactory
@@ -111,8 +121,8 @@ private extension AdamantWalletFactoryCompose {
             factory.makeWalletVC(service: $0, screensFactory: screensFactory)
         }
     }
-    
-    func tryMakeTransferListVC<Factory: WalletFactory>(
+
+    fileprivate func tryMakeTransferListVC<Factory: WalletFactory>(
         factory: Factory,
         service: WalletService,
         screenFactory: ScreensFactory
@@ -121,8 +131,8 @@ private extension AdamantWalletFactoryCompose {
             factory.makeTransferListVC(service: $0, screensFactory: screenFactory)
         }
     }
-    
-    func tryMakeTransferVC<Factory: WalletFactory>(
+
+    fileprivate func tryMakeTransferVC<Factory: WalletFactory>(
         factory: Factory,
         service: WalletService,
         screenFactory: ScreensFactory
@@ -131,8 +141,8 @@ private extension AdamantWalletFactoryCompose {
             factory.makeTransferVC(service: $0, screensFactory: screenFactory)
         }
     }
-    
-    func tryMakeDetailsVC<Factory: WalletFactory>(
+
+    fileprivate func tryMakeDetailsVC<Factory: WalletFactory>(
         factory: Factory,
         service: WalletService,
         transaction: RichMessageTransaction
@@ -141,8 +151,8 @@ private extension AdamantWalletFactoryCompose {
             factory.makeDetailsVC(service: $0, transaction: transaction)
         }
     }
-    
-    func tryMakeDetailsVC<Factory: WalletFactory>(
+
+    fileprivate func tryMakeDetailsVC<Factory: WalletFactory>(
         factory: Factory,
         service: WalletService
     ) -> TransactionDetailsViewControllerBase? {
@@ -150,8 +160,8 @@ private extension AdamantWalletFactoryCompose {
             factory.makeDetailsVC(service: $0)
         }
     }
-    
-    func tryExecuteFactoryMethod<Factory: WalletFactory, Result>(
+
+    fileprivate func tryExecuteFactoryMethod<Factory: WalletFactory, Result>(
         factory: Factory,
         service: WalletService,
         method: (Factory.Service) -> Result

@@ -13,21 +13,21 @@ import UIKit
 @MainActor
 final class InfoService: InfoServiceProtocol {
     typealias Rates = [InfoServiceTicker: Decimal]
-    
+
     private let securedStore: SecureStore
     private let api: InfoServiceApiServiceProtocol
     private let rateCoins: [String]
-    
+
     private var rates = Rates()
     private var currentCurrencyValue: Currency = .default
     private var subscriptions = Set<AnyCancellable>()
     private var isUpdating = false
-    
+
     var currentCurrency: Currency {
         get { currentCurrencyValue }
         set { updateCurrency(newValue) }
     }
-    
+
     init(
         securedStore: SecureStore,
         walletServiceCompose: WalletServiceCompose,
@@ -38,23 +38,23 @@ final class InfoService: InfoServiceProtocol {
         rateCoins = walletServiceCompose.getWallets().map { $0.core.tokenSymbol }
         configure()
     }
-    
+
     func update() {
         Task {
             guard !isUpdating else { return }
             isUpdating = true
             defer { isUpdating = false }
-            
+
             guard let newRates = try? await api.loadRates(coins: rateCoins).get() else { return }
             rates = newRates
             sendRatesChangedNotification()
         }
     }
-    
+
     func getRate(for coin: String) -> Decimal? {
         rates[.init(crypto: coin, fiat: currentCurrency.rawValue)]
     }
-    
+
     func getHistory(
         for coin: String,
         date: Date
@@ -67,33 +67,32 @@ final class InfoService: InfoServiceProtocol {
     }
 }
 
-private extension InfoService {
-    func configure() {
+extension InfoService {
+    fileprivate func configure() {
         setupCurrency()
-        
+
         NotificationCenter.default
             .notifications(named: UIApplication.didBecomeActiveNotification)
             .sink { [weak self] _ in await self?.update() }
             .store(in: &subscriptions)
     }
-    
-    func sendRatesChangedNotification() {
+
+    fileprivate func sendRatesChangedNotification() {
         NotificationCenter.default.post(
             name: .AdamantCurrencyInfoService.currencyRatesUpdated,
             object: nil
         )
     }
-    
-    func updateCurrency(_ newValue: Currency) {
+
+    fileprivate func updateCurrency(_ newValue: Currency) {
         guard newValue != currentCurrencyValue else { return }
         currentCurrencyValue = newValue
         securedStore.set(currentCurrencyValue.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
         sendRatesChangedNotification()
     }
-    
-    func setupCurrency() {
-        if
-            let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),
+
+    fileprivate func setupCurrency() {
+        if let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),
             let currency = Currency(rawValue: id)
         {
             currentCurrency = currency

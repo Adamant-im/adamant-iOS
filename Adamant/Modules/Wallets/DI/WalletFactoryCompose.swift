@@ -14,7 +14,7 @@ protocol WalletFactoryCompose {
     func makeTransferListVC(service: WalletService, screenFactory: ScreensFactory) -> UIViewController
     func makeTransferVC(service: WalletService, screenFactory: ScreensFactory) -> TransferViewControllerBase
     func makeDetailsVC(service: WalletService) -> TransactionDetailsViewControllerBase
-    
+
     func makeDetailsVC(
         service: WalletService,
         transaction: RichMessageTransaction

@@ -7,13 +7,13 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(MessageTransaction)
 public class MessageTransaction: ChatTransaction {
     static let entityName = "MessageTransaction"
-    
+
     override func serializedMessage() -> String? {
         return message
     }

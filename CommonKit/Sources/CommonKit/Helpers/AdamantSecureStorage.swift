@@ -9,17 +9,17 @@ import Foundation
 
 public struct AdamantSecureStorage: SecureStorageProtocol {
     private let tag = "com.adamant.keys.id".data(using: .utf8)!
-    
-    public init() { }
-    
+
+    public init() {}
+
     public func getPrivateKey() -> SecKey? {
         loadPrivateKey() ?? createAndStorePrivateKey()
     }
-    
+
     public func getPublicKey(privateKey: SecKey) -> SecKey? {
         SecKeyCopyPublicKey(privateKey)
     }
-    
+
     public func encrypt(data: Data, publicKey: SecKey) -> Data? {
         SecKeyCreateEncryptedData(
             publicKey,
@@ -28,7 +28,7 @@ public struct AdamantSecureStorage: SecureStorageProtocol {
             nil
         ).map { $0 as Data }
     }
-    
+
     public func decrypt(data: Data, privateKey: SecKey) -> Data? {
         SecKeyCreateDecryptedData(
             privateKey,
@@ -39,31 +39,33 @@ public struct AdamantSecureStorage: SecureStorageProtocol {
     }
 }
 
-private extension AdamantSecureStorage {
-    func loadPrivateKey() -> SecKey? {
+extension AdamantSecureStorage {
+    fileprivate func loadPrivateKey() -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag,
             kSecAttrKeyType as String: kSecAttrKeyTypeEC,
             kSecReturnRef as String: true
         ]
-        
+
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        
+
         return status == errSecSuccess
-        ? (item as! SecKey)
-        : nil
+            ? (item as! SecKey)
+            : nil
     }
-    
-    func createAndStorePrivateKey() -> SecKey? {
-        guard let access = SecAccessControlCreateWithFlags(
-            kCFAllocatorDefault,
-            kSecAttrAccessibleAfterFirstUnlock,
-            .privateKeyUsage,
-            nil
-        ) else { return nil }
-        
+
+    fileprivate func createAndStorePrivateKey() -> SecKey? {
+        guard
+            let access = SecAccessControlCreateWithFlags(
+                kCFAllocatorDefault,
+                kSecAttrAccessibleAfterFirstUnlock,
+                .privateKeyUsage,
+                nil
+            )
+        else { return nil }
+
         let attributes: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeEC,
             kSecAttrKeySizeInBits as String: 256,
@@ -74,7 +76,7 @@ private extension AdamantSecureStorage {
                 kSecAttrAccessControl as String: access
             ]
         ]
-        
+
         return SecKeyCreateRandomKey(attributes as CFDictionary, nil)
     }
 }

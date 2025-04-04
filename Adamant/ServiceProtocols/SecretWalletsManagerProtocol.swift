@@ -10,7 +10,7 @@ import CommonKit
 
 protocol SecretWalletsManagerProtocol {
     var statePublisher: AnyObservable<SecretWalletsManagerStateProtocol> { get }
-        
+
     func createSecretWallet(withPassword password: String)
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol?
     func getCurrentWallet() -> WalletStoreServiceProtocol

@@ -6,16 +6,16 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import SnapKit
-import Eureka
-import CommonKit
 import Combine
+import CommonKit
+import Eureka
+import SnapKit
+import UIKit
 
 final class NodeCell: Cell<NodeCell.Model>, CellType {
     private let checkmarkRowView = CheckmarkRowView()
     private var subscription: AnyCancellable?
-    
+
     private var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
@@ -23,17 +23,17 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
             update()
         }
     }
-    
+
     required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
     }
-    
+
     override func update() {
         checkmarkRowView.setIsChecked(model.isEnabled, animated: true)
         checkmarkRowView.title = model.title
@@ -43,26 +43,27 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
         checkmarkRowView.subtitle = model.statusString
         checkmarkRowView.subtitleColor = model.statusColor
     }
-    
+
     func subscribe<P: Observable<Model>>(_ publisher: P) {
-        subscription = publisher
+        subscription =
+            publisher
             .removeDuplicates()
             .sink { [weak self] in self?.model = $0 }
     }
 }
 
-private extension NodeCell {
-    func setupView() {
+extension NodeCell {
+    fileprivate func setupView() {
         contentView.addSubview(checkmarkRowView)
         checkmarkRowView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
-        
+
         checkmarkRowView.checkmarkImage = .asset(named: "status_success")
         checkmarkRowView.onCheckmarkTap = { [weak self] in self?.onCheckmarkTap() }
     }
-    
-    func onCheckmarkTap() {
+
+    fileprivate func onCheckmarkTap() {
         model.nodeUpdateAction.value(!checkmarkRowView.isChecked)
     }
 }

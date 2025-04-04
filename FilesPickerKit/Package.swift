@@ -12,7 +12,8 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "FilesPickerKit",
-            targets: ["FilesPickerKit"]),
+            targets: ["FilesPickerKit"]
+        )
     ],
     dependencies: [
         .package(path: "../CommonKit"),
@@ -27,6 +28,7 @@ let package = Package(
         ),
         .testTarget(
             name: "FilesPickerKitTests",
-            dependencies: ["FilesPickerKit"]),
+            dependencies: ["FilesPickerKit"]
+        )
     ]
 )

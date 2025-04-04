@@ -24,10 +24,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public struct Crypto {
@@ -57,17 +58,17 @@ public struct Crypto {
 
     public static func sign(_ data: Data, privateKey: PrivateKey) throws -> Data {
         #if BitcoinKitXcode
-        return _Crypto.signMessage(data, withPrivateKey: privateKey.data)
+            return _Crypto.signMessage(data, withPrivateKey: privateKey.data)
         #else
-        return try _Crypto.signMessage(data, withPrivateKey: privateKey.data)
+            return try _Crypto.signMessage(data, withPrivateKey: privateKey.data)
         #endif
     }
 
     public static func verifySignature(_ signature: Data, message: Data, publicKey: Data) throws -> Bool {
         #if BitcoinKitXcode
-        return _Crypto.verifySignature(signature, message: message, publicKey: publicKey)
+            return _Crypto.verifySignature(signature, message: message, publicKey: publicKey)
         #else
-        return try _Crypto.verifySignature(signature, message: message, publicKey: publicKey)
+            return try _Crypto.verifySignature(signature, message: message, publicKey: publicKey)
         #endif
     }
 

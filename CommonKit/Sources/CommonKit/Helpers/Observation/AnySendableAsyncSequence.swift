@@ -11,7 +11,7 @@
 @available(watchOS, deprecated: 11, message: "`AsyncSequence.Failure` is available, so use the `any` keyword")
 public struct AnySendableAsyncSequence<Element>: Sendable {
     private let _makeAsyncIterator: @Sendable () -> AsyncIterator
-    
+
     public init<Wrapped: AsyncSequence & Sendable>(_ wrapped: Wrapped) where Wrapped.Element == Element {
         _makeAsyncIterator = { .init(wrapped.makeAsyncIterator()) }
     }
@@ -20,13 +20,13 @@ public struct AnySendableAsyncSequence<Element>: Sendable {
 extension AnySendableAsyncSequence: AsyncSequence {
     public struct AsyncIterator {
         private let _next: () async throws -> Element?
-        
+
         init<Wrapped: AsyncIteratorProtocol>(_ wrapped: Wrapped) where Wrapped.Element == Element {
             var iterator = wrapped
             _next = { try await iterator.next() }
         }
     }
-    
+
     public func makeAsyncIterator() -> AsyncIterator {
         _makeAsyncIterator()
     }
@@ -38,8 +38,8 @@ extension AnySendableAsyncSequence.AsyncIterator: AsyncIteratorProtocol {
     }
 }
 
-public extension AsyncSequence where Self: Sendable {
-    func eraseToAnySendableAsyncSequence() -> AnySendableAsyncSequence<Element> {
+extension AsyncSequence where Self: Sendable {
+    public func eraseToAnySendableAsyncSequence() -> AnySendableAsyncSequence<Element> {
         .init(self)
     }
 }

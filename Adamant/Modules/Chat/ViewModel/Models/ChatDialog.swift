@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
 import ElegantEmojiPicker
+import UIKit
 
 enum ChatDialog {
     case toast(String)

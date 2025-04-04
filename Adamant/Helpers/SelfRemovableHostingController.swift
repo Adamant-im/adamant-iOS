@@ -11,16 +11,15 @@ import SwiftUI
 class SelfRemovableHostingController<T: View>: UIHostingController<T> {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
             target: self,
             action: #selector(close)
         )
     }
-    
+
     @objc private func close() {
         dismiss(animated: true)
     }
 }
-

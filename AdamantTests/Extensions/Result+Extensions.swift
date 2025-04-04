@@ -15,7 +15,7 @@ extension Result {
             return nil
         }
     }
-    
+
     var value: Success? {
         switch self {
         case .failure:

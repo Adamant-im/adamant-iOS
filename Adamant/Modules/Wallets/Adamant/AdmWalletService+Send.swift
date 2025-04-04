@@ -6,13 +6,13 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension AdmWalletService: WalletServiceSimpleSend {
     /// Transaction ID
     typealias T = Int
-    
+
     func sendMoney(
         recipient: String,
         amount: Decimal,
@@ -26,7 +26,7 @@ extension AdmWalletService: WalletServiceSimpleSend {
                 comment: comments,
                 replyToMessageId: replyToMessageId
             )
-            
+
             return transaction
         } catch let error as TransfersProviderError {
             throw error.asWalletServiceError()

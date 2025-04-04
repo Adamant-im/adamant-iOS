@@ -25,8 +25,8 @@
 import Foundation
 
 public enum ScriptVerification {
-    case StrictEncoding // enforce strict conformance to DER and SEC2 for signatures and pubkeys (aka SCRIPT_VERIFY_STRICTENC)
-    case EvenS // enforce lower S values (below curve halforder) in signatures (aka SCRIPT_VERIFY_EVEN_S, depends on STRICTENC)
+    case StrictEncoding  // enforce strict conformance to DER and SEC2 for signatures and pubkeys (aka SCRIPT_VERIFY_STRICTENC)
+    case EvenS  // enforce lower S values (below curve halforder) in signatures (aka SCRIPT_VERIFY_EVEN_S, depends on STRICTENC)
 }
 
 public enum ScriptMachineError: Error {
@@ -41,9 +41,14 @@ public enum ScriptMachineError: Error {
 // You can -copy a machine which will copy all the parameters and the stack state.
 public struct ScriptMachine {
 
-    public init() { }
+    public init() {}
 
-    public static func verifyTransaction(signedTx: Transaction, inputIndex: UInt32, utxo: TransactionOutput, blockTimeStamp: UInt32 = UInt32(NSTimeIntervalSince1970)) throws -> Bool {
+    public static func verifyTransaction(
+        signedTx: Transaction,
+        inputIndex: UInt32,
+        utxo: TransactionOutput,
+        blockTimeStamp: UInt32 = UInt32(NSTimeIntervalSince1970)
+    ) throws -> Bool {
         // Sanity check: transaction and its input should be consistent.
         guard inputIndex < signedTx.inputs.count else {
             throw ScriptMachineError.exception("Transaction and valid inputIndex are required for script verification.")
@@ -117,8 +122,8 @@ public struct ScriptMachine {
     }
 }
 
-private extension Array {
-    subscript (normalized index: Int) -> Element {
+extension Array {
+    fileprivate subscript(normalized index: Int) -> Element {
         return (index < 0) ? self[count + index] : self[index]
     }
 }

@@ -9,15 +9,15 @@
 import Foundation
 
 // MARK: - SecureStore keys
-public extension StoreKey {
-    enum NodesStorage {
+extension StoreKey {
+    public enum NodesStorage {
         public static let nodes = "nodesStorage.nodes"
     }
 }
 
 public protocol NodesStorageProtocol: Sendable {
     var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> { get }
-    
+
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]>
     func addNode(_ node: Node, group: NodeGroup)
     func resetNodes(_ groups: Set<NodeGroup>)

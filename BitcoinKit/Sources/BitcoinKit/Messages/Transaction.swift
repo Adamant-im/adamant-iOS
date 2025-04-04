@@ -73,12 +73,12 @@ public struct Transaction {
         data += lockTime
         return data
     }
-    
+
     public mutating func unpack(with network: Network, addressConverter: AddressConverter) {
         for index in 0..<inputs.count {
             inputs[index].unpack(with: network, addressConverter: addressConverter)
         }
-        
+
         for index in 0..<outputs.count {
             outputs[index].unpack(with: network)
         }
@@ -108,75 +108,95 @@ public struct Transaction {
         let lockTime = byteStream.read(UInt32.self)
         return Transaction(version: version, inputs: inputs, outputs: outputs, lockTime: lockTime)
     }
-    
-    static public func createNewTransaction(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0, keys:  [PrivateKey]) -> Transaction {
+
+    static public func createNewTransaction(
+        toAddress: Address,
+        amount: UInt64,
+        fee: UInt64,
+        changeAddress: Address,
+        utxos: [UnspentTransaction],
+        lockTime: UInt32 = 0,
+        keys: [PrivateKey]
+    ) -> Transaction {
         let unsignedTx = createUnsignedTx(toAddress: toAddress, amount: amount, fee: fee, changeAddress: changeAddress, utxos: utxos, lockTime: 0)
         let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
         return signedTransaction
     }
-    
+
     static private func selectTx(from utxos: [UnspentTransaction], amount: UInt64, fee: UInt64) -> [UnspentTransaction] {
-        
+
         var selected = [UnspentTransaction]()
-        
+
         let target = amount + fee
         var transferAmount: UInt64 = 0
         utxos.forEach { transaction in
             let amount = transaction.output.value
-            if (transferAmount < target) {
+            if transferAmount < target {
                 transferAmount += amount
-                
+
                 selected.append(transaction)
             }
         }
-        
+
         return selected
     }
-    
-    static private func createUnsignedTx(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0) -> UnsignedTransaction {
+
+    static private func createUnsignedTx(
+        toAddress: Address,
+        amount: UInt64,
+        fee: UInt64,
+        changeAddress: Address,
+        utxos: [UnspentTransaction],
+        lockTime: UInt32 = 0
+    ) -> UnsignedTransaction {
         let utxos = selectTx(from: utxos, amount: amount, fee: fee)
         let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
         let change: UInt64 = totalAmount - amount - fee
-        
+
         let lockingScriptTo = toAddress.lockingScript
         let lockingScriptChange = changeAddress.lockingScript
-        
+
         var outputs = [TransactionOutput]()
         outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo))
         if change > 0 {
             outputs.append(TransactionOutput(value: change, lockingScript: lockingScriptChange))
         }
-        
+
         let unsignedInputs = utxos.map { TransactionInput(previousOutput: $0.outpoint, signatureScript: Data(), sequence: UInt32.max) }
         let tx = BitcoinKit.Transaction(version: 1, inputs: unsignedInputs, outputs: outputs, lockTime: lockTime)
         return UnsignedTransaction(tx: tx, utxos: utxos)
     }
-    
+
     static private func signTx(unsignedTx: UnsignedTransaction, keys: [PrivateKey]) -> Transaction {
         var inputsToSign = unsignedTx.tx.inputs
         var transactionToSign: BitcoinKit.Transaction {
-            return BitcoinKit.Transaction(version: unsignedTx.tx.version, inputs: inputsToSign, outputs: unsignedTx.tx.outputs, lockTime: unsignedTx.tx.lockTime)
+            return BitcoinKit.Transaction(
+                version: unsignedTx.tx.version,
+                inputs: inputsToSign,
+                outputs: unsignedTx.tx.outputs,
+                lockTime: unsignedTx.tx.lockTime
+            )
         }
-        
+
         // Signing
         let hashType = SighashType.BTC.ALL
         for (i, utxo) in unsignedTx.utxos.enumerated() {
             let pubkeyHash: Data = Script.getPublicKeyHash(from: utxo.output.lockingScript)
-            
+
             let keysOfUtxo: [PrivateKey] = keys.filter { $0.publicKey().hashP2pkh == pubkeyHash }
             guard let key = keysOfUtxo.first else {
                 print("No keys to this txout : \(utxo.output.value)")
                 continue
             }
             print("Value of signing txout : \(utxo.output.value)")
-            
+
             let sighash: Data = transactionToSign.signatureHash(for: utxo.output, inputIndex: i, hashType: SighashType.BTC.ALL)
             let signature: Data = try! BitcoinKit.Crypto.sign(sighash, privateKey: key)
             let txin = inputsToSign[i]
             let pubkey = key.publicKey()
-            
+
             let unlockingScript = Script.buildPublicKeyUnlockingScript(signature: signature, pubkey: pubkey, hashType: hashType)
-            
+
             inputsToSign[i] = TransactionInput(previousOutput: txin.previousOutput, signatureScript: unlockingScript, sequence: txin.sequence)
         }
         return transactionToSign

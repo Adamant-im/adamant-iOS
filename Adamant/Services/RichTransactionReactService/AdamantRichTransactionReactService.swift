@@ -6,21 +6,21 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import CoreData
 import Combine
 import CommonKit
+import CoreData
 
 actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService {
     private let coreDataStack: CoreDataStack
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
-    
+
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
     private lazy var messageController = getMessageController()
     private let unknownErrorMessage = String.adamant.reply.shortUnknownMessageError
-    
+
     private var reactions: [String: Set<Reaction>] = [:]
 
     init(
@@ -35,14 +35,14 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
         self.accountService = accountService
         super.init()
     }
-    
+
     func startObserving() {
         richController.delegate = self
         try? richController.performFetch()
-        
+
         transferController.delegate = self
         try? transferController.performFetch()
-        
+
         messageController.delegate = self
         try? messageController.performFetch()
     }
@@ -57,27 +57,29 @@ extension AdamantRichTransactionReactService: NSFetchedResultsControllerDelegate
         newIndexPath _: IndexPath?
     ) {
         if let transaction = object as? RichMessageTransaction,
-           transaction.additionalType == .reaction {
+            transaction.additionalType == .reaction
+        {
             Task { await processReactionCoreDataChange(type: type_, transaction: transaction) }
         }
-        
+
         if let transaction = object as? RichMessageTransaction,
-           transaction.additionalType != .reaction {
+            transaction.additionalType != .reaction
+        {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
-        
+
         if let transaction = object as? TransferTransaction {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
-        
+
         if let transaction = object as? MessageTransaction {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
     }
 }
 
-private extension AdamantRichTransactionReactService {
-    func processReaction(transaction: RichMessageTransaction) {
+extension AdamantRichTransactionReactService {
+    fileprivate func processReaction(transaction: RichMessageTransaction) {
         guard
             let id = transaction.getRichValue(
                 for: RichContentKeys.react.reactto_id
@@ -88,25 +90,26 @@ private extension AdamantRichTransactionReactService {
         else {
             return
         }
-        
+
         var reactions = reactions[id] ?? []
         let lastReactionForSender = reactions.first(
             where: { $0.sender == transaction.senderAddress }
         )
-        
+
         let lastReactionSentDate: Date = lastReactionForSender?.sentDate ?? .init(timeIntervalSince1970: .zero)
-        
-        let currentReactionSentDate = transaction.sentDate == nil
-        ? .now
-        : transaction.sentDate ?? .now
-        
+
+        let currentReactionSentDate =
+            transaction.sentDate == nil
+            ? .now
+            : transaction.sentDate ?? .now
+
         guard lastReactionSentDate < currentReactionSentDate
         else { return }
-        
+
         if let index = reactions.firstIndex(where: { $0.sender == transaction.senderAddress }) {
             reactions.remove(at: index)
         }
-        
+
         reactions.update(
             with: .init(
                 sender: transaction.senderAddress,
@@ -115,11 +118,11 @@ private extension AdamantRichTransactionReactService {
                 sentDate: transaction.sentDate ?? .now
             )
         )
-        
+
         self.reactions[id] = reactions
-        
+
         let baseTransaction = getTransactionFromDB(id: id)
-        
+
         switch baseTransaction {
         case let trs as MessageTransaction:
             update(transaction: trs)
@@ -131,44 +134,44 @@ private extension AdamantRichTransactionReactService {
             break
         }
     }
-    
-    func update(transaction: RichMessageTransaction) {
+
+    fileprivate func update(transaction: RichMessageTransaction) {
         let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
-        
+
         guard savedReactions != reactions else { return }
-        
+
         setReact(
             to: transaction,
             reactions: reactions
         )
     }
-    
-    func update(transaction: TransferTransaction) {
+
+    fileprivate func update(transaction: TransferTransaction) {
         let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.reactions
-        
+
         guard savedReactions != reactions else { return }
-        
+
         setReact(
             to: transaction,
             reactions: reactions
         )
     }
-    
-    func update(transaction: MessageTransaction) {
+
+    fileprivate func update(transaction: MessageTransaction) {
         let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.reactions
-        
+
         guard savedReactions != reactions else { return }
-        
+
         setReact(
             to: transaction,
             reactions: reactions
         )
     }
-    
-    func setReact(
+
+    fileprivate func setReact(
         to transaction: RichMessageTransaction,
         reactions: Set<Reaction>
     ) {
@@ -177,15 +180,16 @@ private extension AdamantRichTransactionReactService {
         )
 
         privateContext.parent = coreDataStack.container.viewContext
-        
-        let transaction = privateContext.object(with: transaction.objectID)
+
+        let transaction =
+            privateContext.object(with: transaction.objectID)
             as? RichMessageTransaction
-        
+
         transaction?.richContent?[RichContentKeys.react.reactions] = reactions
         try? privateContext.save()
     }
-    
-    func setReact(
+
+    fileprivate func setReact(
         to transaction: TransferTransaction,
         reactions: Set<Reaction>
     ) {
@@ -194,14 +198,15 @@ private extension AdamantRichTransactionReactService {
         )
 
         privateContext.parent = coreDataStack.container.viewContext
-        
-        let transaction = privateContext.object(with: transaction.objectID)
+
+        let transaction =
+            privateContext.object(with: transaction.objectID)
             as? TransferTransaction
         transaction?.reactions = reactions
         try? privateContext.save()
     }
-    
-    func setReact(
+
+    fileprivate func setReact(
         to transaction: MessageTransaction,
         reactions: Set<Reaction>
     ) {
@@ -210,8 +215,9 @@ private extension AdamantRichTransactionReactService {
         )
 
         privateContext.parent = coreDataStack.container.viewContext
-        
-        let transaction = privateContext.object(with: transaction.objectID)
+
+        let transaction =
+            privateContext.object(with: transaction.objectID)
             as? MessageTransaction
         transaction?.reactions = reactions
         try? privateContext.save()
@@ -220,22 +226,22 @@ private extension AdamantRichTransactionReactService {
 
 // MARK: Core Data
 
-private extension AdamantRichTransactionReactService {
+extension AdamantRichTransactionReactService {
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
     /// - Returns: Transaction, if found
-    func getTransactionFromDB(id: String) -> BaseTransaction? {
+    fileprivate func getTransactionFromDB(id: String) -> BaseTransaction? {
         let privateContext = NSManagedObjectContext(
             concurrencyType: .privateQueueConcurrencyType
         )
 
         privateContext.parent = coreDataStack.container.viewContext
-        
+
         let request = NSFetchRequest<BaseTransaction>(entityName: "BaseTransaction")
         request.predicate = NSPredicate(format: "transactionId == %@", String(id))
         request.fetchLimit = 1
-        
+
         do {
             let result = try privateContext.fetch(request)
             return result.first
@@ -243,8 +249,8 @@ private extension AdamantRichTransactionReactService {
             return nil
         }
     }
-    
-    func processReactionCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
+
+    fileprivate func processReactionCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
         switch type {
         case .insert, .update:
             processReaction(transaction: transaction)
@@ -256,8 +262,8 @@ private extension AdamantRichTransactionReactService {
             break
         }
     }
-    
-    func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: AnyObject) {
+
+    fileprivate func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: AnyObject) {
         switch type {
         case .insert, .update:
             switch transaction {
@@ -278,8 +284,8 @@ private extension AdamantRichTransactionReactService {
             break
         }
     }
-    
-    func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
+
+    fileprivate func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
         let request: NSFetchRequest<RichMessageTransaction> = NSFetchRequest(
             entityName: RichMessageTransaction.entityName
         )
@@ -292,8 +298,8 @@ private extension AdamantRichTransactionReactService {
             cacheName: nil
         )
     }
-    
-    func getTransferController() -> NSFetchedResultsController<TransferTransaction> {
+
+    fileprivate func getTransferController() -> NSFetchedResultsController<TransferTransaction> {
         let request: NSFetchRequest<TransferTransaction> = NSFetchRequest(
             entityName: TransferTransaction.entityName
         )
@@ -306,8 +312,8 @@ private extension AdamantRichTransactionReactService {
             cacheName: nil
         )
     }
-    
-    func getMessageController() -> NSFetchedResultsController<MessageTransaction> {
+
+    fileprivate func getMessageController() -> NSFetchedResultsController<MessageTransaction> {
         let request: NSFetchRequest<MessageTransaction> = NSFetchRequest(
             entityName: MessageTransaction.entityName
         )

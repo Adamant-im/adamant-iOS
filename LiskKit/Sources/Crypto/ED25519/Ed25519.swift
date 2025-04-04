@@ -1,6 +1,6 @@
 //
 //  Ed25519.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 18.12.2023.
 //
@@ -15,14 +15,14 @@ public struct Ed25519 {
 
     static func sha512(_ s: [UInt8]) -> [UInt8] {
         #if NO_USE_CryptoSwift
-        let data = Data(s)
-        var digest = [UInt8](repeating: 0, count: Int(CC_SHA512_DIGEST_LENGTH))
-        data.withUnsafeBytes { (p: UnsafeRawBufferPointer) -> Void in
-            CC_SHA512(p.baseAddress, CC_LONG(data.count), &digest)
-        }
-        return digest
+            let data = Data(s)
+            var digest = [UInt8](repeating: 0, count: Int(CC_SHA512_DIGEST_LENGTH))
+            data.withUnsafeBytes { (p: UnsafeRawBufferPointer) -> Void in
+                CC_SHA512(p.baseAddress, CC_LONG(data.count), &digest)
+            }
+            return digest
         #else
-        return s.sha512()
+            return s.sha512()
         #endif
     }
     private static func randombytes(_ r: inout [UInt8], len: Int) {
@@ -69,9 +69,9 @@ public struct Ed25519 {
         // sha512 of sk
         crypto_hash_sha512(&az, secretKey, len: 32)
         // calc public key
-        az[0] &= 248 // clear lowest 3bit
-        az[31] &= 127 // clear highest bit
-        az[31] |= 64 // set second highest bit
+        az[0] &= 248  // clear lowest 3bit
+        az[31] &= 127  // clear highest bit
+        az[31] |= 64  // set second highest bit
 
         sc.sc25519_from32bytes(&sc_sk, az)
 
@@ -124,21 +124,21 @@ public struct Ed25519 {
         /* pk: 32-byte public key A */
         let pk = calcPublicKey(secretKey: secretKey)
         crypto_hash_sha512(&az, secretKey, len: 32)
-        az[0] &= 248 // clear lowest 3bit
-        az[31] &= 127 // clear highest bit
-        az[31] |= 64 // set second highest bit
+        az[0] &= 248  // clear lowest 3bit
+        az[31] &= 127  // clear highest bit
+        az[31] |= 64  // set second highest bit
 
-        var sm = [UInt8](repeating: 0, count: mlen+64)
+        var sm = [UInt8](repeating: 0, count: mlen + 64)
         for i in 0..<mlen {
-            sm[64+i] = message[i]
+            sm[64 + i] = message[i]
         }
         for i in 0..<32 {
-            sm[32+i] = az[32+i]
+            sm[32 + i] = az[32 + i]
         }
 
         /* az: 32-byte scalar a, 32-byte rendomizer z */
-        let data: [UInt8] = Array(sm[32..<(mlen+64)])
-        crypto_hash_sha512(&nonce, data, len: mlen+32)
+        let data: [UInt8] = Array(sm[32..<(mlen + 64)])
+        crypto_hash_sha512(&nonce, data, len: mlen + 32)
         /* nonce: 64-byte H(z,m) */
         // sck = r
         sc.sc25519_from64bytes(&sc_k, nonce)
@@ -148,10 +148,10 @@ public struct Ed25519 {
         ge.ge25519_pack(&sm, ge_r)
         // set pk
         for i in 0..<32 {
-            sm[i+32] = pk[i]
+            sm[i + 32] = pk[i]
         }
         // k
-        crypto_hash_sha512(&hram, sm, len: mlen+64)
+        crypto_hash_sha512(&hram, sm, len: mlen + 64)
         // sc_s = k
         sc.sc25519_from64bytes(&sc_s, hram)
         // sc_sk = s
@@ -165,7 +165,7 @@ public struct Ed25519 {
         sc.sc25519_to32bytes(&a, sc_s)
         // set S
         for i in 0..<32 {
-            sm[32+i] = a[i]
+            sm[32 + i] = a[i]
         }
 
         var signature = [UInt8](repeating: 0, count: 64)

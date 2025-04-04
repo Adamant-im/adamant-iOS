@@ -1,6 +1,6 @@
 //
 //  ChatContextMenuArguments.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 25.08.2023.
 //
@@ -16,7 +16,7 @@ public struct ChatContextMenuArguments: @unchecked Sendable {
     public let menu: AMenuSection
     public let selectedEmoji: String?
     public let getPositionOnScreen: () -> CGPoint
-    
+
     public init(
         copyView: UIView,
         size: CGSize,
@@ -36,5 +36,5 @@ public struct ChatContextMenuArguments: @unchecked Sendable {
         self.selectedEmoji = selectedEmoji
         self.getPositionOnScreen = getPositionOnScreen
     }
-    
+
 }

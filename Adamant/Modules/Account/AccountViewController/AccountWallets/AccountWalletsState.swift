@@ -8,6 +8,6 @@
 
 struct AccountWalletsState: Equatable {
     var wallets: [WalletCollectionViewCell.Model]
-    
+
     static let `default` = Self(wallets: [])
 }

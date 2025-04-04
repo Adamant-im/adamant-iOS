@@ -4,7 +4,7 @@ public final class SegWitV0Address: Address, Equatable {
     public let type: AddressType
     public let lockingScriptPayload: Data
     public let stringValue: String
-    
+
     public var qrcodeString: String {
         stringValue
     }
@@ -26,7 +26,7 @@ public final class SegWitV0Address: Address, Equatable {
         self.stringValue = bech32
     }
 
-    static public func ==<T: Address>(lhs: SegWitV0Address, rhs: T) -> Bool {
+    static public func == <T: Address>(lhs: SegWitV0Address, rhs: T) -> Bool {
         guard let rhs = rhs as? SegWitV0Address else {
             return false
         }

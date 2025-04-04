@@ -12,7 +12,8 @@ let package = Package(
     products: [
         .library(
             name: "LiskKit",
-            targets: ["LiskKit"])
+            targets: ["LiskKit"]
+        )
     ],
     dependencies: [
         .package(name: "Sodium", url: "https://github.com/jedisct1/swift-sodium.git", from: "0.9.1"),
@@ -34,6 +35,6 @@ let package = Package(
             dependencies: ["LiskKit"],
             path: "Tests"
         )
-        
+
     ]
 )

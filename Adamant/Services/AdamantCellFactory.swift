@@ -21,12 +21,12 @@ final class AdamantCellFactory: CellFactory {
 
         return UINib(nibName: sharedCell.defaultXibName, bundle: nil)
     }
-    
+
     func cellInstance(for sharedCell: SharedCell) -> UITableViewCell? {
         guard let nib = nib(for: sharedCell) else {
             return nil
         }
-        
+
         let cell = nib.instantiate(withOwner: nil, options: nil).first as? UITableViewCell
         return cell
     }

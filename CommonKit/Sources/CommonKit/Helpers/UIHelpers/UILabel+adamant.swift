@@ -8,8 +8,8 @@
 
 import UIKit
 
-public extension UILabel {
-    convenience init(
+extension UILabel {
+    public convenience init(
         font: UIFont? = nil,
         textColor: UIColor? = nil,
         numberOfLines: Int? = nil,

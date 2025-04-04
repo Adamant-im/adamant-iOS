@@ -13,11 +13,11 @@ extension Comparable {
         if self < min {
             return min
         }
-        
+
         if self > max {
             return max
         }
-        
+
         return self
     }
 }

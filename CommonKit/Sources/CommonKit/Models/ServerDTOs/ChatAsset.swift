@@ -10,13 +10,15 @@ import Foundation
 
 public struct ChatAsset: Codable, Hashable, Sendable {
     public enum CodingKeys: String, CodingKey {
-        case message, ownMessage = "own_message", type
+        case message
+        case ownMessage = "own_message"
+        case type
     }
-    
+
     public let message: String
     public let ownMessage: String
     public let type: ChatType
-    
+
     public init(message: String, ownMessage: String, type: ChatType) {
         self.message = message
         self.ownMessage = ownMessage

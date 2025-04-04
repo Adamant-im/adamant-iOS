@@ -8,8 +8,8 @@
 
 import Foundation
 
-public extension Notification.Name {
-    struct LanguageStorageService {
+extension Notification.Name {
+    public struct LanguageStorageService {
         public static let languageUpdated = Notification.Name("adamant.language.languageUpdated")
     }
 }
@@ -20,7 +20,7 @@ public enum Language: String, Sendable {
     case de
     case zh
     case auto
-    
+
     public var name: String {
         switch self {
         case .ru: return "Русский"
@@ -30,7 +30,7 @@ public enum Language: String, Sendable {
         case .auto: return .localized("Language.Auto", comment: "Account tab: Language auto")
         }
     }
-    
+
     public var locale: String {
         switch self {
         case .ru: return "ru_RU"
@@ -40,6 +40,6 @@ public enum Language: String, Sendable {
         case .auto: return "en_EN"
         }
     }
-    
+
     public static let all: [Language] = [.auto, .en, .ru, .de, .zh]
 }

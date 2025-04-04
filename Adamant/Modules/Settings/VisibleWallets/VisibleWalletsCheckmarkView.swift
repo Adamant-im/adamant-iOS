@@ -6,9 +6,9 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
+import CommonKit
 import SnapKit
 import UIKit
-import CommonKit
 
 final class VisibleWalletsCheckmarkRowView: UIView {
     private let checkmarkView = CheckmarkView()
@@ -17,9 +17,9 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     private let captionLabel = makeCaptionLabel()
     private let logoImageView = UIImageView()
     private let balanceLabel = makeAdditionalLabel()
-    
+
     private let awaitingValueString = "⏱"
-    
+
     private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [captionLabel, subtitleLabel])
         stack.axis = .horizontal
@@ -28,22 +28,22 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         stack.spacing = 6
         return stack
     }()
-    
+
     var title: String? {
         get { titleLabel.text }
         set { titleLabel.text = newValue }
     }
-    
+
     var subtitle: String? {
         get { subtitleLabel.text }
         set { subtitleLabel.text = newValue }
     }
-    
+
     var caption: String? {
         get { captionLabel.text }
         set { captionLabel.text = newValue }
     }
-    
+
     var balance: Decimal? {
         didSet {
             if let balance = balance {
@@ -59,26 +59,26 @@ final class VisibleWalletsCheckmarkRowView: UIView {
             }
         }
     }
-    
+
     var onCheckmarkTap: (() -> Void)? {
         get { checkmarkView.onCheckmarkTap }
         set { checkmarkView.onCheckmarkTap = newValue }
     }
-    
+
     var checkmarkImage: UIImage? {
         get { checkmarkView.image }
         set { checkmarkView.image = newValue }
     }
-    
+
     var logoImage: UIImage? {
         get { logoImageView.image }
         set { logoImageView.image = newValue }
     }
-    
+
     var isChecked: Bool {
         checkmarkView.isChecked
     }
-    
+
     var checkmarkImageBorderColor: UIColor? {
         get {
             guard let imageBorderColor = checkmarkView.imageBorderColor else { return nil }
@@ -86,26 +86,26 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         }
         set { checkmarkView.imageBorderColor = newValue?.cgColor }
     }
-    
+
     var checkmarkImageTintColor: UIColor? {
         get { checkmarkView.imageTintColor }
         set { checkmarkView.imageTintColor = newValue }
     }
-    
+
     init() {
         super.init(frame: .zero)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
     }
-    
+
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
         checkmarkView.setIsChecked(isChecked, animated: animated)
     }
-    
+
     private func setupView() {
         addSubview(logoImageView)
         logoImageView.snp.makeConstraints {
@@ -113,25 +113,25 @@ final class VisibleWalletsCheckmarkRowView: UIView {
             $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview().inset(8)
         }
-        
+
         addSubview(checkmarkView)
         checkmarkView.snp.makeConstraints {
             $0.size.equalTo(44)
             $0.top.trailing.bottom.equalToSuperview().inset(2)
         }
-        
+
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(checkmarkView)
             $0.leading.equalTo(logoImageView.snp.trailing).offset(8)
         }
-        
+
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(2)
             $0.leading.equalTo(titleLabel)
         }
-        
+
         addSubview(balanceLabel)
         balanceLabel.contentMode = .left
         balanceLabel.snp.makeConstraints {
