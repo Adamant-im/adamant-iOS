@@ -1264,10 +1264,7 @@ extension ChatListViewController {
         ) { (_, _, completionHandler) in
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
-                self.chatsManuallyMarkedAsUnread.remove(adress)
-                Task {
-                    await self.chatsProvider.removeManualMarkChatAsUnread(chatroomId: adress)
-                }
+                self.removeManualAdress(adress: adress)
             } else {
                 chatroom.markAsUnread()
                 self.chatsManuallyMarkedAsUnread.insert(adress)
@@ -1434,6 +1431,9 @@ extension ChatListViewController {
     private func removeManualAdress(adress: String?) {
         if let adress {
             chatsManuallyMarkedAsUnread.remove(adress)
+            Task {
+                await chatsProvider.removeManualMarkChatAsUnread(chatroomId: adress)
+            }
         }
     }
 }
