@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension TransferTransaction {
 
@@ -20,7 +20,7 @@ extension TransferTransaction {
     @NSManaged public var replyToId: String?
     @NSManaged public var decodedReplyMessage: String?
     @NSManaged public var reactionsData: Data?
-    
+
     var reactions: Set<Reaction>? {
         get {
             guard let data = reactionsData else {
@@ -29,7 +29,7 @@ extension TransferTransaction {
 
             return try? PropertyListDecoder().decode(Set<Reaction>.self, from: data)
         }
-        
+
         set {
             guard let value = newValue else {
                 reactionsData = nil
@@ -46,18 +46,18 @@ extension TransferTransaction: AdamantTransactionDetails {
     var partnerName: String? {
         partner?.name
     }
-    
+
     var showToChat: Bool? {
         guard let partner = partner as? CoreDataAccount,
-              let chatroom = partner.chatroom,
-              !chatroom.isReadonly
+            let chatroom = partner.chatroom,
+            !chatroom.isReadonly
         else {
             return false
         }
-        
+
         return true
     }
-    
+
     var chatRoom: Chatroom? {
         let partner = partner as? CoreDataAccount
         return partner?.chatroom

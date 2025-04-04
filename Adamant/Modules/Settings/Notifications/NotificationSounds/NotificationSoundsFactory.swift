@@ -6,27 +6,27 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Swinject
 import SwiftUI
+import Swinject
 
 @MainActor
 struct NotificationSoundsFactory {
     private let parent: Assembler
     private let assemblies = [NotificationSoundAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     @MainActor
     func makeView(target: NotificationTarget) -> NotificationSoundsView {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = {
             assembler.resolver.resolve(NotificationSoundsViewModel.self, argument: target)!
         }
-        
+
         let view = NotificationSoundsView(viewModel: viewModel)
-        
+
         return view
     }
 }

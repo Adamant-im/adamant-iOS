@@ -11,11 +11,11 @@ import LiskKit
 
 // sourcery: AutoMockable
 protocol KlyNodeApiServiceProtocol: ApiServiceProtocol {
-    
+
     func requestTransactionsApi<Output>(
         _ request: @Sendable @escaping (Transactions) async throws -> Output
     ) async -> WalletServiceResult<Output>
-    
+
     func requestAccountsApi<Output>(
         _ request: @Sendable @escaping (Accounts) async throws -> Output
     ) async -> WalletServiceResult<Output>

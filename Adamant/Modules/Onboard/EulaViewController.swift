@@ -9,11 +9,11 @@
 import UIKit
 
 final class EulaViewController: UIViewController {
-    
+
     // MARK: Outlets
     @IBOutlet weak var eulaTextView: UITextView!
     @IBOutlet var buttons: [UIButton]!
-    
+
     var onAccept: (() -> Void)?
     var onDecline: (() -> Void)?
 
@@ -23,9 +23,9 @@ final class EulaViewController: UIViewController {
 
         setColors()
     }
-    
+
     // MARK: - Other
-    
+
     private func setColors() {
         buttons.forEach { btn in
             btn.setTitleColor(UIColor.adamant.textColor, for: .normal)
@@ -33,16 +33,16 @@ final class EulaViewController: UIViewController {
         eulaTextView.textColor = UIColor.adamant.textColor
         view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
     }
-    
+
     // MARK: - Actions
-    
+
     @IBAction func handleAccept() {
         DispatchQueue.main.async { [weak self] in
             self?.onAccept?()
             self?.dismiss(animated: true, completion: nil)
         }
     }
-    
+
     @IBAction func handleDecline() {
         DispatchQueue.main.async { [weak self] in
             self?.onDecline?()

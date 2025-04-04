@@ -8,7 +8,7 @@
 import Foundation
 
 extension Transactions {
-    
+
     public struct TransactionSubmitModel: APIModel {
         public let transactionId: String
 
@@ -50,15 +50,15 @@ extension Transactions {
         public let signature: String
 
         public var confirmations: UInt64?
-        
+
         public var isOutgoing: Bool = false
-        
+
         public var nonce: String
-        
+
         public var executionStatus: ExecutionStatus
 
         public var txData: String?
-        
+
         // MARK: - Hashable
 
         public static func == (lhs: TransactionModel, rhs: TransactionModel) -> Bool {
@@ -68,11 +68,11 @@ extension Transactions {
         public var hashValue: Int {
             return id.hashValue
         }
-        
+
         public func hash(into hasher: inout Hasher) {
             hasher.combine(id)
         }
-        
+
         public mutating func updateConfirmations(value: UInt64) {
             confirmations = value
         }

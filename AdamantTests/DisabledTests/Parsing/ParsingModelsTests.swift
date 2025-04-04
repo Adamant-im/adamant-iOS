@@ -7,17 +7,18 @@
 //
 
 import XCTest
+
 @testable import Adamant
 
 class ParsingModelsTests: XCTestCase {
     func testTransactionSend() {
         let t: Transaction = TestTools.LoadJsonAndDecode(filename: "TransactionSend")
-        
-        XCTAssertEqual(t.id, 1873173140086400619)
+
+        XCTAssertEqual(t.id, 1_873_173_140_086_400_619)
         XCTAssertEqual(t.height, 777336)
         XCTAssertEqual(t.blockId, "10172499053153614044")
         XCTAssertEqual(t.type, TransactionType.send)
-        XCTAssertEqual(t.timestamp, 10724447)
+        XCTAssertEqual(t.timestamp, 10_724_447)
         XCTAssertEqual(t.senderPublicKey, "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6")
         XCTAssertNil(t.requesterPublicKey)
         XCTAssertEqual(t.senderId, "U15423595369615486571")
@@ -25,7 +26,10 @@ class ParsingModelsTests: XCTestCase {
         XCTAssertEqual(t.recipientPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
         XCTAssertEqual(t.amount, Decimal(0.49))
         XCTAssertEqual(t.fee, Decimal(0.5))
-        XCTAssertEqual(t.signature, "539f80c8a71abc8d4d31e5bd0d0ddb1ea98499c1d43fe5ab07faec8d376cd12357cf17bca36dc7a561085cbd615e64c523f2b17807d3f4da787baaa657aa450a")
+        XCTAssertEqual(
+            t.signature,
+            "539f80c8a71abc8d4d31e5bd0d0ddb1ea98499c1d43fe5ab07faec8d376cd12357cf17bca36dc7a561085cbd615e64c523f2b17807d3f4da787baaa657aa450a"
+        )
         XCTAssertNil(t.signSignature)
         XCTAssert(t.signatures.count == 0)
         XCTAssertEqual(t.confirmations, 148388)
@@ -35,11 +39,11 @@ class ParsingModelsTests: XCTestCase {
     func testTransactionChat() {
         let t: Transaction = TestTools.LoadJsonAndDecode(filename: "TransactionChat")
 
-        XCTAssertEqual(t.id, 16214962152767034408)
+        XCTAssertEqual(t.id, 16_214_962_152_767_034_408)
         XCTAssertEqual(t.height, 857385)
         XCTAssertEqual(t.blockId, "11054360802486546958")
         XCTAssertEqual(t.type, TransactionType.chatMessage)
-        XCTAssertEqual(t.timestamp, 11138999)
+        XCTAssertEqual(t.timestamp, 11_138_999)
         XCTAssertEqual(t.senderPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
         XCTAssertNil(t.requesterPublicKey)
         XCTAssertEqual(t.senderId, "U2279741505997340299")
@@ -47,7 +51,10 @@ class ParsingModelsTests: XCTestCase {
         XCTAssertNil(t.recipientPublicKey)
         XCTAssertEqual(t.amount, 0)
         XCTAssertEqual(t.fee, Decimal(0.005))
-        XCTAssertEqual(t.signature, "7c58921d29beb5fbc7886053d81b37d8495db53848ebe04a8847f06dbcb810d8d675ea6501b1fe9b5ce7fbf9d7660a09895ac915dc82e6e8878fd0e919538c0e")
+        XCTAssertEqual(
+            t.signature,
+            "7c58921d29beb5fbc7886053d81b37d8495db53848ebe04a8847f06dbcb810d8d675ea6501b1fe9b5ce7fbf9d7660a09895ac915dc82e6e8878fd0e919538c0e"
+        )
         XCTAssertNil(t.signSignature)
         XCTAssert(t.signatures.count == 0)
         XCTAssertEqual(t.confirmations, 0)
@@ -55,14 +62,14 @@ class ParsingModelsTests: XCTestCase {
         XCTAssertEqual(t.asset.chat!.ownMessage, "898e0bd7d8008fb0396195a911d19a24a7234d2e2a00cdf9")
         XCTAssertEqual(t.asset.chat!.type, ChatType.message)
     }
-    
+
     func testEncodingTransactionChat() {
         let t: Transaction = TestTools.LoadJsonAndDecode(filename: "TransactionChat")
-        
+
         let rawTransaction = try! JSONEncoder().encode(t)
-        
+
         let newT = try! JSONDecoder().decode(Transaction.self, from: rawTransaction)
-        
+
         XCTAssertEqual(t.id, newT.id)
         XCTAssertEqual(t.height, newT.height)
         XCTAssertEqual(t.blockId, newT.blockId)
@@ -109,12 +116,12 @@ class ParsingModelsTests: XCTestCase {
 
     func testNormalizedTransaction() {
         let t: NormalizedTransaction = TestTools.LoadJsonAndDecode(filename: "NormalizedTransaction")
-        
+
         XCTAssertEqual(t.type, TransactionType.send)
         XCTAssertEqual(t.amount, Decimal(505.05050505))
         XCTAssertEqual(t.senderPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
         XCTAssertNil(t.requesterPublicKey)
-        XCTAssertEqual(t.timestamp, 11236791)
+        XCTAssertEqual(t.timestamp, 11_236_791)
         XCTAssertNil(t.asset.chat)
         XCTAssertEqual(t.recipientId, "U2279741505997340299")
     }

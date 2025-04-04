@@ -1,28 +1,28 @@
 //
 //  ContextMenuOverlayView.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 23.06.2023.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct ContextMenuOverlayView: View {
     @StateObject private var viewModel: ContextMenuOverlayViewModel
-    
+
     init(viewModel: ContextMenuOverlayViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var backgroundBlur: Blur {
         Blur(style: .systemUltraThinMaterialDark, sensetivity: 0.5)
     }
-    
+
     var axes: Axis.Set {
         return viewModel.shouldScroll ? .vertical : []
     }
-    
+
     var menuTransition: AnyTransition {
         AnyTransition.asymmetric(
             insertion: .scale(scale: 0, anchor: .top),
@@ -31,14 +31,14 @@ struct ContextMenuOverlayView: View {
             )
         )
     }
-    
+
     var body: some View {
         ZStack {
             if viewModel.additionalMenuVisible {
                 backgroundBlur
                     .zIndex(0)
                     .ignoresSafeArea()
-                
+
                 if let upperContentView = viewModel.upperContentView {
                     makeUpperOverlayView(upperContentView: upperContentView)
                         .zIndex(2)
@@ -68,21 +68,21 @@ struct ContextMenuOverlayView: View {
     }
 }
 
-private extension ContextMenuOverlayView {
-    func makeOverlayView() -> some View {
+extension ContextMenuOverlayView {
+    fileprivate func makeOverlayView() -> some View {
         makeOverlayScrollToBottom(makeOverlayScrollView())
     }
-    
-    func makeOverlayScrollView() -> some View {
+
+    fileprivate func makeOverlayScrollView() -> some View {
         ScrollView(axes, showsIndicators: false) {
             VStack(spacing: .zero) {
                 makeContentView()
-                    .onTapGesture { }
+                    .onTapGesture {}
                 Spacer()
                     .frame(
                         height: viewModel.menuSize.height
-                        + minBottomOffset
-                        + minContentsSpace
+                            + minBottomOffset
+                            + minContentsSpace
                     )
             }
             .id(1)
@@ -90,36 +90,38 @@ private extension ContextMenuOverlayView {
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeOverlayScrollToBottom(_ content: some View) -> some View {
+
+    fileprivate func makeOverlayScrollToBottom(_ content: some View) -> some View {
         if #available(iOS 17.0, *) {
-            return content
+            return
+                content
                 .defaultScrollAnchor(.bottom)
         }
-        
+
         return ScrollViewReader { value in
             content
                 .onChange(of: viewModel.scrollToEnd) { scrollToBottom in
                     guard scrollToBottom else { return }
-                    
+
                     withAnimation {
                         value.scrollTo(1, anchor: .bottom)
                     }
                 }
         }
     }
-    
-    func makeContentView() -> some View {
+
+    fileprivate func makeContentView() -> some View {
         HStack {
             UIViewWrapper(view: viewModel.contentView)
                 .frame(
                     width: viewModel.contentViewSize.width,
                     height: viewModel.contentViewSize.height
                 )
-                .padding(.top,
-                         viewModel.additionalMenuVisible
-                         ? viewModel.contentViewLocation.y
-                         : viewModel.startOffsetForContentView
+                .padding(
+                    .top,
+                    viewModel.additionalMenuVisible
+                        ? viewModel.contentViewLocation.y
+                        : viewModel.startOffsetForContentView
                 )
                 .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
@@ -127,21 +129,22 @@ private extension ContextMenuOverlayView {
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeMenuOverlayView() -> some View {
+
+    fileprivate func makeMenuOverlayView() -> some View {
         VStack {
             makeMenuView()
-                .onTapGesture { }
+                .onTapGesture {}
             Spacer()
         }
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeMenuView() -> some View {
+
+    fileprivate func makeMenuView() -> some View {
         HStack {
             if viewModel.additionalMenuVisible,
-               let menuVC = viewModel.menu {
+                let menuVC = viewModel.menu
+            {
                 UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
                     .cornerRadius(15)
@@ -157,35 +160,36 @@ private extension ContextMenuOverlayView {
         .offset(y: viewModel.menuLocation.y)
         .ignoresSafeArea()
     }
-    
-    func makeUpperOverlayView(upperContentView: some View) -> some View {
+
+    fileprivate func makeUpperOverlayView(upperContentView: some View) -> some View {
         VStack {
             makeUpperContentView(upperContentView: upperContentView)
-                .onTapGesture { }
+                .onTapGesture {}
             Spacer()
         }
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeUpperContentView(upperContentView: some View) -> some View {
+
+    fileprivate func makeUpperContentView(upperContentView: some View) -> some View {
         HStack {
             upperContentView
                 .frame(
                     width: viewModel.upperContentSize.width,
                     height: viewModel.upperContentSize.height
                 )
-                .padding(.top,
-                         viewModel.additionalMenuVisible
-                         ? viewModel.upperContentViewLocation.y
-                         : viewModel.startOffsetForUpperContentView
+                .padding(
+                    .top,
+                    viewModel.additionalMenuVisible
+                        ? viewModel.upperContentViewLocation.y
+                        : viewModel.startOffsetForUpperContentView
                 )
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
         .fullScreen()
     }
-    
+
 }
 
 private let minBottomOffset: CGFloat = 50

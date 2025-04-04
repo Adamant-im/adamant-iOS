@@ -12,7 +12,7 @@ struct SecretWalletsFactory {
     private let visibleWalletsService: VisibleWalletsService
     private let accountService: AccountService
     private let securedStore: SecureStore
-    
+
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
@@ -22,7 +22,7 @@ struct SecretWalletsFactory {
         self.accountService = accountService
         self.securedStore = securedStore
     }
-    
+
     func makeSecretWallet(withPassword password: String) -> WalletStoreServiceProtocol {
         var wallets: [WalletCoreProtocol] = [
             AdmWalletService(),
@@ -32,26 +32,26 @@ struct SecretWalletsFactory {
             DogeWalletService(),
             DashWalletService()
         ]
-        
+
         let erc20WalletServices = ERC20Token.supportedTokens.map {
             ERC20WalletService(token: $0)
         }
         wallets.append(contentsOf: erc20WalletServices)
         let walletServiceCompose = AdamantWalletServiceCompose(wallets: wallets)
-        Task.detached(priority: .userInitiated){
+        Task.detached(priority: .userInitiated) {
             await initWallets(withPass: password, for: walletServiceCompose)
         }
         let wallet = AdamantWalletStoreService(visibleWalletsService: visibleWalletsService, walletServiceCompose: walletServiceCompose)
-        
+
         return wallet
     }
-    
+
     private func initWallets(withPass password: String, for walletService: WalletServiceCompose) async {
         guard let passphrase: String = securedStore.get(StoreKey.accountService.passphrase) else {
             print("No passphrase found")
             return
         }
-        
+
         await withTaskGroup(of: Void.self) { taskGroup in
             for wallet in walletService.getWallets() {
                 taskGroup.addTask {

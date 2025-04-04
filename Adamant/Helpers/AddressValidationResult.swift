@@ -11,7 +11,7 @@ import Foundation
 enum AddressValidationResult {
     case valid
     case invalid(description: String?)
-    
+
     var isValid: Bool {
         switch self {
         case .valid:
@@ -20,7 +20,7 @@ enum AddressValidationResult {
             return false
         }
     }
-    
+
     var errorDescription: String? {
         switch self {
         case .valid:

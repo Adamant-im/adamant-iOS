@@ -6,18 +6,18 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
+import Combine
 @preconcurrency import MessageKit
 import UIKit
-import Combine
 
 @MainActor
 final class ChatDisplayManager: MessagesDisplayDelegate {
     private let viewModel: ChatViewModel
-    
+
     init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
     }
-    
+
     nonisolated func messageStyle(
         for message: MessageType,
         at _: IndexPath,
@@ -32,7 +32,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             )
         }
     }
-    
+
     nonisolated func backgroundColor(
         for message: MessageType,
         at _: IndexPath,
@@ -40,13 +40,13 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
     ) -> UIColor {
         message.fullModel.backgroundColor.uiColor
     }
-    
+
     nonisolated func textColor(
         for _: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor { .adamant.primary }
-    
+
     nonisolated func messageHeaderView(
         for indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
@@ -56,17 +56,17 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
                 ChatViewController.SpinnerCell.self,
                 for: indexPath
             )
-            
+
             if viewModel.messages[indexPath.section].topSpinnerOn {
                 header.wrappedView.startAnimating()
             } else {
                 header.wrappedView.stopAnimating()
             }
-            
+
             return header
         }
     }
-    
+
     nonisolated func messageFooterView(
         for indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
@@ -75,7 +75,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             guard let separatorIndex = viewModel.separatorIndex, indexPath.section == separatorIndex else {
                 return MessageReusableView()
             }
-            
+
             let footer = messagesCollectionView.dequeueReusableFooterView(
                 NewMessagesCell.self,
                 for: indexPath
@@ -83,7 +83,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             return footer
         }
     }
-    
+
     nonisolated func enabledDetectors(
         for _: MessageType,
         at _: IndexPath,
@@ -91,7 +91,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
     ) -> [DetectorType] {
         return [.url]
     }
-    
+
     nonisolated func detectorAttributes(
         for detector: DetectorType,
         and _: MessageType,
@@ -101,7 +101,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             ? [.foregroundColor: UIColor.adamant.active]
             : [:]
     }
-    
+
     nonisolated func configureAccessoryView(
         _ accessoryView: UIView,
         for message: MessageType,
@@ -112,11 +112,11 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             switch message.fullModel.status {
             case .failed:
                 guard accessoryView.subviews.isEmpty else { break }
-                
+
                 if case .file = message.fullModel.content {
                     break
                 }
-                
+
                 let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
                 icon.contentMode = .scaleAspectFit
                 icon.tintColor = .adamant.secondary

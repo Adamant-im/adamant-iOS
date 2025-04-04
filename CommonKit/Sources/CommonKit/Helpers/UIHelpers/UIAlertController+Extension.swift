@@ -1,30 +1,31 @@
 //
 //  UIAlertController+Extension.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 23.08.2023.
 //
 
 import UIKit
 
-public extension UIAlertController {
-    enum SourceView {
+extension UIAlertController {
+    public enum SourceView {
         case view(UIView)
         case barButtonItem(UIBarButtonItem)
     }
-    
-    convenience init(
+
+    public convenience init(
         title: String?,
         message: String?,
         preferredStyleSafe: UIAlertController.Style,
         source: SourceView?
     ) {
-        let style = source == nil && UIScreen.main.traitCollection.userInterfaceIdiom == .pad
+        let style =
+            source == nil && UIScreen.main.traitCollection.userInterfaceIdiom == .pad
             ? .alert
             : preferredStyleSafe
-        
+
         self.init(title: title, message: message, preferredStyle: style)
-        
+
         switch source {
         case let .view(view):
             popoverPresentationController?.sourceView = view

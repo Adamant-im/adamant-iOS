@@ -6,16 +6,16 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Swinject
 import CommonKit
+import Swinject
 import UIKit
 
 struct ERC20WalletFactory: WalletFactory {
     typealias Service = WalletService
-    
+
     let typeSymbol: String = ERC20WalletService.richMessageType
     let assembler: Assembler
-    
+
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         ERC20WalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
@@ -26,7 +26,7 @@ struct ERC20WalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         ERC20TransactionsViewController(
             walletService: service,
@@ -35,7 +35,7 @@ struct ERC20WalletFactory: WalletFactory {
             screensFactory: screensFactory
         )
     }
-    
+
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
         ERC20TransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
@@ -45,26 +45,26 @@ struct ERC20WalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!, 
+            vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
-    
+
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
         guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else { return nil }
-                
+
         let comment: String?
         if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
             comment = raw
         } else {
             comment = nil
         }
-        
+
         // MARK: Go to transaction
-        
+
         return makeTransactionDetailsVC(
             hash: hash,
             senderId: transaction.senderId,
@@ -77,14 +77,14 @@ struct ERC20WalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeDetailsVC(service: Service) -> TransactionDetailsViewControllerBase {
         makeTransactionDetailsVC(service: service)
     }
 }
 
-private extension ERC20WalletFactory {
-    func makeTransactionDetailsVC(
+extension ERC20WalletFactory {
+    fileprivate func makeTransactionDetailsVC(
         hash: String,
         senderId: String?,
         recipientId: String?,
@@ -96,15 +96,16 @@ private extension ERC20WalletFactory {
         service: Service
     ) -> UIViewController {
         let vc = makeTransactionDetailsVC(service: service)
-        
+
         let amount: Decimal
         if let amountRaw = richTransaction.getRichValue(for: RichContentKeys.transfer.amount),
-           let decimal = Decimal(string: amountRaw) {
+            let decimal = Decimal(string: amountRaw)
+        {
             amount = decimal
         } else {
             amount = 0
         }
-        
+
         let failedTransaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: senderAddress,
@@ -118,7 +119,7 @@ private extension ERC20WalletFactory {
             transactionStatus: nil,
             nonceRaw: nil
         )
-        
+
         vc.senderId = senderId
         vc.recipientId = recipientId
         vc.comment = comment
@@ -126,13 +127,13 @@ private extension ERC20WalletFactory {
         vc.richTransaction = richTransaction
         return vc
     }
-    
-    func makeTransactionDetailsVC(service: Service) -> ERC20TransactionDetailsViewController {
+
+    fileprivate func makeTransactionDetailsVC(service: Service) -> ERC20TransactionDetailsViewController {
         ERC20TransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            accountService:  assembler.resolve(AccountService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
             walletService: service,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )

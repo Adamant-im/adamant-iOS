@@ -7,18 +7,18 @@
 //
 //
 
-import Foundation
-import CoreData
 import CommonKit
+import CoreData
+import Foundation
 
 @objc(RichMessageTransaction)
 public class RichMessageTransaction: ChatTransaction, @unchecked Sendable {
     static let entityName = "RichMessageTransaction"
-    
+
     override func serializedMessage() -> String? {
         return richContentSerialized
     }
-    
+
     override var transactionStatus: TransactionStatus? {
         get {
             let data = Data(transactionStatusRaw.utf8)
@@ -26,16 +26,16 @@ public class RichMessageTransaction: ChatTransaction, @unchecked Sendable {
         }
         set {
             guard let data = try? JSONEncoder().encode(newValue),
-                  let raw = String(data: data, encoding: .utf8)
+                let raw = String(data: data, encoding: .utf8)
             else {
                 transactionStatusRaw = ""
                 return
             }
-            
+
             transactionStatusRaw = raw
         }
     }
-    
+
     var transfer: RichMessageTransfer? {
         guard let richContent = richContent else { return nil }
         return .init(content: richContent)

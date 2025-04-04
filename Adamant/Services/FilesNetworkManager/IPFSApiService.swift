@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 enum IPFSApiCommands {
     static let file = (
@@ -19,21 +19,21 @@ enum IPFSApiCommands {
 
 final class IPFSApiService: FileApiServiceProtocol {
     let service: BlockchainHealthCheckWrapper<IPFSApiCore>
-    
+
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { service.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { service.nodesInfo }
-    
+
     func healthCheck() { service.healthCheck() }
-    
+
     init(
         healthCheckWrapper: BlockchainHealthCheckWrapper<IPFSApiCore>
     ) {
         service = healthCheckWrapper
     }
-    
+
     func request<Output>(
         _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
@@ -41,7 +41,7 @@ final class IPFSApiService: FileApiServiceProtocol {
             await request(admApiCore.apiCore, node)
         }
     }
-    
+
     func uploadFile(
         data: Data,
         uploadProgress: @escaping @Sendable (Progress) -> Void
@@ -51,7 +51,7 @@ final class IPFSApiService: FileApiServiceProtocol {
             fileName: defaultFileName,
             data: data
         )
-        
+
         let result: Result<IpfsDTO, ApiServiceError> = await request { core, origin in
             await core.sendRequestMultipartFormDataJsonResponse(
                 origin: origin,
@@ -61,18 +61,18 @@ final class IPFSApiService: FileApiServiceProtocol {
                 uploadProgress: uploadProgress
             )
         }
-        
+
         return result.flatMap { result in
             guard let cid = result.cids.first else {
                 return .failure(
                     .serverError(error: FileManagerError.cantUploadFile.localizedDescription)
                 )
             }
-            
+
             return .success(cid)
         }.mapError { .apiError(error: $0) }
     }
-    
+
     func downloadFile(
         id: String,
         downloadProgress: @escaping @Sendable (Progress) -> Void
@@ -84,30 +84,31 @@ final class IPFSApiService: FileApiServiceProtocol {
                 timeout: .extended,
                 downloadProgress: downloadProgress
             )
-            
+
             if let error = handleError(result) {
                 return .failure(error)
             }
-            
+
             return result.result
         }
-        
+
         return result.flatMap { .success($0) }
             .mapError { .apiError(error: $0) }
     }
 }
 
-private extension IPFSApiService {
-    func handleError(_ result: APIResponseModel) -> ApiServiceError? {
+extension IPFSApiService {
+    fileprivate func handleError(_ result: APIResponseModel) -> ApiServiceError? {
         guard let code = result.code,
-              !(200 ... 299).contains(code)
+            !(200...299).contains(code)
         else { return nil }
-        
+
         let serverError = ApiServiceError.serverError(error: "\(code)")
-        let error = code == 500 || code == 502 || code == 504
-        ? .networkError(error: serverError)
-        : serverError
-        
+        let error =
+            code == 500 || code == 502 || code == 504
+            ? .networkError(error: serverError)
+            : serverError
+
         return error
     }
 }

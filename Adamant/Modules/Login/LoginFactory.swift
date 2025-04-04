@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Swinject
 import CommonKit
+import Swinject
+import UIKit
 
 @MainActor
 struct LoginFactory {
     let assembler: Assembler
-    
+
     func makeViewController(screenFactory: ScreensFactory) -> LoginViewController {
         LoginViewController(
             accountService: assembler.resolve(AccountService.self)!,

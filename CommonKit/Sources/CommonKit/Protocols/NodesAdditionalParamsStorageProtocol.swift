@@ -7,8 +7,8 @@
 //
 
 // MARK: - SecureStore keys
-public extension StoreKey {
-    enum NodesAdditionalParamsStorage {
+extension StoreKey {
+    public enum NodesAdditionalParamsStorage {
         public static let fastestNodeMode = "nodesAdditionalParamsStorage.fastestNodeMode"
     }
 }

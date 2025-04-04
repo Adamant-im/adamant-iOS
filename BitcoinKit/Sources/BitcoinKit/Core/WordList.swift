@@ -2082,7 +2082,7 @@ class WordList {
             """
         return words.split(separator: "\n")
     }()
-    static var japanese: [String.SubSequence] =  {
+    static var japanese: [String.SubSequence] = {
         let words =
             """
             あいこくしん
@@ -14406,7 +14406,7 @@ class WordList {
             """
         return words.split(separator: "\n")
     }()
-    static var italian: [String.SubSequence] =  {
+    static var italian: [String.SubSequence] = {
         let words =
             """
             abaco

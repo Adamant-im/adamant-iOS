@@ -42,7 +42,8 @@ extension Transaction {
     internal func getSequenceHash(hashType: SighashType) -> Data {
         if !hashType.isAnyoneCanPay
             && !hashType.isSingle
-            && !hashType.isNone {
+            && !hashType.isNone
+        {
             // If none of the ANYONECANPAY, SINGLE, NONE sighash type is set, hashSequence is the double SHA256 of the serialization of nSequence of all inputs
             let serializedSequence: Data = inputs.reduce(Data()) { $0 + $1.sequence }
             return Crypto.sha256sha256(serializedSequence)
@@ -54,7 +55,8 @@ extension Transaction {
 
     internal func getOutputsHash(index: Int, hashType: SighashType) -> Data {
         if !hashType.isSingle
-            && !hashType.isNone {
+            && !hashType.isNone
+        {
             // If the sighash type is neither SINGLE nor NONE, hashOutputs is the double SHA256 of the serialization of all output amounts (8-byte little endian) paired up with their scriptPubKey (serialized as scripts inside CTxOuts)
             let serializedOutputs: Data = outputs.reduce(Data()) { $0 + $1.serialized() }
             return Crypto.sha256sha256(serializedOutputs)

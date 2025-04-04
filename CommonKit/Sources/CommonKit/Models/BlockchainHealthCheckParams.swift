@@ -14,7 +14,7 @@ public struct BlockchainHealthCheckParams: Sendable {
     public let crucialUpdateInterval: TimeInterval
     public let minNodeVersion: Version?
     public let nodeHeightEpsilon: Int
-    
+
     public init(
         group: NodeGroup,
         name: String,

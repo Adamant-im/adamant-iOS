@@ -6,12 +6,13 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import XCTest
-@testable import Adamant
+import BigInt
 import CommonKit
 import Web3Core
+import XCTest
+
+@testable import Adamant
 @testable import web3swift
-import BigInt
 
 final class EthWalletServiceTests: XCTestCase {
     private var sut: EthWalletService!
@@ -25,7 +26,7 @@ final class EthWalletServiceTests: XCTestCase {
     private var ethMock: IEthMock!
     private var web3: Web3!
     private var session: URLSession!
-    
+
     override func setUp() async throws {
         try await super.setUp()
         apiCoreMock = APICoreProtocolMock()
@@ -40,18 +41,18 @@ final class EthWalletServiceTests: XCTestCase {
         session = makeSession()
         web3ProviderMock.session = session
         let store = try XCTUnwrap(try makeKeystore())
-        
+
         walletStorage = .init(keystore: store, unicId: "ERC20ETH")
         keystoreManager = .init([store])
         increaseFeeServiceMock = IncreaseFeeServiceMock()
-        
+
         sut = EthWalletService()
         sut.increaseFeeService = increaseFeeServiceMock
         sut.setWalletForTests(walletStorage.getWallet())
         sut.ethApiService = ethApiMock
         increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
     }
-    
+
     override func tearDown() {
         sut = nil
         apiCoreMock = nil
@@ -64,11 +65,11 @@ final class EthWalletServiceTests: XCTestCase {
         MockURLProtocol.requestHandler = nil
         super.tearDown()
     }
-    
+
     func test_createTransaction_noWalletThrowsError() async throws {
         // GIVEN
         sut.setWalletForTests(nil)
-        
+
         // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
@@ -78,11 +79,11 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
-    
+
     func test_createTransaction_invalidAddressThrowsError() async throws {
         // WHEN
         let result = await Result(catchingAsync: {
@@ -93,11 +94,11 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
-    
+
     func test_createTransaction_invalidAmountThrowsError() async throws {
         // WHEN
         let result = await Result(catchingAsync: {
@@ -108,11 +109,11 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .invalidAmount(.nan))
     }
-    
+
     func test_createTransaction_noKeystoreManagerThrowsError() async throws {
         // WHEN
         let result = await Result(catchingAsync: {
@@ -123,7 +124,7 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         // THEN
         switch result.error as? WalletServiceError {
         case .internalError?:
@@ -132,12 +133,12 @@ final class EthWalletServiceTests: XCTestCase {
             XCTFail("Expected `.internalError`, got :\(String(describing: result.error))")
         }
     }
-    
+
     func test_createTransaction_correctFields() async throws {
         // GIVEN
         await setupKeyStoreManager()
         makeTransactionsCountMock()
-        
+
         // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
@@ -147,7 +148,7 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         // THEN
         XCTAssertNil(result.error)
         let transaction = try XCTUnwrap(result.value)
@@ -158,13 +159,13 @@ final class EthWalletServiceTests: XCTestCase {
         XCTAssertEqual(transaction.encode(), Constants.expectedTxData)
         XCTAssertEqual(transaction.hashForSignature(), Constants.extectedSignatureHash)
     }
-    
+
     func test_createAndSendTransaction_sendsCorrectData() async throws {
         // GIVEN
         var didCallSendMock = false
         await setupKeyStoreManager()
         makeTransactionsCountMock()
-        
+
         // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
@@ -174,27 +175,27 @@ final class EthWalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
+
         let transaction = try XCTUnwrap(result.value)
         let data = try XCTUnwrap(transaction.encode())
         let hash = data.toHexString().addHexPrefix()
         makeEthSendMock(expectedHash: hash) { didCallSendMock = true }
-        
+
         let sendResult = await Result {
             try await self.sut.sendTransaction(transaction)
         }
-        
+
         // THEN
         XCTAssertNil(sendResult.error)
         XCTAssertTrue(ethMock.invokedSendRaw)
         XCTAssertTrue(didCallSendMock)
     }
-    
+
     private func setupKeyStoreManager() async {
         await ethApiMock.setKeystoreManager(keystoreManager)
         web3ProviderMock.attachedKeystoreManager = keystoreManager
     }
-    
+
     private func makeSession() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
@@ -210,7 +211,7 @@ final class EthWalletServiceTests: XCTestCase {
 
             let ethBody = try JSONDecoder().decode(EthRequestBody.self, from: Data(reading: stream))
             guard ethBody.method == Constants.transactionCountResponseMethod else { return nil }
-            
+
             return try self.makeResponseAndMockData(
                 url: request.url!,
                 ethResponse: EthAPIResponse(result: "\(Constants.nonce)")
@@ -251,7 +252,7 @@ final class EthWalletServiceTests: XCTestCase {
         let mockData = try JSONEncoder().encode(ethResponse)
         return (response, mockData)
     }
-    
+
     private func makeKeystore() throws -> BIP32Keystore? {
         try BIP32Keystore(
             mnemonics: "village lunch say patrol glow first hurt shiver name method dolphin sample",
@@ -272,13 +273,13 @@ private enum Constants {
         91, 13, 9, 179, 80, 252, 71, 102, 108, 115, 61, 254, 105, 0, 115, 81, 242
     ])
     static let expectedTxData = Data([
-            248, 108, 2, 133, 2, 143, 166, 174, 0, 130, 94, 136, 148, 171, 253, 245,
-            5, 255, 213, 88, 125, 158, 119, 7, 223, 180, 127, 69, 175, 31, 3, 226, 117,
-            136, 138, 199, 35, 4, 137, 232, 0, 0, 128, 36, 160, 142, 188, 94, 138, 169,
-            58, 131, 110, 28, 87, 29, 119, 40, 126, 98, 187, 13, 210, 2, 58, 244, 151, 234,
-            149, 49, 14, 49, 195, 53, 129, 29, 40, 160, 79, 100, 92, 44, 207, 73, 57, 12, 184,
-            108, 82, 24, 242, 197, 97, 151, 32, 107, 254, 152, 1, 73, 147, 254, 141, 113, 51,
-            45, 211, 225, 3, 2
+        248, 108, 2, 133, 2, 143, 166, 174, 0, 130, 94, 136, 148, 171, 253, 245,
+        5, 255, 213, 88, 125, 158, 119, 7, 223, 180, 127, 69, 175, 31, 3, 226, 117,
+        136, 138, 199, 35, 4, 137, 232, 0, 0, 128, 36, 160, 142, 188, 94, 138, 169,
+        58, 131, 110, 28, 87, 29, 119, 40, 126, 98, 187, 13, 210, 2, 58, 244, 151, 234,
+        149, 49, 14, 49, 195, 53, 129, 29, 40, 160, 79, 100, 92, 44, 207, 73, 57, 12, 184,
+        108, 82, 24, 242, 197, 97, 151, 32, 107, 254, 152, 1, 73, 147, 254, 141, 113, 51,
+        45, 211, 225, 3, 2
     ])
 
     static let nonce = 2

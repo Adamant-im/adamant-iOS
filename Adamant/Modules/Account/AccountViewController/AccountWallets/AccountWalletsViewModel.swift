@@ -6,29 +6,29 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import Foundation
-import CommonKit
 import Combine
+import CommonKit
+import Foundation
 
 @MainActor
 final class AccountWalletsViewModel {
     @ObservableValue var state: AccountWalletsState = .default
-    
+
     private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
-    
+
     init(walletsStoreService: WalletStoreServiceProviderProtocol) {
         self.walletsStoreService = walletsStoreService
         setup()
     }
 }
 
-private extension AccountWalletsViewModel {
-    func setup() {
+extension AccountWalletsViewModel {
+    fileprivate func setup() {
         addObservers()
     }
-    
-    func addObservers() {
+
+    fileprivate func addObservers() {
         for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
@@ -41,7 +41,7 @@ private extension AccountWalletsViewModel {
         }
     }
 
-    func updateInfo(for wallet: WalletService) {
+    fileprivate func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
         if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUniqueID }) {
             state.wallets[index].balance = coreService.wallet?.balance ?? 0
@@ -49,7 +49,7 @@ private extension AccountWalletsViewModel {
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
             let network = type(of: coreService).tokenNetworkSymbol
-            
+
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,
@@ -60,7 +60,7 @@ private extension AccountWalletsViewModel {
                 balance: coreService.wallet?.balance ?? 0,
                 notificationBadgeCount: coreService.wallet?.notifications ?? 0
             )
-            
+
             state.wallets.append(model)
         }
     }

@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension StoreKey {
     enum PushNotificationsTokenService {

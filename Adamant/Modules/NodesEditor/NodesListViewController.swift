@@ -6,10 +6,10 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Eureka
-import CommonKit
 import Combine
+import CommonKit
+import Eureka
+import UIKit
 
 // MARK: - Localization
 extension String.adamant {
@@ -20,15 +20,15 @@ extension String.adamant {
         static var nodesListButton: String {
             String.localized("NodesList.NodesList", comment: "NodesList: Button label")
         }
-        
+
         static var defaultNodesWasLoaded: String {
             String.localized("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
         }
-        
+
         static var resetAlertTitle: String {
             String.localized("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
         }
-        
+
         static var fastestNodeModeTip: String {
             String.localized(
                 "NodesList.PreferTheFastestNode.Footer",
@@ -41,12 +41,12 @@ extension String.adamant {
 // MARK: - NodesListViewController
 final class NodesListViewController: FormViewController {
     // Rows & Sections
-    
+
     private enum Sections {
         case nodes
         case buttons
         case preferTheFastestNode
-        
+
         var tag: String {
             switch self {
             case .nodes: return "nds"
@@ -55,32 +55,32 @@ final class NodesListViewController: FormViewController {
             }
         }
     }
-    
+
     private enum Rows {
         case addNode
         case save
         case reset
         case preferTheFastestNode
-        
+
         var localized: String {
             switch self {
             case .addNode:
                 return .localized("NodesList.AddNewNode", comment: "NodesList: 'Add new node' button lable")
-                
+
             case .save:
                 return String.adamant.alert.save
-                
+
             case .reset:
                 return .localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
-                
+
             case .preferTheFastestNode:
                 return .localized("NodesList.PreferTheFastestNode", comment: "NodesList: 'Prefer the fastest node' switch")
             }
         }
     }
-    
+
     // MARK: Dependencies
-    
+
     private let dialogService: DialogService
     private let securedStore: SecureStore
     private let screensFactory: ScreensFactory
@@ -88,19 +88,19 @@ final class NodesListViewController: FormViewController {
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
     private let apiService: AdamantApiServiceProtocol
     private let socketService: SocketService
-    
+
     // Properties
-    
+
     @ObservableValue private var nodesList = [Node]()
     @ObservableValue private var currentSocketsNodeId: UUID?
     @ObservableValue private var chosenRestNodeId: UUID?
-    
+
     private var nodesHaveBeenDisplayed = false
     private var timerSubsctiption: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
-    
+
     // MARK: - Lifecycle
-    
+
     init(
         dialogService: DialogService,
         securedStore: SecureStore,
@@ -119,93 +119,94 @@ final class NodesListViewController: FormViewController {
         self.socketService = socketService
         super.init(style: .insetGrouped)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("Isn't implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = String.adamant.nodesList.title
         navigationOptions = .Disabled
         navigationItem.largeTitleDisplayMode = .never
-        
+
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
         }
-        
+
         // MARK: Nodes
-        
-        form +++ Section {
-            $0.tag = Sections.nodes.tag
-        }
-        
-        // MARK: Prefer the fastest node
-        
-        +++ Section {
-            $0.tag = Sections.preferTheFastestNode.tag
-            $0.footer = HeaderFooterView(stringLiteral: .adamant.nodesList.fastestNodeModeTip)
-        }
-        
-        <<< SwitchRow { [nodesAdditionalParamsStorage] in
-            $0.title = Rows.preferTheFastestNode.localized
-            $0.value = nodesAdditionalParamsStorage.isFastestNodeMode(
-                group: nodeGroup
-            )
-        }.onChange { [nodesAdditionalParamsStorage] in
-            nodesAdditionalParamsStorage.setFastestNodeMode(
-                group: nodeGroup,
-                value: $0.value ?? true
-            )
-        }.cellUpdate { cell, _ in
-            cell.switchControl.onTintColor = .adamant.active
-        }
-        
-        // MARK: Buttons
-        
-        +++ Section {
-            $0.tag = Sections.buttons.tag
-        }
-        
-        // Add node
-        <<< ButtonRow {
-            $0.title = Rows.addNode.localized
-        }.cellSetup { (cell, _) in
-            cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, _) in
-            self?.createNewNode()
-        }
-            
-        // Reset
-        <<< ButtonRow {
-            $0.title = Rows.reset.localized
-        }.onCellSelection { [weak self] (_, _) in
-            self?.resetToDefault()
-        }
-        
+
+        form
+            +++ Section {
+                $0.tag = Sections.nodes.tag
+            }
+
+            // MARK: Prefer the fastest node
+
+            +++ Section {
+                $0.tag = Sections.preferTheFastestNode.tag
+                $0.footer = HeaderFooterView(stringLiteral: .adamant.nodesList.fastestNodeModeTip)
+            }
+
+            <<< SwitchRow { [nodesAdditionalParamsStorage] in
+                $0.title = Rows.preferTheFastestNode.localized
+                $0.value = nodesAdditionalParamsStorage.isFastestNodeMode(
+                    group: nodeGroup
+                )
+            }.onChange { [nodesAdditionalParamsStorage] in
+                nodesAdditionalParamsStorage.setFastestNodeMode(
+                    group: nodeGroup,
+                    value: $0.value ?? true
+                )
+            }.cellUpdate { cell, _ in
+                cell.switchControl.onTintColor = .adamant.active
+            }
+
+            // MARK: Buttons
+
+            +++ Section {
+                $0.tag = Sections.buttons.tag
+            }
+
+            // Add node
+            <<< ButtonRow {
+                $0.title = Rows.addNode.localized
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.onCellSelection { [weak self] (_, _) in
+                self?.createNewNode()
+            }
+
+            // Reset
+            <<< ButtonRow {
+                $0.title = Rows.reset.localized
+            }.onCellSelection { [weak self] (_, _) in
+                self?.resetToDefault()
+            }
+
         setColors()
         setupObservers()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         apiService.healthCheck()
         setHealthCheckTimer()
     }
-    
+
     // MARK: - Other
-    
+
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
-    
+
     private func setupObservers() {
         apiService.nodesInfoPublisher
             .sink { [weak self] in self?.setNewNodesList($0) }
             .store(in: &subscriptions)
-        
+
         NotificationCenter.default
             .notifications(named: .SocketService.currentNodeUpdate, object: nil)
             .sink { @MainActor [weak self] _ in
@@ -214,14 +215,14 @@ final class NodesListViewController: FormViewController {
                 self?.currentSocketsNodeId = newId
             }
             .store(in: &subscriptions)
-        
+
         currentSocketsNodeId = socketService.currentNode?.id
     }
-    
+
     private func setNewNodesList(_ newNodes: NodesListInfo) {
         nodesList = newNodes.nodes
         chosenRestNodeId = newNodes.chosenNodeId
-        
+
         if !nodesHaveBeenDisplayed {
             UIView.performWithoutAnimation {
                 remakeNodesRows()
@@ -229,7 +230,7 @@ final class NodesListViewController: FormViewController {
         } else {
             remakeNodesRows()
         }
-        
+
         nodesHaveBeenDisplayed = true
     }
 }
@@ -239,37 +240,37 @@ extension NodesListViewController {
     func createNewNode() {
         presentEditor(forNode: nil)
     }
-    
+
     func addNode(node: Node) {
         getNodesSection()?.append(createRowFor(nodeId: node.id, tag: generateRandomTag()))
         nodesStorage.addNode(node, group: nodeGroup)
     }
-    
+
     func removeNode(nodeId: UUID) {
         guard let index = getNodeIndex(nodeId: nodeId) else { return }
-        
+
         getNodesSection()?.remove(at: index)
         nodesStorage.removeNode(id: nodeId, group: .adm)
     }
-    
+
     func getNodeIndex(nodeId: UUID) -> Int? {
         displayedNodesIds.firstIndex { $0 == nodeId }
     }
-    
+
     func getNodesSection() -> Section? {
         form.sectionBy(tag: Sections.nodes.tag)
     }
-    
+
     var displayedNodesIds: [UUID] {
         getNodesSection()?.allRows.compactMap {
             ($0.baseValue as? NodeCell.Model)?.id
         } ?? []
     }
-    
+
     func editNode(_ node: Node) {
         presentEditor(forNode: node)
     }
-    
+
     @objc func close() {
         if self.navigationController?.viewControllers.count == 1 {
             self.dismiss(animated: true, completion: nil)
@@ -277,32 +278,34 @@ extension NodesListViewController {
             self.navigationController?.popViewController(animated: true)
         }
     }
-    
+
     func resetToDefault(silent: Bool = false) {
         if silent {
             nodesStorage.resetNodes([nodeGroup])
             return
         }
-        
+
         let alert = UIAlertController(title: String.adamant.nodesList.resetAlertTitle, message: nil, preferredStyleSafe: .alert, source: nil)
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(
-            title: Rows.reset.localized,
-            style: .destructive,
-            handler: { [weak self] _ in self?.nodesStorage.resetNodes([nodeGroup]) }
-        ))
+        alert.addAction(
+            UIAlertAction(
+                title: Rows.reset.localized,
+                style: .destructive,
+                handler: { [weak self] _ in self?.nodesStorage.resetNodes([nodeGroup]) }
+            )
+        )
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }
-    
+
     func remakeNodesRows() {
         guard
             let nodesSection = getNodesSection(),
             displayedNodesIds != nodesList.map({ $0.id })
         else { return }
-        
+
         nodesSection.removeAll()
-        
+
         for node in nodesList {
             let row = createRowFor(nodeId: node.id, tag: generateRandomTag())
             nodesSection.append(row)
@@ -321,7 +324,7 @@ extension NodesListViewController: NodeEditorDelegate {
         case .nodeUpdated, .cancel:
             break
         }
-        
+
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             navigationController?.popToViewController(self, animated: true)
         } else {
@@ -335,7 +338,7 @@ extension NodesListViewController: NodeEditorDelegate {
 extension NodesListViewController {
     func loadDefaultNodes(showAlert: Bool) {
         nodesStorage.resetNodes([nodeGroup])
-        
+
         if showAlert {
             dialogService.showSuccess(withMessage: String.adamant.nodesList.defaultNodesWasLoaded)
         }
@@ -348,17 +351,17 @@ extension NodesListViewController {
         let row = NodeRow {
             $0.cell.subscribe(makeNodeCellPublisher(nodeId: nodeId))
             $0.tag = tag
-            
+
             let deleteAction = SwipeAction(
                 style: .destructive,
                 title: "Delete"
             ) { [weak self] _, row, completionHandler in
                 defer { completionHandler?(true) }
-                
+
                 guard let model = row.baseValue as? NodeCell.Model else { return }
                 self?.removeNode(nodeId: model.id)
             }
-            
+
             $0.trailingSwipe.actions = [deleteAction]
             $0.trailingSwipe.performsFirstActionWithFullSwipe = true
         }.cellUpdate { (cell, _) in
@@ -367,21 +370,21 @@ extension NodesListViewController {
             }
         }.onCellSelection { [weak self] (_, row) in
             defer { row.deselect(animated: true) }
-            
+
             guard
                 let self = self,
                 let node = self.nodesList.first(where: { $0.id == row.value?.id })
             else { return }
-            
+
             self.editNode(node)
         }
-        
+
         return row
     }
-    
+
     private func presentEditor(forNode node: Node?) {
         let editor = screensFactory.makeNodeEditor()
-        
+
         editor.delegate = self
         editor.node = node
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
@@ -392,26 +395,27 @@ extension NodesListViewController {
             present(navigator, animated: true, completion: nil)
         }
     }
-    
+
     private func generateRandomTag() -> String {
         let capacity = 6
         var nums: [UInt32] = []
         nums.reserveCapacity(capacity)
-        
+
         for _ in 0...capacity {
             nums.append(arc4random_uniform(10))
         }
-        
+
         return nums.compactMap { String($0) }.joined()
     }
-    
+
     private func setHealthCheckTimer() {
-        timerSubsctiption = Timer
+        timerSubsctiption =
+            Timer
             .publish(every: nodeGroup.onScreenUpdateInterval, on: .main, in: .default)
             .autoconnect()
             .sink { [apiService] _ in apiService.healthCheck() }
     }
-    
+
     private func makeNodeCellModel(node: Node) -> NodeCell.Model {
         .init(
             id: node.id,
@@ -433,19 +437,19 @@ extension NodesListViewController {
             }
         )
     }
-    
+
     private func makeNodeCellPublisher(nodeId: UUID) -> some Observable<NodeCell.Model> {
         $nodesList.combineLatest(
             $currentSocketsNodeId,
             $chosenRestNodeId
         ).compactMap { [weak self] tuple in
             let nodes = tuple.0
-            
+
             guard
                 let self = self,
                 let node = nodes.first(where: { $0.id == nodeId })
             else { return nil }
-            
+
             return self.makeNodeCellModel(node: node)
         }
     }

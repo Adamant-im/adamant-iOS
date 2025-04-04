@@ -13,7 +13,7 @@ public struct AsyncMapStreamable<
 >: AsyncStreamable where NewProducedSequence.Element: Sendable {
     private let wrapped: Wrapped
     private let transformation: @Sendable (Wrapped.ProducedSequence) -> NewProducedSequence
-    
+
     public init(
         wrapped: Wrapped,
         transformation: @escaping @Sendable (Wrapped.ProducedSequence) -> NewProducedSequence
@@ -21,14 +21,14 @@ public struct AsyncMapStreamable<
         self.wrapped = wrapped
         self.transformation = transformation
     }
-    
+
     public func makeSequence() -> NewProducedSequence {
         transformation(wrapped.makeSequence())
     }
 }
 
-public extension AsyncStreamable {
-    func map<NewProducedSequence>(
+extension AsyncStreamable {
+    public func map<NewProducedSequence>(
         _ transformation: @escaping @Sendable (ProducedSequence) -> NewProducedSequence
     ) -> AsyncMapStreamable<Self, NewProducedSequence> {
         .init(wrapped: self, transformation: transformation)

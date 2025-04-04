@@ -10,28 +10,39 @@ import Foundation
 
 class BaseBtcTransaction: TransactionDetails, @unchecked Sendable {
     var defaultCurrencySymbol: String? { return "" }
-    
+
     let txId: String
     let dateValue: Date?
     let blockValue: String?
-    
+
     let senderAddress: String
     let recipientAddress: String
-    
+
     let amountValue: Decimal?
     let feeValue: Decimal?
     let confirmationsValue: String?
-    
+
     let isOutgoing: Bool
     let transactionStatus: TransactionStatus?
-    
+
     var blockHeight: UInt64?
-    
+
     var nonceRaw: String? {
         nil
     }
-    
-    required init(txId: String, dateValue: Date?, blockValue: String?, senderAddress: String, recipientAddress: String, amountValue: Decimal, feeValue: Decimal?, confirmationsValue: String?, isOutgoing: Bool, transactionStatus: TransactionStatus?) {
+
+    required init(
+        txId: String,
+        dateValue: Date?,
+        blockValue: String?,
+        senderAddress: String,
+        recipientAddress: String,
+        amountValue: Decimal,
+        feeValue: Decimal?,
+        confirmationsValue: String?,
+        isOutgoing: Bool,
+        transactionStatus: TransactionStatus?
+    ) {
         self.txId = txId
         self.dateValue = dateValue
         self.blockValue = blockValue

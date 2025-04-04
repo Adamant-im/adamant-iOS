@@ -13,7 +13,7 @@ extension Accounts {
 
         public let data: [LegacyAccountModel]
     }
-    
+
     public struct AccountsResponse: APIResponse {
 
         public let data: AccountModel

@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import FilesPickerKit
 
 final class FilesPickerKitTests: XCTestCase {

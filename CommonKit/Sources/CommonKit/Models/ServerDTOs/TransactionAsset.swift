@@ -12,7 +12,7 @@ public struct TransactionAsset: Codable, Hashable, Sendable {
     public let chat: ChatAsset?
     public let state: StateAsset?
     public let votes: VotesAsset?
-    
+
     public init(chat: ChatAsset? = nil, state: StateAsset? = nil, votes: VotesAsset? = nil) {
         self.chat = chat
         self.state = state

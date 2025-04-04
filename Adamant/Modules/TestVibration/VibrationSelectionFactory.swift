@@ -6,18 +6,18 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Swinject
 import SwiftUI
+import Swinject
 
 @MainActor
 struct VibrationSelectionFactory {
     private let parent: Assembler
     private let assemblies = [VibrationSelectionAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     @MainActor
     func makeViewController() -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
