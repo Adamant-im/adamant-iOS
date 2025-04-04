@@ -41,22 +41,10 @@ extension ChatMediaContainerView {
             }.count
             
             let otherFilesCount = content.fileModel.files.count - mediaFilesCount
-            
-            let previewEmodji = FilePresentationHelper.getFilePresentationText(
-                mediaFilesCount: mediaFilesCount,
-                otherFilesCount: otherFilesCount,
-                comment: ""
-            )
-            
-            let comment = content.comment.string
-            var processedComment = ChatMessageFactory.markdownParser.parse(comment)
-            
-            let parsedPreviewEmodji = ChatMessageFactory.markdownParser.parse(previewEmodji)
-            
-            let combined = NSMutableAttributedString(attributedString: parsedPreviewEmodji)
-            combined.append(processedComment)
+                        
+            let result = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaFilesCount, otherFilesCount: otherFilesCount, comment: content.comment.string, parsedWith: ChatMessageFactory.markdownParser)
            
-            return combined
+            return result
         }
     }
 }

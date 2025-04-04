@@ -1034,53 +1034,30 @@ extension ChatListViewController {
                 if [.file, .reply].contains(richMessage.additionalType),
                    let rawContent = richMessage.richContent {
                     
-                    // Add prefix "you:" for outgoing messages
                     let youPrefixText = richMessage.isOutgoing ? String.adamant.chatList.sentMessagePrefix : ""
                     
-                    // If it's a reply with plain text — handle it as a simple reply
                     if richMessage.additionalType == .reply,
                        let replyText = rawContent[RichContentKeys.reply.replyMessage] as? String {
                         return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: replyText)
                     }
                     
-                    // Extract actual file content
-                    let content = (rawContent[RichContentKeys.reply.replyMessage] as? [String: Any]) ?? rawContent
+                    let result = NSMutableAttributedString(attributedString: markdownParser.parse(youPrefixText))
                     
-                    // Try to get the comment from content, otherwise skip rendering
-                    guard let commentText = content[RichContentKeys.file.comment] as? String else { return nil }
-                    
-                    // Remove comment from the content to isolate file data
-                    let fileContent = content.filter { $0.key != RichContentKeys.file.comment }
-                    
-                    // Parse outgoing prefix (e.g., "you:")
-                    let prefix = markdownParser.parse(youPrefixText)
-                    
-                    // Render reply text block (e.g., a reply bubble or label)
                     let replyAttributedText = richMessage.additionalType == .reply
                     ? makeReplayNSAttributedString()
                     : NSAttributedString()
                     
-                    // Convert file metadata to emoji/text form (e.g., 📎 file.pdf)
-                    let fileTextConverted = FilePresentationHelper.getFilePresentationText(fileContent)
+                    result.append(replyAttributedText)
                     
-                    // Parse comment text with markdown, then apply link color formatting
-                    var formattedComment = markdownParser
-                        .parse(commentText)
-                        .resolveLinkColor()
+                    let content = (rawContent[RichContentKeys.reply.replyMessage] as? [String: Any]) ?? rawContent
+                                        
+                    let text = FilePresentationHelper.getFilePresentationText(content, parsedWith: markdownParser, resolveLinkColor: true)
                     
-                    // Optionally post-process text (e.g., truncating links, adding spacing)
-                    formattedComment = MessageProcessHelper.process(attributedText: formattedComment)
+                    result.append(text)
                     
-                    // Compose the final message by merging all parts
-                    let parts: [NSAttributedString] = [
-                        prefix,
-                        replyAttributedText,
-                        richMessage.additionalType == .reply ? NSAttributedString(string: " ") : NSAttributedString(),
-                        NSAttributedString(string: fileTextConverted),
-                        formattedComment
-                    ]
+                    let formattedResult = MessageProcessHelper.process(attributedText: result)
                     
-                    return parts.joined()
+                    return formattedResult
                 }
                 
                 if let serialized = richMessage.serializedMessage() {
@@ -1107,10 +1084,9 @@ extension ChatListViewController {
             let mediaCount = files.count(where: { $0.type.isMedia })
             let otherCount = files.count(where: { !$0.type.isMedia })
             
-            let text = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaCount, otherFilesCount: otherCount, comment: "")
-            let prefix = markdownParser.parse(text).resolveLinkColor()
+            let text = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaCount, otherFilesCount: otherCount, comment: "", parsedWith: markdownParser, resolveLinkColor: true)
             
-            descriptionParts.insert(prefix, at: 0)
+            descriptionParts.insert(text, at: 0)
         }
         
         guard descriptionParts.contains(where: { !$0.string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty }) else {

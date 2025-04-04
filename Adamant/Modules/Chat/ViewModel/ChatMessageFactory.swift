@@ -216,7 +216,7 @@ private extension ChatMessageFactory {
         
         let replyMessage = makeAttributed(replyMessageRaw)
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
-        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let decodedMessageMarkDown = FilePresentationHelper.getFilePresentationText(from: decodedMessage, parsedWith: Self.markdownReplyParser, resolveLinkColor: true)
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
         
         let address = transaction.isOutgoing
@@ -364,25 +364,32 @@ private extension ChatMessageFactory {
     }
     
     func makeAttributed(_ text: String) -> NSMutableAttributedString {
-        let attributedString = Self.markdownParser.parse(text)
-        
-        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+        let attributedString = FilePresentationHelper.getFilePresentationText(
+            from: text,
+            parsedWith: Self.markdownParser,
+            resolveLinkColor: false
+        )
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = lineSpacing
         
-        mutableAttributedString.addAttribute(
-            NSAttributedString.Key.paragraphStyle,
+        attributedString.addAttribute(
+            .paragraphStyle,
             value: paragraphStyle,
-            range: NSRange(location: .zero, length: attributedString.length)
+            range: NSRange(location: 0, length: attributedString.length)
         )
         
-        return mutableAttributedString
+        return attributedString
     }
     
     func decodeMessage(_ transaction: RichMessageTransaction) -> NSMutableAttributedString {
-        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
-        return Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let decoded = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        return FilePresentationHelper
+            .getFilePresentationText(
+                from: decoded,
+                parsedWith: Self.markdownReplyParser,
+                resolveLinkColor: true
+            )
     }
     
     func makeChatFiles(
@@ -583,3 +590,48 @@ private extension ChatSender {
 }
 
 private let lineSpacing: CGFloat = 1.15
+
+private extension FilePresentationHelper {
+    static func getFilePresentationText(
+        from string: String,
+        parsedWith parser: MarkdownParser? = nil,
+        resolveLinkColor: Bool = false
+    ) -> NSMutableAttributedString {
+        guard let parser = parser else {
+            return NSMutableAttributedString(string: string)
+        }
+        
+        let (emojiPrefix, markdownBody) = extractEmojiPrefixAndBody(from: string)
+        
+        var parsedEmodji = parser.parse(emojiPrefix)
+        var parsedComment = parser.parse(markdownBody)
+        
+        if resolveLinkColor {
+            parsedEmodji = parsedEmodji.resolveLinkColor()
+            parsedComment = parsedComment.resolveLinkColor()
+        }
+        
+        let result = NSMutableAttributedString()
+        result.append(parsedEmodji)
+        result.append(parsedComment)
+        return result
+    }
+    
+    static func extractEmojiPrefixAndBody(from string: String) -> (String, String) {
+        let pattern = #"^((?:[📸📄]\d*)+)"#
+        let regex = try! NSRegularExpression(pattern: pattern)
+        let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)
+        
+        guard let match = regex.firstMatch(in: string, options: [], range: nsrange),
+              match.range.length > 0
+        else {
+            return ("", string)
+        }
+        
+        let prefix = (string as NSString).substring(with: match.range)
+        let body = (string as NSString).substring(from: match.range.length)
+        
+        let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        return (prefix, trimmedBody)
+    }
+}
