@@ -1434,6 +1434,9 @@ extension ChatListViewController {
     private func removeManualAdress(adress: String?) {
         if let adress {
             chatsManuallyMarkedAsUnread.remove(adress)
+            Task {
+                await chatsProvider.removeManualMarkChatAsUnread(chatroomId: adress)
+            }
         }
     }
 }
