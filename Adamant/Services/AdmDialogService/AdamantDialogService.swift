@@ -186,6 +186,10 @@ extension AdamantDialogService {
     func dissmisNoConnectionNotification() {
         popupManager.dismissNotification()
     }
+    
+    func shortVibro() {
+        vibroService.applyVibration(.rigid)
+    }
 
     private func sendErrorEmail(errorDescription: String) {
         let body = String(

@@ -117,6 +117,8 @@ extension ChatDialogManager {
             showRenameAlert()
         case .actionMenu:
             showActionMenu()
+        case .shortVibro:
+            dialogService.shortVibro()
         }
     }
 

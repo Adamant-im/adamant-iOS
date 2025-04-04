@@ -639,6 +639,12 @@ extension ChatMessageReplyCell {
     }
 }
 
+extension ChatMessageReplyCell: ChatCellProtocol {
+    func animateMessageHighlight() {
+        messageContainerView.animateHighlight()
+    }
+}
+
 private let reactionsContanerVerticalSpace: CGFloat = 10
 private let minReactionsSpacingToOwnBoundary: CGFloat = 60
 private let minReactionsSpacingToOppositeBoundary: CGFloat = 15

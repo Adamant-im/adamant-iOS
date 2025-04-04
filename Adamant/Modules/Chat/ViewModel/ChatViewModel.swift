@@ -89,7 +89,7 @@ final class ChatViewModel: NSObject {
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
-    var needToAnimateCellIndex: Int?
+    var needToAnimateCellIndex: String?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -134,21 +134,14 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToIdAndPosition: (id: String, position: UICollectionView.ScrollPosition)?
+    @ObservableValue var scrollToIdAndPosition: String?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
         }
     }
 
-    var startPosition: ChatStartPosition? {
-        if messageIdToShow != nil {
-            return nil
-        }
-
-        guard let address = chatroom?.partner?.address else { return nil }
-        return chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
-    }
+    var startPosition: ChatStartPosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -237,6 +230,7 @@ final class ChatViewModel: NSObject {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
+        makeStartPosition()
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -265,6 +259,18 @@ final class ChatViewModel: NSObject {
         }
     }
 
+    func makeStartPosition() {
+        guard messageIdToShow == nil,
+              let address = chatroom?.partner?.address else {
+            startPosition = nil
+            return
+        }
+
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(.init($0)) }
+    }
+    
     func presentKeyboardOnStartIfNeeded() {
         guard
             !inputText.isEmpty
@@ -547,12 +553,8 @@ final class ChatViewModel: NSObject {
                 }
 
                 await waitForMessage(withId: messageId)
-
-                if let lastMessageId = messages.last?.id {
-                    let position: UICollectionView.ScrollPosition = (messageId == lastMessageId) ? .top : .bottom
-                    scrollToIdAndPosition = (id: messageId, position: position)
-                }
-
+                scrollToIdAndPosition = messageId
+                
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
                     markMessageAsRead(index: index)
@@ -1092,6 +1094,10 @@ extension ChatViewModel {
     func unredMessageCount() -> Int? {
         unreadMessagesIds?.count
     }
+    
+    func shortVibro() {
+        dialog.send(.shortVibro)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1310,14 +1316,14 @@ extension ChatViewModel {
 
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
+            updateSeparatorId()
             postProcess(messages: &messages)
-
+            
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
-            updateSeparatorId()
             messagesUpdated.send()
         }
     }

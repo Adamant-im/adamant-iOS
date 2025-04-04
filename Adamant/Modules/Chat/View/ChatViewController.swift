@@ -45,7 +45,8 @@ final class ChatViewController: MessagesViewController {
     private var scrollToUnreadBottomConstraint: Constraint?
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
-    private var scrollToPositionType: UICollectionView.ScrollPosition = .top
+    private var isAnimatingCellHighlight = false
+    private var isAutoScrolling: Bool = false
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -195,22 +196,6 @@ final class ChatViewController: MessagesViewController {
                 ? nil
                 : chatMessagesCollectionView.bottomOffset
         )
-    }
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        willDisplay cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
-        // TODO: refactor for architecture
-        if let index = viewModel.needToAnimateCellIndex,
-            indexPath.section == index
-        {
-            cell.isSelected = true
-            cell.isSelected = false
-            viewModel.needToAnimateCellIndex = nil
-        }
-        super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
 
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
@@ -423,11 +408,9 @@ extension ChatViewController {
 
         viewModel.$scrollToIdAndPosition
             .sink { [weak self] in
-                guard let idAndPosition = $0
+                guard let id = $0
                 else { return }
-
-                self?.scrollToPositionType = idAndPosition.position
-                self?.scrollToPosition(.messageId(idAndPosition.id), animated: false, setExtraOffset: self?.scrollToPositionType == .top)
+                self?.scrollToPosition(.messageId(id), animated: true)
                 self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
@@ -571,6 +554,7 @@ extension ChatViewController {
     }
 
     fileprivate func updateUnreadMessages() {
+        guard !isAutoScrolling else { return }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
 
@@ -765,6 +749,9 @@ extension ChatViewController {
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
+        if !messagesLoaded {
+            viewModel.startPosition.map { scrollToPosition($0) }
+        }
     }
 
     fileprivate func updateMessagesPosition() {
@@ -772,10 +759,8 @@ extension ChatViewController {
         messagesLoaded = true
         if viewModel.messageIdToShow == nil {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
-                scrollToPosition(.messageId(unreadMessage), setExtraOffset: true)
-            } else if let position = viewModel.startPosition {
-                scrollToPosition(position)
-            }
+                scrollToPosition(.messageId(unreadMessage), setExtraOffset: true, scrollAt: .top)
+           }
         }
     }
 
@@ -854,10 +839,10 @@ extension ChatViewController {
         button.action = { [weak self] in
             guard let self else { return }
             if viewModel.shouldScrollToBottom {
+                isAutoScrolling = true
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
-                scrollToPositionType = .top
-                viewModel.scroll(to: id)
+                self.scrollToPosition(.messageId(id), animated: true)
                 viewModel.shouldScrollToBottom = true
             }
         }
@@ -871,8 +856,7 @@ extension ChatViewController {
             guard let self,
                 let unreadId = self.viewModel.messagesWithUnredReactionsIds?.last
             else { return }
-
-            scrollToPositionType = .bottom
+            isAnimatingCellHighlight = false
             viewModel.scroll(to: unreadId)
         }
         button.alpha = 0
@@ -932,7 +916,7 @@ extension ChatViewController {
     }
 
     @MainActor
-    fileprivate func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false) {
+    fileprivate func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false, scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
         chatMessagesCollectionView.fixedBottomOffset = nil
 
         switch position {
@@ -951,13 +935,14 @@ extension ChatViewController {
 
             guard let index = index else { break }
 
+            isAutoScrolling = true
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
-                at: scrollToPositionType,
+                at: scrollAt,
                 animated: animated
             )
 
-            if setExtraOffset {
+            if setExtraOffset && !animated {
                 if checkIfNeedExtraOffsetForUnreadMessages() {
                     setExtraOffsetForNewMessages()
                 }
@@ -965,7 +950,7 @@ extension ChatViewController {
 
             viewModel.needToAnimateCellIndex =
                 needToAnimateCell
-                ? index
+                ? id
                 : nil
 
             guard animated else { break }
@@ -975,9 +960,6 @@ extension ChatViewController {
                 visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
             )
         }
-
-        guard !viewAppeared else { return }
-        chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
     }
 
     fileprivate func setExtraOffsetForNewMessages() {
@@ -1258,25 +1240,46 @@ extension ChatViewController {
 }
 
 // MARK: Animate cell
-
 extension ChatViewController {
     override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         animateScroll(isStarted: false)
-
-        guard let index = viewModel.needToAnimateCellIndex else { return }
-
-        let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
-            $0.section == index
+        isAutoScrolling = false
+        updateUnreadMessages()
+        
+        guard !isAnimatingCellHighlight else { return }
+        guard let messageId = viewModel.needToAnimateCellIndex,
+              let index = viewModel.messages.firstIndex(where: { $0.messageId == messageId }) else {
+            return
         }
 
-        guard isVisible else { return }
+        let indexPath = IndexPath(item: 0, section: index)
+        
+        tryAnimateCell(at: indexPath)
+    }
 
-        // TODO: refactor for architecture
-        let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
-        cell?.isSelected = true
-        cell?.isSelected = false
+    //scrolling to item can work very differently, especially when going to a message at a large distance, so I had to implement it in such a way that the animation would be displayed for sure
+    private func tryAnimateCell(at indexPath: IndexPath, retryCount: Int = 20) {
+        isAnimatingCellHighlight = true
 
-        viewModel.needToAnimateCellIndex = nil
+        guard retryCount > 0 else {
+            isAnimatingCellHighlight = false
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            guard let self = self else { return }
+
+            guard self.messagesCollectionView.indexPathsForVisibleItems.contains(indexPath),
+                  let cell = self.messagesCollectionView.cellForItem(at: indexPath) as? ChatCellProtocol else {
+                self.tryAnimateCell(at: indexPath, retryCount: retryCount - 1)
+                return
+            }
+
+            cell.animateMessageHighlight()
+            self.viewModel.shortVibro()
+            self.viewModel.needToAnimateCellIndex = nil
+            self.isAnimatingCellHighlight = false
+        }
     }
 }
 
