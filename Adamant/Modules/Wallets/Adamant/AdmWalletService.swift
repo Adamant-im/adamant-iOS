@@ -164,6 +164,8 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             return
         }
         
+        admWallet?.isBalanceInitialized = false
+        
         let isRaised: Bool
         
         if let wallet = admWallet {

@@ -306,6 +306,9 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
             break
         }
         
+        wallet.isBalanceInitialized = false
+        walletUpdateSender.send()
+        
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
@@ -315,11 +318,9 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
             
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-            
-            walletUpdateSender.send()
-        } else {
-            wallet.isBalanceInitialized = false
         }
+        
+        walletUpdateSender.send()
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,

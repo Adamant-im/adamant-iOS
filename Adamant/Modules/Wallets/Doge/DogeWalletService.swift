@@ -260,6 +260,9 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             break
         }
         
+        wallet.isBalanceInitialized = false
+        walletUpdateSender.send()
+        
         setState(.updating)
         
         if let balance = try? await getBalance() {
@@ -269,11 +272,9 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-            
-            walletUpdateSender.send()
-        } else {
-            wallet.isBalanceInitialized = false
         }
+        
+        walletUpdateSender.send()
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,

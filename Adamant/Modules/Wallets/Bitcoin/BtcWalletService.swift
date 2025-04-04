@@ -290,6 +290,9 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             break
         }
         
+        wallet.isBalanceInitialized = false
+        walletUpdateSender.send()
+        
         setState(.updating)
         
         if let balance = try? await getBalance() {
@@ -299,17 +302,15 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-        } else {
-            wallet.isBalanceInitialized = false
         }
+        
+        walletUpdateSender.send()
         
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
-        
-        walletUpdateSender.send()
         
         setState(.upToDate)
         
