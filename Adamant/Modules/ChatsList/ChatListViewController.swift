@@ -71,11 +71,12 @@ final class ChatListViewController: KeyboardObservingViewController {
     var searchController: UISearchController?
     
     private var transactionsRequiringBalanceUpdate: [String] = []
-    private var chatsManuallyMarkedAsUnread: Set<Int> = Set() {
+    private var chatsManuallyMarkedAsUnread: Set<String> = Set() {
         didSet {
             setBadgeValue(unreadController?.fetchedObjects?.count)
         }
     }
+    private var chatDeselectedIndex: IndexPath?
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
@@ -197,8 +198,11 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: animated)
+            }
         }
     }
     override func viewDidLayoutSubviews() {
@@ -278,7 +282,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     }
     
     // MARK: Add Observers
-    
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
@@ -342,9 +345,18 @@ final class ChatListViewController: KeyboardObservingViewController {
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                self?.tableView.reloadData()
+                guard let deselectedIndex = self?.chatDeselectedIndex,
+                      let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+                      let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
+                self?.configureCell(cell, for: chatroom)
             }
             .store(in: &subscriptions)
+    }
+    
+    @MainActor
+    private func updateChatsManuallyMarkedAsUnread() async {
+        let addresses = await chatsProvider.getMarkAdressesFromChain()
+        self.chatsManuallyMarkedAsUnread = addresses
     }
     
     private func closeDetailVC() {
@@ -357,7 +369,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private func updateUITitles() {
         updatingIndicatorView.updateTitle(title:  String.adamant.chatList.title)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
         searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
@@ -406,9 +418,12 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
         
         areMessagesLoaded = true
+        Task {
+            await updateChatsManuallyMarkedAsUnread()
+        }
         performOnMessagesLoadedActions()
         setIsBusy(!synced)
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     // MARK: IB Actions
@@ -469,7 +484,6 @@ final class ChatListViewController: KeyboardObservingViewController {
             }
             
             tableView.reloadData()
-            setBadgeValue(unreadController?.fetchedObjects?.count)
         }
     }
     
@@ -479,7 +493,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         switch result {
         case .success:
-            tableView.reloadData()
+            tableView.reloadDataPreservingSelection()
         case .failure(let error):
             dialogService.showRichError(error: error)
         }
@@ -564,6 +578,10 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         return UIView()
     }
     
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        chatDeselectedIndex = indexPath
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
@@ -577,7 +595,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if let chatroom = chatsController?.fetchedObjects?[safe: nIndexPath.row] {
             let vc = chatViewController(for: chatroom)
             vc.hidesBottomBarWhenPushed = true
-            chatsManuallyMarkedAsUnread.remove(indexPath.row)
+            removeManualAdress(adress: chatroom.partner?.address)
             
             if let split = self.splitViewController {
                 let chat = UINavigationController(rootViewController:vc)
@@ -701,11 +719,10 @@ extension ChatListViewController {
            let preservedMessage = shortDescription(for: address) {
             cell.hasUnreadMessages = chatroom.hasUnreadMessages
             cell.lastMessageLabel.attributedText = preservedMessage
-            cell.isClockVisible = false
         } else if let lastTransaction = chatroom.lastTransaction {
             cell.hasUnreadMessages = chatroom.hasUnreadMessages
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
-            cell.isClockVisible = lastTransaction.statusEnum == .pending
+            cell.messageStatus = lastTransaction.statusEnum
         } else {
             cell.lastMessageLabel.text = nil
         }
@@ -719,7 +736,7 @@ extension ChatListViewController {
     
     private func insertReloadRow() {
         lastSystemChatPositionRow = getBottomSystemChatIndex()
-        tableView.reloadData()
+        tableView.reloadDataPreservingSelection()
     }
     
     @MainActor
@@ -727,7 +744,7 @@ extension ChatListViewController {
         loadNewChatTask = Task {
             await chatsProvider.getChatRooms(offset: offset)
             isBusy = false
-            tableView.reloadData()
+            tableView.reloadDataPreservingSelection()
         }
     }
 }
@@ -1065,14 +1082,14 @@ extension ChatListViewController {
     private func shortDescription(for address: String) -> NSAttributedString? {
         var descriptionParts: [NSAttributedString] = []
 
-        if chatPreservation.getReplyMessage(address: address, thenRemoveIt: false) != nil {
+        if chatPreservation.getReplyMessage(address: address) != nil {
                 let replyImageAttachment = NSTextAttachment()
                 replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
                 replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
 
                 descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
             }
-        if let files = chatPreservation.getPreservedFiles(for: address, thenRemoveIt: false), !files.isEmpty {
+        if let files = chatPreservation.getPreservedFiles(for: address), !files.isEmpty {
                 let mediaCount = files.count(where: { $0.type.isMedia })
                 let otherCount = files.count(where: { !$0.type.isMedia })
 
@@ -1093,7 +1110,7 @@ extension ChatListViewController {
                 }
             }
 
-        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address, thenRemoveIt: false) {
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address) {
             let processedMessage = MessageProcessHelper.process(preservedMessage)
             descriptionParts.append(NSAttributedString(string: processedMessage))
         }
@@ -1177,11 +1194,14 @@ extension ChatListViewController {
         
         var actions: [UIContextualAction] = []
       
-        let markAsRead = makeMarkAsReadContextualAction(for: chatroom, index: indexPath.row)
-        actions.append(markAsRead)
+        if let adress = chatroom.partner?.address {
+            let markAsRead = makeMarkAsReadContextualAction(for: chatroom, adress: adress)
+            actions.append(markAsRead)
+        }
         
         return UISwipeActionsConfiguration(actions: actions)
     }
+    
     func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
         swipedIndex = nil
         guard let deselectedIndex = indexPath,
@@ -1189,6 +1209,7 @@ extension ChatListViewController {
               let chatroom = chatsController?.fetchedObjects?[safe: deselectedIndex.row] else { return }
         configureCell(cell, for: chatroom)
     }
+    
     private func blockChat(with address: String, for chatroom: Chatroom?) {
         Task {
             chatroom?.isHidden = true
@@ -1236,17 +1257,23 @@ extension ChatListViewController {
         return block
     }
     
-    private func makeMarkAsReadContextualAction(for chatroom: Chatroom, index: Int) -> UIContextualAction {
+    private func makeMarkAsReadContextualAction(for chatroom: Chatroom, adress: String) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
             title: "👀"
         ) { (_, _, completionHandler) in
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
-                self.chatsManuallyMarkedAsUnread.remove(index)
+                self.chatsManuallyMarkedAsUnread.remove(adress)
+                Task {
+                    await self.chatsProvider.removeManualMarkChatAsUnread(chatroomId: adress)
+                }
             } else {
                 chatroom.markAsUnread()
-                self.chatsManuallyMarkedAsUnread.insert(index)
+                self.chatsManuallyMarkedAsUnread.insert(adress)
+                Task {
+                    await self.chatsProvider.setManualMarkChatAsUnread(chatroomId: adress)
+                }
             }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
@@ -1401,6 +1428,12 @@ extension ChatListViewController {
             style: .cancel
         ) { _ in
             completion?()
+        }
+    }
+    
+    private func removeManualAdress(adress: String?) {
+        if let adress {
+            chatsManuallyMarkedAsUnread.remove(adress)
         }
     }
 }
@@ -1594,6 +1627,14 @@ private extension UITableView {
         let selectedRowIndexPath = indexPathForSelectedRow
         reloadRows(at: indexPaths, with: .none)
         selectRow(at: selectedRowIndexPath, animated: false, scrollPosition: .none)
+    }
+    
+    func reloadDataPreservingSelection() {
+        let selectedRow = indexPathForSelectedRow
+        reloadData()
+        if let selectedRow = selectedRow {
+            selectRow(at: selectedRow, animated: false, scrollPosition: .none)
+        }
     }
 }
 

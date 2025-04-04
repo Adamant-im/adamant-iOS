@@ -12,6 +12,7 @@ import CryptoSwift
 import CoreData
 import CommonKit
 import FilesStorageKit
+import AdamantWalletsKit
 
 // MARK: - Constants
 extension String.adamant {

@@ -9,24 +9,7 @@ import BigInt
 import CommonKit
 import AdamantWalletsKit
 
-protocol SmartTokenInfoProtocol {
-    static var currencySymbol: String { get }
-    
-    var reliabilityGasPricePercent: BigUInt {get }
-    
-    var reliabilityGasLimitPercent: BigUInt {get }
-    
-    var defaultGasPriceGwei: BigUInt {get }
-    
-    var defaultGasLimit: BigUInt {get }
-    
-    var warningGasPriceGwei: BigUInt { get }
-}
-extension SmartTokenInfoProtocol {
-    static var coinInfo: CoinInfoDTO? {
-        CoinInfoProvider.coins[currencySymbol]
-    }
-    
+extension EthWalletService {
     var reliabilityGasPricePercent: BigUInt {
         BigUInt(Self.coinInfo?.reliabilityGasLimitPercent ?? 10)
     }

@@ -45,7 +45,7 @@ final class ChatViewController: MessagesViewController {
     private var scrollToUnreadBottomConstraint: Constraint?
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
-    private var scrollToPosition: UICollectionView.ScrollPosition = .top
+    private var scrollToPositionType: UICollectionView.ScrollPosition = .top
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -171,7 +171,6 @@ final class ChatViewController: MessagesViewController {
         defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
-        
         updateUnreadMessages()
         if !viewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
@@ -190,9 +189,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
-        viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
             ? nil
@@ -332,6 +329,11 @@ private extension ChatViewController {
             .removeDuplicates()
             .sink { [weak self] _ in
                 self?.updateMessages()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.messagesUpdated
+            .sink { [weak self] _ in
                 self?.updateMessagesPosition()
             }
             .store(in: &subscriptions)
@@ -418,12 +420,14 @@ private extension ChatViewController {
             .sink { [weak self] in self?.processFileToolbarView($0) }
             .store(in: &subscriptions)
         
-        viewModel.$scrollToMessage
+        viewModel.$scrollToIdAndPosition
             .sink { [weak self] in
-                guard let toId = $0
+                guard let idAndPosition = $0
                 else { return }
                 
-                self?.scrollToPosition(.messageId(toId), animated: false)
+                self?.scrollToPositionType = idAndPosition.position
+                self?.scrollToPosition(.messageId(idAndPosition.id), animated: false, setExtraOffset: self?.scrollToPositionType == .top)
+                self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
         
@@ -765,10 +769,12 @@ private extension ChatViewController {
     func updateMessagesPosition() {
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
         messagesLoaded = true
-        if let position = viewModel.startPosition {
-            scrollToPosition(position)
-        } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-            scrollToPosition(.messageId(unreadMessage), animated: false)
+        if viewModel.messageIdToShow == nil {
+            if let unreadMessage = viewModel.unreadMessagesIds?.first {
+                scrollToPosition(.messageId(unreadMessage), setExtraOffset: true)
+            } else if let position = viewModel.startPosition {
+                scrollToPosition(position)
+            }
         }
     }
     
@@ -849,7 +855,7 @@ private extension ChatViewController {
             if viewModel.shouldScrollToBottom {
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
-                scrollToPosition = .top
+                scrollToPositionType = .top
                 viewModel.scroll(to: id)
                 viewModel.shouldScrollToBottom = true
             }
@@ -864,7 +870,7 @@ private extension ChatViewController {
             guard let self,
                   let unreadId = self.viewModel.messagesWithUnredReactionsIds?.last else { return }
             
-            scrollToPosition = .bottom
+            scrollToPositionType = .bottom
             viewModel.scroll(to: unreadId)
         }
         button.alpha = 0
@@ -924,7 +930,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -944,9 +950,15 @@ private extension ChatViewController {
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
-                at: scrollToPosition,
+                at: scrollToPositionType,
                 animated: animated
             )
+            
+            if setExtraOffset {
+                if checkIfNeedExtraOffsetForUnreadMessages() {
+                    setExtraOffsetForNewMessages()
+                }
+            }
             
             viewModel.needToAnimateCellIndex = needToAnimateCell
             ? index
@@ -962,6 +974,41 @@ private extension ChatViewController {
         
         guard !viewAppeared else { return }
         chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
+    }
+    
+    func setExtraOffsetForNewMessages() {
+        //extra scroll to 120 to see newMessage line and 2 strings from previus message
+        let newOffsetY = max(
+            messagesCollectionView.contentOffset.y - 120,
+            0
+        )
+        let newOffset = CGPoint(x: messagesCollectionView.contentOffset.x, y: newOffsetY)
+        
+        messagesCollectionView.setContentOffset(newOffset, animated: false)
+    }
+    
+    func checkIfNeedExtraOffsetForUnreadMessages() -> Bool {
+        guard let unreadCount = viewModel.unredMessageCount() else { return false }
+
+        let totalSections = messagesCollectionView.numberOfSections
+        let visibleHeight = messagesCollectionView.bounds.height
+        var totalUnreadHeight: CGFloat = 0
+
+        for i in 0..<unreadCount {
+            let sectionIndex = totalSections - 1 - i
+            let indexPath = IndexPath(item: 0, section: sectionIndex)
+
+            guard let attributes = messagesCollectionView.layoutAttributesForItem(at: indexPath) else {
+                continue
+            }
+
+            totalUnreadHeight += attributes.frame.height
+
+            if totalUnreadHeight + 120 > visibleHeight {
+                return true
+            }
+        }
+        return false
     }
     
     func scrollDownOnNewMessageIfNeeded(previousBottomMessageId: String?) {

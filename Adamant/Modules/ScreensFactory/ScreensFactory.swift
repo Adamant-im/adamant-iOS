@@ -61,7 +61,7 @@ protocol ScreensFactory {
     func makeContribute() -> UIViewController
     func makeStorageUsage() -> UIViewController
     func makeLogin() -> LoginViewController
-    func makeVibrationSelection() -> UIViewController
+    func makeVibrationSelection(onSettingsSelect: @escaping (SettingsView.SettingsType) -> Void) -> UIViewController
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController
     func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView
     func makeBuyAndSellView(action: @escaping () -> Void) -> AnyView

@@ -11,6 +11,7 @@ import BitcoinKit
 import CommonKit
 import FilesStorageKit
 import FilesPickerKit
+import AdamantWalletsKit
 
 struct AppAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
@@ -64,6 +65,14 @@ struct AppAssembly: MainThreadAssembly {
             service.accountService = r.resolve(AccountService.self)
             service.chatsProvider = r.resolve(ChatsProvider.self)
         }.inObjectScope(.container)
+        
+        // MARK: Wallet storage
+        container.register(AnyTokensStorage.self) { _ in
+            TokensStorage()
+        }
+        .inObjectScope(.container)
+        
+        initWalletsStorage(from: container)
         
         // MARK: VisibleWalletsService
         container.register(VisibleWalletsService.self) { r in
@@ -436,7 +445,7 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Wallet Service Compose
-        container.register(WalletServiceCompose.self) { r in
+        container.register(WalletServiceCompose.self) { _ in
             var wallets: [WalletCoreProtocol] = [
                 AdmWalletService(),
                 BtcWalletService(),
@@ -494,5 +503,17 @@ struct AppAssembly: MainThreadAssembly {
         container.register(CoreDataRealationMapperProtocol.self) { r in
             CoreDataRealationMapper(stack: r.resolve(CoreDataStack.self)!)
         }.inObjectScope(.container)
+    }
+    
+    // Needs to be called on the register stage to setup the wallets for other dependencies
+    // That's wrong to do it on registering stage of the app. But it's need to be done as it is done
+    private func initWalletsStorage(from container: Container) {
+        let storage = container.resolve(AnyTokensStorage.self)
+        
+        if let storage {
+            storage.loadTokens()
+            ERC20Token.supportedTokens = ERC20TokenAssembly.getERC20Tokens(tokensStorage: storage)
+            CoinInfoProvider.storage = storage
+        }
     }
 }

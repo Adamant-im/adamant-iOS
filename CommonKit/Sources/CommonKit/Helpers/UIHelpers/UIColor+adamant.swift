@@ -273,5 +273,7 @@ extension UIColor {
         
         // Outcome transfer icon background, light red
         public static let transferOutcomeIconBackground = #colorLiteral(red: 0.9411764706, green: 0.5215686275, blue: 0.5294117647, alpha: 1) //#F08587
+        
+        public static let newMessageLineColor = #colorLiteral(red: 0.2705882353, green: 0.2705882353, blue: 0.2705882353, alpha: 1)
     }
 }

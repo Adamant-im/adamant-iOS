@@ -963,9 +963,9 @@ final class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        let unavailableNodes: [NodeGroup] = NodeGroup.allCases.filter {
-            apiServiceCompose.get($0)?.hasEnabledNode == false
-        }
+        let unavailableNodes: Set<NodeGroup> = Set(NodeGroup.allCases.filter {
+            !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
+        })
         
         if unavailableNodes.contains(where: {
             $0.name == currentSelectedWalletItem?.currencyNetwork
@@ -978,7 +978,7 @@ final class AccountViewController: FormViewController {
         }
         
         Task { @MainActor in
-            await accountService.reloadWallets()
+            accountService.update()
             refreshControl.endRefreshing()
         }
     }
