@@ -780,6 +780,9 @@ private extension ChatViewController {
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
+        if !messagesLoaded {
+            viewModel.startPosition.map { scrollToPosition($0) }
+        }
     }
     
     func updateMessagesPosition() {
@@ -788,9 +791,7 @@ private extension ChatViewController {
         if viewModel.messageIdToShow == nil {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: true)
-            } else if let position = viewModel.startPosition {
-                scrollToPosition(position)
-            }
+           }
         }
     }
     
@@ -808,18 +809,18 @@ private extension ChatViewController {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
         self.scrollDownButton.updateCounter(topCount)
         guard isScrollDownButtonHidden != isScrollPositionNearlyTheBottom else { return }
-            isScrollDownButtonHidden = isScrollPositionNearlyTheBottom
-            let buttonUpdate = {
-                self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
-                self.updateScrollToUnreadButtonPosition()
-            }
-            if messagesLoaded {
-                UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-                    buttonUpdate()
-                }
-            } else {
+        isScrollDownButtonHidden = isScrollPositionNearlyTheBottom
+        let buttonUpdate = {
+            self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
+            self.updateScrollToUnreadButtonPosition()
+        }
+        if messagesLoaded {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
                 buttonUpdate()
             }
+        } else {
+            buttonUpdate()
+        }
     }
 
     func updateScrollToUnreadButtonVisibility() {
