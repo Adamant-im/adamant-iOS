@@ -5,7 +5,6 @@ target 'Adamant' do
   
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'MyLittlePinpad' # Pinpad
-  pod 'SwiftLint'
 end
 
 post_install do |installer|
