@@ -19,7 +19,7 @@ extension CoinInfoDTO.Nodes {
         list.map { walletNode in
             Node.makeDefaultNode(
                 url: URL(string: walletNode.url)!,
-                altUrl: walletNode.altIP.flatMap { URL(string: $0) }
+                altUrl: walletNode.altIp.flatMap { URL(string: $0) }
             )
         }
     }

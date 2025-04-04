@@ -2,6 +2,8 @@
   "name": "Injective",
   "symbol": "INJ",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 200,
   "contractId": "0xe28b3b32b6c345a34ff64674606124dd5aceca30",
   "decimals": 18
 }

@@ -43,7 +43,7 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         coinInfo?.services?.klyService?.list.map { serviceNode in
             Node.makeDefaultNode(
                 url: URL(string: serviceNode.url)!,
-                altUrl: serviceNode.altIP.flatMap { URL(string: $0) }
+                altUrl: serviceNode.altIp.flatMap { URL(string: $0) }
             )
         } ?? []
     }

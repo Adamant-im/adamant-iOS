@@ -608,6 +608,8 @@ private extension UITextField {
         if let pasteboardText = UIPasteboard.general.string {
             let newText = String(pasteboardText.prefix(150))
             handler(newText)
+        } else {
+            handler("")
         }
     }
 }

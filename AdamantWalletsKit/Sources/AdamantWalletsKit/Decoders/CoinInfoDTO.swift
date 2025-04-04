@@ -34,15 +34,19 @@ public struct CoinInfoDTO: Codable {
     public let nodes: Nodes?
     public let services: Services?
     public let links: [Link]?
-    public let tor: Tor?
     public let txFetchInfo: TxFetchInfo?
     public let timeout: Timeout?
     public let contractId: String?
     public let txConsistencyMaxTime: Int?
     
     public struct Node: Codable {
+        public enum CodingKeys: String, CodingKey {
+            case url
+            case altIp = "alt_ip"
+        }
+        
         public let url: String
-        public let altIP: String?
+        public let altIp: String?
     }
 
     public struct NodeHealthCheck: Codable {
@@ -52,6 +56,12 @@ public struct CoinInfoDTO: Codable {
         public let threshold: Int?
     }
 
+    public struct Description: Codable {
+        let software: String
+        let github: String
+        let docs: String?
+    }
+
     public struct Service: Codable {
         let description: Description
         public let list: [Node]
@@ -59,25 +69,10 @@ public struct CoinInfoDTO: Codable {
         let minVersion: String?
     }
     
-    public struct Description: Codable {
-        let software: String
-        let github: String
-        let docs: String?
-    }
-
     public struct Services: Codable {
         public let infoService: Service?
         public let klyService: Service?
         public let ipfsNode: Service?
-    }
-
-    public struct Tor: Codable {
-        let website: String?
-        let explorer: String?
-        let explorerTx: String?
-        let explorerAddress: String?
-        let nodes: Nodes?
-        let services: Services?
     }
 
     public struct Nodes: Codable {
