@@ -6,12 +6,12 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import UIKit
-import CommonKit
 
 protocol AvatarService: Sendable {
-    func avatar(for key:String, size: Double) -> UIImage
+    func avatar(for key: String, size: Double) -> UIImage
 }
 
 extension AdamantAvatarService: AvatarService {}

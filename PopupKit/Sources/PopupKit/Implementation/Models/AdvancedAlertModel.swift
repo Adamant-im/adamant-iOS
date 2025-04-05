@@ -1,12 +1,12 @@
 //
 //  AdvancedAlertModel.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 12.04.2023.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 public struct AdvancedAlertModel: Equatable, Hashable {
     public let icon: UIImage
@@ -14,7 +14,7 @@ public struct AdvancedAlertModel: Equatable, Hashable {
     public let text: String
     public let secondaryButton: Button?
     public let primaryButton: Button
-    
+
     public init(
         icon: UIImage,
         title: String?,
@@ -30,11 +30,11 @@ public struct AdvancedAlertModel: Equatable, Hashable {
     }
 }
 
-public extension AdvancedAlertModel {
-    struct Button: Equatable, Hashable {
+extension AdvancedAlertModel {
+    public struct Button: Equatable, Hashable {
         public let title: String
         public let action: IDWrapper<() -> Void>
-        
+
         public init(title: String, action: IDWrapper<() -> Void>) {
             self.title = title
             self.action = action

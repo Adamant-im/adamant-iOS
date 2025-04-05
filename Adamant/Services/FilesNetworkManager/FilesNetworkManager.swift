@@ -10,11 +10,11 @@ import Foundation
 
 final class FilesNetworkManager: FilesNetworkManagerProtocol {
     private let ipfsService: IPFSApiService
-    
+
     init(ipfsService: IPFSApiService) {
         self.ipfsService = ipfsService
     }
-    
+
     func uploadFiles(
         _ data: Data,
         type: NetworkFileProtocolType,
@@ -25,7 +25,7 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
             return await ipfsService.uploadFile(data: data, uploadProgress: uploadProgress)
         }
     }
-    
+
     func downloadFile(
         _ id: String,
         type: String,
@@ -34,7 +34,7 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
         guard let netwrokProtocol = NetworkFileProtocolType(rawValue: type) else {
             return .failure(.cantDownloadFile)
         }
-        
+
         switch netwrokProtocol {
         case .ipfs:
             return await ipfsService.downloadFile(

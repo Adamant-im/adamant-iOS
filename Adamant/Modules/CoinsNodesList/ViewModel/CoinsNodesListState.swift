@@ -6,14 +6,14 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct CoinsNodesListState: Equatable {
     var sections: [Section]
     var fastestNodeMode: Bool
     var isAlertShown: Bool
-    
+
     static var `default`: Self {
         Self(
             sections: .init(),

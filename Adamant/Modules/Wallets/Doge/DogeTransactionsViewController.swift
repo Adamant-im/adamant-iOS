@@ -6,30 +6,30 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import ProcedureKit
 import CommonKit
+import ProcedureKit
+import UIKit
 
 final class DogeTransactionsViewController: TransactionsListViewControllerBase {
-    
+
     // MARK: - UITableView
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let address = walletService.core.wallet?.address,
-              let transaction = transactions[safe: indexPath.row]
+            let transaction = transactions[safe: indexPath.row]
         else { return }
-        
+
         let controller = screensFactory.makeDetailsVC(service: walletService)
         controller.transaction = transaction
-        
+
         if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
             controller.senderName = String.adamant.transactionDetails.yourAddress
         }
-        
+
         if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
             controller.recipientName = String.adamant.transactionDetails.yourAddress
         }
-        
+
         navigationController?.pushViewController(controller, animated: true)
     }
 }
@@ -37,17 +37,17 @@ final class DogeTransactionsViewController: TransactionsListViewControllerBase {
 private class LoadMoreDogeTransactionsProcedure: Procedure {
     let from: Int
     let service: DogeWalletService
-    
+
     private(set) var result: (transactions: [DogeTransaction], hasMore: Bool)?
-    
+
     init(service: DogeWalletService, from: Int) {
         self.from = from
         self.service = service
-        
+
         super.init()
         log.severity = .warning
     }
-    
+
     override func execute() {
         Task {
             do {

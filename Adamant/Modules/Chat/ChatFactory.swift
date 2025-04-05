@@ -6,14 +6,14 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import UIKit
-import MessageKit
-import InputBarAccessoryView
 import Combine
-import Swinject
-import FilesStorageKit
-import FilesPickerKit
 import CommonKit
+import FilesPickerKit
+import FilesStorageKit
+import InputBarAccessoryView
+import MessageKit
+import Swinject
+import UIKit
 
 @MainActor
 struct ChatFactory {
@@ -38,7 +38,7 @@ struct ChatFactory {
     let filesPickerKit: FilesPickerProtocol
     let coreDataRealationMapper: CoreDataRealationMapperProtocol
     let visibleWalletsService: VisibleWalletsService
-   
+
     init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
@@ -61,7 +61,7 @@ struct ChatFactory {
         coreDataRealationMapper = assembler.resolve(CoreDataRealationMapperProtocol.self)!
         visibleWalletsService = assembler.resolve(VisibleWalletsService.self)!
     }
-    
+
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
         let viewModel = makeViewModel()
         let delegates = makeDelegates(viewModel: viewModel)
@@ -71,13 +71,13 @@ struct ChatFactory {
             emojiService: emojiService,
             accountService: accountService
         )
-        
+
         let wallets = walletServiceCompose.getWallets()
-        
+
         let walletService = wallets.first { wallet in
             return wallet.core is AdmWalletService
         }
-        
+
         let viewController = ChatViewController(
             viewModel: viewModel,
             walletServiceCompose: walletServiceCompose,
@@ -90,7 +90,7 @@ struct ChatFactory {
                 screensFactory: screensFactory
             )
         )
-        
+
         viewController.setupDelegates(delegates)
         delegates.cell.setupDelegate(
             collection: viewController.messagesCollectionView,
@@ -100,27 +100,30 @@ struct ChatFactory {
     }
 }
 
-private extension ChatFactory {
-    struct Delegates {
+extension ChatFactory {
+    fileprivate struct Delegates {
         let dataSource: MessagesDataSource
         let layout: MessagesLayoutDelegate
         let display: MessagesDisplayDelegate
         let inputBar: InputBarAccessoryViewDelegate
         let cell: ChatCellManager
-        
+
         var asArray: [AnyObject] {
             [dataSource, layout, display, inputBar, cell]
         }
     }
-    
-    func makeViewModel() -> ChatViewModel {
+
+    fileprivate func makeViewModel() -> ChatViewModel {
         .init(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
-            chatMessagesListFactory: .init(chatMessageFactory: .init(
-                walletServiceCompose: walletServiceCompose),
-            coreDataRelationMapper: coreDataRealationMapper),
+            chatMessagesListFactory: .init(
+                chatMessageFactory: .init(
+                    walletServiceCompose: walletServiceCompose
+                ),
+                coreDataRelationMapper: coreDataRealationMapper
+            ),
             addressBookService: addressBookService,
             walletsStoreService: walletsStoreService,
             accountService: accountService,
@@ -144,8 +147,8 @@ private extension ChatFactory {
             visibleWalletsService: visibleWalletsService
         )
     }
-    
-    func makeDelegates(viewModel: ChatViewModel) -> Delegates {
+
+    fileprivate func makeDelegates(viewModel: ChatViewModel) -> Delegates {
         .init(
             dataSource: ChatDataSourceManager(viewModel: viewModel),
             layout: ChatLayoutManager(viewModel: viewModel),
@@ -154,19 +157,19 @@ private extension ChatFactory {
             cell: ChatCellManager(viewModel: viewModel)
         )
     }
-    
-    func makeSendTransactionAction(
+
+    fileprivate func makeSendTransactionAction(
         viewModel: ChatViewModel,
         screensFactory: ScreensFactory
     ) -> ChatViewController.SendTransaction {
         { [screensFactory, viewModel] parentVC, messageId in
             guard let vc = screensFactory.makeComplexTransfer() as? ComplexTransferViewController
             else { return }
-            
+
             vc.partner = viewModel.chatroom?.partner
             vc.transferDelegate = parentVC
             vc.replyToMessageId = messageId
-            
+
             let navigator = UINavigationController(rootViewController: vc)
             navigator.modalPresentationStyle = .overFullScreen
             parentVC.present(navigator, animated: true, completion: nil)
@@ -174,8 +177,8 @@ private extension ChatFactory {
     }
 }
 
-private extension ChatViewController {
-    func setupDelegates(_ delegates: ChatFactory.Delegates) {
+extension ChatViewController {
+    fileprivate func setupDelegates(_ delegates: ChatFactory.Delegates) {
         messagesCollectionView.messagesDataSource = delegates.dataSource
         messagesCollectionView.messagesLayoutDelegate = delegates.layout
         messagesCollectionView.messagesDisplayDelegate = delegates.display
@@ -184,15 +187,15 @@ private extension ChatViewController {
     }
 }
 
-private extension ChatCellManager {
-    func setupDelegate(collection: MessagesCollectionView, dataSource: MessagesDataSource) {
+extension ChatCellManager {
+    fileprivate func setupDelegate(collection: MessagesCollectionView, dataSource: MessagesDataSource) {
         getMessageId = { [weak collection, weak dataSource] cell in
             guard
                 let collection = collection,
                 let indexPath = collection.indexPath(for: cell),
                 let message = dataSource?.messageForItem(at: indexPath, in: collection)
             else { return nil }
-            
+
             return message.messageId
         }
     }

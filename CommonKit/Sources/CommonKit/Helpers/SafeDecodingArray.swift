@@ -7,7 +7,7 @@
 
 public struct SafeDecodingArray<T: Codable> {
     public let values: [T]
-    
+
     init(_ values: [T]) {
         self.values = values
     }
@@ -16,7 +16,7 @@ public struct SafeDecodingArray<T: Codable> {
 extension SafeDecodingArray: Sequence {
     public typealias Element = T
     public typealias Iterator = IndexingIterator<[Element]>
-    
+
     public func makeIterator() -> Iterator {
         values.makeIterator()
     }
@@ -33,7 +33,7 @@ extension SafeDecodingArray: Decodable {
     struct Item<Value: Decodable> {
         let value: Value?
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let items = try container.decode([Item<T>].self)

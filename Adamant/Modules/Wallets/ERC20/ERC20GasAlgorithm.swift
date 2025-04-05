@@ -6,8 +6,8 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import Foundation
 import BigInt
+import Foundation
 
 protocol ERC20GasAlgorithmComputable {
     var reliabilityGasPricePercent: BigUInt { get }
@@ -27,10 +27,10 @@ extension ERC20GasAlgorithmComputable {
 
         let reliableGasPrice = reliabilityGasPricePercent + gasPrice
         let reliableGasLimit = reliabilityGasLimitPercent + gasLimit
-        
+
         let finalGasPrice = BigUInt(reliableGasPrice.asDouble() * gasPriceCoeficient.doubleValue)
         let newFee = (finalGasPrice * reliableGasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
-        
+
         completion(
             finalGasPrice,
             reliableGasLimit,

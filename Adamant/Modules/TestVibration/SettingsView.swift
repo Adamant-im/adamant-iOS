@@ -6,22 +6,22 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct SettingsView: View {
     enum SettingsType: String, CaseIterable {
         case adamantWallets = "Adamant-Wallets"
     }
-    
+
     @StateObject var viewModel: VibrationSelectionViewModel
     private let onSettingsSelect: (SettingsType) -> Void
-    
+
     init(viewModel: @escaping () -> VibrationSelectionViewModel, onSettingsSelect: @escaping (SettingsType) -> Void) {
         _viewModel = .init(wrappedValue: viewModel())
         self.onSettingsSelect = onSettingsSelect
     }
-    
+
     var body: some View {
         List {
             Section("Vibrations") {
@@ -48,7 +48,7 @@ struct SettingsView: View {
         .navigationTitle("Preferrences")
         .navigationBarTitleDisplayMode(.inline)
     }
-    
+
     private func vibrationTypeDescription(_ type: AdamantVibroType) -> String {
         switch type {
         case .light:

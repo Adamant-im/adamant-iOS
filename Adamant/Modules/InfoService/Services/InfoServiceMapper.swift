@@ -6,12 +6,12 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct InfoServiceMapper: InfoServiceMapperProtocol {
     private let currencies = Set(Currency.allCases.map { $0.rawValue })
-    
+
     func mapToModel(_ dto: InfoServiceStatusDTO) -> InfoServiceStatus {
         .init(
             lastUpdated: dto.last_updated.map {
@@ -20,13 +20,13 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
             version: .init(dto.version) ?? .zero
         )
     }
-    
+
     func mapRatesToModel(
         _ dto: InfoServiceResponseDTO<[String: Decimal]>
     ) -> InfoServiceApiResult<[InfoServiceTicker: Decimal]> {
         mapResponseDTO(dto).map { mapToTickers($0) }
     }
-    
+
     func mapToModel(
         _ dto: InfoServiceResponseDTO<[InfoServiceHistoryItemDTO]>
     ) -> InfoServiceApiResult<InfoServiceHistoryItem> {
@@ -35,14 +35,16 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
                 let item = $0.first,
                 let tickers = item.tickers
             else { return .failure(.parsingError) }
-            
-            return .success(.init(
-                date: .init(timeIntervalSince1970: .init(milliseconds: item.date)),
-                tickers: mapToTickers(tickers)
-            ))
+
+            return .success(
+                .init(
+                    date: .init(timeIntervalSince1970: .init(milliseconds: item.date)),
+                    tickers: mapToTickers(tickers)
+                )
+            )
         }
     }
-    
+
     func mapToNodeStatusInfo(
         ping: TimeInterval,
         status: InfoServiceStatus
@@ -55,11 +57,11 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
             version: status.version
         )
     }
-    
+
     func mapToRatesRequestDTO(_ coins: [String]) -> InfoServiceRatesRequestDTO {
         .init(coin: coins.joined(separator: ","))
     }
-    
+
     func mapToHistoryRequestDTO(
         date: Date,
         coin: String
@@ -71,33 +73,33 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
     }
 }
 
-private extension InfoServiceMapper {
-    func mapToTickers(_ rawTickers: [String: Decimal]) -> [InfoServiceTicker: Decimal] {
+extension InfoServiceMapper {
+    fileprivate func mapToTickers(_ rawTickers: [String: Decimal]) -> [InfoServiceTicker: Decimal] {
         var dict = [InfoServiceTicker: Decimal]()
-        
+
         for raw in rawTickers {
             guard let ticker = mapToTicker(raw.key) else { continue }
             dict[ticker] = raw.value
         }
-        
+
         return dict
     }
-    
-    func mapToTicker(_ string: String) -> InfoServiceTicker? {
+
+    fileprivate func mapToTicker(_ string: String) -> InfoServiceTicker? {
         let list: [String] = string.split(separator: "/").map { .init($0) }
-        
+
         guard
             list.count == 2,
             let crypto = list.first,
             let fiat = list.last
         else { return nil }
-        
+
         return currencies.contains(fiat)
             ? .init(crypto: crypto, fiat: fiat)
             : nil
     }
-    
-    func mapResponseDTO<Body: Codable>(
+
+    fileprivate func mapResponseDTO<Body: Codable>(
         _ dto: InfoServiceResponseDTO<Body>
     ) -> InfoServiceApiResult<Body> {
         guard dto.success else { return .failure(.unknown) }

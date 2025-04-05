@@ -1,20 +1,20 @@
 //
 //  ContextMenuOverlayViewMac.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 13.07.2023.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct ContextMenuOverlayViewMac: View {
     @StateObject private var viewModel: ContextMenuOverlayViewModelMac
-    
+
     init(viewModel: ContextMenuOverlayViewModelMac) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         GeometryReader { geometry in
             makeStackView(geometry: geometry)
@@ -22,25 +22,28 @@ struct ContextMenuOverlayViewMac: View {
     }
 }
 
-private extension ContextMenuOverlayViewMac {
-    func makeStackView(geometry: GeometryProxy) -> some View {
+extension ContextMenuOverlayViewMac {
+    fileprivate func makeStackView(geometry: GeometryProxy) -> some View {
         ZStack {
             viewModel.updateLocations(geometry: geometry)
-            
-            Button(action: {
-                Task {
-                    await viewModel.dismiss()
+
+            Button(
+                action: {
+                    Task {
+                        await viewModel.dismiss()
+                    }
+                },
+                label: {
+                    if viewModel.additionalMenuVisible {
+                        Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
+                    } else {
+                        Color.clear
+                    }
                 }
-            }, label: {
-                if viewModel.additionalMenuVisible {
-                    Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
-                } else {
-                    Color.clear
-                }
-            })
-            
+            )
+
             makeContentOverlayView()
-            
+
             if viewModel.additionalMenuVisible {
                 if let upperContentView = viewModel.upperContentView {
                     makeUpperOverlayView(upperContentView: upperContentView)
@@ -59,19 +62,19 @@ private extension ContextMenuOverlayViewMac {
         }
     }
 
-    func makeOverlayView() -> some View {
+    fileprivate func makeOverlayView() -> some View {
         VStack(spacing: 10) {
             if viewModel.additionalMenuVisible {
                 makeMenuView()
-                    .onTapGesture { }
+                    .onTapGesture {}
             }
             Spacer()
         }
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeContentOverlayView() -> some View {
+
+    fileprivate func makeContentOverlayView() -> some View {
         VStack(spacing: 10) {
             makeContentView()
             Spacer()
@@ -79,8 +82,8 @@ private extension ContextMenuOverlayViewMac {
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeContentView() -> some View {
+
+    fileprivate func makeContentView() -> some View {
         HStack {
             UIViewWrapper(view: viewModel.contentView)
                 .frame(
@@ -94,8 +97,8 @@ private extension ContextMenuOverlayViewMac {
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeMenuView() -> some View {
+
+    fileprivate func makeMenuView() -> some View {
         HStack {
             if let menuVC = viewModel.menu {
                 UIViewControllerWrapper(menuVC)
@@ -110,18 +113,18 @@ private extension ContextMenuOverlayViewMac {
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeUpperOverlayView(upperContentView: some View) -> some View {
+
+    fileprivate func makeUpperOverlayView(upperContentView: some View) -> some View {
         VStack {
             makeUpperContentView(upperContentView: upperContentView)
-                .onTapGesture { }
+                .onTapGesture {}
             Spacer()
         }
         .fullScreen()
         .transition(.opacity)
     }
-    
-    func makeUpperContentView(upperContentView: some View) -> some View {
+
+    fileprivate func makeUpperContentView(upperContentView: some View) -> some View {
         HStack {
             upperContentView
                 .frame(

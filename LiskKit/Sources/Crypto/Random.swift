@@ -7,24 +7,25 @@
 //
 
 import Foundation
+
 #if os(Linux)
-import Glibc
+    import Glibc
 #endif
 
 internal struct Random {
     #if os(Linux)
-    static var initialized = false
+        static var initialized = false
     #endif
 
     static func roll(max: Int) -> Int {
         #if os(Linux)
-        if !initialized {
-            srandom(UInt32(time(nil)))
-            initialized = true
-        }
-        return Int(random() % max)
+            if !initialized {
+                srandom(UInt32(time(nil)))
+                initialized = true
+            }
+            return Int(random() % max)
         #else
-        return Int(arc4random_uniform(UInt32(max)))
+            return Int(arc4random_uniform(UInt32(max)))
         #endif
     }
 }

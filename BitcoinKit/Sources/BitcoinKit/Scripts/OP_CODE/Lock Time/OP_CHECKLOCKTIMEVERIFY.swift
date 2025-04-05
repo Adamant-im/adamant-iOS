@@ -54,12 +54,14 @@ public struct OpCheckLockTimeVerify: OpCodeProtocol {
         // There are two kinds of nLockTime: lock-by-blockheight and lock-by-blocktime, distinguished by whether nLockTime < LOCKTIME_THRESHOLD.
         //
         // We want to compare apples to apples, so fail the script unless the type of nLockTime being tested is the same as the nLockTime in the transaction.
-        guard (tx.lockTime < BTC_LOCKTIME_THRESHOLD && nLockTime < BTC_LOCKTIME_THRESHOLD) ||
-            (tx.lockTime >= BTC_LOCKTIME_THRESHOLD && nLockTime >= BTC_LOCKTIME_THRESHOLD) else {
+        guard
+            (tx.lockTime < BTC_LOCKTIME_THRESHOLD && nLockTime < BTC_LOCKTIME_THRESHOLD)
+                || (tx.lockTime >= BTC_LOCKTIME_THRESHOLD && nLockTime >= BTC_LOCKTIME_THRESHOLD)
+        else {
             throw OpCodeExecutionError.error("tx.lockTime and nLockTime should be the same kind.")
         }
 
-        guard nLockTime <= tx.lockTime  else {
+        guard nLockTime <= tx.lockTime else {
             throw OpCodeExecutionError.error("The top stack item is greater than the transaction's nLockTime field")
         }
 
@@ -72,7 +74,7 @@ public struct OpCheckLockTimeVerify: OpCodeProtocol {
         // Alternatively we could test all inputs, but testing just this input
         // minimizes the data required to prove correct CHECKLOCKTIMEVERIFY
         // execution.
-        let SEQUENCE_FINAL: UInt32 = 0xffffffff
+        let SEQUENCE_FINAL: UInt32 = 0xffff_ffff
         guard txin.sequence != SEQUENCE_FINAL else {
             throw OpCodeExecutionError.error("The input's nSequence field is equal to 0xffffffff.")
         }

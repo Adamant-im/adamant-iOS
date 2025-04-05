@@ -8,15 +8,15 @@
 
 import Foundation
 
-public extension Decimal {
+extension Decimal {
     public func shiftedFromAdamant() -> Decimal {
         return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: AdamantUtilities.admCurrencyExponent, significand: self)
     }
-    
+
     public func shiftedToAdamant() -> Decimal {
         return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: -AdamantUtilities.admCurrencyExponent, significand: self)
     }
-    
+
     public var doubleValue: Double {
         // NSDecimalNumber loses decimal precision when deserializing numbers by doubleValue.
         // Try to get string value and deserialize it

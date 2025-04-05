@@ -15,19 +15,19 @@ final class AdamantApiTask<Output>: CancellableTask {
             await task.value
         }
     }
-    
+
     init(task: Task<Result<Output, ApiServiceError>, Never>) {
         self.task = task
     }
-    
+
     func cancel() {
         task.cancel()
     }
-    
+
     func storeIn(taskStorage: inout [UUID: CancellableTask]) {
         taskStorage[id] = self
     }
-    
+
     func removeFrom(taskStorage: inout [UUID: CancellableTask]) {
         taskStorage[id] = nil
     }

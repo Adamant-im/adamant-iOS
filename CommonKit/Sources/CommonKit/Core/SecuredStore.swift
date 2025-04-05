@@ -1,5 +1,5 @@
 //
-//  SecuredStore.swift
+//  SecureStore.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 04.03.2018.
@@ -13,15 +13,15 @@ public enum StoreKey {}
 
 // MARK: - Notifications
 
-public extension Notification.Name {
-    enum SecuredStore {
+extension Notification.Name {
+    public enum SecureStore {
         /// Raised when store is purged
-        public static let securedStorePurged = Notification.Name("adamant.SecuredStore.purged")
+        public static let SecureStorePurged = Notification.Name("adamant.SecureStore.purged")
     }
 }
 
-public extension StoreKey {
-    enum notificationsService {
+extension StoreKey {
+    public enum notificationsService {
         public static let notificationsMode = "notifications.mode"
         public static let customBadgeNumber = "notifications.number"
         public static let notificationsSound = "notifications.sound"
@@ -30,45 +30,46 @@ public extension StoreKey {
         public static let inAppVibrate = "notifications.inAppVibrate"
         public static let inAppToasts = "notifications.inAppToasts"
     }
-    
-    enum visibleWallets {
+
+    public enum visibleWallets {
         public static let invisibleWallets = "invisible.wallets"
         public static let indexWallets = "index.wallets"
         public static let indexWalletsWithInvisible = "index.wallets.include.ivisible"
         public static let useCustomIndexes = "visible.wallets.useCustomIndexes"
         public static let useCustomVisibility = "visible.wallets.useCustomVisibility"
     }
-    
-    enum increaseFee {
+
+    public enum increaseFee {
         public static let increaseFee = "increaseFee"
     }
-    
-    enum crashlytic {
+
+    public enum crashlytic {
         public static let crashlyticEnabled = "crashlyticEnabled"
     }
-    
-    enum emojis {
+
+    public enum emojis {
         public static let emojis = "emojis"
     }
-    
-    enum partnerQR {
+
+    public enum partnerQR {
         public static let includeNameEnabled = "includeNameEnabled"
         public static let includeURLEnabled = "includeURLEnabled"
     }
-    
-    enum language {
+
+    public enum language {
         public static let language = "language"
         public static let languageLocale = "language.locale"
     }
-    
-    enum storage {
+
+    public enum storage {
         public static let autoDownloadPreview = "autoDownloadPreviewEnabled"
         public static let autoDownloadFullMedia = "autoDownloadFullMediaEnabled"
         public static let saveFileEncrypted = "saveFileEncrypted"
     }
 }
 
-public protocol SecuredStore: AnyObject, Sendable {
+// sourcery: AutoMockable
+public protocol SecureStore: AnyObject, Sendable {
     func get<T: Decodable>(_ key: String) -> T?
     func set<T: Encodable>(_ value: T, for key: String)
 

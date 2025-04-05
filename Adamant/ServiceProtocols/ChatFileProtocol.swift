@@ -6,11 +6,11 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
-import CommonKit
 import Combine
-import UIKit
+import CommonKit
 import FilesStorageKit
+import Foundation
+import UIKit
 
 struct FileUpdateProperties {
     let id: String
@@ -29,7 +29,7 @@ protocol ChatFileProtocol: Sendable {
     var uploadingFiles: [String] { get }
     var filesLoadingProgress: [String: Int] { get }
     var updateFileFields: AnyObservable<FileUpdateProperties> { get }
-    
+
     func sendFile(
         text: String?,
         chatroom: Chatroom?,
@@ -37,7 +37,7 @@ protocol ChatFileProtocol: Sendable {
         replyMessage: MessageModel?,
         saveEncrypted: Bool
     ) async throws
-    
+
     func downloadFile(
         file: ChatFile,
         chatroom: Chatroom?,
@@ -45,7 +45,7 @@ protocol ChatFileProtocol: Sendable {
         previewDownloadAllowed: Bool,
         fullMediaDownloadAllowed: Bool
     ) async throws
-    
+
     func autoDownload(
         file: ChatFile,
         chatroom: Chatroom?,
@@ -54,13 +54,13 @@ protocol ChatFileProtocol: Sendable {
         fullMediaDownloadPolicy: DownloadPolicy,
         saveEncrypted: Bool
     ) async
-    
+
     func getDecodedData(
         file: FilesStorageKit.File,
         nonce: String,
         chatroom: Chatroom?
     ) throws -> Data
-    
+
     func resendMessage(
         with id: String,
         text: String?,
@@ -68,17 +68,17 @@ protocol ChatFileProtocol: Sendable {
         replyMessage: MessageModel?,
         saveEncrypted: Bool
     ) async throws
-    
+
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool
-    
+
     func cancelUpload(messageId: String, fileId: String) async
-    
+
     func isPreviewAutoDownloadAllowedByPolicy(
         hasPartnerName: Bool,
         isFromCurrentSender: Bool,
         downloadPolicy: DownloadPolicy
     ) -> Bool
-    
+
     func isOriginalAutoDownloadAllowedByPolicy(
         hasPartnerName: Bool,
         isFromCurrentSender: Bool,

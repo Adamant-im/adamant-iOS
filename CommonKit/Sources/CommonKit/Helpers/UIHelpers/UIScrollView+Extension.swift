@@ -8,12 +8,12 @@
 
 import UIKit
 
-public extension UIScrollView {
-    func scrollToBottom(animated: Bool) {
+extension UIScrollView {
+    public func scrollToBottom(animated: Bool) {
         let fullInsets = contentInset + safeAreaInsets
         let visibleHeight = bounds.height - fullInsets.top - fullInsets.bottom
         guard contentSize.height > visibleHeight else { return }
-        
+
         let maxOffset = contentSize.height - bounds.height + contentInset.bottom + safeAreaInsets.bottom
         setContentOffset(.init(x: .zero, y: maxOffset), animated: animated)
     }

@@ -12,13 +12,15 @@ import Foundation
 
 class KlyApiCore: BlockchainHealthCheckableService, @unchecked Sendable {
     func makeClient(origin: NodeOrigin) -> APIClient {
-        .init(options: .init(
-            nodes: [.init(origin: origin.asString())],
-            nethash: .mainnet,
-            randomNode: false
-        ))
+        .init(
+            options: .init(
+                nodes: [.init(origin: origin.asString())],
+                nethash: .mainnet,
+                randomNode: false
+            )
+        )
     }
-    
+
     func request<Output>(
         origin: NodeOrigin,
         body: @escaping @Sendable (
@@ -32,39 +34,39 @@ class KlyApiCore: BlockchainHealthCheckableService, @unchecked Sendable {
             }
         }
     }
-    
+
     func request<Output>(
         origin: NodeOrigin,
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {
         let client = makeClient(origin: origin)
-        
+
         do {
             return .success(try await body(client))
         } catch {
             return .failure(mapError(error))
         }
     }
-    
+
     func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        
+
         return await request(origin: origin) { client in
             try await LiskKit.Node(client: client).info()
         }.map { model in
-                .init(
-                    ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                    height: model.height ?? .zero,
-                    wsEnabled: false,
-                    wsPort: nil,
-                    version: .init(model.version)
-                )
+            .init(
+                ping: Date.now.timeIntervalSince1970 - startTimestamp,
+                height: model.height ?? .zero,
+                wsEnabled: false,
+                wsPort: nil,
+                version: .init(model.version)
+            )
         }
     }
 }
 
-private extension LiskKit.Result {
-    func asWalletServiceResult() -> WalletServiceResult<R> {
+extension LiskKit.Result {
+    fileprivate func asWalletServiceResult() -> WalletServiceResult<R> {
         switch self {
         case let .success(response):
             return .success(response)
@@ -87,6 +89,6 @@ private func mapError(_ error: Error) -> WalletServiceError {
     if let error = error as? APIError {
         return mapError(error)
     }
-    
+
     return .remoteServiceError(message: error.localizedDescription, error: error)
 }

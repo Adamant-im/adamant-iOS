@@ -11,7 +11,7 @@ import Foundation
 public struct Keypair: Equatable, Sendable {
     public let publicKey: String
     public let privateKey: String
-    
+
     public init(publicKey: String, privateKey: String) {
         self.publicKey = publicKey
         self.privateKey = privateKey

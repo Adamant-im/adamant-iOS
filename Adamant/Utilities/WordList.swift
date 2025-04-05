@@ -15,7 +15,7 @@ enum WordList {
         let url = Bundle.main.url(forResource: "english", withExtension: "txt")
         let data = try! Data(contentsOf: url!)
         let raw = String(data: data, encoding: .utf8)!
-        
+
         return raw.split(separator: "\n")
     }()
 }

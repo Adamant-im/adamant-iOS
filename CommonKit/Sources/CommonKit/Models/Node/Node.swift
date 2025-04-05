@@ -22,7 +22,7 @@ public struct Node: Equatable, Identifiable, @unchecked Sendable {
     public var preferMainOrigin: Bool?
     public var isEnabled: Bool
     public var type: NodeType
-    
+
     public init(
         id: UUID,
         isEnabled: Bool,
@@ -50,18 +50,18 @@ public struct Node: Equatable, Identifiable, @unchecked Sendable {
     }
 }
 
-public extension Node {
-    var preferredOrigin: NodeOrigin {
+extension Node {
+    public var preferredOrigin: NodeOrigin {
         preferMainOrigin ?? true
             ? mainOrigin
             : altOrigin ?? mainOrigin
     }
-    
-    var isSupported: Bool {
+
+    public var isSupported: Bool {
         isEnabled && connectionStatus == .allowed && version != nil
     }
-    
-    static func makeDefaultNode(url: URL, altUrl: URL? = nil) -> Self {
+
+    public static func makeDefaultNode(url: URL, altUrl: URL? = nil) -> Self {
         .init(
             id: .init(),
             isEnabled: true,
@@ -76,20 +76,20 @@ public extension Node {
             type: .default(isHidden: false)
         )
     }
-    
-    func asSocketURL() -> URL? {
+
+    public func asSocketURL() -> URL? {
         preferredOrigin.asSocketURL()
     }
 
-    func asURL() -> URL? {
+    public func asURL() -> URL? {
         preferredOrigin.asURL()
     }
-    
-    func isSame(_ node: Node) -> Bool {
+
+    public func isSame(_ node: Node) -> Bool {
         mainOrigin.host == node.mainOrigin.host
     }
-    
-    mutating func updateWsPort(_ wsPort: Int?) {
+
+    public mutating func updateWsPort(_ wsPort: Int?) {
         mainOrigin.wsPort = wsPort
         altOrigin?.wsPort = wsPort
     }

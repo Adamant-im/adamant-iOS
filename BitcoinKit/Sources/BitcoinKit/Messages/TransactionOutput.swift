@@ -34,7 +34,7 @@ public struct TransactionOutput {
     }
     /// Usually contains the public key as a Bitcoin script setting up conditions to claim this output
     public let lockingScript: Data
-    
+
     public var address: String?
 
     public func scriptCode() -> Data {
@@ -48,7 +48,7 @@ public struct TransactionOutput {
         self.value = value
         self.lockingScript = lockingScript
     }
-    
+
     public init() {
         self.init(value: 0, lockingScript: Data())
     }
@@ -60,7 +60,7 @@ public struct TransactionOutput {
         data += lockingScript
         return data
     }
-    
+
     public mutating func unpack(with network: Network) {
         if Script.isPublicKeyHashOut(self.lockingScript) {
             let pubKeyHash = Script.getPublicKeyHash(from: self.lockingScript)

@@ -57,17 +57,19 @@ public struct OpCheckSequenceVerify: OpCodeProtocol {
         }
 
         let SEQUENCE_LOCKTIME_TYPE_FLAG: UInt32 = (1 << 22)
-        let SEQUENCE_LOCKTIME_MASK: UInt32 = 0x0000ffff
+        let SEQUENCE_LOCKTIME_MASK: UInt32 = 0x0000_ffff
         let nLockTimeMask: UInt32 = SEQUENCE_LOCKTIME_TYPE_FLAG | SEQUENCE_LOCKTIME_MASK
         let txToSequenceMasked: UInt32 = txToSequence & nLockTimeMask
         let nSequenceMasked: UInt32 = nSequence & nLockTimeMask
 
-        guard (txToSequenceMasked < SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked < SEQUENCE_LOCKTIME_TYPE_FLAG) ||
-            (txToSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG) else {
-                throw OpCodeExecutionError.error("txToSequenceMasked and nSequenceMasked should be the same kind.")
+        guard
+            (txToSequenceMasked < SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked < SEQUENCE_LOCKTIME_TYPE_FLAG)
+                || (txToSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG)
+        else {
+            throw OpCodeExecutionError.error("txToSequenceMasked and nSequenceMasked should be the same kind.")
         }
 
-        guard nSequence <= txToSequenceMasked  else {
+        guard nSequence <= txToSequenceMasked else {
             throw OpCodeExecutionError.error("The top stack item is greater than the transaction's nSequence field")
         }
     }

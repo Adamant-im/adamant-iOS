@@ -11,7 +11,7 @@ import Foundation
 public enum DelegateVote {
     case upvote(publicKey: String)
     case downvote(publicKey: String)
-    
+
     public func asString() -> String {
         switch self {
         case .upvote(let key): return "+\(key)"

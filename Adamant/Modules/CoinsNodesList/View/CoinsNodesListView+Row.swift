@@ -6,14 +6,14 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 extension CoinsNodesListView {
     struct Row: View {
         let model: CoinsNodesListState.Section.Row
         let setIsEnabled: (Bool) -> Void
-        
+
         var body: some View {
             HStack(spacing: 10) {
                 CheckmarkView(
@@ -22,13 +22,13 @@ extension CoinsNodesListView {
                 )
                 .frame(squareSize: 24)
                 .animation(.easeInOut(duration: 0.1), value: model.isEnabled)
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(model.title).font(titleFont).lineLimit(1)
-                    
+
                     HStack(spacing: 6) {
                         Text(model.connectionStatus).font(captionFont)
-                        
+
                         Text(model.subtitle).font(subtitleFont)
                             .lineLimit(1)
                             .frame(height: 10)
@@ -39,11 +39,11 @@ extension CoinsNodesListView {
     }
 }
 
-private extension CoinsNodesListView.Row {
-    struct CheckmarkView: View {
+extension CoinsNodesListView.Row {
+    fileprivate struct CheckmarkView: View {
         let isEnabled: Bool
         let setIsEnabled: (Bool) -> Void
-        
+
         var body: some View {
             ZStack {
                 if isEnabled {
@@ -52,7 +52,7 @@ private extension CoinsNodesListView.Row {
                         .scaledToFit()
                         .transition(.scale)
                 }
-                
+
                 if !isEnabled {
                     Circle().strokeBorder(
                         Color(uiColor: .adamant.secondary),

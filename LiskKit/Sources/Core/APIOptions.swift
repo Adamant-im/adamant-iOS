@@ -23,7 +23,7 @@ public struct APIOptions {
     public var node: APINode {
         return nodes.select(random: randomNode)
     }
-    
+
     public init(nodes: [APINode], nethash: APINethash, randomNode: Bool) {
         self.nodes = nodes
         self.nethash = nethash
@@ -41,7 +41,7 @@ extension APIOptions {
 
     /// Betanet options
     public static let betanet: APIOptions = .init(nodes: .betanet, nethash: .mainnet, randomNode: true)
-    
+
     public struct Service {
         /// Mainnet options
         public static let mainnet: APIOptions = .init(nodes: .Service.mainnet, nethash: .mainnet, randomNode: true)

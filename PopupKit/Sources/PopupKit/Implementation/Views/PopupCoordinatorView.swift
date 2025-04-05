@@ -1,23 +1,23 @@
 //
 //  PopupCoordinatorView.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct PopupCoordinatorView: View {
     @ObservedObject var model: PopupCoordinatorModel
-    
+
     var body: some View {
         GeometryReader { geomerty in
             ZStack {
                 if !(model.alert?.userInteractionEnabled ?? true) {
                     BlockingView()
                 }
-                
+
                 makeNotificationView(safeAreaInsets: geomerty.safeAreaInsets)
                 makeAlertView()
                 makeAdvancedAlertView()
@@ -29,8 +29,8 @@ struct PopupCoordinatorView: View {
     }
 }
 
-private extension PopupCoordinatorView {
-    func makeNotificationView(safeAreaInsets: EdgeInsets) -> some View {
+extension PopupCoordinatorView {
+    fileprivate func makeNotificationView(safeAreaInsets: EdgeInsets) -> some View {
         VStack {
             if let notificationModel = model.notification {
                 NotificationPresenterView(
@@ -46,8 +46,8 @@ private extension PopupCoordinatorView {
         }
         .animation(.easeInOut(duration: animationDuration), value: model.notification?.hashValue)
     }
-    
-    func makeAlertView() -> some View {
+
+    fileprivate func makeAlertView() -> some View {
         VStack {
             if let alertModel = model.alert, model.advancedAlert == nil {
                 AlertView(model: alertModel)
@@ -57,8 +57,8 @@ private extension PopupCoordinatorView {
         }
         .animation(.easeInOut(duration: animationDuration), value: model.alert?.hashValue)
     }
-    
-    func makeAdvancedAlertView() -> some View {
+
+    fileprivate func makeAdvancedAlertView() -> some View {
         VStack {
             if let advancedAlertModel = model.advancedAlert {
                 AdvancedAlertView(model: advancedAlertModel)
@@ -68,8 +68,8 @@ private extension PopupCoordinatorView {
         }
         .animation(.easeInOut(duration: animationDuration), value: model.advancedAlert?.hashValue)
     }
-    
-    func makeToastView(safeAreaInsets: EdgeInsets) -> some View {
+
+    fileprivate func makeToastView(safeAreaInsets: EdgeInsets) -> some View {
         VStack {
             Spacer()
             if let message = model.toastMessage {

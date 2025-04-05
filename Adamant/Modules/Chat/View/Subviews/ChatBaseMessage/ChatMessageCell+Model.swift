@@ -20,7 +20,7 @@ extension ChatMessageCell {
         let isFake: Bool
         var isHidden: Bool
         var swipeState: ChatSwipeWrapperModel.State
-        
+
         static var `default`: Self {
             Self(
                 id: "",
@@ -35,7 +35,7 @@ extension ChatMessageCell {
                 swipeState: .idle
             )
         }
-        
+
         func makeReplyContent() -> NSAttributedString {
             return text
         }

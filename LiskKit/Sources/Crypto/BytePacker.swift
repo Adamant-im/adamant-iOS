@@ -20,10 +20,10 @@ internal struct BytePacker {
     ///   - value: value to pack of type `T`
     ///   - byteOrder: Byte order (wither little or big endian)
     /// - Returns: Byte array
-    static func pack<T: Any>( _ value: T, byteOrder: ByteOrder) -> [UInt8] {
-        var value = value // inout works only for var not let types
+    static func pack<T: Any>(_ value: T, byteOrder: ByteOrder) -> [UInt8] {
+        var value = value  // inout works only for var not let types
         let valueByteArray = withUnsafePointer(to: &value) {
-            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: UInt8.self, capacity: 1) {$0}, count: MemoryLayout<T>.size))
+            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: UInt8.self, capacity: 1) { $0 }, count: MemoryLayout<T>.size))
         }
         return (byteOrder == .littleEndian) ? valueByteArray : valueByteArray.reversed()
     }

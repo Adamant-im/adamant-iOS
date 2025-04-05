@@ -6,18 +6,18 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Swinject
 import SwiftUI
+import Swinject
 
 @MainActor
 struct SettingSelectionFactory {
     private let parent: Assembler
     private let assemblies = [VibrationSelectionAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     @MainActor
     func makeViewController(onSettingsSelect: @escaping (SettingsView.SettingsType) -> Void) -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)

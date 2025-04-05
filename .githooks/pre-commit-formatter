@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Get only files that are staged and have changes in the index (excluding unstaged changes)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(swift)$')
+
+if [ -n "$STAGED_FILES" ]; then
+    echo "Formatting staged files..."
+    echo "$STAGED_FILES" | while read -r file; do
+        scripts/AdamantCLI/adamant-cli format staged "$file"
+        git add "$file"
+    done
+else
+    echo "No staged files to format."
+fi
+
+exit 0

@@ -1,6 +1,6 @@
 //
 //  TransparentWindow.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //
@@ -20,7 +20,7 @@ public final class TransparentWindow: UIWindow {
         /// we therefor still return the default hit test result, but only if the tap was detected within the bounds of the _deepest view_
         if #available(iOS 18, *) {
             guard let view = rootViewController?.view else { return false }
-            
+
             let hit = Self._hitTest(
                 point,
                 with: event,
@@ -28,13 +28,13 @@ public final class TransparentWindow: UIWindow {
                 /// not advisable when added subviews are potentially non-interactive, as `rootViewController?.view` itself is part of `self.subviews`, and therefor participates in hit testing
                 view: subviews.count > 1 ? self : view
             )
-            
+
             return hit != nil
         } else {
             return super.point(inside: point, with: event)
         }
     }
-    
+
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if #available(iOS 18, *) {
             return super.hitTest(point, with: event)
@@ -45,44 +45,45 @@ public final class TransparentWindow: UIWindow {
     }
 }
 
-private extension TransparentWindow {
-    static func _hitTest(
+extension TransparentWindow {
+    fileprivate static func _hitTest(
         _ point: CGPoint,
         with event: UIEvent?,
         view: UIView,
         depth: Int = .zero
     ) -> (view: UIView, depth: Int)? {
         var deepest: (view: UIView, depth: Int)?
-        
+
         /// views are ordered back-to-front
         for subview in view.subviews.reversed() {
             let converted = view.convert(point, to: subview)
-            
+
             guard
                 subview.isUserInteractionEnabled,
                 !subview.isHidden,
                 subview.alpha > .zero,
                 subview.point(inside: converted, with: event)
             else { continue }
-            
-            let result = if let hit = _hitTest(
-                converted,
-                with: event,
-                view: subview,
-                depth: depth + 1
-            ) {
-                hit
-            } else {
-                (view: subview, depth: depth)
-            }
-            
+
+            let result =
+                if let hit = _hitTest(
+                    converted,
+                    with: event,
+                    view: subview,
+                    depth: depth + 1
+                ) {
+                    hit
+                } else {
+                    (view: subview, depth: depth)
+                }
+
             if case .none = deepest {
                 deepest = result
             } else if let current = deepest, result.depth > current.depth {
                 deepest = result
             }
         }
-        
+
         return deepest
     }
 }
