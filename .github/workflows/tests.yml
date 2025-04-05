@@ -25,9 +25,10 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build adamant-cli
       run: make configure
+    - name: Setup project dependencies
+      run: ./scripts/AdamantCLI/adamant-cli setup
     - name: Generate mocks for tests
-      run: |
-        ./scripts/AdamantCLI/adamant-cli mocks
+      run: ./scripts/AdamantCLI/adamant-cli mocks
     - name: Run tests
       run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16' | xcbeautify
 
