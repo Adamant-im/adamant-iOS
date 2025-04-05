@@ -23,22 +23,11 @@ jobs:
     - name: Print Current Xcode
       run: xcode-select -p
     - uses: actions/checkout@v3
-    - name: Run Cocoapods
-      run: pod install
-    - name: Install xcbeautify
-      run: brew install xcbeautify
-    - name: Sourcery
+    - name: Build adamant-cli
+      run: make configure
+    - name: Generate mocks for tests
       run: |
-        brew install sourcery
-        sourcery --config .sourcery.yml
-    - name: Generate AdamantSecret (for migration)
-      run: |
-        echo 'import Foundation
-        enum AdamantSecret {
-            static let appIdentifierPrefix: String = "random.string"
-            static let keychainValuePassword: String = "random.string.two"
-            static let oldKeychainPass: String = "random.string.three"
-        }' > CommonKit/Sources/CommonKit/AdamantSecret.swift
+        ./scripts/AdamantCLI/adamant-cli mocks
     - name: Run tests
       run: xcodebuild test -workspace Adamant.xcworkspace -scheme Adamant.Dev -destination 'platform=iOS Simulator,name=iPhone 16' | xcbeautify
 

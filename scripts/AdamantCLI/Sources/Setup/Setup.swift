@@ -8,8 +8,8 @@
 import ArgumentParser
 import Foundation
 
-public struct Setup: ParsableCommand {
-    public static let configuration = CommandConfiguration(
+struct Setup: ParsableCommand {
+    static let configuration = CommandConfiguration(
         abstract: "Setup script for Adamant-CLI Toolkit.",
         usage: "adamant-cli setup",
         discussion: """
@@ -18,9 +18,7 @@ public struct Setup: ParsableCommand {
             """
     )
 
-    public init() {}
-
-    mutating public func run() throws {
+    func run() throws {
         let brewInstallCommand = """
             if ! command -v brew &> /dev/null; then
                 echo "Homebrew is not installed. Please install Homebrew first."
@@ -32,6 +30,16 @@ public struct Setup: ParsableCommand {
 
             echo "Installing CocoaPods..."
             brew install cocoapods
+
+            echo "Installing xcbeautify..."
+            brew install xcbeautify
+
+            echo 'import Foundation
+            enum AdamantSecret {
+                static let appIdentifierPrefix: String = "random.string"
+                static let keychainValuePassword: String = "random.string.two"
+                static let oldKeychainPass: String = "random.string.three"
+            }' > CommonKit/Sources/CommonKit/AdamantSecret.swift
             """
 
         let process = Process()
