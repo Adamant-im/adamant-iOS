@@ -33,7 +33,7 @@ extension ApiServiceProtocol {
     }
 
     @MainActor
-    var hasSupportedNode: Bool {
+    public var hasSupportedNode: Bool {
         nodesInfo.nodes.contains { $0.isSupported }
     }
 }

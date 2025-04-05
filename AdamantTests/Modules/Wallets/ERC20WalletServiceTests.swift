@@ -241,6 +241,7 @@ private enum Constants {
         defaultOrdinalLevel: nil,
         reliabilityGasPricePercent: 10,
         reliabilityGasLimitPercent: 10,
+        increasedGasPricePercent: 0,
         defaultGasPriceGwei: 10,
         defaultGasLimit: 58000,
         warningGasPriceGwei: 25,
