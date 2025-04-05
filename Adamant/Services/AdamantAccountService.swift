@@ -17,7 +17,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
 
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
-    private let SecureStore: SecureStore
+    private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
     private let currencyInfoService: InfoServiceProtocol
     private let coreDataStack: CoreDataStack
@@ -42,7 +42,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
-        SecureStore: SecureStore,
+        securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         currencyInfoService: InfoServiceProtocol,
         coreDataStack: CoreDataStack,
@@ -50,7 +50,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
-        self.SecureStore = SecureStore
+        self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
         self.currencyInfoService = currencyInfoService
         self.coreDataStack = coreDataStack
@@ -84,7 +84,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             self?.update()
         }.store(in: &subscriptions)
 
-        setupSecureStore()
+        setupSecuredStore()
     }
 }
 
@@ -101,13 +101,13 @@ extension AdamantAccountService {
             return
         }
 
-        SecureStore.set(pin, for: .pin)
+        securedStore.set(pin, for: .pin)
 
         if let passphrase = passphrase {
-            SecureStore.set(passphrase, for: .passphrase)
+            securedStore.set(passphrase, for: .passphrase)
         } else {
-            SecureStore.set(keypair.publicKey, for: .publicKey)
-            SecureStore.set(keypair.privateKey, for: .privateKey)
+            securedStore.set(keypair.publicKey, for: .publicKey)
+            securedStore.set(keypair.privateKey, for: .privateKey)
         }
 
         hasStayInAccount = true
@@ -120,7 +120,7 @@ extension AdamantAccountService {
     }
 
     func validatePin(_ pin: String) -> Bool {
-        guard let savedPin = SecureStore.get(.pin) else {
+        guard let savedPin = securedStore.get(.pin) else {
             return false
         }
 
@@ -128,7 +128,7 @@ extension AdamantAccountService {
     }
 
     private func getSavedKeypair() -> Keypair? {
-        if let publicKey = SecureStore.get(.publicKey), let privateKey = SecureStore.get(.privateKey) {
+        if let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) {
             return Keypair(publicKey: publicKey, privateKey: privateKey)
         }
 
@@ -136,7 +136,7 @@ extension AdamantAccountService {
     }
 
     private func getSavedPassphrase() -> String? {
-        return SecureStore.get(.passphrase)
+        return securedStore.get(.passphrase)
     }
 
     func dropSavedAccount() {
@@ -144,7 +144,7 @@ extension AdamantAccountService {
         isBalanceExpired = true
         pushNotificationsTokenService?.removeCurrentToken()
         balanceInvalidationSubscription = nil
-        Key.allCases.forEach(SecureStore.remove)
+        Key.allCases.forEach(securedStore.remove)
 
         hasStayInAccount = false
         NotificationCenter.default.post(
@@ -174,25 +174,25 @@ extension AdamantAccountService {
         }.eraseToAnyCancellable()
     }
 
-    private func setupSecureStore() {
-        if SecureStore.get(.passphrase) != nil {
+    private func setupSecuredStore() {
+        if securedStore.get(.passphrase) != nil {
             hasStayInAccount = true
-            useBiometry = SecureStore.get(.useBiometry) != nil
-        } else if SecureStore.get(.publicKey) != nil,
-            SecureStore.get(.privateKey) != nil,
-            SecureStore.get(.pin) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
+        } else if securedStore.get(.publicKey) != nil,
+            securedStore.get(.privateKey) != nil,
+            securedStore.get(.pin) != nil
         {
             hasStayInAccount = true
 
-            useBiometry = SecureStore.get(.useBiometry) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
         } else {
             hasStayInAccount = false
             useBiometry = false
         }
 
-        NotificationCenter.default.addObserver(forName: Notification.Name.SecureStore.SecureStorePurged, object: SecureStore, queue: OperationQueue.main) {
+        NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) {
             [weak self] notification in
-            guard let store = notification.object as? SecureStore else {
+            guard let store = notification.object as? SecuredStore else {
                 return
             }
 
@@ -211,9 +211,9 @@ extension AdamantAccountService {
             $0 = newValue && hasStayInAccount
 
             if $0 {
-                SecureStore.set(String($0), for: .useBiometry)
+                securedStore.set(String($0), for: .useBiometry)
             } else {
-                SecureStore.remove(.useBiometry)
+                securedStore.remove(.useBiometry)
             }
         }
     }
@@ -327,7 +327,7 @@ extension AdamantAccountService {
 
     // MARK: Pincode
     func loginWith(pincode: String) async throws -> AccountServiceResult {
-        guard let storePin = SecureStore.get(.pin) else {
+        guard let storePin = securedStore.get(.pin) else {
             throw AccountServiceError.invalidPassphrase
         }
 
@@ -350,10 +350,10 @@ extension AdamantAccountService {
             let account = try await loginWith(keypair: keypair)
 
             let alert: (title: String, message: String)?
-            if SecureStore.get(.showedV12) != nil {
+            if securedStore.get(.showedV12) != nil {
                 alert = nil
             } else {
-                SecureStore.set("1", for: .showedV12)
+                securedStore.set("1", for: .showedV12)
                 alert = (
                     title: String.adamant.accountService.updateAlertTitleV12,
                     message: String.adamant.accountService.updateAlertMessageV12
@@ -496,7 +496,7 @@ private enum Key: CaseIterable {
     }
 }
 
-extension SecureStore {
+extension SecuredStore {
     fileprivate func set(_ value: String, for key: Key) {
         set(value, for: key.stringValue)
     }
