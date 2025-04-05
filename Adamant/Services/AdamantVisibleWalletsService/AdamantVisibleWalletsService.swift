@@ -13,7 +13,7 @@ import Foundation
 final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Sendable {
 
     // MARK: Dependencies
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
     let accountService: AccountService
     let walletsServiceCompose: WalletServiceCompose
 
@@ -40,11 +40,11 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
 
     // MARK: Lifecycle
     init(
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         accountService: AccountService,
         walletsServiceCompose: WalletServiceCompose
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.accountService = accountService
         self.walletsServiceCompose = walletsServiceCompose
         self.state = .init()
@@ -72,10 +72,10 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     }
 
     private func userLoggedOut() {
-        securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
-        securedStore.remove(StoreKey.visibleWallets.indexWallets)
-        securedStore.remove(StoreKey.visibleWallets.useCustomIndexes)
-        securedStore.remove(StoreKey.visibleWallets.useCustomVisibility)
+        SecureStore.remove(StoreKey.visibleWallets.invisibleWallets)
+        SecureStore.remove(StoreKey.visibleWallets.indexWallets)
+        SecureStore.remove(StoreKey.visibleWallets.useCustomIndexes)
+        SecureStore.remove(StoreKey.visibleWallets.useCustomVisibility)
         state.invisibleWallets.removeAll()
         state.indexesWallets.removeAll()
     }
@@ -103,7 +103,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
             return wallets
         }
 
-        return securedStore.get(StoreKey.visibleWallets.invisibleWallets) ?? []
+        return SecureStore.get(StoreKey.visibleWallets.invisibleWallets) ?? []
     }
 
     func isInvisible(_ walletTokenUniqueID: String) -> Bool {
@@ -111,7 +111,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     }
 
     private func setInvisibleWallets(_ wallets: [String]) {
-        securedStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
+        SecureStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
         setUseCustomFilter(for: .visibility, value: true)
         state.invisibleWallets = getInvisibleWallets()
     }
@@ -147,7 +147,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
             ? StoreKey.visibleWallets.indexWallets
             : StoreKey.visibleWallets.indexWalletsWithInvisible
 
-        guard let indexes: [String] = securedStore.get(path) else {
+        guard let indexes: [String] = SecureStore.get(path) else {
             return []
         }
         return indexes
@@ -159,7 +159,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
             ? StoreKey.visibleWallets.indexWallets
             : StoreKey.visibleWallets.indexWalletsWithInvisible
 
-        securedStore.set(wallets, for: path)
+        SecureStore.set(wallets, for: path)
         state.indexesWallets = getSortedWallets(includeInvisible: false)
         setUseCustomFilter(for: .indexes, value: true)
 
@@ -173,13 +173,13 @@ final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Send
     }
 
     private func isUseCustomFilter(for type: Types) -> Bool {
-        guard let result: Bool = securedStore.get(type.path) else {
+        guard let result: Bool = SecureStore.get(type.path) else {
             return false
         }
         return result
     }
 
     private func setUseCustomFilter(for type: Types, value: Bool) {
-        securedStore.set(value, for: type.path)
+        SecureStore.set(value, for: type.path)
     }
 }

@@ -37,7 +37,7 @@ private struct PartnerQRAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
         container.register(PartnerQRService.self) { r in
             AdamantPartnerQRService(
-                securedStore: r.resolve(SecureStore.self)!
+                SecureStore: r.resolve(SecureStore.self)!
             )
         }.inObjectScope(.container)
 

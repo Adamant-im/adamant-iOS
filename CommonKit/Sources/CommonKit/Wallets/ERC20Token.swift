@@ -18,6 +18,7 @@ public struct ERC20Token: Sendable {
     public let defaultOrdinalLevel: Int?
     public let reliabilityGasPricePercent: Int
     public let reliabilityGasLimitPercent: Int
+    public let increasedGasPricePercent: Decimal
     public let defaultGasPriceGwei: Int
     public let defaultGasLimit: Int
     public let warningGasPriceGwei: Int

@@ -45,7 +45,7 @@ enum NotificationTarget: CaseIterable {
 @MainActor
 final class AdamantNotificationsService: NSObject, NotificationsService {
     // MARK: Dependencies
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
     private let vibroService: VibroService
     weak var accountService: AccountService?
     weak var chatsProvider: ChatsProvider?
@@ -75,10 +75,10 @@ final class AdamantNotificationsService: NSObject, NotificationsService {
 
     // MARK: Lifecycle
     init(
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         vibroService: VibroService
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.vibroService = vibroService
         super.init()
 
@@ -122,7 +122,7 @@ extension AdamantNotificationsService {
             notificationsReactionSound = sound
         }
 
-        securedStore.set(
+        SecureStore.set(
             sound.fileName,
             for: target.storeId
         )
@@ -141,7 +141,7 @@ extension AdamantNotificationsService {
         switch mode {
         case .disabled:
             AdamantNotificationsService.configureUIApplicationFor(mode: mode)
-            securedStore.remove(StoreKey.notificationsService.notificationsMode)
+            SecureStore.remove(StoreKey.notificationsService.notificationsMode)
             notificationsMode = mode
 
             NotificationCenter.default.post(
@@ -177,7 +177,7 @@ extension AdamantNotificationsService {
                     AdamantNotificationsService.configureUIApplicationFor(mode: mode)
                 }
 
-                self?.securedStore.set(
+                self?.SecureStore.set(
                     mode.toRaw(),
                     for: StoreKey.notificationsService.notificationsMode
                 )
@@ -273,11 +273,11 @@ extension AdamantNotificationsService {
         if let number = number {
             customBadgeNumber = number
             appIconBadgeNumber = number
-            securedStore.set(String(number), for: StoreKey.notificationsService.customBadgeNumber)
+            SecureStore.set(String(number), for: StoreKey.notificationsService.customBadgeNumber)
         } else {
             customBadgeNumber = 0
             appIconBadgeNumber = 0
-            securedStore.remove(StoreKey.notificationsService.customBadgeNumber)
+            SecureStore.remove(StoreKey.notificationsService.customBadgeNumber)
         }
 
         DispatchQueue.onMainAsync {
@@ -296,7 +296,7 @@ extension AdamantNotificationsService {
     }
 
     func setValue(for key: String, value: Bool) {
-        securedStore.set(value, for: key)
+        SecureStore.set(value, for: key)
     }
 }
 
@@ -318,7 +318,7 @@ extension AdamantNotificationsService {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = 0
 
-        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
+        if let raw: String = SecureStore.get(StoreKey.notificationsService.notificationsMode),
             let mode = NotificationsMode(string: raw)
         {
             setNotificationsMode(mode, completion: nil)
@@ -327,16 +327,16 @@ extension AdamantNotificationsService {
         }
 
         NotificationTarget.allCases.forEach { target in
-            if let raw: String = securedStore.get(target.storeId),
+            if let raw: String = SecureStore.get(target.storeId),
                 let sound = NotificationSound(fileName: raw)
             {
                 setNotificationSound(sound, for: target)
             }
         }
 
-        inAppSound = securedStore.get(StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
-        inAppVibrate = securedStore.get(StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
-        inAppToasts = securedStore.get(StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
+        inAppSound = SecureStore.get(StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
+        inAppVibrate = SecureStore.get(StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
+        inAppToasts = SecureStore.get(StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
 
         preservedBadgeNumber = nil
 
@@ -349,12 +349,12 @@ extension AdamantNotificationsService {
         setNotificationsMode(.disabled, completion: nil)
         setNotificationSound(defaultNotificationsSound, for: .baseMessage)
         setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
-        securedStore.remove(StoreKey.notificationsService.notificationsMode)
-        securedStore.remove(StoreKey.notificationsService.notificationsSound)
-        securedStore.remove(StoreKey.notificationsService.notificationsReactionSound)
-        securedStore.remove(StoreKey.notificationsService.inAppSounds)
-        securedStore.remove(StoreKey.notificationsService.inAppVibrate)
-        securedStore.remove(StoreKey.notificationsService.inAppToasts)
+        SecureStore.remove(StoreKey.notificationsService.notificationsMode)
+        SecureStore.remove(StoreKey.notificationsService.notificationsSound)
+        SecureStore.remove(StoreKey.notificationsService.notificationsReactionSound)
+        SecureStore.remove(StoreKey.notificationsService.inAppSounds)
+        SecureStore.remove(StoreKey.notificationsService.inAppVibrate)
+        SecureStore.remove(StoreKey.notificationsService.inAppToasts)
         preservedBadgeNumber = nil
 
         resetUnreadController()

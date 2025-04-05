@@ -14,7 +14,7 @@ final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
 
     // MARK: Dependencies
 
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
 
     // MARK: Proprieties
 
@@ -23,8 +23,8 @@ final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
 
     // MARK: Lifecycle
 
-    init(securedStore: SecureStore) {
-        self.securedStore = securedStore
+    init(SecureStore: SecureStore) {
+        self.SecureStore = SecureStore
 
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -48,7 +48,7 @@ final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
     }
 
     private func userLoggedOut() {
-        securedStore.remove(StoreKey.increaseFee.increaseFee)
+        SecureStore.remove(StoreKey.increaseFee.increaseFee)
         increaseFeeData = [:]
     }
 
@@ -61,12 +61,12 @@ final class AdamantIncreaseFeeService: IncreaseFeeService, @unchecked Sendable {
     func setIncreaseFeeEnabled(for tokenUniqueID: String, value: Bool) {
         $increaseFeeData.mutate {
             $0[tokenUniqueID] = value
-            securedStore.set($0, for: StoreKey.increaseFee.increaseFee)
+            SecureStore.set($0, for: StoreKey.increaseFee.increaseFee)
         }
     }
 
     private func getIncreaseFeeDictionary() -> [String: Bool] {
-        guard let result: [String: Bool] = securedStore.get(StoreKey.increaseFee.increaseFee) else {
+        guard let result: [String: Bool] = SecureStore.get(StoreKey.increaseFee.increaseFee) else {
             return [:]
         }
 

@@ -12,7 +12,7 @@ import Foundation
 public final class NodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol {
     @Atomic private var fastestNodeModeValues: ObservableValue<[NodeGroup: Bool]>
 
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
     private var subscription: AnyCancellable?
 
     public func isFastestNodeMode(group: NodeGroup) -> Bool {
@@ -38,12 +38,12 @@ public final class NodesAdditionalParamsStorage: NodesAdditionalParamsStoragePro
         fastestNodeModeValues.wrappedValue[group] = value
     }
 
-    public init(securedStore: SecureStore) {
-        self.securedStore = securedStore
+    public init(SecureStore: SecureStore) {
+        self.SecureStore = SecureStore
 
         _fastestNodeModeValues = .init(
             wrappedValue: .init(
-                wrappedValue: securedStore.get(
+                wrappedValue: SecureStore.get(
                     StoreKey.NodesAdditionalParamsStorage.fastestNodeMode
                 ) ?? [:]
             )
@@ -58,6 +58,6 @@ public final class NodesAdditionalParamsStorage: NodesAdditionalParamsStoragePro
 
 extension NodesAdditionalParamsStorage {
     fileprivate func saveFastestNodeMode(_ dict: [NodeGroup: Bool]) {
-        securedStore.set(dict, for: StoreKey.NodesAdditionalParamsStorage.fastestNodeMode)
+        SecureStore.set(dict, for: StoreKey.NodesAdditionalParamsStorage.fastestNodeMode)
     }
 }

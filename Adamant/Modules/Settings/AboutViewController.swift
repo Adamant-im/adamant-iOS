@@ -82,7 +82,7 @@ final class AboutViewController: FormViewController {
             case .email: return .localized("About.Row.WriteUs", comment: "About scene: Write us row")
             case .blog: return .localized("About.Row.Blog", comment: "About scene: Our blog row")
             case .twitter: return .localized("About.Row.Twitter", comment: "About scene: Twitter row")
-            case .vibration: return "Vibrations"
+            case .vibration: return "Developer"
             }
         }
 
@@ -109,7 +109,7 @@ final class AboutViewController: FormViewController {
             case .website: return .asset(named: "row_website")
             case .welcomeScreens: return .asset(named: "row_logo")
             case .twitter: return .asset(named: "row_twitter")
-            case .vibration: return .asset(named: "row_vibration")
+            case .vibration: return .asset(named: "row_crashlytics")
             }
         }
     }
@@ -424,20 +424,21 @@ extension AboutViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.screensFactory.makeVibrationSelection()
+            guard
+                let vc = self?.screensFactory.makeVibrationSelection(
+                    onSettingsSelect: { [weak self] settingType in
+                        switch settingType {
+                        case .adamantWallets:
+                            let vc = TokensAndCoinsViewController(dialogService: self?.dialogService)
+                            self?.showViewController(vc)
+                        }
+                    }
+                )
             else {
                 return
             }
 
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController: vc)
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
+            self?.showViewController(vc)
         }
 
         appSection.append(vibrationRow)
@@ -450,5 +451,17 @@ extension AboutViewController {
                 .adamant.about.commit(.init($0.prefix(20)))
             }
         )
+    }
+
+    private func showViewController(_ vc: UIViewController) {
+        if let split = self.splitViewController {
+            let details = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(details, sender: self)
+        } else if let nav = self.navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            vc.modalPresentationStyle = .overFullScreen
+            self.present(vc, animated: true, completion: nil)
+        }
     }
 }

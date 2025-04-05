@@ -11,23 +11,23 @@ import Foundation
 
 extension AdamantTransfersProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
-        guard let address: String = securedStore.get(StoreKey.transfersProvider.address) else {
+        guard let address: String = SecureStore.get(StoreKey.transfersProvider.address) else {
             return .failed
         }
 
         var lastHeight: Int64?
-        if let raw: String = securedStore.get(StoreKey.transfersProvider.receivedLastHeight) {
+        if let raw: String = SecureStore.get(StoreKey.transfersProvider.receivedLastHeight) {
             lastHeight = Int64(raw)
         } else {
             lastHeight = nil
         }
 
         var notifiedCount = 0
-        if let raw: String = securedStore.get(StoreKey.transfersProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+        if let raw: String = SecureStore.get(StoreKey.transfersProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
             if h < notifiedHeight {
                 lastHeight = notifiedHeight
 
-                if let raw: String = securedStore.get(StoreKey.transfersProvider.notifiedTransfersCount), let count = Int(raw) {
+                if let raw: String = SecureStore.get(StoreKey.transfersProvider.notifiedTransfersCount), let count = Int(raw) {
                     notifiedCount = count
                 }
             }
@@ -47,14 +47,14 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 
             guard total > 0 else { return .noData }
 
-            securedStore.set(
+            SecureStore.set(
                 String(total + notifiedCount),
                 for: StoreKey.transfersProvider.notifiedTransfersCount
             )
 
             if var newLastHeight = transactions.map({ $0.height }).sorted().last {
                 newLastHeight += 1  // Server will return new transactions including this one
-                securedStore.set(
+                SecureStore.set(
                     String(newLastHeight),
                     for: StoreKey.transfersProvider.notifiedLastHeight
                 )
@@ -73,7 +73,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
     }
 
     func dropStateData() {
-        securedStore.remove(StoreKey.transfersProvider.notifiedLastHeight)
-        securedStore.remove(StoreKey.transfersProvider.notifiedTransfersCount)
+        SecureStore.remove(StoreKey.transfersProvider.notifiedLastHeight)
+        SecureStore.remove(StoreKey.transfersProvider.notifiedTransfersCount)
     }
 }

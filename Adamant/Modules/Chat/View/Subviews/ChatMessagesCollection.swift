@@ -46,8 +46,9 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     func reloadData(newIds: [String], isOnBottom: Bool) {
         let hasNewMessagesAtTop = newIds.first != currentIds.first
         let hasNewMessagesAtBottom = newIds.last != currentIds.last
+        let hasSameOrMoreMessages = newIds.count >= currentIds.count
 
-        guard hasNewMessagesAtTop || hasNewMessagesAtBottom else {
+        guard hasNewMessagesAtTop || hasNewMessagesAtBottom, hasSameOrMoreMessages else {
             return applyNewIds(newIds)
         }
 

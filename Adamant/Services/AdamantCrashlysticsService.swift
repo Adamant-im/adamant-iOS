@@ -16,7 +16,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
 
     // MARK: Dependencies
 
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
 
     // MARK: Proprieties
 
@@ -25,8 +25,8 @@ final class AdamantCrashlyticsService: CrashlyticsService {
 
     // MARK: Lifecycle
 
-    init(securedStore: SecureStore) {
-        self.securedStore = securedStore
+    init(SecureStore: SecureStore) {
+        self.SecureStore = SecureStore
 
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -39,20 +39,20 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     // MARK: Notification actions
 
     private func userLoggedOut() {
-        securedStore.remove(StoreKey.increaseFee.increaseFee)
+        SecureStore.remove(StoreKey.increaseFee.increaseFee)
         updateCrashlyticSDK(isEnabled: false)
     }
 
     // MARK: Update data
 
     func setCrashlyticsEnabled(_ value: Bool) {
-        securedStore.set(value, for: StoreKey.crashlytic.crashlyticEnabled)
+        SecureStore.set(value, for: StoreKey.crashlytic.crashlyticEnabled)
         updateCrashlyticSDK(isEnabled: value)
     }
 
     func isCrashlyticsEnabled() -> Bool {
         guard
-            let result: Bool = securedStore.get(
+            let result: Bool = SecureStore.get(
                 StoreKey.crashlytic.crashlyticEnabled
             )
         else {

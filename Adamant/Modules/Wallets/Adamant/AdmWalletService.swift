@@ -179,12 +179,12 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
 
         admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
 
-        if isRaised {
-            Task { @MainActor in vibroService.applyVibration(.success) }
-        }
-
         if let wallet = wallet {
             postUpdateNotification(with: wallet)
+        }
+
+        if isRaised {
+            Task { @MainActor in vibroService.applyVibration(.success) }
         }
     }
 

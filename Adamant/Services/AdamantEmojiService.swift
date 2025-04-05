@@ -13,7 +13,7 @@ import Foundation
 final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     // MARK: Dependencies
 
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
 
     // MARK: Proprieties
 
@@ -25,8 +25,8 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
 
     // MARK: Lifecycle
 
-    init(securedStore: SecureStore) {
-        self.securedStore = securedStore
+    init(SecureStore: SecureStore) {
+        self.SecureStore = SecureStore
 
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedIn)
@@ -46,7 +46,7 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     // MARK: Notification actions
 
     private func userLoggedOut() {
-        securedStore.remove(StoreKey.emojis.emojis)
+        SecureStore.remove(StoreKey.emojis.emojis)
     }
 
     private func userLoggedIn() {
@@ -56,18 +56,18 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     // MARK: Update data
 
     private func setDefaultEmojiIfNeeded() {
-        let emojis: [String: Int]? = securedStore.get(
+        let emojis: [String: Int]? = SecureStore.get(
             StoreKey.emojis.emojis
         )
 
         guard emojis == nil else { return }
 
-        securedStore.set(defaultEmojis, for: StoreKey.emojis.emojis)
+        SecureStore.set(defaultEmojis, for: StoreKey.emojis.emojis)
     }
 
     func getFrequentlySelectedEmojis() -> [String] {
         let storedEmojis: [String: Int] =
-            securedStore.get(
+            SecureStore.get(
                 StoreKey.emojis.emojis
             ) ?? defaultEmojis
 
@@ -87,7 +87,7 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
         type: EmojiUpdateType
     ) {
         var storedEmojis: [String: Int] =
-            securedStore.get(
+            SecureStore.get(
                 StoreKey.emojis.emojis
             ) ?? defaultEmojis
 
@@ -102,6 +102,6 @@ final class AdamantEmojiService: EmojiService, @unchecked Sendable {
             storedEmojis[selectedEmoji] = value
         }
 
-        securedStore.set(storedEmojis, for: StoreKey.emojis.emojis)
+        SecureStore.set(storedEmojis, for: StoreKey.emojis.emojis)
     }
 }

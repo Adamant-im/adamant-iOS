@@ -14,7 +14,7 @@ import UIKit
 final class InfoService: InfoServiceProtocol {
     typealias Rates = [InfoServiceTicker: Decimal]
 
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
     private let api: InfoServiceApiServiceProtocol
     private let rateCoins: [String]
 
@@ -29,11 +29,11 @@ final class InfoService: InfoServiceProtocol {
     }
 
     init(
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         walletServiceCompose: WalletServiceCompose,
         api: InfoServiceApiServiceProtocol
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.api = api
         rateCoins = walletServiceCompose.getWallets().map { $0.core.tokenSymbol }
         configure()
@@ -87,12 +87,12 @@ extension InfoService {
     fileprivate func updateCurrency(_ newValue: Currency) {
         guard newValue != currentCurrencyValue else { return }
         currentCurrencyValue = newValue
-        securedStore.set(currentCurrencyValue.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
+        SecureStore.set(currentCurrencyValue.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
         sendRatesChangedNotification()
     }
 
     fileprivate func setupCurrency() {
-        if let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),
+        if let id: String = SecureStore.get(StoreKey.CoinInfo.selectedCurrency),
             let currency = Currency(rawValue: id)
         {
             currentCurrency = currency

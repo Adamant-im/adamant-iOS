@@ -14,7 +14,7 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
 
     // MARK: Dependencies
 
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
 
     // MARK: Proprieties
 
@@ -22,8 +22,8 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
 
     // MARK: Lifecycle
 
-    init(securedStore: SecureStore) {
-        self.securedStore = securedStore
+    init(SecureStore: SecureStore) {
+        self.SecureStore = SecureStore
 
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -43,12 +43,12 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
     // MARK: Update data
 
     func setIncludeNameEnabled(_ value: Bool) {
-        securedStore.set(value, for: StoreKey.partnerQR.includeNameEnabled)
+        SecureStore.set(value, for: StoreKey.partnerQR.includeNameEnabled)
     }
 
     func isIncludeNameEnabled() -> Bool {
         guard
-            let result: Bool = securedStore.get(
+            let result: Bool = SecureStore.get(
                 StoreKey.partnerQR.includeNameEnabled
             )
         else {
@@ -59,12 +59,12 @@ final class AdamantPartnerQRService: PartnerQRService, @unchecked Sendable {
     }
 
     func setIncludeURLEnabled(_ value: Bool) {
-        securedStore.set(value, for: StoreKey.partnerQR.includeURLEnabled)
+        SecureStore.set(value, for: StoreKey.partnerQR.includeURLEnabled)
     }
 
     func isIncludeURLEnabled() -> Bool {
         guard
-            let result: Bool = securedStore.get(
+            let result: Bool = SecureStore.get(
                 StoreKey.partnerQR.includeURLEnabled
             )
         else {

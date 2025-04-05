@@ -16,7 +16,7 @@ public enum StoreKey {}
 extension Notification.Name {
     public enum SecureStore {
         /// Raised when store is purged
-        public static let securedStorePurged = Notification.Name("adamant.SecureStore.purged")
+        public static let SecureStorePurged = Notification.Name("adamant.SecureStore.purged")
     }
 }
 

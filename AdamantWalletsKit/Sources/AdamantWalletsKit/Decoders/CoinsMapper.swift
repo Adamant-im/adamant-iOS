@@ -35,7 +35,7 @@ public enum AnyBlockchain: Hashable {
     }
 }
 
-final class BlockchainTokensStorage {
+public final class BlockchainTokensStorage {
     private let chain: AnyBlockchain
     var tokens: [String: CoinInfoDTO] = [:]
 
@@ -59,6 +59,8 @@ public protocol AnyTokensStorage: AnyObject {
 
     func loadTokens()
     func getCoin(_ coin: String) -> CoinInfoDTO?
+
+    func getCoinsAndChains() -> (coins: [String: CoinInfoDTO], chains: [AnyBlockchain: BlockchainTokensStorage])
 }
 
 public final class TokensStorage: AnyTokensStorage {
@@ -90,6 +92,13 @@ public final class TokensStorage: AnyTokensStorage {
     /// Get list of tokens for chain
     public subscript(chain: AnyBlockchain) -> [String: CoinInfoDTO]? {
         blockchainTokens(for: chain)?.tokens
+    }
+
+    public func getCoinsAndChains() -> (
+        coins: [String: CoinInfoDTO],
+        chains: [AnyBlockchain: BlockchainTokensStorage]
+    ) {
+        (self.coinsStorage, self.blockchaisTokensStorage)
     }
 
     public func getCoin(_ coin: String) -> CoinInfoDTO? {
@@ -124,7 +133,7 @@ public final class TokensStorage: AnyTokensStorage {
         guard let infoJson = Bundle.module.url(forResource: "general/\(folderName)/info", withExtension: "json"),
             let data = try? Data(contentsOf: infoJson),
             let coinInfo = try? JSONDecoder().decode(CoinInfoDTO.self, from: data),
-            coinInfo._type == .coin, coinInfo.isActive
+            coinInfo._type == .coin, coinInfo.isActive, coinsStorage[coinInfo.symbol] == nil
         else {
             return
         }
@@ -219,7 +228,8 @@ public final class TokensStorage: AnyTokensStorage {
             return nil
         }
 
-        guard let coinInfo = try? JSONDecoder().decode(CoinInfoDTO.self, from: data),
+        guard let baseCoin = try? JSONDecoder().decode(CoinInfoDTO.self, from: data),
+            let coinInfo = mergeTokenFrom(path: "blockchains/\(chain.rawValue)", base: baseCoin),
             coinInfo.isActive
         else { return nil }
 

@@ -10,22 +10,22 @@ import CommonKit
 import Foundation
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService, @unchecked Sendable {
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
 
     private let tokenProcessingQueue = DispatchQueue(label: "com.adamant.push-token-processing-queue")
     private let tokenProcessingSemaphore = DispatchSemaphore(value: 1)
-    private let securedStoreSemaphore = DispatchSemaphore(value: 1)
+    private let SecureStoreSemaphore = DispatchSemaphore(value: 1)
 
     init(
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.accountService = accountService
@@ -209,39 +209,39 @@ extension AdamantPushNotificationsTokenService {
 
 extension AdamantPushNotificationsTokenService {
     fileprivate func setTokenToStorage(_ token: String?) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
 
         if let token = token {
-            securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
+            SecureStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
         } else {
-            securedStore.remove(StoreKey.PushNotificationsTokenService.token)
+            SecureStore.remove(StoreKey.PushNotificationsTokenService.token)
         }
     }
 
     fileprivate func getToken() -> String? {
-        securedStore.get(StoreKey.PushNotificationsTokenService.token)
+        SecureStore.get(StoreKey.PushNotificationsTokenService.token)
     }
 
     fileprivate func addTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
 
         var transactions = getTokenDeletionTransactions()
         transactions.insert(transaction)
-        securedStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
+        SecureStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
     }
 
     fileprivate func removeTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
 
         var transactions = getTokenDeletionTransactions()
         transactions.remove(transaction)
-        securedStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
+        SecureStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
     }
 
     fileprivate func getTokenDeletionTransactions() -> Set<UnregisteredTransaction> {
-        securedStore.get(StoreKey.PushNotificationsTokenService.tokenDeletionTransactions) ?? .init()
+        SecureStore.get(StoreKey.PushNotificationsTokenService.tokenDeletionTransactions) ?? .init()
     }
 }

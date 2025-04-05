@@ -18,7 +18,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private let passphraseStoreKey = "accountService.passphrase"
     private let sizeWithoutMessageLabel: CGFloat = 123.0
 
-    private lazy var securedStore: SecureStorageProtocol = {
+    private lazy var SecureStore: SecureStorageProtocol = {
         AdamantSecureStorage()
     }()
 
@@ -48,12 +48,12 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     func didReceive(_ notification: UNNotification) {
         // MARK: 0. Necessary services
         let avatarService = AdamantAvatarService()
-        let keychainStore = KeychainStore(secureStorage: securedStore)
+        let keychainStore = KeychainStore(secureStorage: SecureStore)
         let nativeCore = NativeAdamantCore()
 
         let extensionApi = ExtensionsApiFactory(
             core: nativeCore,
-            securedStore: keychainStore
+            SecureStore: keychainStore
         ).make()
 
         var keypair: Keypair?

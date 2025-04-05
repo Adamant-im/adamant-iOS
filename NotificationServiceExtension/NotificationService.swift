@@ -18,7 +18,7 @@ class NotificationService: UNNotificationServiceExtension {
         return AdamantProvider()
     }()
 
-    private lazy var securedStore: SecureStore = {
+    private lazy var SecureStore: SecureStore = {
         KeychainStore(secureStorage: AdamantSecureStorage())
     }()
 
@@ -65,11 +65,11 @@ class NotificationService: UNNotificationServiceExtension {
 
         // MARK: 1. Getting services
         let core = NativeAdamantCore()
-        let api = ExtensionsApiFactory(core: core, securedStore: securedStore).make()
+        let api = ExtensionsApiFactory(core: core, SecureStore: SecureStore).make()
 
         // No passphrase - no point of trying to get and decode
         guard
-            let passphrase: String = securedStore.get(passphraseStoreKey),
+            let passphrase: String = SecureStore.get(passphraseStoreKey),
             let keypair = core.createKeypairFor(passphrase: passphrase, password: .empty),
             AdamantUtilities.generateAddress(publicKey: keypair.publicKey) == pushRecipient
         else { return }
@@ -94,7 +94,7 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
 
-        let contactsBlockList: [String] = securedStore.get(StoreKey.accountService.blockList) ?? []
+        let contactsBlockList: [String] = SecureStore.get(StoreKey.accountService.blockList) ?? []
         guard !contactsBlockList.contains(partnerAddress) else { return }
 
         // MARK: 4. Address book
@@ -319,7 +319,7 @@ class NotificationService: UNNotificationServiceExtension {
         }
 
         bestAttemptContent.sound = getSound(
-            securedStore: securedStore,
+            SecureStore: SecureStore,
             isReaction: isReaction
         )
 
@@ -343,13 +343,13 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
 
-    private func getSound(securedStore: SecureStore, isReaction: Bool) -> UNNotificationSound? {
+    private func getSound(SecureStore: SecureStore, isReaction: Bool) -> UNNotificationSound? {
         let key =
             isReaction
             ? StoreKey.notificationsService.notificationsReactionSound
             : StoreKey.notificationsService.notificationsSound
 
-        let sound: String = securedStore.get(key) ?? .empty
+        let sound: String = SecureStore.get(key) ?? .empty
 
         return sound.isEmpty
             ? nil

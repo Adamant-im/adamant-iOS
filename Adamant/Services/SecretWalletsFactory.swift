@@ -11,16 +11,16 @@ import CommonKit
 struct SecretWalletsFactory {
     private let visibleWalletsService: VisibleWalletsService
     private let accountService: AccountService
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
 
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
-        securedStore: SecureStore
+        SecureStore: SecureStore
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
     }
 
     func makeSecretWallet(withPassword password: String) -> WalletStoreServiceProtocol {
@@ -47,7 +47,7 @@ struct SecretWalletsFactory {
     }
 
     private func initWallets(withPass password: String, for walletService: WalletServiceCompose) async {
-        guard let passphrase: String = securedStore.get(StoreKey.accountService.passphrase) else {
+        guard let passphrase: String = SecureStore.get(StoreKey.accountService.passphrase) else {
             print("No passphrase found")
             return
         }

@@ -21,7 +21,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     private let accountsProvider: AccountsProvider
-    let securedStore: SecureStore
+    let SecureStore: SecureStore
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
 
@@ -78,7 +78,7 @@ actor AdamantTransfersProvider: TransfersProvider {
         adamantCore: AdamantCore,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         transactionService: ChatTransactionService,
         chatsProvider: ChatsProvider
     ) {
@@ -87,7 +87,7 @@ actor AdamantTransfersProvider: TransfersProvider {
         self.adamantCore = adamantCore
         self.accountService = accountService
         self.accountsProvider = accountsProvider
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.transactionService = transactionService
         self.chatsProvider = chatsProvider
 
@@ -120,7 +120,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     // MARK: - Notifications action
 
     private func userLoggedInAction(_ loggedAddress: String?) async {
-        let store = securedStore
+        let store = SecureStore
 
         guard let loggedAddress = loggedAddress else {
             store.remove(StoreKey.transfersProvider.address)
@@ -242,7 +242,7 @@ extension AdamantTransfersProvider {
                 readedLastHeight = nil
             }
 
-            let store = securedStore
+            let store = SecureStore
             // Received
             if let h = receivedLastHeight {
                 if let raw: String = store.get(StoreKey.transfersProvider.receivedLastHeight),
@@ -328,9 +328,9 @@ extension AdamantTransfersProvider {
         readedLastHeight = nil
 
         // Drop store
-        securedStore.remove(StoreKey.transfersProvider.address)
-        securedStore.remove(StoreKey.transfersProvider.receivedLastHeight)
-        securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
+        SecureStore.remove(StoreKey.transfersProvider.address)
+        SecureStore.remove(StoreKey.transfersProvider.receivedLastHeight)
+        SecureStore.remove(StoreKey.transfersProvider.readedLastHeight)
 
         // Drop CoreData
         //        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)

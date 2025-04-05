@@ -37,7 +37,7 @@ final class AdmWalletServiceTests: XCTestCase {
             adamantCore: adamantCoreMock,
             accountService: accountServiceMock,
             accountsProvider: accountsProviderMock,
-            securedStore: SecureStoreMock(),
+            SecureStore: SecureStoreMock(),
             transactionService: ChatTransactionServiceMock(),
             chatsProvider: chatProviderMock
         )

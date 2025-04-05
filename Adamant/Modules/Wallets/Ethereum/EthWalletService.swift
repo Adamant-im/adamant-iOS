@@ -6,6 +6,7 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import AdamantWalletsKit
 import Alamofire
 @preconcurrency import BigInt
 import Combine
@@ -72,27 +73,31 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
+final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC20GasAlgorithmComputable, @unchecked Sendable {
     static let currencySymbol = "ETH"
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 
+    static var coinInfo: CoinInfoDTO? {
+        CoinInfoProvider.storage?[currencySymbol]
+    }
+
     static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
 
     var tokenSymbol: String {
-        return type(of: self).currencySymbol
+        type(of: self).currencySymbol
     }
 
     var tokenLogo: UIImage {
-        return type(of: self).currencyLogo
+        type(of: self).currencyLogo
     }
 
     static var tokenNetworkSymbol: String {
-        return "ERC20"
+        "ERC20"
     }
 
     var tokenContract: String {
-        return ""
+        ""
     }
 
     var tokenUniqueID: String {
@@ -100,19 +105,19 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     }
 
     var richMessageType: String {
-        return Self.richMessageType
+        Self.richMessageType
     }
 
     var qqPrefix: String {
-        return Self.qqPrefix
+        Self.qqPrefix
     }
 
     var isSupportIncreaseFee: Bool {
-        return true
+        true
     }
 
     var isIncreaseFeeEnabled: Bool {
-        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
+        increaseFeeService.isIncreaseFeeEnabled(for: tokenUniqueID)
     }
 
     var nodeGroups: [NodeGroup] {
@@ -161,6 +166,10 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
 
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
+
+    var increasedGasPricePercent: Decimal {
+        Decimal(Self.coinInfo?.increasedGasPricePercent ?? 50)
+    }
 
     // MARK: - Properties
 
@@ -307,14 +316,16 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             wallet.balance = balance
             markBalanceAsFresh(wallet)
 
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
-
             walletUpdateSender.send()
+        } else {
+            wallet.isBalanceInitialized = false
         }
+
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
 
         setState(.upToDate)
         await calculateFee()
@@ -339,46 +350,41 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     }
 
     func calculateFee(for address: EthereumAddress? = nil) async {
-        let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit(to: address)
+        async let pricePriceAsync = getGasPrices()
+        async let gasLimitAsync = getGasLimit(to: address)
+        var gasPriceCoeficient: Decimal = 1
+        if isIncreaseFeeEnabled {
+            gasPriceCoeficient += increasedGasPricePercent / 100
+        }
 
-        var price = priceRaw ?? defaultGasPriceGwei.toWei()
-        var gasLimit = gasLimitRaw ?? defaultGasLimit
+        let gasPrice: BigUInt
+        let gasLimit: BigUInt
 
-        let pricePercent = price * reliabilityGasPricePercent / 100
-        let gasLimitPercent = gasLimit * reliabilityGasLimitPercent / 100
+        // Getting gas data
+        do {
+            let (gasPriceFromChain, gasLimitFromChain) = try await (pricePriceAsync, gasLimitAsync)
+            try Task.checkCancellation()
+            gasPrice = gasPriceFromChain
+            gasLimit = gasLimitFromChain
+        } catch {
+            gasPrice = BigUInt(defaultGasPriceGwei).toWei()
+            gasLimit = BigUInt(defaultGasLimit)
+        }
 
-        price =
-            priceRaw == nil
-            ? price
-            : price + pricePercent
-
-        gasLimit =
-            gasLimitRaw == nil
-            ? gasLimit
-            : gasLimit + gasLimitPercent
-
-        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
-
-        newFee =
-            isIncreaseFeeEnabled
-            ? newFee * defaultIncreaseFee
-            : newFee
-
-        guard transactionFee != newFee else { return }
-
-        transactionFee = newFee
-        let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
-
-        gasPrice =
-            isIncreaseFeeEnabled
-            ? BigUInt(integerLiteral: incGasPrice)
-            : price
-
-        isWarningGasPrice = gasPrice >= warningGasPriceGwei.toWei()
-        self.gasLimit = gasLimit
-
-        NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        // Updating localy
+        updateGasAndFee(
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
+            gasPriceCoeficient: gasPriceCoeficient
+        ) { [weak self] gasPrice, gasLimit, newFee in
+            guard let self else { return }
+            self.gasPrice = gasPrice
+            self.gasLimit = gasLimit
+            guard transactionFee != newFee else { return }
+            transactionFee = newFee
+            isWarningGasPrice = gasPrice >= BigUInt(warningGasPriceGwei).toWei()
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        }
     }
 
     // MARK: - Tools

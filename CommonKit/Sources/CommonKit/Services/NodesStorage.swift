@@ -22,7 +22,7 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
     }
 
     private var subscription: AnyCancellable?
-    private let securedStore: SecureStore
+    private let SecureStore: SecureStore
     private let defaultNodes: DefaultNodesGetter
 
     public func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
@@ -99,18 +99,18 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
     }
 
     public init(
-        securedStore: SecureStore,
+        SecureStore: SecureStore,
         nodesMergingService: NodesMergingServiceProtocol,
         defaultNodes: @escaping DefaultNodesGetter
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.defaultNodes = defaultNodes
 
-        let dto: NodesKeychainDTO? = securedStore.get(StoreKey.NodesStorage.nodes)
+        let dto: NodesKeychainDTO? = SecureStore.get(StoreKey.NodesStorage.nodes)
 
         let savedNodes =
             dto?.data.values.mapValues { $0.map { $0.mapToModel() } }
-            ?? migrateOldNodesData(securedStore: securedStore)
+            ?? migrateOldNodesData(SecureStore: SecureStore)
             ?? .init()
 
         _items = .init(
@@ -139,12 +139,12 @@ public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
 extension NodesStorage {
     fileprivate func saveNodes(nodes: [NodeGroup: [Node]]) {
         let nodesDto = NodesKeychainDTO(nodes.mapValues { $0.map { $0.mapToDto() } })
-        securedStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
+        SecureStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
     }
 }
 
-private func migrateOldNodesData(securedStore: SecureStore) -> [NodeGroup: [Node]]? {
-    let dto: SafeDecodingArray<OldNodeKeychainDTO>? = securedStore.get(StoreKey.NodesStorage.nodes)
+private func migrateOldNodesData(SecureStore: SecureStore) -> [NodeGroup: [Node]]? {
+    let dto: SafeDecodingArray<OldNodeKeychainDTO>? = SecureStore.get(StoreKey.NodesStorage.nodes)
     guard let dto = dto else { return nil }
     var result: [NodeGroup: [Node]] = [:]
 

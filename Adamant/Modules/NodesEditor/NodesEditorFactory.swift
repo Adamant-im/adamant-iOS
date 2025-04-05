@@ -17,7 +17,7 @@ struct NodesEditorFactory {
     func makeNodesListVC(screensFactory: ScreensFactory) -> UIViewController {
         NodesListViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            securedStore: assembler.resolve(SecureStore.self)!,
+            SecureStore: assembler.resolve(SecureStore.self)!,
             screensFactory: screensFactory,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
             nodesAdditionalParamsStorage: assembler.resolve(NodesAdditionalParamsStorageProtocol.self)!,

@@ -9,11 +9,11 @@ import Combine
 
 public struct ExtensionsApiFactory {
     public let core: AdamantCore
-    public let securedStore: SecureStore
+    public let SecureStore: SecureStore
 
-    public init(core: AdamantCore, securedStore: SecureStore) {
+    public init(core: AdamantCore, SecureStore: SecureStore) {
         self.core = core
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
     }
 
     public func make() -> ExtensionsApi {
@@ -22,12 +22,12 @@ public struct ExtensionsApiFactory {
                 healthCheckWrapper: .init(
                     service: AdamantApiCore(apiCore: APICore()),
                     nodesStorage: NodesStorage(
-                        securedStore: securedStore,
+                        SecureStore: SecureStore,
                         nodesMergingService: NodesMergingService(),
                         defaultNodes: { _ in .init() }
                     ),
                     nodesAdditionalParamsStorage: NodesAdditionalParamsStorage(
-                        securedStore: securedStore
+                        SecureStore: SecureStore
                     ),
                     isActive: false,
                     params: .init(

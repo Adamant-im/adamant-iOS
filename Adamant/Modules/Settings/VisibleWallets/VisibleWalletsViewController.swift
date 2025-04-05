@@ -103,16 +103,18 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     private func addObservers() {
-        wallets.publisher
-            .flatMap { wallet in
-                NotificationCenter.default.publisher(for: wallet.walletUpdatedNotification, object: wallet)
-            }
-            .receive(on: DispatchQueue.main)
-            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.tableView.reloadData()
-            }
-            .store(in: &subscriptions)
+        for (index, wallet) in wallets.enumerated() {
+            NotificationCenter.default.publisher(for: wallet.walletUpdatedNotification, object: wallet)
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    let indexPath = IndexPath(row: index, section: 0)
+                    self.tableView.reloadRows(at: [indexPath], with: .none)
+                }
+                .store(in: &subscriptions)
+        }
 
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,

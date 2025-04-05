@@ -167,7 +167,7 @@ extension KeychainStore {
 
     fileprivate func purgeStore() {
         try? KeychainStore.keychain.removeAll()
-        NotificationCenter.default.post(name: Notification.Name.SecureStore.securedStorePurged, object: self)
+        NotificationCenter.default.post(name: Notification.Name.SecureStore.SecureStorePurged, object: self)
     }
 }
 

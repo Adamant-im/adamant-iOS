@@ -1088,6 +1088,10 @@ extension ChatViewModel {
                 self?.dateHeaderHidden = true
             }
     }
+
+    func unredMessageCount() -> Int? {
+        unreadMessagesIds?.count
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
