@@ -27,6 +27,8 @@ jobs:
       run: make configure
     - name: Setup project dependencies
       run: ./scripts/AdamantCLI/adamant-cli setup
+    - name: Pod Install
+      run: pod install
     - name: Generate mocks for tests
       run: ./scripts/AdamantCLI/adamant-cli mocks
     - name: Run tests
