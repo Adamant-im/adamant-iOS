@@ -249,8 +249,14 @@ extension KlyWalletService {
             .store(in: &subscriptions)
     }
 
+    func updateWithRefreshUIBalance(){
+        Task {
+            await update(updateWithRefreshUIBalance: true)
+        }
+    }
+    
     @MainActor
-    fileprivate func update() async {
+    fileprivate func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = klyWallet else {
             return
         }
@@ -263,8 +269,10 @@ extension KlyWalletService {
             break
         }
         
-        wallet.isBalanceInitialized = false
-        walletUpdateSender.send()
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
         
         setState(.updating)
 

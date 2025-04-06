@@ -995,9 +995,9 @@ final class AccountViewController: FormViewController {
         }
 
         Task { @MainActor in
-            accountService.update()
-            refreshControl.endRefreshing()
+            accountService.updateWithRefreshUI()
         }
+        refreshControl.endRefreshing()
     }
 
     private func selectCurrentWallet() {

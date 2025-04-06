@@ -158,13 +158,19 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             .store(in: &subscriptions)
     }
 
+    func updateWithRefreshUIBalance(){
+        Task {        
+            admWallet?.isBalanceInitialized = false
+            await walletUpdateSender.send()
+            update()
+        }
+    }
+    
     func update() {
         guard let accountService = accountService, let account = accountService.account else {
             admWallet = nil
             return
         }
-        
-        admWallet?.isBalanceInitialized = false
         
         let isRaised: Bool
 

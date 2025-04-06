@@ -278,8 +278,14 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         }
     }
 
+    func updateWithRefreshUIBalance(){
+        Task {
+            await update(updateWithRefreshUIBalance: true)
+        }
+    }
+    
     @MainActor
-    func update() async {
+    func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = btcWallet else {
             return
         }
@@ -292,8 +298,10 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             break
         }
         
-        wallet.isBalanceInitialized = false
-        walletUpdateSender.send()
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
         
         setState(.updating)
 

@@ -225,9 +225,15 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             await update()
         }
     }
+    
+    func updateWithRefreshUIBalance(){
+        Task {
+            await update(updateWithRefreshUIBalance: true)
+        }
+    }
 
     @MainActor
-    func update() async {
+    func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = dashWallet else {
             return
         }
@@ -240,8 +246,10 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             break
         }
         
-        wallet.isBalanceInitialized = false
-        walletUpdateSender.send()
+        if updateWithRefreshUIBalance{
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
         
         setState(.updating)
 

@@ -255,8 +255,14 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         }
     }
 
+    func updateWithRefreshUIBalance() {
+        Task {
+            await update(updateWithRefreshUIBalance: true)
+        }
+    }
+    
     @MainActor
-    func update() async {
+    func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = ethWallet else {
             return
         }
@@ -269,8 +275,10 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             break
         }
         
-        wallet.isBalanceInitialized = false
-        walletUpdateSender.send()
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
         
         setState(.updating)
 
