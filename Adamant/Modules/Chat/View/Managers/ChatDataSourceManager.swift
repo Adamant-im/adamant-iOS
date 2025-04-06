@@ -6,43 +6,43 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-@preconcurrency import MessageKit
-import UIKit
 import Combine
 import CommonKit
+@preconcurrency import MessageKit
+import UIKit
 
 @MainActor
 final class ChatDataSourceManager: MessagesDataSource {
     private let viewModel: ChatViewModel
-    
+
     nonisolated var currentSender: SenderType {
         MainActor.assumeIsolatedSafe {
             viewModel.sender
         }
     }
-    
+
     init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
     }
-    
+
     nonisolated func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
         MainActor.assumeIsolatedSafe { viewModel.messages.count }
     }
-    
+
     nonisolated func messageForItem(
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageType {
         MainActor.assumeIsolatedSafe { viewModel.messages[indexPath.section] }
     }
-    
+
     nonisolated func messageTopLabelAttributedText(
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
         MainActor.assumeIsolatedSafe {
             guard message.fullModel.status == .failed else { return nil }
-            
+
             return .init(
                 string: .adamant.chat.failToSend,
                 attributes: [
@@ -52,21 +52,21 @@ final class ChatDataSourceManager: MessagesDataSource {
             )
         }
     }
-    
+
     nonisolated func messageBottomLabelAttributedText(
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
         message.fullModel.bottomString?.string
     }
-    
+
     nonisolated func cellTopLabelAttributedText(
         for message: MessageType,
         at indexPath: IndexPath
     ) -> NSAttributedString? {
         message.fullModel.dateHeader?.string
     }
-    
+
     nonisolated func textCell(
         for message: MessageType,
         at indexPath: IndexPath,
@@ -78,15 +78,15 @@ final class ChatDataSourceManager: MessagesDataSource {
                     ChatMessageCell.self,
                     for: indexPath
                 )
-                
+
                 let publisher: any Observable<ChatMessageCell.Model> = viewModel.$messages.compactMap {
                     let message = $0[safe: indexPath.section]
                     guard case let .message(model) = message?.fullModel.content
                     else { return nil }
-                    
+
                     return model.value
                 }
-                
+
                 cell.actionHandler = { [weak self] in self?.handleAction($0) }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
@@ -97,21 +97,21 @@ final class ChatDataSourceManager: MessagesDataSource {
                 }
                 return cell
             }
-            
+
             if case let .reply(model) = message.fullModel.content {
                 let cell = messagesCollectionView.dequeueReusableCell(
                     ChatMessageReplyCell.self,
                     for: indexPath
                 )
-                
+
                 let publisher: any Observable<ChatMessageReplyCell.Model> = viewModel.$messages.compactMap {
                     let message = $0[safe: indexPath.section]
                     guard case let .reply(model) = message?.fullModel.content
                     else { return nil }
-                    
+
                     return model.value
                 }
-                
+
                 cell.actionHandler = { [weak self] in self?.handleAction($0) }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
@@ -122,11 +122,11 @@ final class ChatDataSourceManager: MessagesDataSource {
                 }
                 return cell
             }
-            
+
             return UICollectionViewCell()
         }
     }
-    
+
     nonisolated func customCell(
         for message: MessageType,
         at indexPath: IndexPath,
@@ -138,15 +138,15 @@ final class ChatDataSourceManager: MessagesDataSource {
                     ChatTransactionCell.self,
                     for: indexPath
                 )
-                
+
                 let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
                     let message = $0[safe: indexPath.section]
                     guard case let .transaction(model) = message?.fullModel.content
                     else { return nil }
-                    
+
                     return model.value
                 }
-                
+
                 cell.actionHandler = { [weak self] in self?.handleAction($0) }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
@@ -154,21 +154,21 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 return cell
             }
-            
+
             if case let .file(model) = message.fullModel.content {
                 let cell = messagesCollectionView.dequeueReusableCell(
                     ChatMediaCell.self,
                     for: indexPath
                 )
-                
+
                 let publisher: any Observable<ChatMediaContainerView.Model> = viewModel.$messages.compactMap {
                     let message = $0[safe: indexPath.section]
                     guard case let .file(model) = message?.fullModel.content
                     else { return nil }
-                    
+
                     return model.value
                 }
-                
+
                 cell.actionHandler = { [weak self] in self?.handleAction($0) }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
@@ -179,14 +179,14 @@ final class ChatDataSourceManager: MessagesDataSource {
                 }
                 return cell
             }
-            
+
             return UICollectionViewCell()
         }
     }
 }
 
-private extension ChatDataSourceManager {
-    func handleAction(_ action: ChatAction) {
+extension ChatDataSourceManager {
+    fileprivate func handleAction(_ action: ChatAction) {
         switch action {
         case let .openTransactionDetails(id):
             viewModel.didTapTransfer.send(id)
@@ -206,7 +206,7 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
-        case .copyInPart(text: let text):
+        case .copyInPart(let text):
             viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file):
             viewModel.openFile(messageId: messageId, file: file)

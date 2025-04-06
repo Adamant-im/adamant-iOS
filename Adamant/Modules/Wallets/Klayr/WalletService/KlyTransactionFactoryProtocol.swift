@@ -9,6 +9,7 @@
 import Foundation
 import LiskKit
 
+// sourcery: AutoMockable
 protocol KlyTransactionFactoryProtocol: AnyObject {
     func createTx(
         amount: Decimal,

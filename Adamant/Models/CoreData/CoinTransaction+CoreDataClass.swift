@@ -7,13 +7,13 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(CoinTransaction)
 public class CoinTransaction: NSManagedObject, @unchecked Sendable {
     static let entityCoinName = "CoinTransaction"
-    
+
     var transactionStatus: TransactionStatus? {
         get {
             let data = Data(transactionStatusRaw.utf8)
@@ -21,12 +21,12 @@ public class CoinTransaction: NSManagedObject, @unchecked Sendable {
         }
         set {
             guard let data = try? JSONEncoder().encode(newValue),
-                  let raw = String(data: data, encoding: .utf8)
+                let raw = String(data: data, encoding: .utf8)
             else {
                 transactionStatusRaw = ""
                 return
             }
-            
+
             transactionStatusRaw = raw
         }
     }

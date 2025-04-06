@@ -13,7 +13,7 @@ enum ChatMessageBackgroundColor: Equatable {
     case delivered
     case pending
     case failed
-    
+
     var uiColor: UIColor {
         switch self {
         case .opponent:

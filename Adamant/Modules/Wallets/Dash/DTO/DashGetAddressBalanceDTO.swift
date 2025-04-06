@@ -11,7 +11,7 @@ import Foundation
 struct DashGetAddressBalanceDTO: Codable {
     let method: String
     let params: [String]
-    
+
     init(address: String) {
         self.method = "getaddressbalance"
         self.params = [address]

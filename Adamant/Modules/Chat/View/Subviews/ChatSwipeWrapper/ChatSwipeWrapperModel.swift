@@ -11,7 +11,7 @@ import CoreGraphics
 struct ChatSwipeWrapperModel: Identifiable, Equatable {
     let id: String
     var state: State
-    
+
     static let `default` = Self(id: .empty, state: .idle)
 }
 

@@ -13,7 +13,7 @@ struct PKGeneratorState {
     var keys: [KeyInfo]
     var buttonDescription: AttributedString
     var isLoading: Bool
-    
+
     static let `default` = Self(
         passphrase: .empty,
         keys: .init(),
@@ -25,7 +25,7 @@ struct PKGeneratorState {
 extension PKGeneratorState {
     struct KeyInfo: Identifiable {
         var id: String { title }
-        
+
         let title: String
         let description: String
         let icon: UIImage

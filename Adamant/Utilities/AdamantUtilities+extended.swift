@@ -6,29 +6,30 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import SafariServices
-import CommonKit
 
 extension AdamantUtilities {
     // MARK: Application version
     static let applicationVersion: String = {
         if let infoDictionary = Bundle.main.infoDictionary,
             let version = infoDictionary["CFBundleShortVersionString"] as? String,
-            let build = infoDictionary["CFBundleVersion"] as? String {
+            let build = infoDictionary["CFBundleVersion"] as? String
+        {
             return "\(version) (\(build))"
         }
-        
+
         return ""
     }()
-    
+
     // MARK: Device model
     static var deviceModelCode: String {
         isMacOS
             ? macModelCode
             : phoneModelCode
     }
-    
+
     // MARK: Device info
     @MainActor
     static let deviceInfo: String = {
@@ -49,13 +50,13 @@ extension AdamantUtilities {
     static let passphraseRegexString = "^([a-z]* ){11}([a-z]*)$"
     static let passphraseRegex = try! NSRegularExpression(pattern: passphraseRegexString, options: [])
     static let addressRegex = try! NSRegularExpression(pattern: addressRegexString, options: [])
-    
+
     enum AddressValidationResult {
         case valid
         case system
         case invalid
     }
-    
+
     /// Rules are simple:
     ///
     /// - Leading uppercase U
@@ -71,7 +72,7 @@ extension AdamantUtilities {
             return .invalid
         }
     }
-    
+
     /// Rules are simple:
     ///
     /// - No leading and/or trailing whitespaces
@@ -80,28 +81,28 @@ extension AdamantUtilities {
     /// - No -$%èçïäł- caracters
     /// - 12 words, splitted by a single whitespace
     /// - a-z
-    
+
     static func validateAdamantPassphrase(_ passphrase: String) -> Bool {
         validateAdamantPassphrase(passphrase: passphrase)
     }
-    
+
     static func validateAdamantPassphrase(passphrase: String) -> Bool {
         guard validate(string: passphrase, with: passphraseRegex) else {
             return false
         }
-        
+
         for word in passphrase.split(separator: " ") {
             if !WordList.english.contains(word) {
                 return false
             }
         }
-        
+
         return true
     }
-    
+
     private static func validate(string: String, with regex: NSRegularExpression) -> Bool {
         let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
-        
+
         return matches.count == 1
     }
 }
@@ -110,12 +111,12 @@ extension AdamantUtilities {
 extension AdamantUtilities {
     static func getHexString(from bytes: [UInt8]) -> String {
         if bytes.count > 0 {
-            return Data(bytes).reduce("") {$0 + String(format: "%02x", $1)}
+            return Data(bytes).reduce("") { $0 + String(format: "%02x", $1) }
         } else {
             return ""
         }
     }
-    
+
     static func getBytes(from hex: String) -> [UInt8] {
         let hexa = Array(hex)
         return stride(from: 0, to: hex.count, by: 2).compactMap { UInt8(String(hexa[$0..<$0.advanced(by: 2)]), radix: 16) }
@@ -124,7 +125,7 @@ extension AdamantUtilities {
 
 // MARK: - JSON
 extension AdamantUtilities {
-    static func json(from object:Any) -> String? {
+    static func json(from object: Any) -> String? {
         do {
             let data = try JSONSerialization.data(withJSONObject: object, options: [])
             return String(data: data, encoding: String.Encoding.utf8)
@@ -133,7 +134,7 @@ extension AdamantUtilities {
         }
         return nil
     }
-    
+
     static func toArray(text: String) -> [String]? {
         if let data = text.data(using: .utf8) {
             do {
@@ -151,18 +152,18 @@ extension AdamantUtilities {
     @MainActor
     static func openEmailApp(recipient: String, subject: String?, body: String?) {
         guard var urlComponents = URLComponents(string: "mailto:\(recipient)") else { return }
-        
+
         urlComponents.queryItems = [
             .init(name: "subject", value: subject),
             .init(name: "body", value: body)
         ]
-        
+
         urlComponents.url.map { UIApplication.shared.open($0) }
     }
 }
 
-private extension AdamantUtilities {
-    static var phoneModelCode: String {
+extension AdamantUtilities {
+    fileprivate static var phoneModelCode: String {
         var systemInfo = utsname()
         uname(&systemInfo)
         let modelCode = withUnsafePointer(to: &systemInfo.machine) {
@@ -172,8 +173,8 @@ private extension AdamantUtilities {
         }
         return modelCode ?? "Unknown"
     }
-    
-    static var macModelCode: String {
+
+    fileprivate static var macModelCode: String {
         var size = 0
         sysctlbyname("hw.model", nil, &size, nil, 0)
 

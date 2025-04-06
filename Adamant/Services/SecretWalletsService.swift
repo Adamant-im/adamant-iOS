@@ -6,9 +6,9 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import Swinject
-import CommonKit
 
 extension AdamantSecretWalletsManager {
     struct State: SecretWalletsManagerStateProtocol {
@@ -21,7 +21,7 @@ extension AdamantSecretWalletsManager {
 final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     private let secretWalletsFactory: SecretWalletsFactory
     private let lock = NSLock()
-    
+
     init(
         walletsStoreService: WalletStoreServiceProtocol,
         secretWalletsFactory: SecretWalletsFactory
@@ -32,12 +32,12 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         )
         self.secretWalletsFactory = secretWalletsFactory
     }
-    
+
     @ObservableValue private var state: SecretWalletsManagerStateProtocol
     var statePublisher: AnyObservable<SecretWalletsManagerStateProtocol> {
         $state.eraseToAnyPublisher()
     }
-    
+
     // MARK: - Manage state
     func createSecretWallet(withPassword password: String) {
         let wallet = secretWalletsFactory.makeSecretWallet(withPassword: password)
@@ -45,29 +45,29 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         defer { lock.unlock() }
         state.secretWallets.append(wallet)
     }
-    
+
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol? {
         lock.lock()
         defer { lock.unlock() }
         guard state.secretWallets.indices.contains(index) else { return nil }
         return state.secretWallets.remove(at: index)
     }
-    
+
     func getCurrentWallet() -> WalletStoreServiceProtocol {
         state.currentWallet
     }
-    
+
     func getSecretWallets() -> [WalletStoreServiceProtocol] {
         state.secretWallets
     }
-    
+
     func activateSecretWallet(at index: Int) {
         lock.lock()
         defer { lock.unlock() }
         guard index < state.secretWallets.count else { return }
         state.currentWallet = state.secretWallets[index]
     }
-    
+
     func activateDefaultWallet() {
         lock.lock()
         defer { lock.unlock() }

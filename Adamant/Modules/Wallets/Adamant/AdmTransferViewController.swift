@@ -6,62 +6,78 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
+import CommonKit
 import Eureka
 import SafariServices
-import CommonKit
+import UIKit
 
 // MARK: - Localization
 extension String.adamant {
     enum transferAdm {
         static func accountNotFoundAlertTitle(for address: String) -> String {
-            return String.localizedStringWithFormat(.localized("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
+            return String.localizedStringWithFormat(
+                .localized(
+                    "TransferScene.unsafeTransferAlert.title",
+                    comment:
+                        "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"
+                ),
+                address
+            )
         }
-            
-        static var accountNotFoundAlertBody: String { String.localized("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
+
+        static var accountNotFoundAlertBody: String {
+            String.localized(
+                "TransferScene.unsafeTransferAlert.body",
+                comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"
+            )
         }
-        
-        static var accountNotFoundChatAlertBody: String { String.localized("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
+
+        static var accountNotFoundChatAlertBody: String {
+            String.localized(
+                "TransferScene.unsafeChatAlert.body",
+                comment:
+                    "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages."
+            )
         }
     }
 }
 
 final class AdmTransferViewController: TransferViewControllerBase {
     // MARK: Properties
-    
+
     private var skipValueChange: Bool = false
-    
+
     static let invalidCharactersSet = CharacterSet.decimalDigits.inverted
-    
+
     // MARK: Sending
-    
+
     @MainActor
     override func sendFunds() {
         guard let service = walletCore as? AdmWalletService,
-              let recipient = recipientAddress,
-              let amount = amount
+            let recipient = recipientAddress,
+            let amount = amount
         else {
             return
         }
-        
+
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
             comments = text
         } else {
             comments = ""
         }
-        
+
         dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
+
         // Check recipient
         Task {
             do {
                 let account = try await accountsProvider.getAccount(byAddress: recipient)
-                
+
                 guard !account.isDummy else {
                     throw AccountsProviderError.dummy(account)
                 }
-                
+
                 sendFundsInternal(
                     service: service,
                     recipient: recipient,
@@ -72,7 +88,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                 switch error {
                 case .notFound, .notInitiated, .dummy:
                     self.dialogService.dismissProgress()
-                    
+
                     dialogService.presentDummyAlert(
                         for: recipient,
                         from: view,
@@ -82,7 +98,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                             withMessage: String.adamant.transfer.transferProcessingMessage,
                             userInteractionEnable: false
                         )
-                        
+
                         self?.sendFundsInternal(
                             service: service,
                             recipient: recipient,
@@ -98,7 +114,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     @MainActor
     private func sendFundsInternal(
         service: AdmWalletService,
@@ -114,12 +130,12 @@ final class AdmTransferViewController: TransferViewControllerBase {
                     comments: comments,
                     replyToMessageId: replyToMessageId
                 )
-                
+
                 service.update()
                 dialogService.dismissProgress()
-                
+
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
-                
+
                 openDetailVC(
                     result: result,
                     vc: self,
@@ -132,7 +148,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     private func openDetailVC(
         result: AdamantTransactionDetails,
         vc: AdmTransferViewController,
@@ -141,20 +157,20 @@ final class AdmTransferViewController: TransferViewControllerBase {
     ) {
         let detailsVC = screensFactory.makeAdmTransactionDetails()
         detailsVC.adamantTransaction = result
-        
+
         if comments.count > 0 {
             detailsVC.comment = comments
         }
-        
+
         // MARK: Sender, you
         detailsVC.senderName = String.adamant.transactionDetails.yourAddress
-        
+
         // MARK: Get recipient
         if let recipientName = recipientName {
             detailsVC.recipientName = recipientName
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
         } else {
-            Task { 
+            Task {
                 do {
                     let account = try await accountsProvider.getAccount(byAddress: recipient)
                     detailsVC.recipientName = account.name
@@ -165,9 +181,9 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     // MARK: Overrides
-    
+
     override var recipientAddress: String? {
         set {
             let _recipient: String?
@@ -176,7 +192,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
             } else {
                 _recipient = newValue
             }
-            
+
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
@@ -185,32 +201,32 @@ final class AdmTransferViewController: TransferViewControllerBase {
         get {
             let recipient: String? = form.rowBy(tag: BaseRows.address.tag)?.value
             guard let recipient = recipient,
-                  let first = recipient.first,
-                  first != "U"
+                let first = recipient.first,
+                first != "U"
             else {
                 return recipient
             }
-            
+
             return "U\(recipient)"
         }
     }
-    
+
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setPopupKeyboardType(.numberPad)
             $0.cell.textField.setLineBreakMode()
-            
+
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
                 $0.value = trimmed
             }
-            
+
             let prefix = UILabel()
             prefix.text = "U"
             prefix.sizeToFit()
-            
+
             let view = UIView()
             view.addSubview(prefix)
             view.frame = prefix.frame
@@ -226,7 +242,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 
                 guard self?.recipientIsReadonly == false else { return }
-        
+
                 cell.textField.leftView?.subviews.forEach { view in
                     guard let label = view as? UILabel else { return }
                     label.textColor = UIColor.adamant.primary
@@ -237,7 +253,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                 self?.skipValueChange = false
                 return
             }
-            
+
             if let text = row.value {
                 var trimmed = ""
                 if let admAddress = text.getAdamantAddress() {
@@ -247,10 +263,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
                 } else {
                     trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
                 }
-                
+
                 if text != trimmed {
                     self?.skipValueChange = true
-                    
+
                     DispatchQueue.main.async {
                         row.value = trimmed
                         row.updateCell()
@@ -261,10 +277,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
-        
+
         return row
     }
-    
+
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress: String
         if let first = address.first, first != "U" {
@@ -272,20 +288,20 @@ final class AdmTransferViewController: TransferViewControllerBase {
         } else {
             fixedAddress = address
         }
-        
+
         switch AdamantUtilities.validateAdamantAddress(address: fixedAddress) {
         case .valid:
             return .valid
-            
+
         case .system, .invalid:
             return .invalid(description: nil)
         }
     }
-    
+
     override func handleRawAddress(_ address: String) -> Bool {
         if let admAddress = address.getAdamantAddress() {
             recipientAddress = admAddress.address
-            
+
             if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
                 row.value = admAddress.amount
                 row.updateCell()
@@ -301,12 +317,12 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
             return true
         }
-        
+
         return false
     }
-    
+
     override func defaultSceneTitle() -> String? {
         return String.adamant.wallets.sendAdm
     }
-    
+
 }

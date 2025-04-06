@@ -27,8 +27,8 @@ public struct Transaction: Sendable {
     public let confirmations: Int64
     public let signatures: [String]
     public let asset: TransactionAsset
-    
-    public let date: Date // Calculated from timestamp
+
+    public let date: Date  // Calculated from timestamp
 }
 
 extension Transaction: Codable {
@@ -52,10 +52,10 @@ extension Transaction: Codable {
         case signatures
         case asset
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.id = UInt64(try container.decode(String.self, forKey: .id))!
         self.height = (try? container.decode(Int64.self, forKey: .height)) ?? 0
         self.blockId = (try? container.decode(String.self, forKey: .blockId)) ?? ""
@@ -70,43 +70,43 @@ extension Transaction: Codable {
         self.signSignature = try? container.decode(String.self, forKey: .signSignature)
         self.signatures = (try? container.decode([String].self, forKey: .signatures)) ?? []
         self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
-        
+
         let amount = try container.decode(Decimal.self, forKey: .amount)
         self.amount = amount.shiftedFromAdamant()
-        
+
         let fee = try container.decode(Decimal.self, forKey: .fee)
         self.fee = fee.shiftedFromAdamant()
-        
+
         let timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.timestamp = timestamp + UInt64(AdamantUtilities.magicAdamantTimeInterval)
         self.timestampMs = (try? container.decodeIfPresent(UInt64.self, forKey: .timestampMs)) ?? self.timestamp * 1000
         self.date = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(String(id), forKey: .id) // String
-        try container.encode(height, forKey: .height) // UInt64
-        try container.encode(blockId, forKey: .blockId) // String
-        try container.encode(type, forKey: .type) // TransactionType
-        try container.encode(timestamp, forKey: .timestamp) // UInt64
-        try container.encode(timestampMs, forKey: .timestampMs) // UInt64
-        try container.encode(senderPublicKey, forKey: .senderPublicKey) // String
-        try container.encode(senderId, forKey: .senderId) // String
-        try container.encode(recipientId, forKey: .recipientId) // String?
-        try container.encode(recipientPublicKey, forKey: .recipientPublicKey) // String
-        try container.encode(signature, forKey: .signature) // String
-        try container.encode(requesterPublicKey, forKey: .requesterPublicKey) // String?
-        try container.encode(signatures, forKey: .signatures) // [String]
-        try container.encode(asset, forKey: .asset) // TransactionAsset
-        try container.encode(signSignature, forKey: .signSignature) // String?
+
+        try container.encode(String(id), forKey: .id)  // String
+        try container.encode(height, forKey: .height)  // UInt64
+        try container.encode(blockId, forKey: .blockId)  // String
+        try container.encode(type, forKey: .type)  // TransactionType
+        try container.encode(timestamp, forKey: .timestamp)  // UInt64
+        try container.encode(timestampMs, forKey: .timestampMs)  // UInt64
+        try container.encode(senderPublicKey, forKey: .senderPublicKey)  // String
+        try container.encode(senderId, forKey: .senderId)  // String
+        try container.encode(recipientId, forKey: .recipientId)  // String?
+        try container.encode(recipientPublicKey, forKey: .recipientPublicKey)  // String
+        try container.encode(signature, forKey: .signature)  // String
+        try container.encode(requesterPublicKey, forKey: .requesterPublicKey)  // String?
+        try container.encode(signatures, forKey: .signatures)  // [String]
+        try container.encode(asset, forKey: .asset)  // TransactionAsset
+        try container.encode(signSignature, forKey: .signSignature)  // String?
         try container.encode(confirmations > .zero ? confirmations : nil, forKey: .confirmations)
-        
-        try container.encode(amount.shiftedToAdamant(), forKey: .amount) // Decimal
-        try container.encode(fee.shiftedToAdamant(), forKey: .fee) // Decimal
+
+        try container.encode(amount.shiftedToAdamant(), forKey: .amount)  // Decimal
+        try container.encode(fee.shiftedToAdamant(), forKey: .fee)  // Decimal
     }
-    
+
 }
 
 extension Transaction: WrappableModel {

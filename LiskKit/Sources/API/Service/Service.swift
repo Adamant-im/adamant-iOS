@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Service: APIService {
-    
+
     public enum Version: String {
         case v1 = "v1"
         case v2 = "v2"
@@ -24,7 +24,7 @@ public struct Service: APIService {
         self.init(client: client)
         self.version = version
     }
-    
+
     public init(client: APIClient = .shared) {
         self.client = client
     }
@@ -37,7 +37,7 @@ extension Service {
     public func getFees(completionHandler: @escaping (Response<ServiceFeeResponse>) -> Void) {
         client.get(path: "\(Version.v3.rawValue)/fees", completionHandler: completionHandler)
     }
-    
+
     public func fees() async throws -> ServiceFeeResponse {
         try await client.request(
             .get,
@@ -45,7 +45,7 @@ extension Service {
             options: nil
         )
     }
-    
+
     public func info() async throws -> ServiceInfoModelDTO {
         try await client.request(
             .get,
@@ -61,7 +61,7 @@ extension Service {
             completionHandler: completionHandler
         )
     }
-    
+
     /// List transaction objects
     public func transactions(
         ownerAddress: String?,
@@ -103,7 +103,7 @@ extension Service {
                             fee: $0.fee,
                             signature: $0.signature,
                             confirmations: $0.confirmations,
-                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(), 
+                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(),
                             nonce: $0.nonce,
                             executionStatus: $0.executionStatus,
                             txData: $0.params.data
@@ -116,7 +116,7 @@ extension Service {
             }
         }
     }
-    
+
     private func transactionsV3(
         id: String? = nil,
         block: String? = nil,

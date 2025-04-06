@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 // MARK: - Notifications
 
@@ -15,7 +15,7 @@ extension Notification.Name {
     struct AdamantAddressBookService {
         /// Raised when user rename accounts in chat
         static let addressBookUpdated = Notification.Name("adamant.addressBookService.updated")
-        
+
         private init() {}
     }
 }
@@ -28,10 +28,10 @@ enum AddressBookChange {
 
 extension AdamantUserInfoKey {
     struct AddressBook {
-        
+
         /// Array of AddressBookChangeType
         static let changes = "adamant.addressBook.changes"
-        
+
         private init() {}
     }
 }
@@ -55,15 +55,15 @@ extension AddressBookServiceError: RichError {
         switch self {
         case .notLogged:
             return String.adamant.sharedErrors.userNotLogged
-            
+
         case .notEnoughMoney:
             return .localized("AddressBookService.Error.notEnoughMoney", comment: "AddressBookService: Not enought money to save address into blockchain")
-            
+
         case .apiServiceError(let error): return error.message
         case .internalError(let message, _): return message
         }
     }
-    
+
     var internalError: Error? {
         switch self {
         case .notLogged, .notEnoughMoney: return nil
@@ -71,7 +71,7 @@ extension AddressBookServiceError: RichError {
         case .internalError(_, let error): return error
         }
     }
-    
+
     var level: ErrorLevel {
         switch self {
         case .notLogged, .notEnoughMoney: return .warning
@@ -87,10 +87,10 @@ protocol AddressBookService: AnyObject, Sendable {
     func set(name: String, for: String) async
     func getName(for key: String) -> String?
     func getName(for partner: BaseAccount?) -> String?
-    
+
     // MARK: Updating & saving
-    func update() async -> AddressBookServiceResult? 
-    
+    func update() async -> AddressBookServiceResult?
+
     var hasChanges: Bool { get }
     func saveIfNeeded() async
 }

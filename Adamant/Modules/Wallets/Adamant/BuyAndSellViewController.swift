@@ -6,10 +6,10 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
+import CommonKit
 import Eureka
 import SafariServices
-import CommonKit
+import UIKit
 
 final class BuyAndSellViewController: FormViewController {
     // MARK: Rows
@@ -18,7 +18,7 @@ final class BuyAndSellViewController: FormViewController {
         case adamantSite
         case coinMarketCap
         case coinGecko
-       
+
         var tag: String {
             switch self {
             case .adamantMessage: return "admChat"
@@ -27,7 +27,7 @@ final class BuyAndSellViewController: FormViewController {
             case .coinGecko: return "coinGecko"
             }
         }
-        
+
         var image: UIImage? {
             switch self {
             case .adamantMessage: return .asset(named: "row_logo")
@@ -36,7 +36,7 @@ final class BuyAndSellViewController: FormViewController {
             case .coinGecko: return .asset(named: "row_coingecko")
             }
         }
-        
+
         var localized: String {
             switch self {
             case .adamantMessage: return String.adamant.wallets.exchangeInChatAdmTokens
@@ -45,7 +45,7 @@ final class BuyAndSellViewController: FormViewController {
             case .coinGecko: return String.adamant.wallets.exchangesOnCoinGecko
             }
         }
-        
+
         var url: String {
             switch self {
             case .adamantMessage: return ""
@@ -55,66 +55,72 @@ final class BuyAndSellViewController: FormViewController {
             }
         }
     }
-    
+
     // MARK: - Props & Dependencies
-    
+
     var accountService: AccountService!
     var dialogService: DialogService!
     var screenFactory: ScreensFactory!
     var chatsProvider: ChatsProvider!
     // MARK: Init
-    
+
     init() {
         super.init(style: .insetGrouped)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.title = AdmWalletViewController.Rows.buyTokens.localized
-        
+
         let section = Section()
-        
+
         // MARK: Adamant
         let admUrl: String
-        
+
         if let account = accountService.account {
             admUrl = String.adamant.wallets.buyTokensUrl(for: account.address)
         } else {
             admUrl = Rows.adamantSite.url
         }
-        
+
         // MARK: Adamant Chat
-        let admChatRow = buildUrlRow(title: Rows.adamantMessage.localized, value: nil, tag: Rows.adamantMessage.tag, urlRaw: admUrl, image: Rows.adamantMessage.image)
-        
+        let admChatRow = buildUrlRow(
+            title: Rows.adamantMessage.localized,
+            value: nil,
+            tag: Rows.adamantMessage.tag,
+            urlRaw: admUrl,
+            image: Rows.adamantMessage.image
+        )
+
         section.append(admChatRow)
-        
+
         // MARK: Adamant Site
         let admRow = buildUrlRow(title: Rows.adamantSite.localized, value: nil, tag: Rows.adamantSite.tag, urlRaw: admUrl, image: Rows.adamantSite.image)
-        
+
         section.append(admRow)
-        
+
         // MARK: CoinMarketCap
         let coinMarketCap = buildUrlRow(for: .coinMarketCap)
         section.append(coinMarketCap)
-        
+
         // MARK: CoinGecko
         let coinGecko = buildUrlRow(for: .coinGecko)
         section.append(coinGecko)
-        
+
         form.append(section)
-        
+
         setColors()
     }
-    
+
     // MARK: - Tools
-    
+
     private func buildUrlRow(for row: Rows) -> LabelRow {
         return buildUrlRow(
             title: row.localized,
@@ -124,7 +130,7 @@ final class BuyAndSellViewController: FormViewController {
             image: row.image
         )
     }
-    
+
     private func buildUrlRow(title: String, value: String?, tag: String, urlRaw: String, image: UIImage?) -> LabelRow {
         let row = LabelRow {
             $0.tag = tag
@@ -147,13 +153,13 @@ final class BuyAndSellViewController: FormViewController {
                 self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", supportEmail: true, error: nil)
                 return
             }
-            
+
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
         }
-        
+
         return row
     }
 
@@ -162,9 +168,9 @@ final class BuyAndSellViewController: FormViewController {
         guard let chatroom = await chatsProvider.getChatroom(for: AdamantContacts.adamantExchange.address) else {
             return
         }
-        
+
         let vc = chatViewController(for: chatroom)
-        
+
         if let navigationController = navigationController {
             navigationController.pushViewController(vc, animated: true)
         } else {
@@ -184,7 +190,7 @@ final class BuyAndSellViewController: FormViewController {
         return vc
     }
     // MARK: - Other
-    
+
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear

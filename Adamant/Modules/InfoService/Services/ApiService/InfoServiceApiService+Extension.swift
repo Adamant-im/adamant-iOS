@@ -6,16 +6,16 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension InfoServiceApiService: ApiServiceProtocol {
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { core.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { core.nodesInfo }
-    
+
     func healthCheck() { core.healthCheck() }
 }
 
@@ -33,7 +33,7 @@ extension InfoServiceApiService: InfoServiceApiServiceProtocol {
             )
         }.flatMap { mapper.mapRatesToModel($0) }
     }
-    
+
     func getHistory(
         coin: String,
         date: Date

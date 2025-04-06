@@ -8,8 +8,8 @@
 
 import Foundation
 
-public extension NSDate {
-    var timeIntervalMillisecondsSince1970: Int64 {
+extension NSDate {
+    public var timeIntervalMillisecondsSince1970: Int64 {
         Int64(timeIntervalSince1970 * 1000)
     }
 }

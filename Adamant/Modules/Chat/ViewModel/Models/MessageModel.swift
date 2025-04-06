@@ -10,6 +10,6 @@ import UIKit
 
 protocol MessageModel: Sendable {
     var id: String { get }
-    
+
     func makeReplyContent() -> NSAttributedString
 }

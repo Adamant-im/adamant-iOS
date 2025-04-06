@@ -6,19 +6,19 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UserNotifications
-import MarkdownKit
 import CommonKit
+import MarkdownKit
+import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
-    
+
     // MARK: - Rich providers
     private lazy var adamantProvider: AdamantProvider = {
         return AdamantProvider()
     }()
-    
-    private lazy var securedStore: SecuredStore = {
+
+    private lazy var SecureStore: SecureStore = {
         KeychainStore(secureStorage: AdamantSecureStorage())
     }()
 
@@ -31,15 +31,15 @@ class NotificationService: UNNotificationServiceExtension {
             DashProvider.richMessageType: DashProvider(),
             BtcProvider.richMessageType: BtcProvider()
         ]
-        
+
         for token in ERC20Token.supportedTokens {
             let key = "\(token.symbol)_transaction".lowercased()
             providers[key] = ERC20Provider(token)
         }
-        
+
         return providers
     }()
-    
+
     // MARK: - Hanlder
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
@@ -50,41 +50,42 @@ class NotificationService: UNNotificationServiceExtension {
             request.content.userInfo.debugDescription,
             separator: "\n"
         )
-        
+
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
-        
+
         guard let bestAttemptContent = bestAttemptContent,
             let raw = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
             let id = UInt64(raw),
-            let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String else {
+            let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
+        else {
             contentHandler(request.content)
             return
         }
-        
+
         // MARK: 1. Getting services
         let core = NativeAdamantCore()
-        let api = ExtensionsApiFactory(core: core, securedStore: securedStore).make()
-        
+        let api = ExtensionsApiFactory(core: core, SecureStore: SecureStore).make()
+
         // No passphrase - no point of trying to get and decode
         guard
-            let passphrase: String = securedStore.get(passphraseStoreKey),
+            let passphrase: String = SecureStore.get(passphraseStoreKey),
             let keypair = core.createKeypairFor(passphrase: passphrase, password: .empty),
             AdamantUtilities.generateAddress(publicKey: keypair.publicKey) == pushRecipient
         else { return }
-        
+
         // MARK: 2. Get transaction
         guard let transaction = api.getTransaction(by: id) else {
             contentHandler(bestAttemptContent)
             return
         }
-        
+
         // MARK: 3. Working on transaction
         let partnerAddress: String
         let partnerPublicKey: String
         var partnerName: String?
         var decodedMessage: String?
-        
+
         if transaction.senderId == pushRecipient {
             partnerAddress = transaction.recipientId
             partnerPublicKey = transaction.recipientPublicKey ?? keypair.publicKey
@@ -92,99 +93,107 @@ class NotificationService: UNNotificationServiceExtension {
             partnerAddress = transaction.senderId
             partnerPublicKey = transaction.senderPublicKey
         }
-        
-        let contactsBlockList: [String] = securedStore.get(StoreKey.accountService.blockList) ?? []
+
+        let contactsBlockList: [String] = SecureStore.get(StoreKey.accountService.blockList) ?? []
         guard !contactsBlockList.contains(partnerAddress) else { return }
-        
+
         // MARK: 4. Address book
-        if
-            let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
+        if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
             let displayName = addressBook[partnerAddress]?.displayName
         {
             partnerName = displayName.checkAndReplaceSystemWallets()
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerDisplayName] = displayName
         } else {
             partnerName = partnerAddress.checkAndReplaceSystemWallets()
-            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey]
-                = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
-        
+
         var shouldIgnoreNotification = false
-        
+
         var isReaction = false
-        
+
         // MARK: 5. Content
         switch transaction.type {
         // MARK: Messages
         case .chatMessage:
             guard let chat = transaction.asset.chat,
-                  let message = core.decodeMessage(
+                let message = core.decodeMessage(
                     rawMessage: chat.message,
                     rawNonce: chat.ownMessage,
                     senderPublicKey: partnerPublicKey,
                     privateKey: keypair.privateKey
-                  ) else {
+                )
+            else {
                 break
             }
-            
+
             decodedMessage = message
-            
+
             switch chat.type {
             // MARK: Simple messages
             case .messageOld:
                 fallthrough
             case .message:
                 // Strip markdown symbols
-                if transaction.amount > 0 { // ADM Transfer with comments
+                if transaction.amount > 0 {  // ADM Transfer with comments
                     // Also will strip markdown
-                    handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: message)
-                } else { // Message
+                    handleAdamantTransfer(
+                        notificationContent: bestAttemptContent,
+                        partnerAddress: partnerAddress,
+                        partnerName: partnerName,
+                        amount: transaction.amount,
+                        comment: message
+                    )
+                } else {  // Message
                     bestAttemptContent.title = partnerName ?? partnerAddress
                     var text = MarkdownParser().parse(message).string
                     text = MessageProcessHelper.process(text)
-                    
+
                     bestAttemptContent.body = text
                     bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                 }
-            
+
             // MARK: Rich messages
             case .richMessage:
                 var content: NotificationContent?
-                
+
                 // base rich
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let type = (richContent[RichContentKeys.type] as? String)?.lowercased(),
-                   let provider = richMessageProviders[type],
-                   let notificationContent = provider.notificationContent(
-                    for: transaction,
-                    partnerAddress: partnerAddress,
-                    partnerName: partnerName,
-                    richContent: richContent
-                   ) {
+                    let richContent = RichMessageTools.richContent(from: data),
+                    let type = (richContent[RichContentKeys.type] as? String)?.lowercased(),
+                    let provider = richMessageProviders[type],
+                    let notificationContent = provider.notificationContent(
+                        for: transaction,
+                        partnerAddress: partnerAddress,
+                        partnerName: partnerName,
+                        richContent: richContent
+                    )
+                {
                     content = notificationContent
                 }
-                
+
                 // adm transfer reply
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   richContent[RichContentKeys.reply.replyToId] != nil,
-                   transaction.amount > 0,
-                   let notificationContent = adamantProvider.notificationContent(
-                    partnerAddress: partnerAddress,
-                    partnerName: partnerName,
-                    amount: transaction.amount,
-                    comment: richContent[RichContentKeys.reply.replyMessage] as? String
-                   ) {
+                    let richContent = RichMessageTools.richContent(from: data),
+                    richContent[RichContentKeys.reply.replyToId] != nil,
+                    transaction.amount > 0,
+                    let notificationContent = adamantProvider.notificationContent(
+                        partnerAddress: partnerAddress,
+                        partnerName: partnerName,
+                        amount: transaction.amount,
+                        comment: richContent[RichContentKeys.reply.replyMessage] as? String
+                    )
+                {
                     content = notificationContent
                 }
-                
+
                 // message reply
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let message = richContent[RichContentKeys.reply.replyMessage] as? String,
-                   richContent[RichContentKeys.reply.replyToId] != nil,
-                   transaction.amount <= 0 {
+                    let richContent = RichMessageTools.richContent(from: data),
+                    let message = richContent[RichContentKeys.reply.replyMessage] as? String,
+                    richContent[RichContentKeys.reply.replyToId] != nil,
+                    transaction.amount <= 0
+                {
                     var text = MarkdownParser().parse(message).string
                     text = MessageProcessHelper.process(text)
                     content = NotificationContent(
@@ -195,39 +204,42 @@ class NotificationService: UNNotificationServiceExtension {
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
                 }
-                
+
                 // rich transfer reply
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String],
-                   let type = transferContent[RichContentKeys.type]?.lowercased(),
-                   let provider = richMessageProviders[type],
-                   let notificationContent = provider.notificationContent(
-                    for: transaction,
-                    partnerAddress: partnerAddress,
-                    partnerName: partnerName,
-                    richContent: transferContent
-                   ) {
+                    let richContent = RichMessageTools.richContent(from: data),
+                    let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String],
+                    let type = transferContent[RichContentKeys.type]?.lowercased(),
+                    let provider = richMessageProviders[type],
+                    let notificationContent = provider.notificationContent(
+                        for: transaction,
+                        partnerAddress: partnerAddress,
+                        partnerName: partnerName,
+                        richContent: transferContent
+                    )
+                {
                     content = notificationContent
                 }
-                
+
                 // reaction
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let reaction = richContent[RichContentKeys.react.react_message] as? String,
-                   richContent[RichContentKeys.react.reactto_id] != nil {
-                    
+                    let richContent = RichMessageTools.richContent(from: data),
+                    let reaction = richContent[RichContentKeys.react.react_message] as? String,
+                    richContent[RichContentKeys.react.reactto_id] != nil
+                {
+
                     /* Ignoring will be later
                     guard !reaction.isEmpty else {
                         shouldIgnoreNotification = true
                         break
                     }
                      */
-                    
-                    let text = reaction.isEmpty
-                    ? NotificationStrings.modifiedReaction
-                    : "\(NotificationStrings.reacted) \(reaction)"
-                    
+
+                    let text =
+                        reaction.isEmpty
+                        ? NotificationStrings.modifiedReaction
+                        : "\(NotificationStrings.reacted) \(reaction)"
+
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
                         subtitle: nil,
@@ -235,16 +247,17 @@ class NotificationService: UNNotificationServiceExtension {
                         attachments: nil,
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
-                    
+
                     isReaction = true
                 }
-                
+
                 // rich file reply
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
-                   replyMessage[RichContentKeys.file.files] is [[String: Any]] {
-                    
+                    let richContent = RichMessageTools.richContent(from: data),
+                    let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
+                    replyMessage[RichContentKeys.file.files] is [[String: Any]]
+                {
+
                     let text = FilePresentationHelper.getFilePresentationText(richContent)
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
@@ -254,12 +267,13 @@ class NotificationService: UNNotificationServiceExtension {
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
                 }
-                
+
                 // rich file
                 if let data = message.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   richContent[RichContentKeys.file.files] is [[String: Any]] {
-                    
+                    let richContent = RichMessageTools.richContent(from: data),
+                    richContent[RichContentKeys.file.files] is [[String: Any]]
+                {
+
                     let text = FilePresentationHelper.getFilePresentationText(richContent)
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
@@ -269,72 +283,79 @@ class NotificationService: UNNotificationServiceExtension {
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
                 }
-                
+
                 guard let content = content else {
                     break
                 }
-                
+
                 bestAttemptContent.title = content.title
                 bestAttemptContent.body = content.body
-                
+
                 if let subtitle = content.subtitle { bestAttemptContent.subtitle = subtitle }
                 if let attachments = content.attachments { bestAttemptContent.attachments = attachments }
                 if let categoryIdentifier = content.categoryIdentifier { bestAttemptContent.categoryIdentifier = categoryIdentifier }
-                
+
             case .unknown: break
             case .signal: break
             }
-            
+
         // MARK: Transfers
         case .send:
-            handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: nil)
-            
+            handleAdamantTransfer(
+                notificationContent: bestAttemptContent,
+                partnerAddress: partnerAddress,
+                partnerName: partnerName,
+                amount: transaction.amount,
+                comment: nil
+            )
+
         default:
             break
         }
-        
+
         guard !shouldIgnoreNotification else {
             contentHandler(UNNotificationContent())
             return
         }
-        
+
         bestAttemptContent.sound = getSound(
-            securedStore: securedStore,
+            SecureStore: SecureStore,
             isReaction: isReaction
         )
-        
+
         // MARK: 6. Other configurations
         bestAttemptContent.threadIdentifier = partnerAddress
-        
+
         // MARK: 7. Caching downloaded transaction, to avoid downloading ang decoding it in ContentExtensions
         if let data = try? JSONEncoder().encode(transaction), let transactionRaw = String(data: data, encoding: .utf8) {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }
         bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
-        
+
         contentHandler(bestAttemptContent)
     }
-    
+
     override func serviceExtensionTimeWillExpire() {
         // Called just before the extension will be terminated by the system.
         // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
-        if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
+        if let contentHandler = contentHandler, let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
     }
-    
-    private func getSound(securedStore: SecuredStore, isReaction: Bool) -> UNNotificationSound? {
-        let key = isReaction 
-        ? StoreKey.notificationsService.notificationsReactionSound
-        : StoreKey.notificationsService.notificationsSound
-        
-        let sound: String = securedStore.get(key) ?? .empty
-        
-        return sound.isEmpty 
-        ? nil
-        : UNNotificationSound(named: UNNotificationSoundName(sound))
+
+    private func getSound(SecureStore: SecureStore, isReaction: Bool) -> UNNotificationSound? {
+        let key =
+            isReaction
+            ? StoreKey.notificationsService.notificationsReactionSound
+            : StoreKey.notificationsService.notificationsSound
+
+        let sound: String = SecureStore.get(key) ?? .empty
+
+        return sound.isEmpty
+            ? nil
+            : UNNotificationSound(named: UNNotificationSoundName(sound))
     }
-    
+
     private func handleAdamantTransfer(
         notificationContent: UNMutableNotificationContent,
         partnerAddress address: String,
@@ -345,18 +366,18 @@ class NotificationService: UNNotificationServiceExtension {
         guard let content = adamantProvider.notificationContent(partnerAddress: address, partnerName: name, amount: amount, comment: comment) else {
             return
         }
-        
+
         notificationContent.title = content.title
         notificationContent.body = content.body
-        
+
         if let subtitle = content.subtitle {
             notificationContent.subtitle = subtitle
         }
-        
+
         if let attachments = content.attachments {
             notificationContent.attachments = attachments
         }
-        
+
         notificationContent.categoryIdentifier = AdamantNotificationCategories.transfer
     }
 }

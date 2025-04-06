@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension MessageTransaction {
 
@@ -19,8 +19,7 @@ extension MessageTransaction {
     @NSManaged public var isMarkdown: Bool
     @NSManaged public var message: String?
     @NSManaged public var reactionsData: Data?
-    
-    
+
     var reactions: Set<Reaction>? {
         get {
             guard let data = reactionsData else {
@@ -29,7 +28,7 @@ extension MessageTransaction {
 
             return try? PropertyListDecoder().decode(Set<Reaction>.self, from: data)
         }
-        
+
         set {
             guard let value = newValue else {
                 reactionsData = nil

@@ -6,24 +6,27 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
-import CommonKit
-import Combine
 import AVFoundation
+import Combine
+import CommonKit
+import SwiftUI
 
 @MainActor
 final class NotificationSoundsViewModel: ObservableObject {
     private let notificationsService: NotificationsService
     private var notificationTarget: NotificationTarget
     private let dialogService: DialogService
-    
-    let dismissAction = PassthroughSubject<Void,Never>()
+
+    let dismissAction = PassthroughSubject<Void, Never>()
     @Published var isPresented: Bool = false
     @Published var selectedSound: NotificationSound = .inputDefault
-    @Published var sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal, .rattle, .rebound, .slide, .welcome]
-    
+    @Published var sounds: [NotificationSound] = [
+        .none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal,
+        .rattle, .rebound, .slide, .welcome
+    ]
+
     private var audioPlayer: AVAudioPlayer?
-    
+
     init(
         notificationsService: NotificationsService,
         target: NotificationTarget,
@@ -32,7 +35,7 @@ final class NotificationSoundsViewModel: ObservableObject {
         self.notificationsService = notificationsService
         self.notificationTarget = target
         self.dialogService = dialogService
-        
+
         switch notificationTarget {
         case .baseMessage:
             self.selectedSound = notificationsService.notificationsSound
@@ -40,25 +43,25 @@ final class NotificationSoundsViewModel: ObservableObject {
             self.selectedSound = notificationsService.notificationsReactionSound
         }
     }
-    
+
     func setup(notificationTarget: NotificationTarget) {
         self.notificationTarget = notificationTarget
     }
-    
+
     func save() {
         setNotificationSound(selectedSound)
         dismissAction.send()
     }
-    
+
     func setNotificationSound(_ sound: NotificationSound) {
         notificationsService.setNotificationSound(sound, for: notificationTarget)
     }
-    
+
     func selectSound(_ sound: NotificationSound) {
         selectedSound = sound
         playSound(sound)
     }
-    
+
     func playSound(_ sound: NotificationSound) {
         switch sound {
         case .none:
@@ -69,12 +72,12 @@ final class NotificationSoundsViewModel: ObservableObject {
     }
 }
 
-private extension NotificationSoundsViewModel {
-    func playSound(by fileName: String) {
+extension NotificationSoundsViewModel {
+    fileprivate func playSound(by fileName: String) {
         guard let url = Bundle.main.url(forResource: fileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
             return
         }
-        
+
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             try AVAudioSession.sharedInstance().setActive(true)

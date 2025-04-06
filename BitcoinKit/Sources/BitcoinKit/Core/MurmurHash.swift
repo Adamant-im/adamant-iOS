@@ -31,8 +31,8 @@ public struct MurmurHash {
     }
 
     public static func hashValue(_ bytes: Data, _ seed: UInt32) -> UInt32 {
-        let c1: UInt32 = 0xcc9e2d51
-        let c2: UInt32 = 0x1b873593
+        let c1: UInt32 = 0xcc9e_2d51
+        let c2: UInt32 = 0x1b87_3593
 
         let byteCount = bytes.count
 
@@ -49,12 +49,12 @@ public struct MurmurHash {
 
             h1 = h1 ^ k1
             h1 = rotateLeft(h1, 13)
-            h1 = h1 &* 5 &+ 0xe6546b64
+            h1 = h1 &* 5 &+ 0xe654_6b64
         }
         let remaining = byteCount & 3
         if remaining != 0 {
             var k1 = UInt32(0)
-            for r in 0 ..< remaining {
+            for r in 0..<remaining {
                 k1 |= UInt32(bytes[byteCount - 1 - r]) << (8 * (remaining - 1 - r))
             }
 
@@ -67,9 +67,9 @@ public struct MurmurHash {
 
         h1 ^= UInt32(truncatingIfNeeded: byteCount)
         h1 ^= (h1 >> 16)
-        h1 = h1 &* 0x85ebca6b
+        h1 = h1 &* 0x85eb_ca6b
         h1 ^= (h1 >> 13)
-        h1 = h1 &* 0xc2b2ae35
+        h1 = h1 &* 0xc2b2_ae35
         h1 ^= (h1 >> 16)
 
         return h1

@@ -6,10 +6,10 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import BitcoinKit
 import Alamofire
+import BitcoinKit
 import CommonKit
+import UIKit
 
 extension BitcoinKit.Transaction: RawTransaction {
     var txHash: String? {
@@ -19,7 +19,7 @@ extension BitcoinKit.Transaction: RawTransaction {
 
 extension DogeWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction
-    
+
     // MARK: Create & Send
     func createTransaction(
         recipient: String,
@@ -31,26 +31,26 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         guard let wallet = self.dogeWallet else {
             throw WalletServiceError.notLogged
         }
-        
+
         let key = wallet.privateKey
-        
+
         guard let toAddress = try? addressConverter.convert(address: recipient) else {
             throw WalletServiceError.accountNotFound
         }
-        
+
         let rawAmount = NSDecimalNumber(decimal: amount * DogeWalletService.multiplier).uint64Value
         let fee = NSDecimalNumber(decimal: fee * DogeWalletService.multiplier).uint64Value
-        
+
         // Search for unspent transactions
         do {
             let utxos = try await getUnspentTransactions()
-            
+
             // Check if we have enought money
             let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
-            guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+            guard totalAmount >= rawAmount + fee else {  // This shit can crash BitcoinKit
                 throw WalletServiceError.notEnoughMoney
             }
-            
+
             // Create local transaction
             let transaction = btcTransactionFactory.createTransaction(
                 toAddress: toAddress,
@@ -66,10 +66,10 @@ extension DogeWalletService: WalletServiceTwoStepSend {
             throw error
         }
     }
-    
+
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         let txHex = transaction.serialized().hex
-        
+
         _ = try await dogeApiService.api.request(waitsForConnectivity: false) { core, origin in
             let response: APIResponseModel = await core.apiCore.sendRequestBasic(
                 origin: origin,
@@ -80,14 +80,14 @@ extension DogeWalletService: WalletServiceTwoStepSend {
                 timeout: .common,
                 downloadProgress: { _ in }
             )
-            
+
             guard
-                !(200 ... 299).contains(response.code ?? .zero),
+                !(200...299).contains(response.code ?? .zero),
                 let dataString = response.data.map({ String(decoding: $0, as: UTF8.self) }),
                 dataString.contains("dust"),
                 dataString.contains("-26")
             else { return response.result.mapError { $0.asWalletServiceError() } }
-            
+
             return .failure(.dustAmountError)
         }.get()
     }
@@ -97,58 +97,58 @@ extension BitcoinKit.Transaction: @retroactive @unchecked Sendable {}
 
 extension BitcoinKit.Transaction: TransactionDetails {
     var defaultCurrencySymbol: String? { DogeWalletService.currencySymbol }
-    
+
     var txId: String {
         return txID
     }
-    
+
     var dateValue: Date? {
         switch lockTime {
-        case 1..<500000000:
+        case 1..<500_000_000:
             return nil
-        case 500000000...:
+        case 500_000_000...:
             return Date(timeIntervalSince1970: TimeInterval(lockTime))
         default:
             return nil
         }
     }
-    
+
     var amountValue: Decimal? {
-        return Decimal(outputs[0].value) / Decimal(100000000)
+        return Decimal(outputs[0].value) / Decimal(100_000_000)
     }
-    
+
     var feeValue: Decimal? {
         return nil
     }
-    
+
     var confirmationsValue: String? {
         return "0"
     }
-    
+
     var blockValue: String? {
         return nil
     }
-    
+
     var isOutgoing: Bool {
         return true
     }
-    
+
     var blockHeight: UInt64? {
         return nil
     }
-    
+
     var transactionStatus: TransactionStatus? {
         return .notInitiated
     }
-    
+
     var senderAddress: String {
         return ""
     }
-    
+
     var recipientAddress: String {
         return ""
     }
-    
+
     var nonceRaw: String? {
         nil
     }

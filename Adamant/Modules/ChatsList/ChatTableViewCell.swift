@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import FreakingSimpleRoundImageView
 import CommonKit
+import FreakingSimpleRoundImageView
+import UIKit
 
 final class ChatTableViewCell: UITableViewCell {
     static var defaultAvatar: UIImage = .asset(named: "avatar-chat-placeholder") ?? .init()
     static let shortDescriptionTextSize: CGFloat = 15.0
-    
+
     // MARK: - IBOutlets
     @IBOutlet weak var avatarImageView: RoundImageView!
     @IBOutlet weak var accountLabel: UILabel!
@@ -23,12 +23,12 @@ final class ChatTableViewCell: UITableViewCell {
     @IBOutlet weak var clockView: UIImageView!
     @IBOutlet weak var lastMessageLeadingAnchor: NSLayoutConstraint!
     @IBOutlet weak var macOsImage: UIImageView!
-    
+
     override func awakeFromNib() {
         badgeView.layer.cornerRadius = badgeView.bounds.height / 2
         clockView.contentMode = .scaleAspectFit
     }
-    
+
     var avatarImage: UIImage? {
         get {
             return avatarImageView.image
@@ -41,7 +41,7 @@ final class ChatTableViewCell: UITableViewCell {
             }
         }
     }
-    
+
     var borderWidth: CGFloat {
         get {
             return avatarImageView.borderWidth
@@ -50,7 +50,7 @@ final class ChatTableViewCell: UITableViewCell {
             avatarImageView.borderWidth = newValue
         }
     }
-    
+
     var borderColor: UIColor? {
         get {
             return avatarImageView.borderColor
@@ -59,13 +59,13 @@ final class ChatTableViewCell: UITableViewCell {
             avatarImageView.borderColor = newValue
         }
     }
-    
+
     var hasUnreadMessages: Bool = false {
         didSet {
             badgeView.isHidden = !hasUnreadMessages
         }
     }
-    
+
     var badgeColor: UIColor? {
         get {
             return badgeView.backgroundColor
@@ -74,11 +74,11 @@ final class ChatTableViewCell: UITableViewCell {
             badgeView.backgroundColor = newValue
         }
     }
-    
+
     var messageStatus: MessageStatus = .delivered {
         didSet {
             let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-            
+
             switch messageStatus {
             case .pending:
                 if isPhone {
@@ -93,7 +93,7 @@ final class ChatTableViewCell: UITableViewCell {
                     macOsImage.tintColor = .adamant.secondary
                     clockView.isHidden = true
                 }
-                
+
             case .failed:
                 if isPhone {
                     clockView.isHidden = false
@@ -107,7 +107,7 @@ final class ChatTableViewCell: UITableViewCell {
                     macOsImage.tintColor = .adamant.attention
                     clockView.isHidden = true
                 }
-                
+
             case .delivered:
                 clockView.isHidden = true
                 macOsImage.isHidden = true

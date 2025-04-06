@@ -11,29 +11,29 @@ import Foundation
 public protocol ApiServiceProtocol: Sendable {
     @MainActor
     var nodesInfo: NodesListInfo { get }
-    
+
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { get }
-    
+
     func healthCheck()
 }
 
-public extension ApiServiceProtocol {
+extension ApiServiceProtocol {
     @MainActor
-    var hasEnabledNodePublisher: AnyObservable<Bool> {
+    public var hasEnabledNodePublisher: AnyObservable<Bool> {
         nodesInfoPublisher
             .map { $0.nodes.contains { $0.isEnabled } }
             .removeDuplicates()
             .eraseToAnyPublisher()
     }
-    
+
     @MainActor
-    var hasEnabledNode: Bool {
+    public var hasEnabledNode: Bool {
         nodesInfo.nodes.contains { $0.isEnabled }
     }
-    
+
     @MainActor
-    var hasSupportedNode: Bool {
+    public var hasSupportedNode: Bool {
         nodesInfo.nodes.contains { $0.isSupported }
     }
 }

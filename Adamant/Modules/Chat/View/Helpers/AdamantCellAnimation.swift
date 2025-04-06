@@ -6,19 +6,19 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension UIView {
     func animateIsSelected(_ value: Bool, originalColor: UIColor?) {
         guard value else { return }
         backgroundColor = .adamant.active.withAlphaComponent(0.2)
-        
+
         UIView.animate(withDuration: 1.0) {
             self.backgroundColor = originalColor
         }
     }
-    
+
     func addShadow(
         shadowColor: UIColor = UIColor.black,
         shadowOffset: CGSize = .zero,

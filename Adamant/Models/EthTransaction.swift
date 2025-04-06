@@ -6,11 +6,12 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import web3swift
-@preconcurrency import struct BigInt.BigUInt
-import Web3Core
 import CommonKit
+import Foundation
+import Web3Core
+import web3swift
+
+@preconcurrency import struct BigInt.BigUInt
 
 struct EthResponse {
     let status: Int
@@ -25,16 +26,16 @@ extension EthResponse: Decodable {
         case message
         case result
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         if let raw = try? container.decode(String.self, forKey: .status), let status = Int(raw) {
             self.status = status
         } else {
             self.status = 0
         }
-        
+
         message = (try? container.decode(String.self, forKey: .message)) ?? ""
         result = (try? container.decode([EthTransaction].self, forKey: .result)) ?? []
     }
@@ -55,7 +56,7 @@ struct EthTransaction: @unchecked Sendable {
     let receiptStatus: TransactionReceipt.TXStatus
     let blockNumber: String?
     let currencySymbol: String
-    
+
     var nonce: Int?
     var isOutgoing: Bool = false
 }
@@ -75,17 +76,17 @@ extension EthTransaction: Decodable {
         case receiptStatus = "txreceipt_status"
         case blockNumber
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         hash = try container.decode(String.self, forKey: .hash)
         from = try container.decode(String.self, forKey: .from)
         to = try container.decode(String.self, forKey: .to)
         blockNumber = try? container.decode(String.self, forKey: .blockNumber)
         confirmations = try? container.decode(String.self, forKey: .confirmations)
         currencySymbol = EthWalletService.currencySymbol
-        
+
         // Status
         if let statusRaw = try? container.decode(String.self, forKey: .receiptStatus) {
             if statusRaw == "1" {
@@ -96,35 +97,35 @@ extension EthTransaction: Decodable {
         } else {
             self.receiptStatus = .notYetProcessed
         }
-        
+
         // Date
         if let timeStampRaw = try? container.decode(String.self, forKey: .timeStamp), let timeStamp = Double(timeStampRaw) {
             self.date = Date(timeIntervalSince1970: timeStamp)
         } else {
             self.date = nil
         }
-        
+
         // IsError
         if let isErrorRaw = try? container.decode(String.self, forKey: .isError) {
             self.isError = isErrorRaw == "1"
         } else {
             self.isError = false
         }
-        
+
         // Value/amount
         if let raw = try? container.decode(String.self, forKey: .value), let value = Decimal(string: raw) {
             self.value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: value)
         } else {
             self.value = 0
         }
-        
+
         // Gas used
         if let raw = try? container.decode(String.self, forKey: .gasUsed), let gas = Decimal(string: raw) {
             self.gasUsed = gas
         } else {
             self.gasUsed = 0
         }
-        
+
         // Gas price
         if let raw = try? container.decode(String.self, forKey: .gasPrice), let gasPrice = Decimal(string: raw) {
             self.gasPrice = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: gasPrice)
@@ -137,7 +138,7 @@ extension EthTransaction: Decodable {
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
     var defaultCurrencySymbol: String? { return currencySymbol }
-    
+
     var txId: String { return hash }
     var senderAddress: String { return from }
     var recipientAddress: String { return to }
@@ -146,26 +147,26 @@ extension EthTransaction: TransactionDetails {
     var confirmationsValue: String? { return confirmations }
     var blockValue: String? { return blockNumber }
     var feeCurrencySymbol: String? { EthWalletService.currencySymbol }
-    
+
     var feeValue: Decimal? {
         guard let gasUsed = gasUsed else {
             return nil
         }
-        
+
         return gasPrice * gasUsed
     }
-    
+
     var transactionStatus: TransactionStatus? {
         return receiptStatus.asTransactionStatus()
     }
-    
+
     var blockHeight: UInt64? {
         return nil
     }
-    
+
     var nonceRaw: String? {
         guard let nonce = nonce else { return nil }
-        
+
         return String(nonce)
     }
 }
@@ -183,19 +184,19 @@ extension CodableTransaction {
         hash: String? = nil,
         for token: ERC20Token? = nil
     ) -> EthTransaction {
-        
+
         var recipient = to
         var txValue: BigUInt? = value
-        
+
         var exponent = EthWalletService.currencyExponent
         if let naturalUnits = token?.naturalUnits {
             exponent = -1 * naturalUnits
         }
-        
+
         if data.count > 0 {
-            let addressRaw = Data(data[16 ..< 36]).toHexString()
-            let erc20RawValue = Data(data[37 ..< 68]).toHexString()
-            
+            let addressRaw = Data(data[16..<36]).toHexString()
+            let erc20RawValue = Data(data[37..<68]).toHexString()
+
             if let address = EthereumAddress("0x\(addressRaw)"), let v = BigUInt(erc20RawValue, radix: 16) {
                 recipient = address
                 txValue = v
@@ -205,16 +206,16 @@ extension CodableTransaction {
         if receiptStatus == .notYetProcessed {
             txValue = nil
         }
-        
+
         let feePrice: BigUInt
         if type == .eip1559 {
             feePrice = (maxFeePerGas ?? BigUInt(0)) + (maxPriorityFeePerGas ?? BigUInt(0))
         } else {
             feePrice = gasPrice ?? BigUInt(0)
         }
-        
+
         let gasPrice = gasPrice ?? feePrice
-        
+
         return EthTransaction(
             date: date,
             hash: hash ?? txHash ?? "",
@@ -256,7 +257,7 @@ extension CodableTransaction {
      "gasUsed":"21000",
      "confirmations":"32316"
  }
- 
+
  */
 
 // MARK: - Adamant ETH API transactions
@@ -270,10 +271,10 @@ struct EthTransactionShort: @unchecked Sendable {
     let gasPrice: Decimal
     let value: Decimal
     let blockNumber: String
-    
+
     let contract_to: String
     let contract_value: BigUInt
-    
+
     func asEthTransaction(isOutgoing: Bool) -> EthTransaction {
         return EthTransaction(
             date: date,
@@ -291,10 +292,10 @@ struct EthTransactionShort: @unchecked Sendable {
             isOutgoing: isOutgoing
         )
     }
-    
+
     func asERCTransaction(isOutgoing: Bool, token: ERC20Token) -> EthTransaction {
         let exponent = -1 * token.naturalUnits
-        
+
         return EthTransaction(
             date: date,
             hash: hash,
@@ -326,41 +327,41 @@ extension EthTransactionShort: Decodable {
         case contract_to
         case contract_value
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         from = try container.decode(String.self, forKey: .txfrom)
         to = try container.decode(String.self, forKey: .txto)
-        
+
         // Hash
         let hashRaw = try container.decode(String.self, forKey: .txhash)
         hash = hashRaw.replacingOccurrences(of: "\\", with: "0")
-        
+
         // Block
         let blockRaw = try container.decode(UInt64.self, forKey: .block)
         blockNumber = String(blockRaw)
-        
+
         // Date
         let timestamp = try container.decode(TimeInterval.self, forKey: .time)
         date = Date(timeIntervalSince1970: timestamp)
-        
+
         // Gas used
         gasUsed = try container.decode(Decimal.self, forKey: .gas)
-        
+
         // Gas price
         let gasPriceRaw = try container.decode(Decimal.self, forKey: .gasprice)
         gasPrice = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: gasPriceRaw)
-        
+
         // Value
         let valueRaw = try container.decode(Decimal.self, forKey: .value)
         value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: valueRaw)
-        
+
         contract_to = try container.decodeIfPresent(String.self, forKey: .contract_to) ?? ""
-        
+
         let contractValueRaw = try container.decodeIfPresent(String.self, forKey: .contract_value) ?? "0"
         contract_value = BigUInt(contractValueRaw, radix: 16) ?? BigUInt.zero
-        
+
         if !contract_to.isEmpty {
             let address = "0x" + contract_to.reversed()[..<40].reversed()
             to = address
@@ -370,7 +371,7 @@ extension EthTransactionShort: Decodable {
 
 // MARK: Adamant node Sample JSON
 /*
- 
+
  {
      "time": 1540676411,
      "txfrom": "0xcE25C5bbEB9f27ac942f914183279FDB31C999dC",
@@ -383,8 +384,8 @@ extension EthTransactionShort: Decodable {
      "contract_to": "",
      "contract_value": ""
  }
- 
+
  Note broken txhash
  contract_to & contract_value not requested from API
- 
+
  */

@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(BaseTransaction)
 public class BaseTransaction: CoinTransaction, @unchecked Sendable {

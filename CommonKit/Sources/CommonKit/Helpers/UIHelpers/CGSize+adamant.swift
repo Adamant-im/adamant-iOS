@@ -8,8 +8,8 @@
 
 import CoreGraphics
 
-public extension CGSize {
-    init(squareSize: CGFloat) {
+extension CGSize {
+    public init(squareSize: CGFloat) {
         self.init(width: squareSize, height: squareSize)
     }
 }

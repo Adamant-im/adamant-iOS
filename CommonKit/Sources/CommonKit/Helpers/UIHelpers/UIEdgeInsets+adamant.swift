@@ -8,8 +8,8 @@
 
 import UIKit
 
-public extension UIEdgeInsets {
-    static func +(lhs: Self, rhs: Self) -> UIEdgeInsets {
+extension UIEdgeInsets {
+    public static func + (lhs: Self, rhs: Self) -> UIEdgeInsets {
         .init(
             top: lhs.top + rhs.top,
             left: lhs.left + rhs.left,

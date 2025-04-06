@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import CommonKit
 
 final class CommonKitTests: XCTestCase {

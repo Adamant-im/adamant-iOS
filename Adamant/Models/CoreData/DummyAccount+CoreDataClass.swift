@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(DummyAccount)
 public class DummyAccount: BaseAccount {

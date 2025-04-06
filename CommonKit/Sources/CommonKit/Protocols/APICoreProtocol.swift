@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 import Alamofire
+import Foundation
 
 public enum ApiCommands {}
 
@@ -16,6 +16,7 @@ public enum TimeoutSize: CaseIterable, Hashable {
     case extended
 }
 
+// sourcery: AutoMockable
 public protocol APICoreProtocol: Actor {
     func sendRequestMultipartFormData(
         origin: NodeOrigin,
@@ -24,34 +25,34 @@ public protocol APICoreProtocol: Actor {
         timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
-    
+
     func sendRequestBasic<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
         timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
-    
+
     /// jsonParameters - arrays and dictionaries are allowed only
     func sendRequestBasic(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         jsonParameters: Any,
         timeout: TimeoutSize
     ) async -> APIResponseModel
 }
 
-public extension APICoreProtocol {
-    var emptyParameters: [String: Bool] { [:] }
-    
-    func sendRequest<Parameters: Encodable>(
+extension APICoreProtocol {
+    public var emptyParameters: [String: Bool] { [:] }
+
+    public func sendRequest<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<Data> {
@@ -65,11 +66,11 @@ public extension APICoreProtocol {
             downloadProgress: { _ in }
         ).result
     }
-    
-    func sendRequest<Parameters: Encodable>(
+
+    public func sendRequest<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
         timeout: TimeoutSize,
@@ -85,11 +86,11 @@ public extension APICoreProtocol {
             downloadProgress: downloadProgress
         )
     }
-    
-    func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
+
+    public func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<JSONOutput> {
@@ -101,8 +102,8 @@ public extension APICoreProtocol {
             encoding: encoding
         ).flatMap { parseJSON(data: $0) }
     }
-    
-    func sendRequestJsonResponse<JSONOutput: Decodable>(
+
+    public func sendRequestJsonResponse<JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String
     ) async -> ApiServiceResult<JSONOutput> {
@@ -114,8 +115,8 @@ public extension APICoreProtocol {
             encoding: .url
         )
     }
-    
-    func sendRequest(
+
+    public func sendRequest(
         origin: NodeOrigin,
         path: String
     ) async -> ApiServiceResult<Data> {
@@ -127,8 +128,8 @@ public extension APICoreProtocol {
             encoding: .url
         )
     }
-    
-    func sendRequest(
+
+    public func sendRequest(
         origin: NodeOrigin,
         path: String,
         timeout: TimeoutSize,
@@ -144,8 +145,8 @@ public extension APICoreProtocol {
             downloadProgress: downloadProgress
         ).result
     }
-    
-    func sendRequest(
+
+    public func sendRequest(
         origin: NodeOrigin,
         path: String,
         timeout: TimeoutSize,
@@ -161,11 +162,11 @@ public extension APICoreProtocol {
             downloadProgress: downloadProgress
         )
     }
-    
-    func sendRequestJsonResponse<JSONOutput: Decodable>(
+
+    public func sendRequestJsonResponse<JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
-        method: HTTPMethod,
+        method: Alamofire.HTTPMethod,
         jsonParameters: Any
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestBasic(
@@ -176,8 +177,8 @@ public extension APICoreProtocol {
             timeout: .common
         ).result.flatMap { parseJSON(data: $0) }
     }
-    
-    func sendRequestMultipartFormDataJsonResponse<JSONOutput: Decodable>(
+
+    public func sendRequestMultipartFormDataJsonResponse<JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
@@ -192,8 +193,8 @@ public extension APICoreProtocol {
             uploadProgress: uploadProgress
         ).result.flatMap { parseJSON(data: $0) }
     }
-    
-    func sendRequestRPC(
+
+    public func sendRequestRPC(
         origin: NodeOrigin,
         path: String,
         requests: [RpcRequest]
@@ -201,7 +202,7 @@ public extension APICoreProtocol {
         let parameters: [Any] = requests.compactMap {
             $0.asDictionary()
         }
-        
+
         return await sendRequestJsonResponse(
             origin: origin,
             path: path,
@@ -209,8 +210,8 @@ public extension APICoreProtocol {
             jsonParameters: parameters
         )
     }
-    
-    func sendRequestRPC(
+
+    public func sendRequestRPC(
         origin: NodeOrigin,
         path: String,
         request: RpcRequest
@@ -224,8 +225,8 @@ public extension APICoreProtocol {
     }
 }
 
-private extension APICoreProtocol {
-    func parseJSON<JSON: Decodable>(data: Data) -> ApiServiceResult<JSON> {
+extension APICoreProtocol {
+    fileprivate func parseJSON<JSON: Decodable>(data: Data) -> ApiServiceResult<JSON> {
         do {
             let output = try JSONDecoder().decode(JSON.self, from: data)
             return .success(output)

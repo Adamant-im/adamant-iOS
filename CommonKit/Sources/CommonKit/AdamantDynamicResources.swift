@@ -1,9 +1,9 @@
-import Foundation
 import AdamantWalletsKit
+import Foundation
 
-public extension AdamantResources {
+extension AdamantResources {
     // MARK: Nodes
-    static var nodes: [Node] {
+    public static var nodes: [Node] {
         guard
             let admWallet = CoinInfoProvider.storage?["ADM"],
             let walletNodes = admWallet.nodes?.toNodes()

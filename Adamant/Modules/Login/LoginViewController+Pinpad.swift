@@ -6,15 +6,15 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import MyLittlePinpad
-import CommonKit
 
 extension LoginViewController {
     /// Shows pinpad in main.async queue
     func loginWithPinpad() {
         let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
-        
+
         DispatchQueue.main.async { [weak self] in
             let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
             pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
@@ -34,57 +34,57 @@ extension LoginViewController {
             self?.present(pinpad, animated: true, completion: nil)
         }
     }
-    
+
     /// Request user biometry authentication
     func loginWithBiometry() {
         let biometry = localAuth.biometryType
-        
+
         guard biometry == .touchID || biometry == .faceID else {
             return
         }
-        
+
         localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount) { result in
             Task { @MainActor [weak self] in
                 switch result {
                 case .success:
                     self?.loginIntoSavedAccount()
-                    
+
                 case .fallback:
                     self?.loginWithPinpad()
-                    
+
                 case .cancel:
                     break
-                    
+
                 case .failed:
                     break
                 }
             }
         }
     }
-    
+
     @MainActor
     private func loginIntoSavedAccount() {
         dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
-        
+
         Task {
             do {
                 let result = try await accountService.loginWithStoredAccount()
                 handleSavedAccountLoginResult(result)
             } catch {
                 dialogService.showRichError(error: error)
-                
+
                 if let pinpad = presentedViewController as? PinpadViewController {
                     pinpad.clearPin()
                 }
             }
         }
     }
-    
+
     private func handleSavedAccountLoginResult(_ result: AccountServiceResult) {
         switch result {
         case .success(_, let alert):
             dialogService.dismissProgress()
-            
+
             let alertVc: UIAlertController?
             if let alert = alert {
                 alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyleSafe: .alert, source: nil)
@@ -92,20 +92,20 @@ extension LoginViewController {
             } else {
                 alertVc = nil
             }
-            
+
             guard let presenter = presentingViewController else {
                 return
             }
             presenter.dismiss(animated: true, completion: nil)
-            
+
             if let alertVc = alertVc {
                 alertVc.modalPresentationStyle = .overFullScreen
                 presenter.present(alertVc, animated: true, completion: nil)
             }
-            
+
         case .failure(let error):
             dialogService.showRichError(error: error)
-            
+
             if let pinpad = presentedViewController as? PinpadViewController {
                 pinpad.clearPin()
             }
@@ -120,31 +120,34 @@ extension LoginViewController: PinpadViewControllerDelegate {
             guard accountService.hasStayInAccount else {
                 return
             }
-            
+
             guard accountService.validatePin(pin) else {
                 pinpad.clearPin()
                 pinpad.playWrongPinAnimation()
                 return
             }
-            
+
             loginIntoSavedAccount()
         }
     }
-    
+
     nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
         Task { @MainActor in
-            localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-                switch result {
-                case .success:
-                    self?.loginIntoSavedAccount()
-                    
-                case .fallback, .cancel, .failed:
-                    break
+            localAuth.authorizeUser(
+                reason: String.adamant.login.loginIntoPrevAccount,
+                completion: { [weak self] result in
+                    switch result {
+                    case .success:
+                        self?.loginIntoSavedAccount()
+
+                    case .fallback, .cancel, .failed:
+                        break
+                    }
                 }
-            })
+            )
         }
     }
-    
+
     nonisolated func pinpadDidCancel(_ pinpad: PinpadViewController) {
         Task { @MainActor in
             pinpad.dismiss(animated: true, completion: nil)

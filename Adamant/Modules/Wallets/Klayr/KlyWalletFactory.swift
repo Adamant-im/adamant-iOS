@@ -6,17 +6,17 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Swinject
-import UIKit
 import CommonKit
 import LiskKit
+import Swinject
+import UIKit
 
 struct KlyWalletFactory: WalletFactory {
     typealias Service = WalletService
-    
+
     let typeSymbol: String = KlyWalletService.richMessageType
     let assembler: Assembler
-    
+
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         KlyWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
@@ -27,7 +27,7 @@ struct KlyWalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         KlyTransactionsViewController(
             walletService: service,
@@ -36,7 +36,7 @@ struct KlyWalletFactory: WalletFactory {
             screensFactory: screensFactory
         )
     }
-    
+
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
         KlyTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
@@ -52,18 +52,18 @@ struct KlyWalletFactory: WalletFactory {
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
-    
+
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
         guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else { return nil }
-        
+
         let comment: String?
         if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
             comment = raw
         } else {
             comment = nil
         }
-        
+
         return makeTransactionDetailsVC(
             hash: hash,
             senderId: transaction.senderId,
@@ -76,13 +76,13 @@ struct KlyWalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeDetailsVC(service: Service) -> TransactionDetailsViewControllerBase {
         makeTransactionDetailsVC(service: service)
     }
 }
 
-private extension KlyWalletFactory {
+extension KlyWalletFactory {
     private func makeTransactionDetailsVC(
         hash: String,
         senderId: String?,
@@ -98,15 +98,16 @@ private extension KlyWalletFactory {
         vc.senderId = senderId
         vc.recipientId = recipientId
         vc.comment = comment
-        
+
         let amount: Decimal
         if let amountRaw = richTransaction.getRichValue(for: RichContentKeys.transfer.amount),
-           let decimal = Decimal(string: amountRaw) {
+            let decimal = Decimal(string: amountRaw)
+        {
             amount = decimal
         } else {
             amount = 0
         }
-        
+
         let failedTransaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: senderAddress,
@@ -125,13 +126,13 @@ private extension KlyWalletFactory {
         vc.richTransaction = richTransaction
         return vc
     }
-    
-    func makeTransactionDetailsVC(service: Service) -> KlyTransactionDetailsViewController {
+
+    fileprivate func makeTransactionDetailsVC(service: Service) -> KlyTransactionDetailsViewController {
         KlyTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            accountService:  assembler.resolve(AccountService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
             walletService: service,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )

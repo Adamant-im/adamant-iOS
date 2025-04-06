@@ -15,7 +15,7 @@ final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
     init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
-    
+
     func request<Output>(
         origin: NodeOrigin,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
@@ -25,7 +25,7 @@ final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
 
     func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        
+
         let response = await apiCore.sendRequestRPC(
             origin: origin,
             path: BtcApiCommands.getRPC(),
@@ -38,29 +38,31 @@ final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
         guard case let .success(data) = response else {
             return .failure(.internalError(.parsingFailed))
         }
-        
+
         let networkInfoModel = data.first(
             where: { $0.id == BtcApiCommands.networkInfoMethod }
         )
-        
+
         let blockchainInfoModel = data.first(
             where: { $0.id == BtcApiCommands.blockchainInfoMethod }
         )
-        
+
         guard
             let networkInfo: BtcNetworkInfoDTO = networkInfoModel?.serialize(),
             let blockchainInfo: BtcBlockchainInfoDTO = blockchainInfoModel?.serialize()
         else {
             return .failure(.internalError(.parsingFailed))
         }
-        
-        return .success(.init(
-            ping: Date.now.timeIntervalSince1970 - startTimestamp,
-            height: blockchainInfo.blocks,
-            wsEnabled: false,
-            wsPort: nil,
-            version: .init([networkInfo.version])
-        ))
+
+        return .success(
+            .init(
+                ping: Date.now.timeIntervalSince1970 - startTimestamp,
+                height: blockchainInfo.blocks,
+                wsEnabled: false,
+                wsPort: nil,
+                version: .init([networkInfo.version])
+            )
+        )
     }
 }
 
@@ -69,7 +71,7 @@ protocol BtcApiServiceProtocol: ApiServiceProtocol {
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output>
-    
+
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo>
 }
 
@@ -78,16 +80,16 @@ final class BtcApiService: BtcApiServiceProtocol {
 
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { api.nodesInfo }
-    
+
     func healthCheck() { api.healthCheck() }
-    
+
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
         self.api = api
     }
-    
+
     func request<Output>(
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
@@ -96,7 +98,7 @@ final class BtcApiService: BtcApiServiceProtocol {
             await core.request(origin: origin, request)
         }
     }
-    
+
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
         await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)

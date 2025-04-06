@@ -1,18 +1,18 @@
 //
 //  AdvancedAlertView.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 12.04.2023.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct AdvancedAlertView: View {
     @State private var width: CGFloat = .zero
-    
+
     let model: AdvancedAlertModel
-    
+
     var body: some View {
         VStack(spacing: .zero) {
             VStack(spacing: .zero) {
@@ -24,15 +24,15 @@ struct AdvancedAlertView: View {
                 }
                 textView
                     .padding(.bottom, bigSpacing)
-                
+
                 if let secondaryButton = model.secondaryButton {
                     makeSecondaryButton(model: secondaryButton)
                         .padding(.bottom, bigSpacing)
                 }
             }.padding(.horizontal, bigSpacing)
-            .background(widthReader)
-            .onPreferenceChange(ViewPreferenceKey.self) { width = $0 }
-            
+                .background(widthReader)
+                .onPreferenceChange(ViewPreferenceKey.self) { width = $0 }
+
             Group {
                 Divider()
                 primaryButton
@@ -44,42 +44,42 @@ struct AdvancedAlertView: View {
     }
 }
 
-private extension AdvancedAlertView {
-    struct ViewPreferenceKey: PreferenceKey {
+extension AdvancedAlertView {
+    fileprivate struct ViewPreferenceKey: PreferenceKey {
         static var defaultValue: CGFloat { .zero }
-        
+
         static func reduce(value: inout Value, nextValue: () -> Value) {
             value += nextValue()
         }
     }
-    
-    var iconView: some View {
+
+    fileprivate var iconView: some View {
         Image(uiImage: model.icon)
             .renderingMode(.template)
             .foregroundColor(.secondary)
             .frame(squareSize: 37)
     }
-    
-    func makeTitleView(title: String) -> some View {
+
+    fileprivate func makeTitleView(title: String) -> some View {
         Text(title)
             .font(.system(size: 17, weight: .bold))
     }
-    
-    var textView: some View {
+
+    fileprivate var textView: some View {
         Text(model.text)
             .multilineTextAlignment(.center)
             .font(.system(size: 13))
     }
-    
-    var primaryButton: some View {
+
+    fileprivate var primaryButton: some View {
         Button(action: model.primaryButton.action.value) {
             Text(model.primaryButton.title)
                 .padding(.vertical, bigSpacing)
                 .expanded(axes: .horizontal)
         }
     }
-    
-    var widthReader: some View {
+
+    fileprivate var widthReader: some View {
         GeometryReader {
             Color.clear.preference(
                 key: ViewPreferenceKey.self,
@@ -87,8 +87,8 @@ private extension AdvancedAlertView {
             )
         }
     }
-    
-    func makeSecondaryButton(model: AdvancedAlertModel.Button) -> some View {
+
+    fileprivate func makeSecondaryButton(model: AdvancedAlertModel.Button) -> some View {
         Button(model.title, action: model.action.value)
     }
 }

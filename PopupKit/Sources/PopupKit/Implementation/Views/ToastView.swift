@@ -1,16 +1,16 @@
 //
 //  ToastView.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 07.12.2022.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct ToastView: View {
     let message: String
-    
+
     var body: some View {
         Text(message)
             .multilineTextAlignment(.center)

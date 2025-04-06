@@ -19,7 +19,7 @@ final class Base58AddressConverter: AddressConverter {
         guard let hex = Base58.decode(address) else {
             throw BitcoinError.unknownAddressType
         }
-        
+
         // check decoded length. Must be 1(version) + 20(KeyHash) + 4(CheckSum)
         if hex.count != Base58AddressConverter.checkSumLength + 20 + 1 {
             throw BitcoinError.invalidAddressLength
@@ -33,9 +33,9 @@ final class Base58AddressConverter: AddressConverter {
 
         let type: AddressType
         switch hex[0] {
-            case addressVersion: type = AddressType.pubkeyHash
-            case addressScriptVersion: type = AddressType.scriptHash
-            default: throw BitcoinError.wrongAddressPrefix
+        case addressVersion: type = AddressType.pubkeyHash
+        case addressScriptVersion: type = AddressType.scriptHash
+        default: throw BitcoinError.wrongAddressPrefix
         }
 
         let keyHash = hex.dropFirst().dropLast(4)
@@ -47,13 +47,13 @@ final class Base58AddressConverter: AddressConverter {
         let addressType: AddressType
 
         switch type {
-            case .p2pkh, .p2pk:
-                version = addressVersion
-                addressType = AddressType.pubkeyHash
-            case .p2sh, .p2wpkhSh:
-                version = addressScriptVersion
-                addressType = AddressType.scriptHash
-            default: throw BitcoinError.unknownAddressType
+        case .p2pkh, .p2pk:
+            version = addressVersion
+            addressType = AddressType.pubkeyHash
+        case .p2sh, .p2wpkhSh:
+            version = addressScriptVersion
+            addressType = AddressType.scriptHash
+        default: throw BitcoinError.unknownAddressType
         }
 
         var withVersion = (Data([version])) + lockingScriptPayload
@@ -63,7 +63,7 @@ final class Base58AddressConverter: AddressConverter {
         let base58 = Base58.encode(withVersion)
         return LegacyAddress(type: addressType, payload: lockingScriptPayload, base58: base58)
     }
-    
+
     func convert(publicKey: PublicKey, type: ScriptType) throws -> Address {
         let keyHash = type == .p2wpkhSh ? publicKey.hashP2wpkhWrappedInP2sh : publicKey.hashP2pkh
         return try convert(lockingScriptPayload: keyHash, type: type)

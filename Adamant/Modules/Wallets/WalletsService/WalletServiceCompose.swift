@@ -15,17 +15,19 @@ protocol WalletServiceCompose: Sendable {
 
 struct AdamantWalletServiceCompose: WalletServiceCompose {
     private let wallets: [String: WalletService]
-    
+
     init(wallets: [WalletCoreProtocol]) {
-        self.wallets = Dictionary(uniqueKeysWithValues: wallets.map { wallet in
-            (wallet.dynamicRichMessageType, WalletService(core: wallet))
-        })
+        self.wallets = Dictionary(
+            uniqueKeysWithValues: wallets.map { wallet in
+                (wallet.dynamicRichMessageType, WalletService(core: wallet))
+            }
+        )
     }
-    
+
     func getWallet(by type: String) -> WalletService? {
         wallets[type]
     }
-    
+
     func getWallets() -> [WalletService] {
         Array(wallets.values)
     }
