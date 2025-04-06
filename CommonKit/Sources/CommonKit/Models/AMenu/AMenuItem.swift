@@ -1,6 +1,6 @@
 //
 //  AMenuItem.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 23.07.2023.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 public enum AMenuItem {
-    
+
     /// The case for an action menu item
     /// - Parameters:
     ///   - name: the menu item name (as it appears in the menu)
@@ -23,7 +23,7 @@ public enum AMenuItem {
         style: Style = .plain,
         action: (() -> Void)
     )
-    
+
     /// Creates an action menu item
     /// - Parameters:
     ///   - name: the menu item name (as it appears in the menu)
@@ -45,7 +45,7 @@ public enum AMenuItem {
             action: action
         )
     }
-    
+
     /// Creates an action menu item
     /// - Parameters:
     ///   - name: the menu item name (as it appears in the menu)
@@ -71,15 +71,15 @@ public enum AMenuItem {
 
 // MARK: - Internal
 
-public extension AMenuItem {
-    var name: String {
+extension AMenuItem {
+    public var name: String {
         switch self {
         case .action(let name, _, _, _, _):
             return name
         }
     }
-    
-    var iconImage: UIImage? {
+
+    public var iconImage: UIImage? {
         switch self {
         case .action(_, let imageName, let systemImageName, _, _):
             if let imageName = imageName {
@@ -90,15 +90,15 @@ public extension AMenuItem {
             return nil
         }
     }
-    
-    var style: Style {
+
+    public var style: Style {
         switch self {
         case .action(_, _, _, let style, _):
             return style
         }
     }
-    
-    var action: () -> Void {
+
+    public var action: () -> Void {
         switch self {
         case .action(_, _, _, _, let action):
             return action

@@ -43,7 +43,7 @@ public struct VarInt: ExpressibleByIntegerLiteral {
      0xfd : 253
      0xfe : 254
      0xff : 255
-     
+
      0~252 : 1-byte(0x00 ~ 0xfc)
      253 ~ 65535: 3-byte(0xfd00fd ~ 0xfdffff)
      65536 ~ 4294967295 : 5-byte(0xfe010000 ~ 0xfeffffffff)
@@ -59,10 +59,10 @@ public struct VarInt: ExpressibleByIntegerLiteral {
         case 253...0xffff:
             length = 2
             data = Data() + UInt8(0xfd).littleEndian + UInt16(value).littleEndian
-        case 0x10000...0xffffffff:
+        case 0x10000...0xffff_ffff:
             length = 4
             data = Data() + UInt8(0xfe).littleEndian + UInt32(value).littleEndian
-        case 0x100000000...0xffffffffffffffff:
+        case 0x1_0000_0000...0xffff_ffff_ffff_ffff:
             fallthrough
         default:
             length = 8

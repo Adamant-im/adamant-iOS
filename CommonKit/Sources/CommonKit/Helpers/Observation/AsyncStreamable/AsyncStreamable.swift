@@ -10,6 +10,6 @@ import Foundation
 public protocol AsyncStreamable<Element>: Sendable {
     associatedtype Element: Sendable
     associatedtype ProducedSequence: AsyncSequence & Sendable where ProducedSequence.Element == Element
-    
+
     func makeSequence() -> ProducedSequence
 }

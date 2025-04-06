@@ -13,17 +13,17 @@ import MessageKit
 final class ChatCellManager: MessageCellDelegate {
     private let viewModel: ChatViewModel
     var getMessageId: ((MessageCollectionViewCell) -> String?)?
-    
+
     init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
     }
-    
+
     nonisolated func didSelectURL(_ url: URL) {
         MainActor.assumeIsolatedSafe {
             viewModel.didSelectURL(url)
         }
     }
-    
+
     nonisolated func didTapMessage(in cell: MessageCollectionViewCell) {
         MainActor.assumeIsolatedSafe {
             guard
@@ -31,7 +31,7 @@ final class ChatCellManager: MessageCellDelegate {
                 let message = viewModel.messages.first(where: { $0.id == id }),
                 message.status == .failed
             else { return }
-            
+
             viewModel.dialog.send(.failedMessageAlert(id: id, sender: .view(cell)))
         }
     }

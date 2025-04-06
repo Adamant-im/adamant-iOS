@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import UIKit
 import Eureka
+import UIKit
 
 /// A decimal row without empty hint on MacOS
 final class SafeDecimalRow: _SafeDecimalRow, RowType {

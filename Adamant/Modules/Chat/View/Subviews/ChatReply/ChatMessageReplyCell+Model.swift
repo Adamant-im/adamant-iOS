@@ -21,7 +21,7 @@ extension ChatMessageReplyCell {
         let opponentAddress: String
         var isHidden: Bool
         var swipeState: ChatSwipeWrapperModel.State
-        
+
         static var `default`: Self {
             Self(
                 id: "",
@@ -37,7 +37,7 @@ extension ChatMessageReplyCell {
                 swipeState: .idle
             )
         }
-        
+
         func makeReplyContent() -> NSAttributedString {
             return message
         }
@@ -48,17 +48,17 @@ extension ChatMessageReplyCell.Model {
     @MainActor
     func contentHeight(for width: CGFloat) -> CGFloat {
         let maxSize = CGSize(width: width, height: .infinity)
-        
+
         let messageHeight = message.boundingRect(
             with: maxSize,
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
         ).height
-        
+
         return verticalInsets * 2
-        + verticalStackSpacing
-        + messageHeight
-        + ChatMessageReplyCell.replyViewHeight
+            + verticalStackSpacing
+            + messageHeight
+            + ChatMessageReplyCell.replyViewHeight
     }
 }
 

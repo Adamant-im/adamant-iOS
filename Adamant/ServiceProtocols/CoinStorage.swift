@@ -13,7 +13,7 @@ protocol CoinStorageService: AnyObject {
     var transactionsPublisher: any Observable<[TransactionDetails]> {
         get
     }
-    
+
     func append(_ transaction: TransactionDetails)
     func append(_ transactions: [TransactionDetails])
     func clear()

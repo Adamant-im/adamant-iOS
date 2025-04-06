@@ -6,21 +6,21 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 import Alamofire
+import Foundation
 
-public extension ApiCommands {
-    static let status = "/api/node/status"
-    static let version = "/api/peers/version"
+extension ApiCommands {
+    public static let status = "/api/node/status"
+    public static let version = "/api/peers/version"
 }
 
 public final class AdamantApiCore: Sendable {
     public let apiCore: APICoreProtocol
-    
+
     public init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
-    
+
     public func getNodeStatus(
         origin: NodeOrigin
     ) async -> ApiServiceResult<NodeStatus> {
@@ -38,7 +38,7 @@ extension AdamantApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
-        
+
         return statusResponse.map { statusDto in
             .init(
                 ping: ping,

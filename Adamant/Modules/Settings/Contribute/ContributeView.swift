@@ -6,12 +6,12 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct ContributeView: View {
     @StateObject private var viewModel: ContributeViewModel
-    
+
     var body: some View {
         List {
             Section(
@@ -25,7 +25,7 @@ struct ContributeView: View {
                 },
                 footer: { Text(viewModel.state.crashliticsRowDescription) }
             )
-            
+
             ForEach(viewModel.state.linkRows) {
                 makeLinkSection(row: $0)
             }
@@ -38,14 +38,14 @@ struct ContributeView: View {
             SafariWebView(url: $0.value).ignoresSafeArea()
         }
     }
-    
+
     init(viewModel: @escaping () -> ContributeViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
 }
 
-private extension ContributeView {
-    var crashliticsContent: some View {
+extension ContributeView {
+    fileprivate var crashliticsContent: some View {
         Toggle(isOn: $viewModel.state.isCrashlyticsOn) {
             HStack {
                 Image(uiImage: viewModel.state.crashliticsRowImage)
@@ -57,12 +57,12 @@ private extension ContributeView {
         }
         .tint(.init(uiColor: .adamant.active))
     }
-    
-    var crashButton: some View {
+
+    fileprivate var crashButton: some View {
         Button(viewModel.state.crashButtonTitle) { viewModel.simulateCrash() }
     }
-    
-    func makeLinkSection(row: ContributeState.LinkRow) -> some View {
+
+    fileprivate func makeLinkSection(row: ContributeState.LinkRow) -> some View {
         Section(
             content: {
                 NavigationButton(action: { viewModel.openLink(row: row) }) {

@@ -36,7 +36,7 @@ internal enum DataStoreKey: String {
     case wif, utxos, transactions
 }
 
-internal extension BitcoinKitDataStoreProtocol {
+extension BitcoinKitDataStoreProtocol {
     func getString(forKey key: DataStoreKey) -> String? {
         return getString(forKey: key.rawValue)
     }

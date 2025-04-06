@@ -23,7 +23,7 @@ public struct ERC20Token: Sendable {
     public let defaultGasLimit: Int
     public let warningGasPriceGwei: Int
     public let transferDecimals: Int
-    
+
     public var logo: UIImage {
         .asset(named: "\(symbol.lowercased())_wallet")
             ?? .asset(named: "ethereum_wallet")

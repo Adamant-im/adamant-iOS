@@ -8,13 +8,13 @@
 
 import Foundation
 
-public extension Encodable {
-    func asDictionary() -> [String: Any]? {
+extension Encodable {
+    public func asDictionary() -> [String: Any]? {
         guard
             let data = try? JSONEncoder().encode(self),
             let object = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
         else { return nil }
-        
+
         return object as? [String: Any]
     }
 }

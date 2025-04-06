@@ -12,7 +12,7 @@ import UIKit
 @MainActor
 struct AccountFactory {
     let assembler: Assembler
-    
+
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
         AccountViewController(
             walletStoreServiceProvider: assembler.resolve(WalletStoreServiceProviderProtocol.self)!,

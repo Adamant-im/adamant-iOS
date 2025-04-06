@@ -1,6 +1,6 @@
 //
 //  FileResult.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 06.03.2024.
 //
@@ -11,7 +11,7 @@ public enum FileType: Sendable {
     case image
     case video
     case other
-    
+
     public var isMedia: Bool {
         switch self {
         case .image, .video:
@@ -22,8 +22,8 @@ public enum FileType: Sendable {
     }
 }
 
-public extension FileType {
-    init?(mimeType: String) {
+extension FileType {
+    public init?(mimeType: String) {
         if mimeType.hasPrefix("image/") {
             self = .image
         } else if mimeType.hasPrefix("video/") {
@@ -32,8 +32,8 @@ public extension FileType {
             self = .other
         }
     }
-    
-    init?(raw: String) {
+
+    public init?(raw: String) {
         switch raw.uppercased() {
         case "JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2":
             self = .image
@@ -58,7 +58,7 @@ public struct FileResult: Sendable {
     public let data: Data?
     public let duration: Float64?
     public let mimeType: String?
-    
+
     public init(
         assetId: String? = nil,
         url: URL,
@@ -90,8 +90,8 @@ public struct FileResult: Sendable {
     }
 }
 
-public extension FileResult {
-    init(
+extension FileResult {
+    public init(
         assetId: String? = nil,
         url: URL,
         type: FileType,
@@ -107,11 +107,12 @@ public extension FileResult {
         mimeType: String? = nil
     ) {
         let nameWithExtension = namePossiblyWithExtension.separateFileExtension()
-        
-        let name = nameWithExtension.extension == extenstion
+
+        let name =
+            nameWithExtension.extension == extenstion
             ? nameWithExtension.name
             : namePossiblyWithExtension
-        
+
         self.init(
             assetId: assetId,
             url: url,

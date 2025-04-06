@@ -27,7 +27,7 @@ import Foundation
 public enum AddressType {
     case pubkeyHash
     case scriptHash
-    
+
     var versionByte: UInt8 {
         switch self {
         case .pubkeyHash:
@@ -36,7 +36,7 @@ public enum AddressType {
             return 8
         }
     }
-    
+
     var versionByte160: UInt8 { return versionByte + 0 }
     var versionByte192: UInt8 { return versionByte + 1 }
     var versionByte224: UInt8 { return versionByte + 2 }

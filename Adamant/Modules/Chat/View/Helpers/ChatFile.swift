@@ -12,7 +12,7 @@ import UIKit
 struct DownloadStatus: Hashable {
     var isPreviewDownloading: Bool
     var isOriginalDownloading: Bool
-    
+
     static let `default` = Self(
         isPreviewDownloading: false,
         isOriginalDownloading: false
@@ -30,17 +30,17 @@ struct ChatFile: Equatable, Hashable, @unchecked Sendable {
     var isFromCurrentSender: Bool
     var fileType: FileType
     var progress: Int?
-    
+
     var isBusy: Bool {
         isDownloading
-        || isUploading
+            || isUploading
     }
-    
+
     var isDownloading: Bool {
         downloadStatus.isOriginalDownloading
-        || downloadStatus.isPreviewDownloading
+            || downloadStatus.isPreviewDownloading
     }
-    
+
     static var `default`: Self {
         Self(
             file: .init([:]),

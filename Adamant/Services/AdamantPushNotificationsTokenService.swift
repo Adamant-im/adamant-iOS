@@ -6,43 +6,43 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService, @unchecked Sendable {
-    private let securedStore: SecuredStore
+    private let SecureStore: SecureStore
     private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
-    
+
     private let tokenProcessingQueue = DispatchQueue(label: "com.adamant.push-token-processing-queue")
     private let tokenProcessingSemaphore = DispatchSemaphore(value: 1)
-    private let securedStoreSemaphore = DispatchSemaphore(value: 1)
-    
+    private let SecureStoreSemaphore = DispatchSemaphore(value: 1)
+
     init(
-        securedStore: SecuredStore,
+        SecureStore: SecureStore,
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService
     ) {
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.accountService = accountService
     }
-    
+
     func setToken(_ token: Data) {
         tokenProcessingQueue.async { [weak self] in
             self?._setToken(token)
         }
     }
-    
+
     func removeCurrentToken() {
         tokenProcessingQueue.async { [weak self] in
             self?._removeCurrentToken()
         }
     }
-    
+
     func sendTokenDeletionTransactions() {
         for transaction in getTokenDeletionTransactions() {
             Task {
@@ -50,11 +50,12 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService,
                     path: ApiCommands.Chats.processTransaction,
                     transaction: transaction
                 )
-                
+
                 switch result {
                 case .success, .failure(.accountNotFound), .failure(.notLogged):
                     removeTokenDeletionTransaction(transaction)
-                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError), .failure(.noEndpointsAvailable):
+                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError),
+                    .failure(.noEndpointsAvailable):
                     break
                 }
             }
@@ -62,60 +63,60 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService,
     }
 }
 
-private extension AdamantPushNotificationsTokenService {
-    typealias EncodedPayload = (message: String, nonce: String)
-    
-    var ansProvider: ANSPayload.Provider {
+extension AdamantPushNotificationsTokenService {
+    fileprivate typealias EncodedPayload = (message: String, nonce: String)
+
+    fileprivate var ansProvider: ANSPayload.Provider {
         #if DEBUG
-        return .apnsSandbox
+            return .apnsSandbox
         #else
-        return .apns
+            return .apns
         #endif
     }
-    
-    func _setToken(_ token: Data) {
+
+    fileprivate func _setToken(_ token: Data) {
         tokenProcessingSemaphore.wait()
         guard let keypair = accountService.keypair else {
             assertionFailure("Trying to register with no user logged")
             tokenProcessingSemaphore.signal()
             return
         }
-        
+
         let token = mapToken(token)
         AdamantUtilities.consoleLog("APNS token:", token)
-        
+
         guard token != getToken() else {
             tokenProcessingSemaphore.signal()
             return
         }
-        
+
         updateCurrentToken(newToken: token, keypair: keypair) { [weak self] in
             self?.tokenProcessingSemaphore.signal()
         }
     }
-    
-    func _removeCurrentToken() {
+
+    fileprivate func _removeCurrentToken() {
         tokenProcessingSemaphore.wait()
         guard let keypair = accountService.keypair else {
             assertionFailure("Trying to unregister with no user logged")
             tokenProcessingSemaphore.signal()
             return
         }
-        
+
         removeCurrentToken(keypair: keypair) { [weak self] in
             self?.tokenProcessingSemaphore.signal()
         }
     }
-    
-    func mapToken(_ token: Data) -> String {
+
+    fileprivate func mapToken(_ token: Data) -> String {
         token.map { String(format: "%02.2hhx", $0) }.joined()
     }
-    
-    func updateCurrentToken(newToken: String, keypair: Keypair, completion: @escaping @Sendable () -> Void) {
+
+    fileprivate func updateCurrentToken(newToken: String, keypair: Keypair, completion: @escaping @Sendable () -> Void) {
         guard let encodedPayload = makeEncodedPayload(token: newToken, keypair: keypair, action: .add) else {
             return completion()
         }
-        
+
         removeCurrentToken(keypair: keypair) { [weak self] in
             self?.sendMessageToANS(
                 keypair: keypair,
@@ -127,8 +128,8 @@ private extension AdamantPushNotificationsTokenService {
             }
         }
     }
-    
-    func removeCurrentToken(keypair: Keypair, completion: @escaping @Sendable () -> Void) {
+
+    fileprivate func removeCurrentToken(keypair: Keypair, completion: @escaping @Sendable () -> Void) {
         guard
             let token = getToken(),
             let encodedPayload = makeEncodedPayload(
@@ -137,11 +138,11 @@ private extension AdamantPushNotificationsTokenService {
                 action: .remove
             )
         else { return completion() }
-        
+
         setTokenToStorage(nil)
-        
+
         let transaction = Atomic<UnregisteredTransaction?>(nil)
-        
+
         transaction.value = sendMessageToANS(
             keypair: keypair,
             encodedPayload: encodedPayload
@@ -151,14 +152,14 @@ private extension AdamantPushNotificationsTokenService {
             self.addTokenDeletionTransaction(transaction)
         }
     }
-    
-    func makeEncodedPayload(
+
+    fileprivate func makeEncodedPayload(
         token: String,
         keypair: Keypair,
         action: ANSPayload.Action
     ) -> EncodedPayload? {
         let payload = ANSPayload(token: token, provider: ansProvider, action: action)
-        
+
         guard
             let data = try? JSONEncoder().encode(payload),
             let payload = String(data: data, encoding: .utf8),
@@ -168,27 +169,29 @@ private extension AdamantPushNotificationsTokenService {
                 privateKey: keypair.privateKey
             )
         else { return nil }
-        
+
         return encodedPayload
     }
-    
+
     @discardableResult
-    func sendMessageToANS(
+    fileprivate func sendMessageToANS(
         keypair: Keypair,
         encodedPayload: EncodedPayload,
         completion: @escaping @Sendable (_ success: Bool) -> Void
     ) -> UnregisteredTransaction? {
-        guard let messageTransaction = try? adamantCore.makeSendMessageTransaction(
-            senderId: AdamantUtilities.generateAddress(publicKey: keypair.publicKey),
-            recipientId: AdamantResources.contacts.ansAddress,
-            keypair: keypair,
-            message: encodedPayload.message,
-            type: ChatType.signal,
-            nonce: encodedPayload.nonce,
-            amount: nil,
-            date: AdmWalletService.correctedDate
-        ) else { return nil }
-        
+        guard
+            let messageTransaction = try? adamantCore.makeSendMessageTransaction(
+                senderId: AdamantUtilities.generateAddress(publicKey: keypair.publicKey),
+                recipientId: AdamantResources.contacts.ansAddress,
+                keypair: keypair,
+                message: encodedPayload.message,
+                type: ChatType.signal,
+                nonce: encodedPayload.nonce,
+                amount: nil,
+                date: AdmWalletService.correctedDate
+            )
+        else { return nil }
+
         Task {
             switch await apiService.sendMessageTransaction(transaction: messageTransaction) {
             case .success:
@@ -197,48 +200,48 @@ private extension AdamantPushNotificationsTokenService {
                 completion(false)
             }
         }
-        
+
         return messageTransaction
     }
 }
 
-// MARK: - SecuredStore
+// MARK: - SecureStore
 
-private extension AdamantPushNotificationsTokenService {
-    func setTokenToStorage(_ token: String?) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
-        
+extension AdamantPushNotificationsTokenService {
+    fileprivate func setTokenToStorage(_ token: String?) {
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
+
         if let token = token {
-            securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
+            SecureStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
         } else {
-            securedStore.remove(StoreKey.PushNotificationsTokenService.token)
+            SecureStore.remove(StoreKey.PushNotificationsTokenService.token)
         }
     }
-    
-    func getToken() -> String? {
-        securedStore.get(StoreKey.PushNotificationsTokenService.token)
+
+    fileprivate func getToken() -> String? {
+        SecureStore.get(StoreKey.PushNotificationsTokenService.token)
     }
-    
-    func addTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
-        
+
+    fileprivate func addTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
+
         var transactions = getTokenDeletionTransactions()
         transactions.insert(transaction)
-        securedStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
+        SecureStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
     }
-    
-    func removeTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
-        
+
+    fileprivate func removeTokenDeletionTransaction(_ transaction: UnregisteredTransaction) {
+        SecureStoreSemaphore.wait()
+        defer { SecureStoreSemaphore.signal() }
+
         var transactions = getTokenDeletionTransactions()
         transactions.remove(transaction)
-        securedStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
+        SecureStore.set(transactions, for: StoreKey.PushNotificationsTokenService.tokenDeletionTransactions)
     }
-    
-    func getTokenDeletionTransactions() -> Set<UnregisteredTransaction> {
-        securedStore.get(StoreKey.PushNotificationsTokenService.tokenDeletionTransactions) ?? .init()
+
+    fileprivate func getTokenDeletionTransactions() -> Set<UnregisteredTransaction> {
+        SecureStore.get(StoreKey.PushNotificationsTokenService.tokenDeletionTransactions) ?? .init()
     }
 }

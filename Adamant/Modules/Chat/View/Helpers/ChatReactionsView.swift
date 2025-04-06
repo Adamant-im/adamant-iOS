@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
 import ElegantEmojiPicker
+import SwiftUI
 
 protocol ChatReactionsViewDelegate: AnyObject {
     func didSelectEmoji(_ emoji: String)
@@ -20,12 +20,12 @@ struct ChatReactionsView: View {
     private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌", "🤝"]
     private let selectedEmoji: String?
     private let messageId: String
-    
+
     var didSelectEmoji: ((_ emoji: String, _ messageId: String) -> Void)?
     var didSelectMore: (() -> Void)?
     
     @State private var isPlusHovered = false
-    
+
     init(
         emojis: [String]?,
         selectedEmoji: String?,
@@ -35,7 +35,7 @@ struct ChatReactionsView: View {
         self.selectedEmoji = selectedEmoji
         self.messageId = messageId
     }
-    
+
     var body: some View {
         HStack(spacing: 10) {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -52,7 +52,7 @@ struct ChatReactionsView: View {
                 }
             }
             .padding([.top, .bottom, .leading], 5)
-            
+
             Button {
                 didSelectMore?()
             } label: {
@@ -87,7 +87,7 @@ struct ChatReactionButton: View {
     let isSelected: Bool
     
     @State private var isHovered = false
-    
+
     var body: some View {
         Text(emoji)
             .font(.title)

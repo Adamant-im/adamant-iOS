@@ -6,10 +6,10 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
-import SwiftUI
 import AdvancedContextMenuKit
 import CommonKit
+import SwiftUI
+import UIKit
 
 @MainActor
 protocol ChatMenuManagerDelegate: AnyObject {
@@ -26,20 +26,20 @@ protocol ChatMenuManagerDelegate: AnyObject {
 @MainActor
 final class ChatMenuManager: NSObject {
     weak var delegate: ChatMenuManagerDelegate?
-    
+
     // MARK: Init
-    
+
     init(delegate: ChatMenuManagerDelegate?) {
         self.delegate = delegate
     }
-    
-    func setup(for contentView: UIView ) {
+
+    func setup(for contentView: UIView) {
         guard !isMacOS else {
             let interaction = UIContextMenuInteraction(delegate: self)
             contentView.addInteraction(interaction)
             return
         }
-        
+
         let longPressGesture = UILongPressGestureRecognizer(
             target: self,
             action: #selector(handleLongPress(_:))
@@ -47,18 +47,18 @@ final class ChatMenuManager: NSObject {
         longPressGesture.minimumPressDuration = 0.17
         contentView.addGestureRecognizer(longPressGesture)
     }
-    
+
     func presentMenuProgrammatically(for contentView: UIView) {
         let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-        
+
         let size = contentView.frame.size
-        
+
         let copyView = delegate?.getCopyView() ?? contentView
-        
+
         let getPositionOnScreen: () -> CGPoint = { [weak contentView] in
             contentView?.convert(CGPoint.zero, to: nil) ?? .zero
         }
-        
+
         delegate?.presentMenu(
             copyView: copyView,
             size: size,
@@ -70,24 +70,24 @@ final class ChatMenuManager: NSObject {
             getPositionOnScreen: getPositionOnScreen
         )
     }
-    
+
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         guard !isMacOS else { return }
-        
+
         guard gesture.state == .began,
-              let contentView = gesture.view
+            let contentView = gesture.view
         else { return }
-        
+
         let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-        
+
         let size = contentView.frame.size
-        
+
         let copyView = delegate?.getCopyView() ?? contentView
-        
+
         let getPositionOnScreen: () -> CGPoint = {
             contentView.convert(CGPoint.zero, to: nil)
         }
-        
+
         delegate?.presentMenu(
             copyView: copyView,
             size: size,
@@ -106,27 +106,27 @@ extension ChatMenuManager: UIContextMenuInteractionDelegate {
         presentMacOverlay(interaction, configurationForMenuAtLocation: location)
         return nil
     }
-    
+
     func presentMacOverlay(
         _ interaction: UIContextMenuInteraction,
         configurationForMenuAtLocation location: CGPoint
     ) {
         guard let contentView = interaction.view
         else { return }
-        
+
         let contentLocation = contentView.convert(CGPoint.zero, to: nil)
         let tapLocation: CGPoint = .init(
             x: contentLocation.x + location.x,
             y: contentLocation.y + location.y
         )
         let size = contentView.frame.size
-        
+
         let copyView = delegate?.getCopyView() ?? contentView
-        
+
         let getPositionOnScreen: () -> CGPoint = {
             contentView.convert(CGPoint.zero, to: nil)
         }
-        
+
         delegate?.presentMenu(
             copyView: copyView,
             size: size,

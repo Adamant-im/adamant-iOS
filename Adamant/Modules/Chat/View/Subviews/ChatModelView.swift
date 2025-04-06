@@ -6,10 +6,10 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import Combine
-import MessageKit
 import CommonKit
+import MessageKit
+import UIKit
 
 protocol ChatReusableViewModelProtocol: Equatable {
     static var `default`: Self { get }
@@ -17,7 +17,7 @@ protocol ChatReusableViewModelProtocol: Equatable {
 
 protocol ChatModelView: UIView, ReusableView {
     associatedtype Model: ChatReusableViewModelProtocol
-    
+
     var model: Model { get set }
     var actionHandler: (ChatAction) -> Void { get set }
     var subscription: AnyCancellable? { get set }
@@ -31,7 +31,7 @@ extension ChatModelView {
         subscription = publisher.sink { [weak self, weak collection] newModel in
             guard newModel != self?.model else { return }
             self?.model = newModel
-            
+
             collection?.collectionViewLayout.invalidateLayout()
         }
     }

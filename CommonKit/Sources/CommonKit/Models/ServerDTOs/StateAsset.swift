@@ -12,7 +12,7 @@ public struct StateAsset: Codable, Hashable, Sendable {
     public let key: String
     public let value: String
     public let type: StateType
-    
+
     public init(key: String, value: String, type: StateType) {
         self.key = key
         self.value = value

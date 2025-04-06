@@ -8,8 +8,8 @@
 
 import Foundation
 
-public extension TimeInterval {
-    init(milliseconds: Int) {
+extension TimeInterval {
+    public init(milliseconds: Int) {
         self.init(Double(milliseconds) / 1000)
     }
 }

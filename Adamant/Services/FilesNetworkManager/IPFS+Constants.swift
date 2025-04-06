@@ -6,14 +6,14 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension IPFSApiService {
     static var symbol: String {
         "IPFS"
     }
-    
+
     static var nodes: [Node] {
         [
             Node.makeDefaultNode(
@@ -30,7 +30,7 @@ extension IPFSApiService {
             )
         ]
     }
-    
+
     static let healthCheckParameters = BlockchainHealthCheckParams(
         group: .ipfs,
         name: symbol,

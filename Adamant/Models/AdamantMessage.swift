@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 /// Adamant message types
 ///
@@ -22,17 +22,17 @@ enum AdamantMessage: Sendable {
 // MARK: - Fee
 extension AdamantMessage {
     static private let textFee = Decimal(sign: .plus, exponent: -3, significand: 1)
-    
+
     var fee: Decimal {
         switch self {
         case .text(let message), .markdownText(let message):
             return AdamantMessage.feeFor(text: message)
-            
+
         case .richMessage(let payload):
             return AdamantMessage.feeFor(text: payload.serialized())
         }
     }
-    
+
     private static func feeFor(text: String) -> Decimal {
         return Decimal(ceil(Double(text.count) / 255.0)) * AdamantMessage.textFee
     }
@@ -44,7 +44,7 @@ extension AdamantMessage {
         switch self {
         case .text, .markdownText:
             return .message
-            
+
         case .richMessage:
             return .richMessage
         }

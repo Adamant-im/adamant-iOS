@@ -13,23 +13,23 @@ final class BlockchainsTokensViewController: UIViewController {
     private lazy var tableView: UITableView = .init(frame: view.bounds)
     private var coinsData: [CoinInfoDTO]
     private let dialogService: DialogService?
-    
+
     init(coinsData: [CoinInfoDTO], title: String, dialogService: DialogService?) {
         self.coinsData = coinsData.sorted(by: { $0.symbol < $1.symbol })
         self.dialogService = dialogService
         super.init(nibName: nil, bundle: nil)
         self.title = "Tokens in \(title)"
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
-    
+
     private func setupViews() {
         view.addSubview(tableView)
         view.backgroundColor = .white
@@ -44,7 +44,7 @@ extension BlockchainsTokensViewController: UITableViewDataSource, UITableViewDel
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         coinsData.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         var config = cell.defaultContentConfiguration()
@@ -52,7 +52,7 @@ extension BlockchainsTokensViewController: UITableViewDataSource, UITableViewDel
         cell.contentConfiguration = config
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let model = coinsData[indexPath.row]

@@ -6,21 +6,21 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct ContributeState {
     var isCrashlyticsOn: Bool
     var isCrashButtonOn: Bool
     var safariURL: IDWrapper<URL>?
-    
+
     let name: String
     let crashliticsRowImage: UIImage
     let crashliticsRowName: String
     let crashliticsRowDescription: String
     let crashButtonTitle: String
     let linkRows: [LinkRow]
-    
+
     static var initial: ContributeState {
         Self(
             isCrashlyticsOn: false,

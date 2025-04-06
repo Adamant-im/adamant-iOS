@@ -7,10 +7,10 @@
 
 import Alamofire
 
-public extension ApiServiceError {
-    init(error: Error) {
+extension ApiServiceError {
+    public init(error: Error) {
         let afError = error as? AFError
-        
+
         switch afError {
         case .explicitlyCancelled:
             self = .requestCancelled

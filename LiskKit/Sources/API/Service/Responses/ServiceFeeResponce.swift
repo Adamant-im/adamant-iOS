@@ -1,6 +1,6 @@
 //
 //  ServiceFeeResponse.swift
-//  
+//
 //
 //  Created by Anton Boyarkin on 20.08.2021.
 //

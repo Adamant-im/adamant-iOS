@@ -14,7 +14,7 @@ public enum ERC20TokenAssembly {
             erc20TokenWith(coinInfo: info)
         }
     }
-    
+
     private static func erc20TokenWith(coinInfo info: CoinInfoDTO) -> ERC20Token {
         ERC20Token(
             symbol: info.symbol,

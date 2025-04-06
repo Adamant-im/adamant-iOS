@@ -10,15 +10,15 @@ import Foundation
 
 final class TaskManager {
     private var tasks = Set<Task<Void, Never>>()
-    
+
     func insert(_ task: Task<(), Never>) {
         tasks.insert(task)
     }
-    
+
     func clean() {
         tasks.forEach { $0.cancel() }
     }
-    
+
     deinit {
         clean()
     }

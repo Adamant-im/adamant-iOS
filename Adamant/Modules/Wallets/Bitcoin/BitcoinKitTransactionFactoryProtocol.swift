@@ -8,6 +8,7 @@
 
 import BitcoinKit
 
+// sourcery: AutoMockable
 protocol BitcoinKitTransactionFactoryProtocol {
     func createTransaction(
         toAddress: Address,
@@ -17,5 +18,5 @@ protocol BitcoinKitTransactionFactoryProtocol {
         utxos: [UnspentTransaction],
         lockTime: UInt32,
         keys: [PrivateKey]
-    ) -> Transaction
+    ) -> BitcoinKit.Transaction
 }

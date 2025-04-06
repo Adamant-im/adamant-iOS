@@ -14,7 +14,7 @@ struct DogeNodeInfoDTO: Decodable {
         let protocolversion: Int
         let blocks: Int
     }
-    
+
     let info: Info
 }
 

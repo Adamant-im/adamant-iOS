@@ -6,12 +6,12 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension NodeCell {
     typealias NodeUpdateAction = (_ isEnabled: Bool) -> Void
-    
+
     struct Model: Equatable {
         let id: UUID
         let title: String
@@ -22,7 +22,7 @@ extension NodeCell {
         let statusColor: UIColor
         let isEnabled: Bool
         let nodeUpdateAction: IDWrapper<NodeUpdateAction>
-        
+
         static var `default`: Self {
             Self(
                 id: .init(),
