@@ -30,11 +30,12 @@ public extension PopupManager {
             self?.coordinatorModel.toastMessage = message
             self?.autoDismissManager.dismissToast()
         }
-        
-        public func dismissToast() {
-            coordinatorModel.toastMessage = nil
-        }
     }
+    
+    func dismissToast() {
+        coordinatorModel.toastMessage = nil
+    }
+}
 
 // MARK: - Alert
 
