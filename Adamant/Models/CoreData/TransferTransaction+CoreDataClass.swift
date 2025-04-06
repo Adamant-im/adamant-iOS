@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(TransferTransaction)
 public class TransferTransaction: ChatTransaction, @unchecked Sendable {

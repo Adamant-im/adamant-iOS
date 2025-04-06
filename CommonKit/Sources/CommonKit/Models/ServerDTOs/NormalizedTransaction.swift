@@ -19,8 +19,8 @@ public struct NormalizedTransaction: SignableTransaction {
     public let asset: TransactionAsset
 }
 
-public extension NormalizedTransaction {
-    init(
+extension NormalizedTransaction {
+    public init(
         type: TransactionType,
         amount: Decimal,
         senderPublicKey: String,
@@ -37,8 +37,8 @@ public extension NormalizedTransaction {
         self.recipientId = recipientId
         self.asset = asset
     }
-    
-    var date: Date {
+
+    public var date: Date {
         return AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
 }
@@ -53,17 +53,17 @@ extension NormalizedTransaction: Decodable {
         case recipientId
         case asset
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.type = try container.decode(TransactionType.self, forKey: .type)
         self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
         self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
         self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.recipientId = try container.decode(String.self, forKey: .recipientId)
         self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
-        
+
         let amount = try container.decode(Decimal.self, forKey: .amount)
         self.amount = amount.shiftedFromAdamant()
     }

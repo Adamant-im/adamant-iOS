@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct TransactionStatusInfo {
     let sentDate: Date?

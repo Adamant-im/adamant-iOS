@@ -10,11 +10,11 @@ import Foundation
 
 public struct ComparableAttributedString: Equatable, @unchecked Sendable {
     public let string: NSAttributedString
-    
+
     public init(string: NSAttributedString) {
         self.string = string
     }
-    
+
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.string.hash == rhs.string.hash else { return false }
         return lhs.string.string == rhs.string.string

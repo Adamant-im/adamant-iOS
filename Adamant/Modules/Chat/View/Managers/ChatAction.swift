@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
@@ -15,7 +15,7 @@ enum ChatAction {
     case reply(id: String)
     case scrollTo(message: ChatMessageReplyCell.Model)
     case copy(text: String)
-    case copyInPart(text:String)
+    case copyInPart(text: String)
     case report(id: String)
     case remove(id: String)
     case react(id: String, emoji: String)

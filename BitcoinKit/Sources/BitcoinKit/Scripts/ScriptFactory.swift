@@ -37,25 +37,25 @@ public struct ScriptFactory {
 }
 
 // MARK: - Standard
-public extension ScriptFactory.Standard {
-    static func buildP2PK(publickey: PublicKey) -> Script? {
+extension ScriptFactory.Standard {
+    public static func buildP2PK(publickey: PublicKey) -> Script? {
         return try? Script()
             .appendData(publickey.data)
             .append(.OP_CHECKSIG)
     }
 
-    static func buildMultiSig(publicKeys: [PublicKey]) -> Script? {
+    public static func buildMultiSig(publicKeys: [PublicKey]) -> Script? {
         return Script(publicKeys: publicKeys, signaturesRequired: UInt(publicKeys.count))
     }
-    static func buildMultiSig(publicKeys: [PublicKey], signaturesRequired: UInt) -> Script? {
+    public static func buildMultiSig(publicKeys: [PublicKey], signaturesRequired: UInt) -> Script? {
         return Script(publicKeys: publicKeys, signaturesRequired: signaturesRequired)
     }
 }
 
 // MARK: - LockTime
-public extension ScriptFactory.LockTime {
+extension ScriptFactory.LockTime {
     // Base
-    static func build(script: Script, lockDate: Date) -> Script? {
+    public static func build(script: Script, lockDate: Date) -> Script? {
         return try? Script()
             .appendData(lockDate.bigNumData)
             .append(.OP_CHECKLOCKTIMEVERIFY)
@@ -63,15 +63,15 @@ public extension ScriptFactory.LockTime {
             .appendScript(script)
     }
 
-    static func build(script: Script, lockIntervalSinceNow: TimeInterval) -> Script? {
+    public static func build(script: Script, lockIntervalSinceNow: TimeInterval) -> Script? {
         let lockDate = Date(timeIntervalSinceNow: lockIntervalSinceNow)
         return build(script: script, lockDate: lockDate)
     }
 }
 
 // MARK: - OpReturn
-public extension ScriptFactory.OpReturn {
-    static func build(text: String) -> Script? {
+extension ScriptFactory.OpReturn {
+    public static func build(text: String) -> Script? {
         let MAX_OP_RETURN_DATA_SIZE: Int = 220
         guard let data = text.data(using: .utf8), data.count <= MAX_OP_RETURN_DATA_SIZE else {
             return nil
@@ -83,8 +83,8 @@ public extension ScriptFactory.OpReturn {
 }
 
 // MARK: - Condition
-public extension ScriptFactory.Condition {
-    static func build(scripts: [Script]) -> Script? {
+extension ScriptFactory.Condition {
+    public static func build(scripts: [Script]) -> Script? {
 
         guard !scripts.isEmpty else {
             return nil
@@ -134,46 +134,46 @@ public extension ScriptFactory.Condition {
  OP_EQUALVERIFYs
  OP_CHECKSIG
 */
-public extension ScriptFactory.HashedTimeLockedContract {
+extension ScriptFactory.HashedTimeLockedContract {
     // Base
-    static func build(recipient: Address, sender: Address, lockDate: Date, hash: Data, hashOp: HashOperator) -> Script? {
+    public static func build(recipient: Address, sender: Address, lockDate: Date, hash: Data, hashOp: HashOperator) -> Script? {
         guard hash.count == hashOp.hashSize else {
             return nil
         }
 
         return try? Script()
             .append(.OP_IF)
-                .append(hashOp.opcode)
-                .appendData(hash)
-                .append(.OP_EQUALVERIFY)
-                .append(.OP_DUP)
-                .append(.OP_HASH160)
-                .appendData(recipient.lockingScriptPayload)
+            .append(hashOp.opcode)
+            .appendData(hash)
+            .append(.OP_EQUALVERIFY)
+            .append(.OP_DUP)
+            .append(.OP_HASH160)
+            .appendData(recipient.lockingScriptPayload)
             .append(.OP_ELSE)
-                .appendData(lockDate.bigNumData)
-                .append(.OP_CHECKLOCKTIMEVERIFY)
-                .append(.OP_DROP)
-                .append(.OP_DUP)
-                .append(.OP_HASH160)
-                .appendData(sender.lockingScriptPayload)
+            .appendData(lockDate.bigNumData)
+            .append(.OP_CHECKLOCKTIMEVERIFY)
+            .append(.OP_DROP)
+            .append(.OP_DUP)
+            .append(.OP_HASH160)
+            .appendData(sender.lockingScriptPayload)
             .append(.OP_ENDIF)
             .append(.OP_EQUALVERIFY)
             .append(.OP_CHECKSIG)
     }
 
     // convenience
-    static func build(recipient: Address, sender: Address, lockIntervalSinceNow: TimeInterval, hash: Data, hashOp: HashOperator) -> Script? {
+    public static func build(recipient: Address, sender: Address, lockIntervalSinceNow: TimeInterval, hash: Data, hashOp: HashOperator) -> Script? {
         let lockDate = Date(timeIntervalSinceNow: lockIntervalSinceNow)
         return build(recipient: recipient, sender: sender, lockDate: lockDate, hash: hash, hashOp: hashOp)
     }
 
-    static func build(recipient: Address, sender: Address, lockIntervalSinceNow: TimeInterval, secret: Data, hashOp: HashOperator) -> Script? {
+    public static func build(recipient: Address, sender: Address, lockIntervalSinceNow: TimeInterval, secret: Data, hashOp: HashOperator) -> Script? {
         let hash = hashOp.hash(secret)
         let lockDate = Date(timeIntervalSinceNow: lockIntervalSinceNow)
         return build(recipient: recipient, sender: sender, lockDate: lockDate, hash: hash, hashOp: hashOp)
     }
 
-    static func build(recipient: Address, sender: Address, lockDate: Date, secret: Data, hashOp: HashOperator) -> Script? {
+    public static func build(recipient: Address, sender: Address, lockDate: Date, secret: Data, hashOp: HashOperator) -> Script? {
         let hash = hashOp.hash(secret)
         return build(recipient: recipient, sender: sender, lockDate: lockDate, hash: hash, hashOp: hashOp)
     }
@@ -209,8 +209,8 @@ final public class HashOperatorHash160: HashOperator {
 }
 
 // MARK: - Utility Extension
-private extension Date {
-    var bigNumData: Data {
+extension Date {
+    fileprivate var bigNumData: Data {
         let dateUnix: TimeInterval = timeIntervalSince1970
         let bn = BigNumber(Int32(dateUnix).littleEndian)
         return bn.data

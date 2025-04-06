@@ -1,0 +1,20 @@
+sources:
+  - ./Adamant/
+  - ./CommonKit/
+  - ./BitcoinKit/
+templates:
+  - ./Templates/sourcery/Mock.swifttemplate
+output:
+  path: ./AdamantTests/Stubs/Generated/
+args:
+  import:
+    - CommonKit
+    - CoreData
+    - XCTest
+    - Alamofire
+    - BitcoinKit
+    - LiskKit
+  testable:
+    - Adamant
+    - SwiftyMocky
+    - SwiftyMockyXCTest

@@ -11,7 +11,7 @@ import Foundation
 struct DashErrorDTO: Codable, LocalizedError {
     let code: Int
     let message: String
-    
+
     var errorDescription: String? {
         message
     }

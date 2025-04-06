@@ -6,15 +6,15 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 protocol FileApiServiceProtocol: ApiServiceProtocol {
     func uploadFile(
         data: Data,
         uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<String>
-    
+
     func downloadFile(
         id: String,
         downloadProgress: @escaping @Sendable (Progress) -> Void

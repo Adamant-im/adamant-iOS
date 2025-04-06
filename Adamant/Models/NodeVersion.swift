@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct NodeVersion: Codable {
     let success: Bool
@@ -15,7 +15,7 @@ struct NodeVersion: Codable {
     let commit: String
     let version: String
     let nodeTimestamp: TimeInterval
-    
+
     var nodeDate: Date {
         return AdamantUtilities.decodeAdamant(timestamp: nodeTimestamp)
     }

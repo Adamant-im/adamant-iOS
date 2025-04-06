@@ -82,6 +82,18 @@ public struct MerkleBlockMessage {
         for _ in 0..<numberOfFlags.underlyingValue {
             flags.append(byteStream.read(UInt8.self))
         }
-        return MerkleBlockMessage(version: version, prevBlock: prevBlock, merkleRoot: merkleRoot, timestamp: timestamp, bits: bits, nonce: nonce, totalTransactions: totalTransactions, numberOfHashes: numberOfHashes, hashes: hashes, numberOfFlags: numberOfFlags, flags: flags)
+        return MerkleBlockMessage(
+            version: version,
+            prevBlock: prevBlock,
+            merkleRoot: merkleRoot,
+            timestamp: timestamp,
+            bits: bits,
+            nonce: nonce,
+            totalTransactions: totalTransactions,
+            numberOfHashes: numberOfHashes,
+            hashes: hashes,
+            numberOfFlags: numberOfFlags,
+            flags: flags
+        )
     }
 }

@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 // MARK: - Notifications
 
@@ -21,7 +21,7 @@ extension Notification.Name {
 
 protocol SocketService: AnyObject, Sendable {
     var currentNode: Node? { get }
-    
+
     func connect(address: String, handler: @escaping @Sendable (ApiServiceResult<Transaction>) -> Void)
     func disconnect()
 }

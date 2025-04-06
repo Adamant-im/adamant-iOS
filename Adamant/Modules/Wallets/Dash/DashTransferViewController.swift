@@ -6,17 +6,18 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import Eureka
 import BitcoinKit
 import CommonKit
+import Eureka
+import UIKit
 
 extension String.adamant.transfer {
-    static var minAmountError: String { String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    static var minAmountError: String {
+        String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
     }
     static func pendingTxError(coin: String) -> String {
         let localizedString = String(
-            format: .localized("TransferScene.Error.Pending.Tx", comment: "Have a pending coin tx"), 
+            format: .localized("TransferScene.Error.Pending.Tx", comment: "Have a pending coin tx"),
             coin
         )
         return localizedString
@@ -24,9 +25,9 @@ extension String.adamant.transfer {
 }
 
 final class DashTransferViewController: TransferViewControllerBase {
-    
+
     // MARK: Send
-    
+
     @MainActor
     override func sendFunds() {
         let comments: String
@@ -35,14 +36,14 @@ final class DashTransferViewController: TransferViewControllerBase {
         } else {
             comments = ""
         }
-        
+
         guard let service = walletCore as? DashWalletService,
-              let recipient = recipientAddress,
-              let amount = amount
+            let recipient = recipientAddress,
+            let amount = amount
         else {
             return
         }
-        
+
         guard amount >= 0.00001 else {
             dialogService.showAlert(
                 title: nil,
@@ -53,13 +54,13 @@ final class DashTransferViewController: TransferViewControllerBase {
             )
             return
         }
-        
+
         guard let wallet = service.wallet else {
             return
         }
-        
+
         dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
+
         Task {
             do {
                 // Create transaction
@@ -69,15 +70,16 @@ final class DashTransferViewController: TransferViewControllerBase {
                     fee: transactionFee,
                     comment: nil
                 )
-                
+
                 if await !doesNotContainSendingTx() {
                     presentSendingError()
                     return
                 }
-                
+
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
-                   let hash = transaction.txHash {
+                    let hash = transaction.txHash
+                {
                     try await reportTransferTo(
                         admAddress: reportRecipient,
                         amount: amount,
@@ -85,7 +87,7 @@ final class DashTransferViewController: TransferViewControllerBase {
                         hash: hash
                     )
                 }
-                
+
                 do {
                     let simpleTransaction = SimpleTransactionDetails(
                         txId: transaction.txID,
@@ -99,7 +101,7 @@ final class DashTransferViewController: TransferViewControllerBase {
                         transactionStatus: nil,
                         nonceRaw: nil
                     )
-                    
+
                     service.coinStorage.append(simpleTransaction)
                     try await service.sendTransaction(transaction)
                 } catch {
@@ -107,17 +109,17 @@ final class DashTransferViewController: TransferViewControllerBase {
                         for: transaction.txId,
                         status: .failed
                     )
-                    
+
                     throw error
                 }
-                
+
                 Task {
                     await service.update()
                 }
-                
+
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
-                
+
                 // Present detail VC
                 presentDetailTransactionVC(
                     transaction: transaction,
@@ -130,7 +132,7 @@ final class DashTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     private func presentDetailTransactionVC(
         transaction: BitcoinKit.Transaction,
         comments: String,
@@ -140,20 +142,20 @@ final class DashTransferViewController: TransferViewControllerBase {
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
-        
+
         if comments.count > 0 {
             detailsVc.comment = comments
         }
-        
+
         delegate?.transferViewController(
             self,
             didFinishWithTransfer: transaction,
             detailsViewController: detailsVc
         )
     }
-    
+
     // MARK: Overrides
-    
+
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
@@ -161,11 +163,11 @@ final class DashTransferViewController: TransferViewControllerBase {
             $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
-            
+
             $0.value = recipientAddress?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
@@ -178,15 +180,15 @@ final class DashTransferViewController: TransferViewControllerBase {
             row.cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
-        
+
         return row
     }
-    
+
     override func defaultSceneTitle() -> String? {
         return String.adamant.sendDash
     }

@@ -7,10 +7,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public struct BigNumber {
@@ -51,8 +52,8 @@ extension BigNumber: Comparable {
     }
 }
 
-private extension Int32 {
-    func toBigNum() -> Data {
+extension Int32 {
+    fileprivate func toBigNum() -> Data {
         let isNegative: Bool = self < 0
         var value: UInt32 = isNegative ? UInt32(-self) : UInt32(self)
 
@@ -80,8 +81,8 @@ private extension Int32 {
     }
 }
 
-private extension Data {
-    func toInt32() -> Int32 {
+extension Data {
+    fileprivate func toInt32() -> Int32 {
         guard !self.isEmpty else {
             return 0
         }
@@ -100,6 +101,6 @@ private extension Data {
         bytes.append(last)
 
         let value: Int32 = Data(bytes).to(type: Int32.self)
-        return isNegative ? -value: value
+        return isNegative ? -value : value
     }
 }

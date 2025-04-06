@@ -7,24 +7,24 @@
 
 import Foundation
 
-public extension TransactionEntity {
-    var id: String {
+extension TransactionEntity {
+    public var id: String {
         getTxID() ?? ""
     }
-    
-    var recipientAddressBase32: String {
+
+    public var recipientAddressBase32: String {
         let bytes = [UInt8](params.recipientAddressBinary)
         let binary = bytes.hexString()
         return Crypto.getBase32Address(binaryAddress: binary)
     }
-    
-    var senderAddress: String {
+
+    public var senderAddress: String {
         let bytes = [UInt8](senderPublicKey)
         let senderPublicKey = bytes.hexString()
         return Crypto.getBase32Address(from: senderPublicKey)
     }
-    
-    func createTx(
+
+    public func createTx(
         amount: Decimal,
         fee: Decimal,
         nonce: UInt64,
@@ -34,7 +34,7 @@ public extension TransactionEntity {
     ) -> TransactionEntity {
         let amount = Crypto.fixedPoint(amount: amount)
         let fee = Crypto.fixedPoint(amount: fee)
-        
+
         return TransactionEntity.with {
             $0.command = Constants.command
             $0.module = Constants.module
@@ -50,10 +50,10 @@ public extension TransactionEntity {
             $0.signatures = []
         }
     }
-    
-    func sign(with keyPair: KeyPair, for chainID: String) -> TransactionEntity {
+
+    public func sign(with keyPair: KeyPair, for chainID: String) -> TransactionEntity {
         let signature = signature(with: keyPair, for: chainID)
-        
+
         return TransactionEntity.with {
             $0.command = command
             $0.module = module
@@ -64,41 +64,42 @@ public extension TransactionEntity {
             $0.signatures = [Data(signature.allHexBytes())]
         }
     }
-    
-    func getTxHash() -> String? {
+
+    public func getTxHash() -> String? {
         let bytes = try? serializedData()
         return bytes?.hexString()
     }
-    
-    func getTxID() -> String? {
+
+    public func getTxID() -> String? {
         let bytes = try? serializedData()
         return bytes?.sha256().hexString()
     }
-    
-    func getFee(with minFeePerByte: UInt64) -> UInt64 {
+
+    public func getFee(with minFeePerByte: UInt64) -> UInt64 {
         let bytesCount = (try? serializedData().count) ?? .zero
         return UInt64(bytesCount) * minFeePerByte
     }
 }
 
-private extension TransactionEntity {
-    func signature(with keyPair: KeyPair, for chainID: String) -> String {
+extension TransactionEntity {
+    fileprivate func signature(with keyPair: KeyPair, for chainID: String) -> String {
         let unsignedBytes = (try? serializedData()) ?? Data()
-        
+
         guard !unsignedBytes.isEmpty else {
             return ""
         }
-        
+
         let tagBytes: [UInt8] = Array("KLY_TX_".utf8)
         let chainBytes: [UInt8] = chainID.allHexBytes()
-        let allBytes = tagBytes
-        + chainBytes
-        + unsignedBytes
-              
+        let allBytes =
+            tagBytes
+            + chainBytes
+            + unsignedBytes
+
         let sha = allBytes.sha256()
         let signBytes = Ed25519.sign(message: sha, privateKey: keyPair.privateKey)
         let sign = signBytes.hexString()
-        
+
         return sign
     }
 }

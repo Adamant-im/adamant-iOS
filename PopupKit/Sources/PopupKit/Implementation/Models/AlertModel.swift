@@ -1,6 +1,6 @@
 //
 //  AlertModel.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //

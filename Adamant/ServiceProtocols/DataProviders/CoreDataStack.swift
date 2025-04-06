@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 protocol CoreDataStack: Sendable {
     var container: NSPersistentContainer { get }

@@ -20,9 +20,9 @@ public final class Delegate: Decodable, @unchecked Sendable {
     public let rank: Int
     public let approval: Double
     public let productivity: Double
-    
+
     @Atomic public var voted: Bool = false
-    
+
     public enum CodingKeys: String, CodingKey {
         case username
         case address
@@ -36,7 +36,7 @@ public final class Delegate: Decodable, @unchecked Sendable {
         case approval
         case productivity
     }
-    
+
     public init(
         username: String,
         address: String,
@@ -79,29 +79,29 @@ public struct DelegateForgeDetails: Decodable, Sendable {
     public let fees: Decimal
     public let rewards: Decimal
     public let forged: Decimal
-    
+
     public enum CodingKeys: String, CodingKey {
         case nodeTimestamp
         case fees
         case rewards
         case forged
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         let feesStr = try container.decode(String.self, forKey: .fees)
         let fees = Decimal(string: feesStr) ?? 0
         self.fees = fees.shiftedFromAdamant()
-        
+
         let rewardsStr = try container.decode(String.self, forKey: .forged)
         let rewards = Decimal(string: rewardsStr) ?? 0
         self.rewards = rewards.shiftedFromAdamant()
-        
+
         let forgedStr = try container.decode(String.self, forKey: .forged)
         let forged = Decimal(string: forgedStr) ?? 0
         self.forged = forged.shiftedFromAdamant()
-        
+
         let timestamp = try container.decode(UInt64.self, forKey: .nodeTimestamp)
         self.nodeTimestamp = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
@@ -118,7 +118,7 @@ public struct NextForgersResult: Decodable, Sendable {
     public let currentBlockSlot: UInt64
     public let currentSlot: UInt64
     public let delegates: [String]
-    
+
     public enum CodingKeys: String, CodingKey {
         case nodeTimestamp
         case currentBlock
@@ -126,15 +126,15 @@ public struct NextForgersResult: Decodable, Sendable {
         case currentSlot
         case delegates
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.currentBlock = try container.decode(UInt64.self, forKey: .currentBlock)
         self.currentBlockSlot = try container.decode(UInt64.self, forKey: .currentBlockSlot)
         self.currentSlot = try container.decode(UInt64.self, forKey: .currentSlot)
         self.delegates = try container.decode([String].self, forKey: .delegates)
-        
+
         let timestamp = try container.decode(UInt64.self, forKey: .nodeTimestamp)
         self.nodeTimestamp = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
     }
@@ -145,7 +145,7 @@ public struct Block: Decodable {
     public let version: UInt
     public let timestamp: UInt64
     public let height: UInt64
-    public let previousBlock:String
+    public let previousBlock: String
     public let numberOfTransactions: UInt
     public let totalAmount: UInt
     public let totalFee: UInt

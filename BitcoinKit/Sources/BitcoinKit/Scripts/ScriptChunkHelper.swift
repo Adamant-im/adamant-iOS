@@ -44,7 +44,7 @@ public struct ScriptChunkHelper {
         } else if data.count <= (0xffff) && (preferredLengthEncoding == -1 || preferredLengthEncoding == 2) {
             scriptData += OpCode.OP_PUSHDATA2
             scriptData += UInt16(data.count)
-        } else if UInt64(data.count) <= 0xffffffff && (preferredLengthEncoding == -1 || preferredLengthEncoding == 4) {
+        } else if UInt64(data.count) <= 0xffff_ffff && (preferredLengthEncoding == -1 || preferredLengthEncoding == 4) {
             scriptData += OpCode.OP_PUSHDATA4
             scriptData += UInt64(data.count)
         } else {
@@ -109,7 +109,7 @@ public struct ScriptChunkHelper {
             _ = scriptData.withUnsafeBytes {
                 memcpy(&dataLength, $0 + offset + MemoryLayout.size(ofValue: opcode), MemoryLayout.size(ofValue: dataLength))
             }
-            dataLength = CFSwapInt32LittleToHost(dataLength) // CoreBitcoin uses CFSwapInt16LittleToHost(dataLength)
+            dataLength = CFSwapInt32LittleToHost(dataLength)  // CoreBitcoin uses CFSwapInt16LittleToHost(dataLength)
             chunkLength = MemoryLayout.size(ofValue: opcode) + MemoryLayout.size(ofValue: dataLength) + Int(dataLength)
         default:
             // cannot happen because it's opcode

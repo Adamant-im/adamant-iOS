@@ -6,19 +6,25 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension String.adamant {
     struct dogeTransaction {
         static func recipients(_ recipients: Int) -> String {
-            return String.localizedStringWithFormat(.localized("Doge.TransactionDetails.RecipientsFormat", comment: "DogeTransaction: amount of recipients, if more than one."), recipients)
+            return String.localizedStringWithFormat(
+                .localized("Doge.TransactionDetails.RecipientsFormat", comment: "DogeTransaction: amount of recipients, if more than one."),
+                recipients
+            )
         }
-        
+
         static func senders(_ senders: Int) -> String {
-            return String.localizedStringWithFormat(.localized("Doge.TransactionDetails.SendersFormat", comment: "DogeTransaction: amount of senders, if more than one."), senders)
+            return String.localizedStringWithFormat(
+                .localized("Doge.TransactionDetails.SendersFormat", comment: "DogeTransaction: amount of senders, if more than one."),
+                senders
+            )
         }
-        
+
         private init() {}
     }
 }
@@ -47,7 +53,7 @@ final class DogeTransaction: BaseBtcTransaction {
     "fees": 1,
     "firstSeenTs": 1554298214
 }
- 
+
 new transaction:
 {
     "txid": "60cd612335c9797ea67689b9cde4a41e20c20c1b96eb0731c59c5b0eab8bad31",
@@ -60,11 +66,11 @@ new transaction:
     "valueIn": 284,
     "fees": 1
 }
- 
+
 */
 
 /* Inputs
- 
+
 {
     "txid": "3f4fa05bef67b1aacc0392fd5c3be3f94c991394166bc12ca73df28b63fe0aab",
     "vout": 0,

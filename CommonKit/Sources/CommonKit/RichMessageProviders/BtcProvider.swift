@@ -12,15 +12,15 @@ public final class BtcProvider: TransferBaseProvider {
     public override class var richMessageType: String {
         return "btc_transaction"
     }
-    
+
     public override var currencyLogoUrl: URL? {
         return Bundle.main.url(forResource: "btc_notificationContent", withExtension: "png")
     }
-    
+
     public override var currencySymbol: String {
         return "BTC"
     }
-    
+
     public override var currencyLogoLarge: UIImage {
         return .asset(named: "bitcoin_notification") ?? .init()
     }

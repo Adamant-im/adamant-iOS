@@ -10,38 +10,38 @@ import Foundation
 
 struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
     var defaultCurrencySymbol: String?
-    
+
     var txId: String
-    
+
     var senderAddress: String
-    
+
     var recipientAddress: String
-    
+
     var dateValue: Date?
-    
+
     var amountValue: Decimal?
-    
+
     var feeValue: Decimal?
-    
+
     var confirmationsValue: String?
-    
+
     var blockValue: String?
-    
+
     var isOutgoing: Bool
-    
+
     var transactionStatus: TransactionStatus?
-    
+
     var blockHeight: UInt64? {
         return nil
     }
-    
+
     var partnerName: String?
     var comment: String?
     var showToChat: Bool?
     var chatRoom: Chatroom?
-    
+
     var nonceRaw: String?
-    
+
     init(
         defaultCurrencySymbol: String? = nil,
         txId: String,
@@ -71,7 +71,7 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
         self.partnerName = partnerName
         self.nonceRaw = nonceRaw
     }
-    
+
     init(_ transaction: TransactionDetails) {
         self.defaultCurrencySymbol = transaction.defaultCurrencySymbol
         self.txId = transaction.txId
@@ -86,7 +86,7 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
         self.transactionStatus = transaction.transactionStatus
         self.nonceRaw = transaction.nonceRaw
     }
-    
+
     init(_ transaction: TransferTransaction) {
         self.defaultCurrencySymbol = transaction.defaultCurrencySymbol
         self.txId = transaction.txId

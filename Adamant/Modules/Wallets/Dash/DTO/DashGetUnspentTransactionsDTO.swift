@@ -11,7 +11,7 @@ import Foundation
 struct DashGetUnspentTransactionDTO: Codable {
     let method: String
     let params: [String]
-    
+
     init(address: String) {
         self.method = "getaddressutxos"
         self.params = [address]

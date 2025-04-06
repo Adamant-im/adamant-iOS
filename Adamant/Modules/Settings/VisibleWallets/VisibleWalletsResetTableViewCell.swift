@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 final class VisibleWalletsResetTableViewCell: UITableViewCell {
 
@@ -17,17 +17,17 @@ final class VisibleWalletsResetTableViewCell: UITableViewCell {
         label.text = .adamant.visibleWallets.reset
         return label
     }()
-    
+
     required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
     }
-    
+
     func setupView() {
         contentView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints {

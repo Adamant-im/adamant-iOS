@@ -15,7 +15,7 @@ public struct NotificationContent {
     public let body: String
     public let attachments: [UNNotificationAttachment]?
     public let categoryIdentifier: String?
-    
+
     public init(
         title: String,
         subtitle: String?,

@@ -12,12 +12,12 @@ public protocol StreamSendableActor: Actor {
     nonisolated var streamSender: AsyncStreamSender<@Sendable (isolated Self) -> Void> { get }
 }
 
-public extension StreamSendableActor {
-    nonisolated func task(_ action: @escaping @Sendable (isolated Self) -> Void) {
+extension StreamSendableActor {
+    public nonisolated func task(_ action: @escaping @Sendable (isolated Self) -> Void) {
         streamSender.send(action)
     }
-    
-    func configureStream() {
+
+    public func configureStream() {
         streamSubscription = Task { [weak self, streamSender] in
             for await action in streamSender.stream {
                 guard let self else { return }

@@ -13,15 +13,15 @@ final class ChatRefreshMock: UIRefreshControl {
         super.init()
         configure()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
     }
 }
 
-private extension ChatRefreshMock {
-    func configure() {
+extension ChatRefreshMock {
+    fileprivate func configure() {
         tintColor = .clear
         addTarget(self, action: #selector(endRefreshing), for: .valueChanged)
     }

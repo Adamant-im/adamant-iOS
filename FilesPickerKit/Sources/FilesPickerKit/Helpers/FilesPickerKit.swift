@@ -1,88 +1,89 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-import CommonKit
-import UIKit
-import SwiftUI
 import AVFoundation
-import QuickLook
+import CommonKit
 import FilesStorageKit
+import QuickLook
+import SwiftUI
+import UIKit
 
 public final class FilesPickerKit: FilesPickerProtocol {
     private let storageKit: FilesStorageProtocol
     public var previewExtension: String { "jpeg" }
-    
+
     public init(storageKit: FilesStorageProtocol) {
         self.storageKit = storageKit
     }
-    
+
     public func getFileSize(from url: URL) throws -> Int64 {
         try storageKit.getFileSize(from: url).get()
     }
-    
+
     public func getUrl(for image: UIImage?, name: String) throws -> URL {
         try storageKit.getTempUrl(for: image, name: name)
     }
-    
+
     public func validateFiles(_ files: [FileResult]) throws {
         guard files.count <= FilesConstants.maxFilesCount else {
             throw FileValidationError.tooManyFiles
         }
-        
+
         for file in files {
             guard file.size <= FilesConstants.maxFileSize else {
                 throw FileValidationError.fileSizeExceedsLimit
             }
         }
     }
-    
+
     public func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
         let newSize = getPreviewSize(
             from: image.size,
             previewSize: FilesConstants.previewSize
         )
-        
+
         return image.imageResized(to: newSize)
     }
-    
+
     public func getOriginalSize(for url: URL) -> CGSize? {
-        guard let track = AVURLAsset(url: url).tracks(
-            withMediaType: AVMediaType.video
-        ).first
+        guard
+            let track = AVURLAsset(url: url).tracks(
+                withMediaType: AVMediaType.video
+            ).first
         else { return nil }
-        
+
         let naturalSize = track.naturalSize.applying(track.preferredTransform)
-        
+
         return .init(width: abs(naturalSize.width), height: abs(naturalSize.height))
     }
-    
+
     public func getThumbnailImage(
         forUrl url: URL,
         originalSize: CGSize?
     ) async throws -> UIImage? {
         var thumbnailSize: CGSize?
-        
+
         if let size = originalSize {
             thumbnailSize = getPreviewSize(
                 from: size,
                 previewSize: FilesConstants.previewVideoSize
             )
         }
-        
+
         let request = QLThumbnailGenerator.Request(
             fileAt: url,
             size: thumbnailSize ?? FilesConstants.previewVideoSize,
             scale: 1.0,
             representationTypes: .thumbnail
         )
-        
+
         let image = try await QLThumbnailGenerator.shared.generateBestRepresentation(
             for: request
         ).uiImage
-        
+
         return image
     }
-    
+
     public func getFileResult(for url: URL) throws -> FileResult {
         try createFileResult(
             from: url,
@@ -93,16 +94,16 @@ public final class FilesPickerKit: FilesPickerProtocol {
 
     public func getFileResult(for image: UIImage) throws -> FileResult {
         let fileName = "\(imagePrefix)\(String.random(length: 4))"
-        
+
         let newUrl = try storageKit.getTempUrl(for: image, name: fileName)
-        
+
         return try createFileResult(
             from: newUrl,
             name: fileName,
             extension: previewExtension
         )
     }
-    
+
     public func getUrlConforms(
         to type: UTType,
         for itemProvider: NSItemProvider
@@ -111,17 +112,17 @@ public final class FilesPickerKit: FilesPickerProtocol {
             guard let utType = UTType(identifier), utType.conforms(to: type) else {
                 continue
             }
-            
+
             do {
                 return try await getFileURL(by: identifier, itemProvider: itemProvider)
             } catch {
                 continue
             }
         }
-        
+
         throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
     }
-    
+
     public func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
         for type in itemProvider.registeredTypeIdentifiers {
             do {
@@ -130,10 +131,10 @@ public final class FilesPickerKit: FilesPickerProtocol {
                 continue
             }
         }
-        
+
         throw FileValidationError.fileNotFound
     }
-    
+
     public func getFileURL(
         by type: String,
         itemProvider: NSItemProvider
@@ -154,32 +155,32 @@ public final class FilesPickerKit: FilesPickerProtocol {
             }
         }
     }
-    
+
     public func getVideoDuration(from url: URL) -> Float64? {
         guard isFileType(format: .movie, atURL: url) else { return nil }
-        
+
         let asset = AVAsset(url: url)
-        
+
         let duration = asset.duration
         let durationTime = CMTimeGetSeconds(duration)
-        
+
         return durationTime
     }
-    
+
     public func getMimeType(for url: URL) -> String? {
         var mimeType: String?
-        
+
         let pathExtension = url.pathExtension
         if let type = UTType(filenameExtension: pathExtension) {
             mimeType = type.preferredMIMEType
         }
-        
+
         return mimeType
     }
 }
 
-private extension FilesPickerKit {
-    func createFileResult(
+extension FilesPickerKit {
+    fileprivate func createFileResult(
         from url: URL,
         name: String,
         extension: String
@@ -206,21 +207,21 @@ private extension FilesPickerKit {
             mimeType: mimeType
         )
     }
-    
-    func getPreviewSize(
+
+    fileprivate func getPreviewSize(
         from originalSize: CGSize?,
         previewSize: CGSize
     ) -> CGSize {
         guard let size = originalSize else { return FilesConstants.previewSize }
-        
+
         let width = abs(size.width)
         let height = abs(size.height)
-        
-        let widthRatio  = previewSize.width  / width
+
+        let widthRatio = previewSize.width / width
         let heightRatio = previewSize.height / height
-        
+
         var newSize: CGSize
-        if(widthRatio > heightRatio) {
+        if widthRatio > heightRatio {
             newSize = CGSize(
                 width: width * heightRatio,
                 height: height * heightRatio
@@ -231,37 +232,37 @@ private extension FilesPickerKit {
                 height: height * widthRatio
             )
         }
-        
+
         return newSize
     }
-    
-    func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
+
+    fileprivate func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
         guard let mimeType = getMimeType(for: fileURL) else { return false }
-        
+
         return UTType(mimeType: mimeType)?.conforms(to: format) ?? false
     }
-    
-    func getPreview(for url: URL) -> (image: UIImage?, url: URL?, resolution: CGSize?) {
+
+    fileprivate func getPreview(for url: URL) -> (image: UIImage?, url: URL?, resolution: CGSize?) {
         defer {
             url.stopAccessingSecurityScopedResource()
         }
-        
+
         _ = url.startAccessingSecurityScopedResource()
-        
+
         var image: UIImage?
-        
+
         if isFileType(format: .image, atURL: url) {
             image = UIImage(contentsOfFile: url.path)
         }
-        
+
         if isFileType(format: .movie, atURL: url) {
             image = getThumbnailImage(forUrl: url)
         }
-        
+
         guard let image = image else {
             return (image: nil, url: nil, resolution: nil)
         }
-        
+
         let resizedImage = resizeImage(
             image: image,
             targetSize: FilesConstants.previewSize
@@ -270,29 +271,29 @@ private extension FilesPickerKit {
             for: resizedImage,
             name: FilesConstants.previewTag + url.lastPathComponent
         )
-        
+
         return (image: resizedImage, url: imageURL, resolution: image.size)
     }
-    
-    func getThumbnailImage(forUrl url: URL) -> UIImage? {
+
+    fileprivate func getThumbnailImage(forUrl url: URL) -> UIImage? {
         let asset: AVAsset = AVAsset(url: url)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
 
         do {
             let thumbnailImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
-            
+
             let image = UIImage(cgImage: thumbnailImage)
             return image
         } catch {
             return nil
         }
     }
-    
-    func detectFileType(for url: URL) -> FileType {
+
+    fileprivate func detectFileType(for url: URL) -> FileType {
         guard let typeIdentifier = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType else {
             return .other
         }
-        
+
         if typeIdentifier.conforms(to: .image) {
             return .image
         } else if typeIdentifier.conforms(to: .movie) {

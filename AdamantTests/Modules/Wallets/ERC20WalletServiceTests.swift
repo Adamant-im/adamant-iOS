@@ -6,12 +6,13 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-@testable import Adamant
 import BigInt
-@testable import CommonKit
 import Web3Core
-@testable import web3swift
 import XCTest
+
+@testable import Adamant
+@testable import CommonKit
+@testable import web3swift
 
 final class ERC20WalletServiceTests: XCTestCase {
     private var sut: ERC20WalletService!
@@ -22,19 +23,21 @@ final class ERC20WalletServiceTests: XCTestCase {
     private var ethMock: IEthMock!
     private var web3: Web3!
     private var session: URLSession!
-    
+
     override func setUp() async throws {
         try await super.setUp()
-        
-        let keystore = try XCTUnwrap(try BIP32Keystore(
-            mnemonics: Constants.passphrase,
-            password: EthWalletService.walletPassword,
-            mnemonicsPassword: "",
-            language: .english,
-            prefixPath: EthWalletService.walletPath)
+
+        let keystore = try XCTUnwrap(
+            try BIP32Keystore(
+                mnemonics: Constants.passphrase,
+                password: EthWalletService.walletPassword,
+                mnemonicsPassword: "",
+                language: .english,
+                prefixPath: EthWalletService.walletPath
+            )
         )
         let ethAddress = try XCTUnwrap(keystore.addresses?.first)
-        
+
         let eWallet = EthWallet(
             unicId: Constants.tokenUniqueID,
             address: ethAddress.address,
@@ -57,12 +60,13 @@ final class ERC20WalletServiceTests: XCTestCase {
         web3ProviderMock.session = session
         increaseFeeServiceMock = IncreaseFeeServiceMock()
 
+        increaseFeeServiceMock.given(.isIncreaseFeeEnabled(for: .any, willReturn: false))
         sut = ERC20WalletService(token: Constants.token)
         sut.setWalletForTests(eWallet)
         sut.increaseFeeService = increaseFeeServiceMock
         sut.erc20ApiService = erc20ApiMock
     }
-    
+
     override func tearDown() async throws {
         sut = nil
         erc20ApiMock = nil
@@ -74,12 +78,12 @@ final class ERC20WalletServiceTests: XCTestCase {
         increaseFeeServiceMock = nil
         try await super.tearDown()
     }
-    
+
     func test_createTransaction_noWalletThrowsError() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(nil)
-        
-        // when
+
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: "recipient",
@@ -88,13 +92,13 @@ final class ERC20WalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
-        // then
+
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .notLogged)
     }
-    
+
     func test_createTransaction_invalidRecipientAddressThrowsError() async throws {
-        // when
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.invalidEthAddress,
@@ -103,16 +107,16 @@ final class ERC20WalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
-        // then
+
+        // THEN
         XCTAssertEqual(result.error as? WalletServiceError, .accountNotFound)
     }
-    
+
     func test_createTransaction_noKeystoreThrowsError() async throws {
-        // given
+        // GIVEN
         erc20ApiMock.keystoreManager = nil
-        
-        // when
+
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -121,8 +125,8 @@ final class ERC20WalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
-        // then
+
+        // THEN
         switch result.error as? WalletServiceError {
         case .internalError:
             break
@@ -130,16 +134,16 @@ final class ERC20WalletServiceTests: XCTestCase {
             XCTFail("Expected '.internalError', but got \(String(describing: result.error))")
         }
     }
-    
+
     func test_createTransaction_correctFields() async throws {
-        // given
+        // GIVEN
         makeTransactionsCountMock()
         var calledMakeDecimals = false
         makeDecimalsMock {
             calledMakeDecimals = true
         }
-        
-        // when
+
+        // WHEN
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.toEthAddress,
@@ -148,8 +152,8 @@ final class ERC20WalletServiceTests: XCTestCase {
                 comment: nil
             )
         })
-        
-        // then
+
+        // THEN
         XCTAssertTrue(calledMakeDecimals)
         XCTAssertNil(result.error)
         let transaction = try XCTUnwrap(result.value)
@@ -163,14 +167,14 @@ final class ERC20WalletServiceTests: XCTestCase {
 
 // MARK: Private
 
-private extension ERC20WalletServiceTests {
-    func makeDecimalsMock(_ onCall: @escaping () -> Void) {
+extension ERC20WalletServiceTests {
+    fileprivate func makeDecimalsMock(_ onCall: @escaping () -> Void) {
         let prevHandler = MockURLProtocol.requestHandler
         MockURLProtocol.requestHandler = MockURLProtocol.combineHandlers(
             prevHandler
         ) { request in
             guard let stream = request.httpBodyStream else { return nil }
-            
+
             let ethBody = try JSONDecoder().decode(EthRequestBody.self, from: Data(reading: stream))
             guard ethBody.method == Constants.ethCallMethod else { return nil }
             onCall()
@@ -181,25 +185,25 @@ private extension ERC20WalletServiceTests {
             )
         }
     }
-    
-    func makeTransactionsCountMock() {
+
+    fileprivate func makeTransactionsCountMock() {
         let prevHandler = MockURLProtocol.requestHandler
         MockURLProtocol.requestHandler = MockURLProtocol.combineHandlers(
             prevHandler
         ) { request in
             guard let stream = request.httpBodyStream else { return nil }
-            
+
             let ethBody = try JSONDecoder().decode(EthRequestBody.self, from: Data(reading: stream))
             guard ethBody.method == Constants.transactionCountResponseMethod else { return nil }
-            
+
             return try self.makeResponseAndMockData(
                 url: request.url!,
                 ethResponse: EthAPIResponse(result: "\(Constants.nonce)")
             )
         }
     }
-    
-    func makeResponseAndMockData<T: Codable>(
+
+    fileprivate func makeResponseAndMockData<T: Codable>(
         url: URL,
         ethResponse: EthAPIResponse<T>
     ) throws -> (HTTPURLResponse, Data) {
@@ -209,12 +213,12 @@ private extension ERC20WalletServiceTests {
             httpVersion: nil,
             headerFields: nil
         )!
-        
+
         let mockData = try JSONEncoder().encode(ethResponse)
         return (response, mockData)
     }
-    
-    func makeSession() -> URLSession {
+
+    fileprivate func makeSession() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         return URLSession(configuration: config)
@@ -222,11 +226,11 @@ private extension ERC20WalletServiceTests {
 }
 
 private enum Constants {
-    
+
     static let passphrase = "village lunch say patrol glow first hurt shiver name method dolphin sample"
-    
+
     static let tokenUniqueID = "ERC20\(token.symbol)\(token.contractAddress)"
-    
+
     static let token = ERC20Token(
         symbol: "BNB",
         name: "Binance Coin",
@@ -237,22 +241,23 @@ private enum Constants {
         defaultOrdinalLevel: nil,
         reliabilityGasPricePercent: 10,
         reliabilityGasLimitPercent: 10,
+        increasedGasPricePercent: 0,
         defaultGasPriceGwei: 10,
         defaultGasLimit: 58000,
         warningGasPriceGwei: 25,
         transferDecimals: 6
     )
-    
+
     static let toEthAddress = "0xabfDF505fFd5587D9E7707dFB47F45AF1f03E275"
     static let invalidEthAddress = "0xBA5CE20aE344CDBd6eAA01ffdDF1976d35Be14"
     static let validEthAddress = "0xBA5CE20aE344CDBd6eAA01ffdDF1976d35Be142d"
-    
+
     static let transactionCountResponseMethod = "eth_getTransactionCount"
     static let decimalsMethod = "decimals"
     static let ethCallMethod = "eth_call"
     static let nonce = 2
     static let decimalsMethodResponse = "0x0000000000000000000000000000000000000000000000000000000000000006"
-    
+
     static let expectedHashForSignature = Data([
         19, 32, 58, 56, 131, 178, 156, 49, 149,
         112, 90, 80, 243, 4, 152, 101, 158, 186,

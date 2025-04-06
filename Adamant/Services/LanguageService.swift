@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 final class LanguageStorageService: LanguageStorageProtocol {
     func getLanguage() -> Language {
@@ -15,7 +15,7 @@ final class LanguageStorageService: LanguageStorageProtocol {
         let language: Language = .init(rawValue: raw) ?? .auto
         return language
     }
-    
+
     func setLanguage(_ language: Language) {
         UserDefaults.standard.set(language.rawValue, forKey: StoreKey.language.language)
         UserDefaults.standard.set(language.locale, forKey: StoreKey.language.languageLocale)

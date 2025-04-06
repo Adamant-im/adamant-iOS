@@ -6,8 +6,8 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import UIKit
 import Parchment
+import UIKit
 
 extension WalletCollectionViewCell {
     struct Model {
@@ -19,7 +19,7 @@ extension WalletCollectionViewCell {
         var isBalanceInitialized: Bool
         var balance: Decimal?
         var notificationBadgeCount: Int
-        
+
         static let `default` = Model(
             index: 0,
             coinID: "",
@@ -36,12 +36,12 @@ extension WalletCollectionViewCell {
 // MARK: PagingItem
 extension WalletCollectionViewCell.Model: PagingItem {
     var identifier: Int { index }
-    
+
     func isBefore(item: PagingItem) -> Bool {
         guard let other = item as? Self else { return false }
         return self.index < other.index
     }
-    
+
     func isEqual(to item: PagingItem) -> Bool {
         guard let other = item as? Self else { return false }
         return self == other
@@ -53,15 +53,10 @@ extension WalletCollectionViewCell.Model: Comparable {
     static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.index < rhs.index
     }
-    
+
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.index == rhs.index &&
-        lhs.coinID == rhs.coinID &&
-        lhs.currencySymbol == rhs.currencySymbol &&
-        lhs.currencyNetwork == rhs.currencyNetwork &&
-        lhs.isBalanceInitialized == rhs.isBalanceInitialized &&
-        lhs.balance == rhs.balance &&
-        lhs.notificationBadgeCount == rhs.notificationBadgeCount
+        return lhs.index == rhs.index && lhs.coinID == rhs.coinID && lhs.currencySymbol == rhs.currencySymbol && lhs.currencyNetwork == rhs.currencyNetwork
+            && lhs.isBalanceInitialized == rhs.isBalanceInitialized && lhs.balance == rhs.balance && lhs.notificationBadgeCount == rhs.notificationBadgeCount
     }
 }
 

@@ -23,7 +23,14 @@ public struct Dapps: APIService {
 extension Dapps {
 
     /// List Dapps
-    public func blocks(transactionId: String? = nil, name: Int? = nil, limit: Int? = nil, offset: Int? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<DappsResponse>) -> Void) {
+    public func blocks(
+        transactionId: String? = nil,
+        name: Int? = nil,
+        limit: Int? = nil,
+        offset: Int? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Response<DappsResponse>) -> Void
+    ) {
         var options: RequestOptions = [:]
         if let value = transactionId { options["transactionId"] = value }
         if let value = name { options["name"] = value }

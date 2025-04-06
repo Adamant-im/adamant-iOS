@@ -18,9 +18,9 @@ public struct APIErrors: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
-            self.errors = try container.decode([APIError].self, forKey: .errors)
+        self.errors = try container.decode([APIError].self, forKey: .errors)
     }
-    
+
     public init(errors: [APIError]) {
         self.errors = errors
     }
@@ -30,7 +30,7 @@ public struct APIErrors: Decodable {
 public struct APIError: LocalizedError, Equatable {
     public let message: String
     public var code: Int?
-    
+
     public var errorDescription: String? { message }
 
     public init(message: String, code: Int?) {
@@ -55,9 +55,9 @@ extension APIError: Decodable {
     }
 }
 
-public extension APIError {
+extension APIError {
     public static let noNetwork = Self.unexpected(code: nil)
-    
+
     /// Describes an unexpected error
     public static func unexpected(code: Int?) -> Self {
         .init(message: "Unexpected Error", code: code)

@@ -15,7 +15,7 @@ final class Web3ProviderMock: Web3Provider {
     var policies: Policies
     var url: URL
     var session: URLSession
-    
+
     init(
         network: Networks? = nil,
         attachedKeystoreManager: KeystoreManager? = nil,

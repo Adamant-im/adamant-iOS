@@ -1,6 +1,6 @@
 //
 //  SegwitAddrCoder.swift
-//  
+//
 //
 //  Created by Anton Boyarkin on 28.05.2022.
 //
@@ -11,8 +11,8 @@ import Foundation
 public class SegwitAddrCoder {
     private let bech32 = Bech32New()
 
-    public init() { }
-    
+    public init() {}
+
     /// Convert from one power-of-2 number base to another
     private func convertBits(from: Int, to: Int, pad: Bool, idata: Data) throws -> Data {
         var acc: Int = 0
@@ -32,12 +32,12 @@ public class SegwitAddrCoder {
             if bits != 0 {
                 odata.append(UInt8((acc << (to - bits)) & maxv))
             }
-        } else if (bits >= from || ((acc << (to - bits)) & maxv) != 0) {
+        } else if bits >= from || ((acc << (to - bits)) & maxv) != 0 {
             throw CoderError.bitsConversionFailed
         }
         return odata
     }
-    
+
     /// Decode segwit address
     public func decode(hrp: String, addr: String) throws -> (version: Int, program: Data) {
         let dec = try bech32.decode(addr)
@@ -59,13 +59,13 @@ public class SegwitAddrCoder {
         }
         return (Int(dec.checksum[0]), conv)
     }
-    
+
     /// Encode segwit address
     public func encode(hrp: String, version: Int, program: Data) throws -> String {
         var enc = Data([UInt8(version)])
         enc.append(try convertBits(from: 8, to: 5, pad: true, idata: program))
         let result = bech32.encode(hrp, values: enc)
-        guard let _ = try? decode(hrp: hrp, addr: result) else {
+        guard (try? decode(hrp: hrp, addr: result)) != nil else {
             throw CoderError.encodingCheckFailed
         }
         return result
@@ -77,13 +77,13 @@ extension SegwitAddrCoder {
         case bitsConversionFailed
         case hrpMismatch(String, String)
         case checksumSizeTooLow
-        
+
         case dataSizeMismatch(Int)
         case segwitVersionNotSupported(UInt8)
         case segwitV0ProgramSizeMismatch(Int)
-        
+
         case encodingCheckFailed
-        
+
         public var errorDescription: String? {
             switch self {
             case .bitsConversionFailed:
@@ -107,7 +107,7 @@ extension SegwitAddrCoder {
 
 /// Bech32 checksum implementation
 public class Bech32New {
-    private let gen: [UInt32] = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
+    private let gen: [UInt32] = [0x3b6a_57b2, 0x2650_8e6d, 0x1ea1_19fa, 0x3d42_33dd, 0x2a14_62b3]
     /// Bech32 checksum delimiter
     private let checksumMarker: String = "1"
     /// Bech32 character set for encoding
@@ -117,15 +117,15 @@ public class Bech32New {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        15, -1, 10, 17, 21, 20, 26, 30,  7,  5, -1, -1, -1, -1, -1, -1,
-        -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
-        1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1,
-        -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
-        1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
+        15, -1, 10, 17, 21, 20, 26, 30, 7, 5, -1, -1, -1, -1, -1, -1,
+        -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
+        1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1,
+        -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
+        1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1
     ]
 
-    public init() { }
-    
+    public init() {}
+
     /// Find the polynomial with value coefficients mod the generator as 30-bit.
     private func polymod(_ values: Data) -> UInt32 {
         var chk: UInt32 = 1
@@ -138,11 +138,11 @@ public class Bech32New {
         }
         return chk
     }
-    
+
     /// Expand a HRP for use in checksum computation.
     private func expandHrp(_ hrp: String) -> Data {
         guard let hrpBytes = hrp.data(using: .utf8) else { return Data() }
-        var result = Data(repeating: 0x00, count: hrpBytes.count*2+1)
+        var result = Data(repeating: 0x00, count: hrpBytes.count * 2 + 1)
         for (i, c) in hrpBytes.enumerated() {
             result[i] = c >> 5
             result[i + hrpBytes.count + 1] = c & 0x1f
@@ -150,14 +150,14 @@ public class Bech32New {
         result[hrp.count] = 0
         return result
     }
-    
+
     /// Verify checksum
     private func verifyChecksum(hrp: String, checksum: Data) -> Bool {
         var data = expandHrp(hrp)
         data.append(checksum)
         return polymod(data) == 1
     }
-    
+
     /// Create checksum
     private func createChecksum(hrp: String, values: Data) -> Data {
         var enc = expandHrp(hrp)
@@ -170,7 +170,7 @@ public class Bech32New {
         }
         return ret
     }
-    
+
     /// Encode Bech32 string
     public func encode(_ hrp: String, values: Data) -> String {
         let checksum = createChecksum(hrp: hrp, values: values)
@@ -184,7 +184,7 @@ public class Bech32New {
         }
         return String(data: ret, encoding: .utf8) ?? ""
     }
-    
+
     /// Decode Bech32 string
     public func decode(_ str: String) throws -> (hrp: String, checksum: Data) {
         guard let strBytes = str.data(using: .utf8) else {
@@ -236,7 +236,7 @@ public class Bech32New {
         guard verifyChecksum(hrp: hrp, checksum: values) else {
             throw DecodingError.checksumMismatch
         }
-        return (hrp, Data(values[..<(vSize-6)]))
+        return (hrp, Data(values[..<(vSize - 6)]))
     }
 }
 
@@ -249,10 +249,10 @@ extension Bech32New {
         case incorrectHrpSize
         case incorrectChecksumSize
         case stringLengthExceeded
-        
+
         case invalidCharacter
         case checksumMismatch
-        
+
         public var errorDescription: String? {
             switch self {
             case .checksumMismatch:

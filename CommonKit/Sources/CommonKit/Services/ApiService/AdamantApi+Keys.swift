@@ -19,7 +19,7 @@ extension AdamantApiService {
                 encoding: .url
             )
         }
-        
+
         return response.flatMap { $0.resolved() }
     }
 }

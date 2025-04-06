@@ -14,14 +14,14 @@ public enum NodeConnectionStatus: Equatable, Codable, Sendable {
     case notAllowed(RejectedReason)
 }
 
-public extension NodeConnectionStatus {
-    enum RejectedReason: Codable, Equatable, Sendable {
+extension NodeConnectionStatus {
+    public enum RejectedReason: Codable, Equatable, Sendable {
         case outdatedApiVersion
     }
 }
 
-public extension NodeConnectionStatus.RejectedReason {
-    var text: String {
+extension NodeConnectionStatus.RejectedReason {
+    public var text: String {
         switch self {
         case .outdatedApiVersion:
             return String.localized(

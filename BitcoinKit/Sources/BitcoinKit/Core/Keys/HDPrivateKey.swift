@@ -24,10 +24,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public class HDPrivateKey {
@@ -91,14 +92,30 @@ public class HDPrivateKey {
 
     public func derived(at index: UInt32, hardened: Bool = false) throws -> HDPrivateKey {
         // As we use explicit parameter "hardened", do not allow higher bit set.
-        if (0x80000000 & index) != 0 {
+        if (0x8000_0000 & index) != 0 {
             fatalError("invalid child index")
         }
 
-        guard let derivedKey = _HDKey(privateKey: raw, publicKey: extendedPublicKey().raw, chainCode: chainCode, depth: depth, fingerprint: fingerprint, childIndex: childIndex).derived(at: index, hardened: hardened) else {
+        guard
+            let derivedKey = _HDKey(
+                privateKey: raw,
+                publicKey: extendedPublicKey().raw,
+                chainCode: chainCode,
+                depth: depth,
+                fingerprint: fingerprint,
+                childIndex: childIndex
+            ).derived(at: index, hardened: hardened)
+        else {
             throw DerivationError.derivationFailed
         }
-        return HDPrivateKey(privateKey: derivedKey.privateKey!, chainCode: derivedKey.chainCode, network: network, depth: derivedKey.depth, fingerprint: derivedKey.fingerprint, childIndex: derivedKey.childIndex)
+        return HDPrivateKey(
+            privateKey: derivedKey.privateKey!,
+            chainCode: derivedKey.chainCode,
+            network: network,
+            depth: derivedKey.depth,
+            fingerprint: derivedKey.fingerprint,
+            childIndex: derivedKey.childIndex
+        )
     }
 }
 
@@ -109,7 +126,7 @@ extension HDPrivateKey: CustomStringConvertible {
 }
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-extension HDPrivateKey: QRCodeConvertible {}
+    extension HDPrivateKey: QRCodeConvertible {}
 #endif
 
 public enum DerivationError: Error {
