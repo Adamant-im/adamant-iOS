@@ -12,8 +12,8 @@ import Foundation
 
 @MainActor
 final class AccountWalletsViewModel {
-    @ObservableValue var state: AccountWalletsState = .default
-
+    var state: AccountWalletsState = .default
+    
     private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
 
@@ -43,16 +43,20 @@ extension AccountWalletsViewModel {
 
     fileprivate func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
-        if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUniqueID }) {
-            state.wallets[index].balance = coreService.wallet?.balance ?? 0
-            state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
-            state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
+        let tokenID = coreService.tokenUniqueID
+        if let index = state.wallets.firstIndex(where: { $0.model.coinID == tokenID }) {
+            let cellState = state.wallets[index]
+            var newModel = cellState.model
+            newModel.balance = coreService.wallet?.balance ?? 0
+            newModel.isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
+            newModel.notificationBadgeCount = coreService.wallet?.notifications ?? 0
+            cellState.model = newModel
+            state.wallets[index] = cellState
         } else {
             let network = type(of: coreService).tokenNetworkSymbol
-
-            let model = WalletCollectionViewCell.Model(
+            let newModel = WalletCollectionViewCellModel(
                 index: state.wallets.count,
-                coinID: coreService.tokenUniqueID,
+                coinID: tokenID,
                 currencySymbol: coreService.tokenSymbol,
                 currencyImage: coreService.tokenLogo,
                 currencyNetwork: network,
@@ -60,8 +64,8 @@ extension AccountWalletsViewModel {
                 balance: coreService.wallet?.balance ?? 0,
                 notificationBadgeCount: coreService.wallet?.notifications ?? 0
             )
-
-            state.wallets.append(model)
+            let cellState = AccountWalletCellState(model: newModel)
+            state.wallets.append(cellState)
         }
     }
 }

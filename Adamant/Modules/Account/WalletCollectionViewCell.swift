@@ -17,21 +17,36 @@ class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var balanceLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var accessoryContainerView: AccessoryContainerView!
-
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    override func prepareForReuse() {
+        cancellables.removeAll()
+    }
+    
     override func setPagingItem(
         _ pagingItem: PagingItem,
         selected: Bool,
         options: PagingOptions
     ) {
-        guard let item = pagingItem as? WalletCollectionViewCell.Model else {
+        guard let item = pagingItem as? AccountWalletCellState else {
             return
         }
-        update(item: item)
+        update(item: item.model)
+        
+        cancellables.removeAll()
+        
+        item.$model
+            .removeDuplicates()
+            .sink { [weak self] item in
+                self?.update(item: item)
+            }
+            .store(in: &cancellables)
     }
 }
 
-extension WalletCollectionViewCell {
-    fileprivate func update(item: WalletCollectionViewCell.Model) {
+private extension WalletCollectionViewCell {
+    func update(item: WalletCollectionViewCellModel) {
         currencyImageView.image = item.currencyImage
         if item.currencyNetwork == item.currencySymbol {
             currencySymbolLabel.text = item.currencySymbol

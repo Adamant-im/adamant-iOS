@@ -91,12 +91,7 @@ final class AccountViewController: FormViewController {
 
     private var walletViewControllers: [WalletViewController] = []
 
-    private var currentWalletCoinID: String = ""
-    private var currentSelectedWalletItem: WalletCollectionViewCell.Model? {
-        viewModel.state.wallets.first { wallet in
-            wallet.coinID == currentWalletCoinID
-        }
-    }
+    private var currentSelectedWallet: AccountWalletCellState? = .none
 
     private var initiated = false
 
@@ -186,14 +181,13 @@ final class AccountViewController: FormViewController {
         setupWalletsVC()
 
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletCollectionViewCell.Model.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: AccountWalletCellState.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        selectCurrentWallet()
-
+        
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
@@ -204,17 +198,7 @@ final class AccountViewController: FormViewController {
         updatePagingItemHeight()
 
         pagingViewController.borderColor = UIColor.clear
-
-        viewModel.$state
-            .removeDuplicates()
-            .debounce(for: .nanoseconds(500_000_000), scheduler: DispatchQueue.main)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.pagingViewController.reloadMenu()
-            }
-            .store(in: &notificationsSet)
-
+        
         // MARK: Rows&Sections
 
         // MARK: Application
@@ -872,8 +856,6 @@ final class AccountViewController: FormViewController {
                 let collectionView = self.pagingViewController.collectionView
                 collectionView.reloadData()
                 self.tableView.reloadData()
-
-                selectCurrentWallet()
             }
             .store(in: &notificationsSet)
     }
@@ -978,33 +960,25 @@ final class AccountViewController: FormViewController {
     }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        let unavailableNodes: Set<NodeGroup> = Set(
-            NodeGroup.allCases.filter {
-                !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
-            }
-        )
-
+        let unavailableNodes: Set<NodeGroup> = Set(NodeGroup.allCases.filter {
+            !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
+        })
+        
+        let currencyNetwork = currentSelectedWallet?.model.currencyNetwork
+        
         if unavailableNodes.contains(where: {
-            $0.name == currentSelectedWalletItem?.currencyNetwork
+            $0.name == currencyNetwork
         }) {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: currentSelectedWalletItem?.currencyNetwork ?? ""
+                    nodeGroupName: currencyNetwork ?? ""
                 ).localizedDescription
             )
         }
-
+        
         Task { @MainActor in
             accountService.update()
             refreshControl.endRefreshing()
-        }
-    }
-
-    private func selectCurrentWallet() {
-        if let index = viewModel.state.wallets.firstIndex(where: { $0.coinID == currentWalletCoinID }) {
-            pagingViewController.select(index: index, animated: false)
-        } else if let firstWalletID = viewModel.state.wallets.first?.coinID {
-            currentWalletCoinID = firstWalletID
         }
     }
 }
@@ -1081,7 +1055,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         MainActor.assertIsolated()
 
         return DispatchQueue.onMainThreadSyncSafe {
-            return viewModel.state.wallets[safe: index] ?? WalletCollectionViewCell.Model.default
+            return viewModel.state.wallets[safe: index] ?? AccountWalletCellState.default
         }
     }
 
@@ -1110,10 +1084,9 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         didSelectItem pagingItem: PagingItem
     ) {
         Task { @MainActor in
-            currentWalletCoinID =
-                viewModel.state.wallets.first(where: { wallet in
-                    wallet.index == pagingItem.identifier
-                })?.coinID ?? ""
+            currentSelectedWallet = viewModel.state.wallets.first(where: { wallet in
+                wallet.model.index == pagingItem.identifier
+            })
         }
     }
 
