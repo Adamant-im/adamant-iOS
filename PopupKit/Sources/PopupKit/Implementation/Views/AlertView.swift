@@ -1,16 +1,16 @@
 //
 //  AlertView.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.12.2022.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct AlertView: View {
     let model: AlertModel
-    
+
     var body: some View {
         VStack(spacing: 8) {
             iconView
@@ -28,8 +28,8 @@ struct AlertView: View {
     }
 }
 
-private extension AlertView {
-    var iconView: some View {
+extension AlertView {
+    fileprivate var iconView: some View {
         Group {
             switch model.icon {
             case .loading:

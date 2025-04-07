@@ -19,11 +19,11 @@ public struct AdamantAccount: @unchecked Sendable {
     public let multisignatures: [String]?
     public let uMultisignatures: [String]?
     public var isDummy: Bool
-    
+
     public init(
         address: String,
         unconfirmedBalance: Decimal,
-        balance: Decimal, 
+        balance: Decimal,
         publicKey: String?,
         unconfirmedSignature: Int,
         secondSignature: Int,
@@ -57,10 +57,10 @@ extension AdamantAccount: Decodable {
         case multisignatures
         case uMultisignatures = "u_multisignatures"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.address = try container.decode(String.self, forKey: .address)
         self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
         self.publicKey = try? container.decode(String.self, forKey: .publicKey)
@@ -68,7 +68,7 @@ extension AdamantAccount: Decodable {
         self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
         self.multisignatures = try? container.decode([String].self, forKey: .multisignatures)
         self.uMultisignatures = try? container.decode([String].self, forKey: .uMultisignatures)
-        
+
         let unconfirmedBalance = Decimal(string: try container.decode(String.self, forKey: .unconfirmedBalance))!
         self.unconfirmedBalance = unconfirmedBalance.shiftedFromAdamant()
         let balance = Decimal(string: try container.decode(String.self, forKey: .balance))!
@@ -79,7 +79,7 @@ extension AdamantAccount: Decodable {
 
 extension AdamantAccount: WrappableModel {
     public static let ModelKey = "account"
-    
+
     public static func makeEmptyAccount(publicKey: String) -> Self {
         .init(
             address: AdamantUtilities.generateAddress(publicKey: publicKey),
@@ -95,7 +95,11 @@ extension AdamantAccount: WrappableModel {
         )
     }
 }
-
+extension AdamantAccount {
+    public var isEnoughMoneyForTransaction: Bool {
+        balance >= AdamantApiService.KvsFee
+    }
+}
 // MARK: - JSON
 /*
 {

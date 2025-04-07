@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct InfoServiceTicker: Hashable, Sendable {
     let crypto: String

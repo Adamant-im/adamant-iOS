@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension IPFSApiCommands {
     static let status = "/api/node/info"
@@ -15,11 +15,11 @@ extension IPFSApiCommands {
 
 final class IPFSApiCore: Sendable {
     let apiCore: APICoreProtocol
-    
+
     init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
-    
+
     func getNodeStatus(origin: NodeOrigin) async -> ApiServiceResult<IPFSNodeStatus> {
         await apiCore.sendRequestJsonResponse(
             origin: origin,
@@ -33,15 +33,22 @@ extension IPFSApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
-        
-        return statusResponse.map { _ in
+
+        return statusResponse.map {
             .init(
                 ping: ping,
-                height: .zero,
+                height: getHeightFrom(timestamp: $0.timestamp),
                 wsEnabled: false,
                 wsPort: nil,
-                version: nil
+                version: .init($0.version)
             )
         }
+    }
+}
+
+extension IPFSApiCore {
+    fileprivate func getHeightFrom(timestamp: UInt64) -> Int {
+        let timestampInSeconds = timestamp / 1000
+        return Int(timestampInSeconds % 100_000_000)
     }
 }

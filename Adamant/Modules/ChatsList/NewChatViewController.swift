@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Eureka
-@preconcurrency import QRCodeReader
-import EFQRCode
 import AVFoundation
-import Photos
-import SafariServices
 import CommonKit
+import EFQRCode
+import Eureka
+import Photos
+@preconcurrency import QRCodeReader
+import SafariServices
+import UIKit
 
 // MARK: - Localization
 extension String.adamant {
@@ -22,7 +22,10 @@ extension String.adamant {
             String.localized("NewChatScene.Title", comment: "New chat: scene title")
         }
         static var addressPlaceholder: String {
-            String.localized("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+            String.localized(
+                "NewChatScene.Address.Placeholder",
+                comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank."
+            )
         }
         static var specifyValidAddressMessage: String {
             String.localized("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
@@ -34,7 +37,10 @@ extension String.adamant {
             String.localized("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
         }
         static var whatDoesItMean: String {
-            String.localized("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
+            String.localized(
+                "NewChatScene.NotInitialized.HelpButton",
+                comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts."
+            )
         }
     }
 }
@@ -52,25 +58,25 @@ protocol NewChatViewControllerDelegate: AnyObject {
 // MARK: -
 final class NewChatViewController: FormViewController {
     static let faqUrl = "https://medium.com/adamant-im/chats-and-uninitialized-accounts-in-adamant-5035438e2fcd"
-    
+
     private enum Rows {
         case addressField
         case scanQr
         case myQr
-        
+
         var tag: String {
             switch self {
             case .addressField:
                 return "a"
-                
+
             case .scanQr:
                 return "b"
-                
+
             case .myQr:
                 return "m"
             }
         }
-        
+
         var localized: String? {
             switch self {
             case .addressField: return nil
@@ -79,119 +85,122 @@ final class NewChatViewController: FormViewController {
             }
         }
     }
-    
+
     // MARK: Dependencies
     var dialogService: DialogService!
     var accountService: AccountService!
     var accountsProvider: AccountsProvider!
     var screensFactory: ScreensFactory!
-    
+
     // MARK: Properties
     private var skipValueChange = false
-    
+
     weak var delegate: NewChatViewControllerDelegate?
     var addressFormatter = NumberFormatter()
     static let invalidCharacters = CharacterSet.decimalDigits.inverted
-    
+
     lazy var qrReader: QRCodeReaderViewController = {
         let builder = QRCodeReaderViewControllerBuilder {
-            $0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
+            $0.reader = QRCodeReader(metadataObjectTypes: [.qr], captureDevicePosition: .back)
             $0.cancelButtonTitle = String.adamant.alert.cancel
             $0.showSwitchCameraButton = false
         }
-        
+
         let vc = QRCodeReaderViewController(builder: builder)
         vc.delegate = self
         return vc
     }()
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         navigationItem.largeTitleDisplayMode = .never
         tableView.keyboardDismissMode = .none
-        
+
         navigationItem.title = String.adamant.newChat.title
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         doneButton.isEnabled = false
         navigationItem.rightBarButtonItem = doneButton
-        
+
         navigationOptions = .Disabled
-        
-        form +++ Section {
-            $0.footer = { [weak self] in
-                var footer = HeaderFooterView<UIView>(.callback {
-                    let view = ButtonsStripeView.adamantConfigured()
-                    view.stripe = [.qrCameraReader, .qrPhotoReader]
-                    view.delegate = self
-                    return view
-                })
-                
-                footer.height = { ButtonsStripeView.adamantDefaultHeight }
-                
-                return footer
-            }()
-        }
-        
-        <<< TextRow {
-            $0.tag = Rows.addressField.tag
-            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
-            $0.cell.textField.setPopupKeyboardType(.numberPad)
-            
-            let prefix = UILabel()
-            prefix.text = "U"
-            prefix.sizeToFit()
-            
-            let view = UIView()
-            view.addSubview(prefix)
-            view.frame = prefix.frame
-            $0.cell.textField.leftView = view
-            $0.cell.textField.leftViewMode = .always
-        }.cellUpdate { (cell, _) in
-            if let text = cell.textField.text {
-                cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
+
+        form
+            +++ Section {
+                $0.footer = { [weak self] in
+                    var footer = HeaderFooterView<UIView>(
+                        .callback {
+                            let view = ButtonsStripeView.adamantConfigured()
+                            view.stripe = [.qrCameraReader, .qrPhotoReader]
+                            view.delegate = self
+                            return view
+                        }
+                    )
+
+                    footer.height = { ButtonsStripeView.adamantDefaultHeight }
+
+                    return footer
+                }()
             }
-        }.onChange { [weak self] row in
-            if let skip = self?.skipValueChange, skip {
-                self?.skipValueChange = false
-                return
-            }
-            
-            if let text = row.value {
-                var trimmed = ""
-                if let admAddress = text.getAdamantAddress() {
-                    trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
-                } else if let admAddress = text.getLegacyAdamantAddress() {
-                    trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+
+            <<< TextRow {
+                $0.tag = Rows.addressField.tag
+                $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
+                $0.cell.textField.setPopupKeyboardType(.numberPad)
+
+                let prefix = UILabel()
+                prefix.text = "U"
+                prefix.sizeToFit()
+
+                let view = UIView()
+                view.addSubview(prefix)
+                view.frame = prefix.frame
+                $0.cell.textField.leftView = view
+                $0.cell.textField.leftViewMode = .always
+            }.cellUpdate { (cell, _) in
+                if let text = cell.textField.text {
+                    cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
+                }
+            }.onChange { [weak self] row in
+                if let skip = self?.skipValueChange, skip {
+                    self?.skipValueChange = false
+                    return
+                }
+
+                if let text = row.value {
+                    var trimmed = ""
+                    if let admAddress = text.getAdamantAddress() {
+                        trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                    } else if let admAddress = text.getLegacyAdamantAddress() {
+                        trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                    } else {
+                        trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                    }
+
+                    if text != trimmed {
+                        self?.skipValueChange = true
+
+                        DispatchQueue.main.async {
+                            row.value = trimmed
+                            row.updateCell()
+                        }
+                    }
+
+                    if let done = self?.navigationItem.rightBarButtonItem {
+                        DispatchQueue.onMainAsync {
+                            done.isEnabled = text.count > 6
+                        }
+                    }
                 } else {
-                    trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                    self?.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
-                
-                if text != trimmed {
-                    self?.skipValueChange = true
-                    
-                    DispatchQueue.main.async {
-                        row.value = trimmed
-                        row.updateCell()
-                    }
-                }
-                
-                if let done = self?.navigationItem.rightBarButtonItem {
-                    DispatchQueue.onMainAsync {
-                        done.isEnabled = text.count > 6
-                    }
-                }
-            } else {
-                self?.navigationItem.rightBarButtonItem?.isEnabled = false
             }
-        }
-        
+
         // MARK: My qr
         if let address = accountService.account?.address {
             let myQrSection = Section()
-            
+
             let button = ButtonRow {
                 $0.tag = Rows.myQr.tag
                 $0.title = Rows.myQr.localized
@@ -199,11 +208,13 @@ final class NewChatViewController: FormViewController {
                 cell.textLabel?.textColor = UIColor.adamant.primary
             }.onCellSelection { [weak self] (_, _) in
                 guard let self = self else { return }
-                let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(
-                    address: address,
-                    params: nil
-                ))
-                
+                let encodedAddress = AdamantUriTools.encode(
+                    request: AdamantUri.address(
+                        address: address,
+                        params: nil
+                    )
+                )
+
                 switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
                 case .success(let qr):
                     let vc = screensFactory.makeShareQr()
@@ -212,8 +223,8 @@ final class NewChatViewController: FormViewController {
                     vc.excludedActivityTypes = ShareContentType.address.excludedActivityTypes
                     vc.modalPresentationStyle = .overFullScreen
                     present(vc, animated: true, completion: nil)
-                    
-                case .failure(error: let error):
+
+                case .failure(let error):
                     dialogService.showError(
                         withMessage: error.localizedDescription,
                         supportEmail: true,
@@ -221,106 +232,107 @@ final class NewChatViewController: FormViewController {
                     )
                 }
             }
-            
+
             myQrSection.append(button)
             form.append(myQrSection)
         }
-        
+
         setColors()
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+
         if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
             row.cell.textField.resignFirstResponder()
         }
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
             row.cell.textField.becomeFirstResponder()
         }
     }
-    
+
     // MARK: - IBActions
-    
-    @IBAction func done(_ sender: Any) {
+
+    @IBAction func done() {
         guard let row: TextRow = form.rowBy(tag: Rows.addressField.tag), let nums = row.value, nums.count > 0 else {
             dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
             return
         }
-        
+
         var address = nums.uppercased()
         if !address.starts(with: "U") {
             address = "U\(address)"
         }
-        
+
         startNewChat(with: address, message: nil)
     }
-    
+
     // MARK: - Other
-    
+
     func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
-    
+
     @MainActor
     func startNewChat(with address: String, name: String? = nil, message: String?) {
         switch AdamantUtilities.validateAdamantAddress(address: address) {
         case .valid:
             break
-            
+
         case .system, .invalid:
             dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
             return
         }
-        
+
         if let loggedAccount = accountService.account, loggedAccount.address == address {
             dialogService.showToastMessage(String.adamant.newChat.loggedUserAddressMessage)
             return
         }
-        
+
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-      
+
         Task {
             do {
                 let account = try await accountsProvider.getAccount(byAddress: address)
                 account.chatroom?.isForcedVisible = true
-                
+
                 self.delegate?.newChatController(
                     didSelectAccount: account,
                     preMessage: message,
                     name: name
                 )
-                
+
                 self.dialogService.dismissProgress()
             } catch let error as AccountsProviderError {
                 switch error {
                 case .dummy, .notFound, .notInitiated:
                     self.dialogService.dismissProgress()
-                    
+
                     dialogService.presentDummyChatAlert(
                         for: address,
                         from: nil,
                         canSend: false,
                         sendCompletion: nil
                     )
-                    
+
                 case .invalidAddress, .networkError:
                     self.dialogService.showWarning(withMessage: error.localized)
-                    
+
                 case .serverError(let apiError):
                     if let apiError = apiError as? ApiServiceError,
-                       case .internalError(let message, _) = apiError,
-                       message == String.adamant.sharedErrors.unknownError {
+                        case .internalError(let message, _) = apiError,
+                        message == String.adamant.sharedErrors.unknownError
+                    {
                         self.dialogService.showWarning(withMessage: AccountsProviderError.notFound(address: address).localized)
                         return
                     }
-                    
+
                     self.dialogService.showError(withMessage: error.localized, supportEmail: false, error: error)
                 }
             } catch {
@@ -328,13 +340,13 @@ final class NewChatViewController: FormViewController {
             }
         }
     }
-    
+
     func startNewChat(with uri: AdamantUri) -> Bool {
         switch uri {
-        case .address(address: let addr, params: let params):
+        case .address(address: let addr, let params):
             if let params = params?.first {
                 switch params {
-                case .label(label: let label):
+                case .label(let label):
                     startNewChat(with: addr, name: label, message: nil)
                 case .address, .message, .amount:
                     break
@@ -342,12 +354,42 @@ final class NewChatViewController: FormViewController {
             } else {
                 startNewChat(with: addr, message: nil)
             }
-            
+
             return true
-            
+
         default:
             return false
         }
+    }
+
+    // MARK: - FormViewController
+
+    override func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        let result = super.textInputShouldReturn(textInput, cell: cell)
+        if cell.row.tag == Rows.addressField.tag {
+            done()
+        }
+
+        return result
+    }
+}
+
+// MARK: - Hardware keyboard handling
+
+extension NewChatViewController {
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        for press in presses {
+            guard let key = press.key else { continue }
+            if key.keyCode == UIKeyboardHIDUsage.keyboardReturnOrEnter {
+                return done()
+            }
+        }
+
+        super.pressesBegan(presses, with: event)
     }
 }
 
@@ -372,18 +414,20 @@ extension NewChatViewController {
             alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
-            
+
         case .denied:
             let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotAuthorized, preferredStyleSafe: .alert, source: nil)
-            
-            alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
-                DispatchQueue.main.async {
-                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(settingsURL)
+
+            alert.addAction(
+                UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
+                    DispatchQueue.main.async {
+                        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(settingsURL)
+                        }
                     }
                 }
-            })
-            
+            )
+
             alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
@@ -391,7 +435,7 @@ extension NewChatViewController {
             break
         }
     }
-    
+
     func loadQr() {
         let presenter: () -> Void = { [weak self] in
             let picker = UIImagePickerController()
@@ -403,7 +447,7 @@ extension NewChatViewController {
             picker.overrideUserInterfaceStyle = .light
             self?.present(picker, animated: true, completion: nil)
         }
-        
+
         presenter()
     }
 }
@@ -426,7 +470,7 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
             }
         }
     }
-    
+
     nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
         MainActor.assumeIsolatedSafe {
             reader.dismiss(animated: true, completion: nil)
@@ -436,15 +480,15 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         dismiss(animated: true, completion: nil)
-        
+
         guard let image = info[.originalImage] as? UIImage, let cgImage = image.cgImage else {
             return
         }
-        
+
         let codes = EFQRCode.recognize(cgImage)
-        
+
         if codes.count > 0 {
             for aCode in codes {
                 if let admAddress = aCode.getAdamantAddress() {
@@ -455,7 +499,7 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
                     return
                 }
             }
-            
+
             dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
         } else {
             dialogService.showWarning(withMessage: String.adamant.login.noQrError)
@@ -469,10 +513,10 @@ extension NewChatViewController: ButtonsStripeViewDelegate {
         switch button {
         case .qrCameraReader:
             scanQr()
-            
+
         case .qrPhotoReader:
             loadQr()
-            
+
         default:
             return
         }

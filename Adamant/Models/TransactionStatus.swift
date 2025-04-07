@@ -19,7 +19,7 @@ enum InconsistentReason: Codable, Hashable {
     case recipientCryptoAddressMismatch(String)
     case senderCryptoAddressUnavailable(String)
     case recipientCryptoAddressUnavailable(String)
-    
+
     var localized: String {
         switch self {
         case .time:
@@ -33,13 +33,25 @@ enum InconsistentReason: Codable, Hashable {
         case .wrongAmount:
             return .localized("TransactionStatus.Inconsistent.WrongAmount", comment: "Transaction status: inconsistent wrong amount")
         case .senderCryptoAddressMismatch(let coin):
-            return String.localizedStringWithFormat(.localized("TransactionStatus.Inconsistent.SenderCryptoAddressMismatch", comment: "Transaction status: inconsistent wrong mismatch"), coin)
+            return String.localizedStringWithFormat(
+                .localized("TransactionStatus.Inconsistent.SenderCryptoAddressMismatch", comment: "Transaction status: inconsistent wrong mismatch"),
+                coin
+            )
         case .recipientCryptoAddressMismatch(let coin):
-            return String.localizedStringWithFormat(.localized("TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch", comment: "Transaction status: inconsistent wrong mismatch"), coin)
+            return String.localizedStringWithFormat(
+                .localized("TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch", comment: "Transaction status: inconsistent wrong mismatch"),
+                coin
+            )
         case .senderCryptoAddressUnavailable(let coin):
-            return String.localizedStringWithFormat(.localized("TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable", comment: "Transaction status: inconsistent unable to retrieve"), coin)
+            return String.localizedStringWithFormat(
+                .localized("TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable", comment: "Transaction status: inconsistent unable to retrieve"),
+                coin
+            )
         case .recipientCryptoAddressUnavailable(let coin):
-            return String.localizedStringWithFormat(.localized("TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable", comment: "Transaction status: inconsistent unable to retrieve"), coin)
+            return String.localizedStringWithFormat(
+                .localized("TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable", comment: "Transaction status: inconsistent unable to retrieve"),
+                coin
+            )
         }
     }
 }
@@ -51,7 +63,7 @@ enum TransactionStatus: Codable, Equatable, Hashable {
     case failed
     case registered
     case inconsistent(InconsistentReason)
-    
+
     var localized: String {
         switch self {
         case .notInitiated:
@@ -73,7 +85,7 @@ extension TransactionStatus {
         if case .inconsistent = self {
             return true
         }
-        
+
         return false
     }
 }

@@ -6,16 +6,16 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Swinject
 import UIKit
-import CommonKit
 
 struct BtcWalletFactory: WalletFactory {
     typealias Service = WalletService
-    
+
     let typeSymbol: String = BtcWalletService.richMessageType
     let assembler: Assembler
-    
+
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         BtcWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
@@ -26,7 +26,7 @@ struct BtcWalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         BtcTransactionsViewController(
             walletService: service,
@@ -36,7 +36,7 @@ struct BtcWalletFactory: WalletFactory {
             addressBook: assembler.resolve(AddressBookService.self)!
         )
     }
-    
+
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
         BtcTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
@@ -52,18 +52,18 @@ struct BtcWalletFactory: WalletFactory {
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
-    
+
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
         guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else { return nil }
-                
+
         let comment: String?
         if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
             comment = raw
         } else {
             comment = nil
         }
-        
+
         return makeTransactionDetailsVC(
             hash: hash,
             senderId: transaction.senderId,
@@ -76,14 +76,14 @@ struct BtcWalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeDetailsVC(service: Service) -> TransactionDetailsViewControllerBase {
         makeTransactionDetailsVC(service: service)
     }
 }
 
-private extension BtcWalletFactory {
-    func makeTransactionDetailsVC(
+extension BtcWalletFactory {
+    fileprivate func makeTransactionDetailsVC(
         hash: String,
         senderId: String?,
         recipientId: String?,
@@ -95,15 +95,16 @@ private extension BtcWalletFactory {
         service: Service
     ) -> UIViewController {
         let vc = makeTransactionDetailsVC(service: service)
-        
+
         let amount: Decimal
         if let amountRaw = richTransaction.getRichValue(for: RichContentKeys.transfer.amount),
-           let decimal = Decimal(string: amountRaw) {
+            let decimal = Decimal(string: amountRaw)
+        {
             amount = decimal
         } else {
             amount = 0
         }
-        
+
         let failedTransaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: senderAddress,
@@ -117,7 +118,7 @@ private extension BtcWalletFactory {
             transactionStatus: nil,
             nonceRaw: nil
         )
-        
+
         vc.senderId = senderId
         vc.recipientId = recipientId
         vc.comment = comment
@@ -125,8 +126,8 @@ private extension BtcWalletFactory {
         vc.richTransaction = richTransaction
         return vc
     }
-    
-    func makeTransactionDetailsVC(service: Service) -> BtcTransactionDetailsViewController {
+
+    fileprivate func makeTransactionDetailsVC(service: Service) -> BtcTransactionDetailsViewController {
         BtcTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,

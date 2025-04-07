@@ -31,7 +31,7 @@ public struct OpHash160: OpCodeProtocol {
 
     // input : in
     // output : hash
-     public func mainProcess(_ context: ScriptExecutionContext) throws {
+    public func mainProcess(_ context: ScriptExecutionContext) throws {
         try context.assertStackHeightGreaterThanOrEqual(1)
 
         let data: Data = context.stack.removeLast()

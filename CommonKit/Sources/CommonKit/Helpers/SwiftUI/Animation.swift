@@ -1,6 +1,6 @@
 //
 //  Animation.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 01.08.2023.
 //

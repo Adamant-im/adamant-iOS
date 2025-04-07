@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
@@ -15,12 +15,13 @@ enum ChatAction {
     case reply(id: String)
     case scrollTo(message: ChatMessageReplyCell.Model)
     case copy(text: String)
-    case copyInPart(text:String)
+    case copyInPart(text: String)
     case report(id: String)
     case remove(id: String)
     case react(id: String, emoji: String)
     case presentMenu(arg: ChatContextMenuArguments)
     case openFile(messageId: String, file: ChatFile)
+    case cancelUploading(messageId: String, file: ChatFile)
     case autoDownloadContentIfNeeded(messageId: String, files: [ChatFile])
     case forceDownloadAllFiles(messageId: String, files: [ChatFile])
 }

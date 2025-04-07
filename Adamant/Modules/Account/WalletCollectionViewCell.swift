@@ -6,62 +6,47 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
+import Combine
+import CommonKit
 import FreakingSimpleRoundImageView
 import Parchment
-import CommonKit
-import Combine
+import UIKit
 
 class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var currencyImageView: UIImageView!
     @IBOutlet weak var balanceLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var accessoryContainerView: AccessoryContainerView!
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    override func prepareForReuse() {
-        cancellables.removeAll()
-    }
-    
+
     override func setPagingItem(
         _ pagingItem: PagingItem,
         selected: Bool,
         options: PagingOptions
     ) {
-        guard let item = pagingItem as? WalletItemModel else {
+        guard let item = pagingItem as? WalletCollectionViewCell.Model else {
             return
         }
-        update(item: item.model)
-        
-        cancellables.removeAll()
-        
-        item.$model
-            .removeDuplicates()
-            .sink { [weak self] item in
-                self?.update(item: item)
-            }
-            .store(in: &cancellables)
+        update(item: item)
     }
 }
 
-private extension WalletCollectionViewCell {
-    func update(item: WalletItem) {
+extension WalletCollectionViewCell {
+    fileprivate func update(item: WalletCollectionViewCell.Model) {
         currencyImageView.image = item.currencyImage
-        if item.currencyNetwork.isEmpty {
+        if item.currencyNetwork == item.currencySymbol {
             currencySymbolLabel.text = item.currencySymbol
         } else {
             let currencyFont = currencySymbolLabel.font ?? .systemFont(ofSize: 12)
             let networkFont = currencyFont.withSize(8)
             let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
             let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
-          
+
             let defaultString = NSMutableAttributedString(string: item.currencySymbol, attributes: currencyAttributes)
             let underlineString = NSAttributedString(string: " \(item.currencyNetwork)", attributes: networkAttributes)
             defaultString.append(underlineString)
             currencySymbolLabel.attributedText = defaultString
         }
-        
+
         if let balance = item.balance, item.isBalanceInitialized {
             if balance < 1 {
                 balanceLabel.text = AdamantBalanceFormat.compact.format(balance)
@@ -71,9 +56,9 @@ private extension WalletCollectionViewCell {
         } else {
             balanceLabel.text = String.adamant.account.updatingBalance
         }
-        
-        if item.notifications > 0 {
-            accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)
+
+        if item.notificationBadgeCount > 0 {
+            accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notificationBadgeCount)), at: .topRight)
         } else {
             accessoryContainerView.setAccessory(nil, at: .topRight)
         }

@@ -6,30 +6,30 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import Reachability
-import Network
 import CommonKit
+import Foundation
+import Network
+import Reachability
 
 // MARK: - AdamantReachability wrapper
 final class AdamantReachability: ReachabilityMonitor, @unchecked Sendable {
     @ObservableValue private(set) var connection = true
-    
+
     private let monitor = NWPathMonitor()
-    
+
     var connectionPublisher: AnyObservable<Bool> {
         $connection.eraseToAnyPublisher()
     }
-    
+
     func start() {
         monitor.pathUpdateHandler = { [weak self] _ in
             guard let self = self else { return }
             self.updateConnection()
-            
+
             let userInfo: [String: Any] = [
                 AdamantUserInfoKey.ReachabilityMonitor.connection: self.connection
             ]
-            
+
             NotificationCenter.default.post(
                 name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
                 object: self,
@@ -44,7 +44,7 @@ final class AdamantReachability: ReachabilityMonitor, @unchecked Sendable {
     func stop() {
         monitor.cancel()
     }
-    
+
     private func updateConnection() {
         switch monitor.currentPath.status {
         case .satisfied:

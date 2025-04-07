@@ -33,19 +33,19 @@ extension OldNodeKeychainDTO.NodeData {
     enum RejectedReason: Codable, Equatable {
         case outdatedApiVersion
     }
-    
+
     enum ConnectionStatus: Equatable, Codable {
         case offline
         case synchronizing
         case allowed
         case notAllowed(RejectedReason)
     }
-    
+
     enum URLScheme: String, Codable {
         case http
         case https
     }
-    
+
     func mapToModernDto(group: NodeGroup) -> NodeKeychainDTO {
         .init(
             mainOrigin: .init(
@@ -68,8 +68,8 @@ extension OldNodeKeychainDTO.NodeData {
     }
 }
 
-private extension OldNodeKeychainDTO.NodeData.URLScheme {
-    func map() -> NodeOrigin.URLScheme {
+extension OldNodeKeychainDTO.NodeData.URLScheme {
+    fileprivate func map() -> NodeOrigin.URLScheme {
         switch self {
         case .http:
             return .http
@@ -79,8 +79,8 @@ private extension OldNodeKeychainDTO.NodeData.URLScheme {
     }
 }
 
-private extension OldNodeKeychainDTO.NodeData.ConnectionStatus {
-    func map() -> NodeConnectionStatusKeychainDTO {
+extension OldNodeKeychainDTO.NodeData.ConnectionStatus {
+    fileprivate func map() -> NodeConnectionStatusKeychainDTO {
         switch self {
         case .offline:
             return .offline
@@ -94,8 +94,8 @@ private extension OldNodeKeychainDTO.NodeData.ConnectionStatus {
     }
 }
 
-private extension OldNodeKeychainDTO.NodeData.RejectedReason {
-    func map() -> NodeConnectionStatusKeychainDTO.RejectedReason {
+extension OldNodeKeychainDTO.NodeData.RejectedReason {
+    fileprivate func map() -> NodeConnectionStatusKeychainDTO.RejectedReason {
         switch self {
         case .outdatedApiVersion:
             return .outdatedApiVersion

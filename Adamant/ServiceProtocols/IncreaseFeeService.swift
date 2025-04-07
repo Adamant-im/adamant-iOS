@@ -8,7 +8,8 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 protocol IncreaseFeeService: AnyObject, Sendable {
-    func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool
-    func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool)
+    func isIncreaseFeeEnabled(for tokenUniqueID: String) -> Bool
+    func setIncreaseFeeEnabled(for tokenUniqueID: String, value: Bool)
 }

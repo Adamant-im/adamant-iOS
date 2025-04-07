@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import Eureka
+import UIKit
 
 public class QrCell: Cell<UIImage>, CellType {
     @IBOutlet weak var qrImageView: UIImageView!
     @IBOutlet weak var tipLabel: UILabel!
     @IBOutlet weak var bottomConstrain: NSLayoutConstraint!
-    
+
     var tipLabelIsHidden: Bool = false {
         didSet {
             if tipLabelIsHidden {
@@ -25,7 +25,7 @@ public class QrCell: Cell<UIImage>, CellType {
             }
         }
     }
-    
+
     public override func update() {
         super.update()
         qrImageView.image = row.value

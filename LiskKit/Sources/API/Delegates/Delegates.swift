@@ -23,7 +23,17 @@ public struct Delegates: APIService {
 extension Delegates {
 
     /// List delegate objects
-    public func delegates(address: String? = nil, publicKey: String? = nil, secondPublicKey: String? = nil, username: String? = nil, search: String? = nil, limit: UInt? = nil, offset: UInt? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<DelegatesResponse>) -> Void) {
+    public func delegates(
+        address: String? = nil,
+        publicKey: String? = nil,
+        secondPublicKey: String? = nil,
+        username: String? = nil,
+        search: String? = nil,
+        limit: UInt? = nil,
+        offset: UInt? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Response<DelegatesResponse>) -> Void
+    ) {
         var options: RequestOptions = [:]
         if let value = address { options["address"] = value }
         if let value = publicKey { options["publicKey"] = value }

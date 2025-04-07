@@ -36,7 +36,7 @@ public struct TransactionInput {
     public let signatureScript: Data
     /// Transaction version as defined by the sender. Intended for "replacement" of transactions when information is updated before inclusion into a block.
     public let sequence: UInt32
-    
+
     public var address: String?
 
     public init(previousOutput: TransactionOutPoint, signatureScript: Data, sequence: UInt32) {
@@ -58,7 +58,7 @@ public struct TransactionInput {
         data += sequence
         return data
     }
-    
+
     public mutating func unpack(with network: Network, addressConverter: AddressConverter) {
         address = addressConverter.extract(from: signatureScript, with: network)?.stringValue
     }

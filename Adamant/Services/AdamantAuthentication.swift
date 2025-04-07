@@ -14,7 +14,7 @@ final class AdamantAuthentication: LocalAuthentication {
         let context = LAContext()
         var error: NSError?
         let available: Bool
-        
+
         available = context.canEvaluatePolicy(
             .deviceOwnerAuthenticationWithBiometrics,
             error: &error
@@ -23,10 +23,10 @@ final class AdamantAuthentication: LocalAuthentication {
             switch context.biometryType {
             case .none, .opticID:
                 return .none
-                
+
             case .touchID:
                 return .touchID
-                
+
             case .faceID:
                 return .faceID
             @unknown default:
@@ -36,7 +36,7 @@ final class AdamantAuthentication: LocalAuthentication {
             return .none
         }
     }
-    
+
     func authorizeUser(reason: String) async -> AuthenticationResult {
         let context = LAContext()
         let result = await authorizeUser(
@@ -53,7 +53,7 @@ final class AdamantAuthentication: LocalAuthentication {
         }
         return result
     }
-    
+
     private func authorizeUser(
         context: LAContext,
         policy: LAPolicy,

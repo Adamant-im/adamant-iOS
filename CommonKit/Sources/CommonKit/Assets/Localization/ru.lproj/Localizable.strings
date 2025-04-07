@@ -449,10 +449,18 @@
 "ChatScene.Actions.NamePlaceholder" = "Имя";
 
 /* Chat: 'Free Tokens' button */
-"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Бесплатные токены";
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Бесплатные монеты";
+
+"ChatScene.FreeTokensAlert.Title.Chat" = "Чтобы начать общение, получите бесплатные монеты или пополните баланс ADM другим способом";
+
+"ChatScene.FreeTokensAlert.Title.Book" = "Чтобы сохранить контакты, получите бесплатные монеты или пополните баланс ADM другим способом";
+
+"ChatScene.FreeTokensAlert.Title.Notification" = "Чтобы включить пуш-уведомления, получите бесплатные монеты или пополните баланс ADM другим способом";
+
+"ChatScene.FreeTokensAlert.BuyADM" = "Купить ADM";
 
 /* Chat: 'Free Tokens' message */
-"ChatScene.FreeTokensAlert.Message" = "АДАМАНТ — мессенджер, полностью работающий на блокчейне, независимый от государств, корпораций и даже разработчиков. Это возможно благодаря децентрализованной сетевой инфраструктуре, с полностью открытым исходным кодом и поддерживаемой пользователями. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM. Чтобы начать общение, получите бесплатные токены.";
+"ChatScene.FreeTokensAlert.Message" = "АДАМАНТ — децентрализованный мессенджер на блокчейне. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM.";
 
 /* Chat: warning message for opening email link without mail app configurated on device */
 "ChatScene.Warning.NoMailApp" = "Не удалось открыть почтовое приложение. Проверьте настройки.";
@@ -750,6 +758,8 @@
 
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
+
+"chat.NewMessages" = "Новые сообщения";
 
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Хранить файлы зашифрованными";
@@ -1346,3 +1356,17 @@
 
 /* Chat unknown */
 "Chat.unknown.title" = "Неизвестный";
+
+/* No active nodes */
+"Chat.Alert.Title.NoActiveNodes" = "Нет активных узлов ADM";
+"Chat.Alert.NoActiveNodes" = "Не удается получить новые сообщения — нет активных узлов блокчейна ADM. Поскольку вы отключили некоторые из них, посмотрите список узлов еще раз.";
+
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Проверьте время на устройстве";
+"Chat.Alert.TimestampIsInTheFuture" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит. Проверьте время на устройстве или попробуйте отправить сообщение снова.";
+"Chat.Alert.TimeSettings" = "Настроить время";
+
+/* Review Nodes List */
+"Chat.Alert.ReviewNodesList" = "К списку узлов ADM";
+
+"Chat.Timestamp.InFuture.Error" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит.\nПроверьте время на устройстве или попробуйте отправить сообщение снова.";

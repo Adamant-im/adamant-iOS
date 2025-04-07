@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension CoinTransaction {
 
@@ -31,8 +31,9 @@ extension CoinTransaction {
     @NSManaged public var blockchainType: String
     @NSManaged public var transactionStatusRaw: String
     @NSManaged public var nonceRaw: String?
+    @NSManaged public var timestampMs: Int64
 }
 
-extension CoinTransaction : Identifiable {
+extension CoinTransaction: Identifiable {
 
 }

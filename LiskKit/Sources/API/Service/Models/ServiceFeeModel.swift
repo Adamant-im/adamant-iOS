@@ -1,6 +1,6 @@
 //
 //  ServiceFeeModel.swift
-//  
+//
 //
 //  Created by Anton Boyarkin on 20.08.2021.
 //
@@ -16,7 +16,7 @@ public struct ServiceFeeModel: APIModel {
     public static func == (lhs: ServiceFeeModel, rhs: ServiceFeeModel) -> Bool {
         return lhs.minFeePerByte == rhs.minFeePerByte
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(minFeePerByte)
     }

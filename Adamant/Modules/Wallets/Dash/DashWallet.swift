@@ -6,9 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 @preconcurrency import BitcoinKit
 import CommonKit
+import Foundation
 
 final class DashWallet: WalletAccount, @unchecked Sendable {
     let unicId: String
@@ -20,9 +20,9 @@ final class DashWallet: WalletAccount, @unchecked Sendable {
     @Atomic var minBalance: Decimal = 0.0001
     @Atomic var minAmount: Decimal = 0.00002
     @Atomic var isBalanceInitialized: Bool = false
-    
+
     var address: String { addressEntity.stringValue }
-    
+
     init(
         unicId: String,
         privateKey: PrivateKey,
@@ -31,7 +31,7 @@ final class DashWallet: WalletAccount, @unchecked Sendable {
         self.unicId = unicId
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
-        
+
         self.addressEntity = try addressConverter.convert(
             publicKey: publicKey,
             type: .p2pkh

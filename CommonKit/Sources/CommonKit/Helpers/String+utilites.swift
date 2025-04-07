@@ -8,10 +8,10 @@
 
 import Foundation
 
-public extension String {
-    static let empty: String = ""
-    
-    func toDictionary() -> [String: Any]? {
+extension String {
+    public static let empty: String = ""
+
+    public func toDictionary() -> [String: Any]? {
         if let data = self.data(using: .utf8) {
             do {
                 return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
@@ -21,12 +21,12 @@ public extension String {
         }
         return nil
     }
-    
-    func matches(for regex: String) -> [String] {
+
+    public func matches(for regex: String) -> [String] {
         do {
             let regex = try NSRegularExpression(pattern: regex)
             let results = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
-            
+
             return results.map {
                 String(self[Range($0.range, in: self)!])
             }
@@ -35,42 +35,42 @@ public extension String {
             return []
         }
     }
-    
-    func checkAndReplaceSystemWallets() -> String {
+
+    public func checkAndReplaceSystemWallets() -> String {
         AdamantContacts(nodeNameKey: self)?.name
             ?? AdamantContacts(address: self)?.name
             ?? self
     }
-    
-    subscript(i: Int) -> Character {
+
+    public subscript(i: Int) -> Character {
         return self[index(startIndex, offsetBy: i)]
     }
-    
-    func separateFileExtension() -> (name: String, extension: String?) {
+
+    public func separateFileExtension() -> (name: String, extension: String?) {
         guard let dotIndex = lastIndex(of: ".") else {
             return (name: self, extension: nil)
         }
-        
+
         return (
-            name: .init(self[startIndex ..< dotIndex]),
-            extension: .init(self[dotIndex ..< endIndex].dropFirst())
+            name: .init(self[startIndex..<dotIndex]),
+            extension: .init(self[dotIndex..<endIndex].dropFirst())
         )
     }
-    
-    func withoutFileExtensionDuplication() -> String {
+
+    public func withoutFileExtensionDuplication() -> String {
         let dotsCount = count { $0 == "." }
         guard dotsCount > 1 else { return self }
-        
+
         var nameAndExtension = separateFileExtension()
         var filename = nameAndExtension.name
         guard let ext = nameAndExtension.extension else { return self }
-        
-        for _ in 1 ..< dotsCount {
+
+        for _ in 1..<dotsCount {
             nameAndExtension = filename.separateFileExtension()
             guard nameAndExtension.extension == ext else { return "\(filename).\(ext)" }
             filename = nameAndExtension.name
         }
-        
+
         return "\(filename).\(ext)"
     }
 }

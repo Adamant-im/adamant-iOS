@@ -12,15 +12,15 @@ public typealias Byte = UInt8
 public enum ByteOrder: Sendable {
     case bigEndian
     case littleEndian
-    
+
     /// Machine specific byte order
     public static let nativeByteOrder: ByteOrder = (Int(CFByteOrderGetCurrent()) == Int(CFByteOrderLittleEndian.rawValue)) ? .littleEndian : .bigEndian
 }
 
 open class ByteBackpacker {
-    
+
     private static let referenceTypeErrorString = "TypeError: Reference Types are not supported."
-    
+
     /// Unpack a byte array into type `T`
     ///
     /// - Parameters:
@@ -30,7 +30,7 @@ open class ByteBackpacker {
     open class func unpack<T: Any>(_ valueByteArray: [Byte], byteOrder: ByteOrder = .nativeByteOrder) -> T {
         return ByteBackpacker.unpack(valueByteArray, toType: T.self, byteOrder: byteOrder)
     }
-    
+
     /// Unpack a byte array into type `T` for type inference
     ///
     /// - Parameters:
@@ -47,32 +47,32 @@ open class ByteBackpacker {
             }
         }
     }
-    
+
     /// Pack method convinience method
     ///
     /// - Parameters:
     ///   - value: value to pack of type `T`
     ///   - byteOrder: Byte order (wither little or big endian)
     /// - Returns: Byte array
-    open class func pack<T: Any>( _ value: T, byteOrder: ByteOrder = .nativeByteOrder) -> [Byte] {
+    open class func pack<T: Any>(_ value: T, byteOrder: ByteOrder = .nativeByteOrder) -> [Byte] {
         assert(!(T.self is AnyClass), ByteBackpacker.referenceTypeErrorString)
-        var value = value // inout works only for var not let types
+        var value = value  // inout works only for var not let types
         let valueByteArray = withUnsafePointer(to: &value) {
-            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: Byte.self, capacity: 1) {$0}, count: MemoryLayout<T>.size))
+            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: Byte.self, capacity: 1) { $0 }, count: MemoryLayout<T>.size))
         }
         return (byteOrder == ByteOrder.nativeByteOrder) ? valueByteArray : valueByteArray.reversed()
     }
 }
 
-public extension Data {
-    
+extension Data {
+
     /// Extension for exporting Data (NSData) to byte array directly
     ///
     /// - Returns: Byte array
-    func toByteArray() -> [Byte] {
+    public func toByteArray() -> [Byte] {
         let count = self.count / MemoryLayout<Byte>.size
         var array = [Byte](repeating: 0, count: count)
-        copyBytes(to: &array, count:count * MemoryLayout<Byte>.size)
+        copyBytes(to: &array, count: count * MemoryLayout<Byte>.size)
         return array
     }
 }

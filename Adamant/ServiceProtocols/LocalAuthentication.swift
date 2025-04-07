@@ -10,7 +10,7 @@ import Foundation
 
 enum BiometryType {
     case none, touchID, faceID
-    
+
     var localized: String {
         switch self {
         case .none: return "None"
@@ -30,6 +30,6 @@ enum AuthenticationResult {
 
 protocol LocalAuthentication: AnyObject {
     var biometryType: BiometryType { get }
-    
+
     func authorizeUser(reason: String) async -> AuthenticationResult
 }

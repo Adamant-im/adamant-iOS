@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
 import ElegantEmojiPicker
+import UIKit
 
 enum ChatDialog {
     case toast(String)
@@ -17,6 +17,8 @@ enum ChatDialog {
     case warning(String)
     case richError(Error)
     case freeTokenAlert
+    case noActiveNodesAlert
+    case timestampIsInTheFuture
     case removeMessageAlert(id: String)
     case reportMessageAlert(id: String)
     case menu(sender: UIBarButtonItem)

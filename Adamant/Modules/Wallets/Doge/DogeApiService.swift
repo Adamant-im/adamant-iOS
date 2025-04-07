@@ -15,7 +15,7 @@ final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
     init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
-    
+
     func request<Output>(
         origin: NodeOrigin,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
@@ -25,14 +25,14 @@ final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
 
     func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        
+
         let response: WalletServiceResult<DogeNodeInfoDTO> = await request(origin: origin) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: DogeApiCommands.getInfo()
             )
         }
-        
+
         return response.map { data in
             return .init(
                 ping: Date.now.timeIntervalSince1970 - startTimestamp,
@@ -45,21 +45,25 @@ final class DogeApiCore: BlockchainHealthCheckableService, Sendable {
     }
 }
 
-final class DogeApiService: ApiServiceProtocol {
-    let api: BlockchainHealthCheckWrapper<DogeApiCore>
-    
-    @MainActor
-    var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
-    
-    @MainActor
-    var nodesInfo: NodesListInfo { api.nodesInfo }
-    
-    func healthCheck() { api.healthCheck() }
-    
-    init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
-        self.api = api
+final class DogeApiService: DogeApiServiceProtocol {
+    var api: DogeInternalApiProtocol {
+        _api
     }
-    
+
+    let _api: BlockchainHealthCheckWrapper<DogeApiCore>
+
+    @MainActor
+    var nodesInfoPublisher: AnyObservable<NodesListInfo> { _api.nodesInfoPublisher }
+
+    @MainActor
+    var nodesInfo: NodesListInfo { _api.nodesInfo }
+
+    func healthCheck() { _api.healthCheck() }
+
+    init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
+        self._api = api
+    }
+
     func request<Output>(
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
@@ -68,10 +72,12 @@ final class DogeApiService: ApiServiceProtocol {
             await core.request(origin: origin, request)
         }
     }
-    
+
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
         await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }
 }
+
+extension BlockchainHealthCheckWrapper: DogeInternalApiProtocol where Service == DogeApiCore {}

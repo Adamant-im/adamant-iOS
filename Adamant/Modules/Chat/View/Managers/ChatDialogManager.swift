@@ -6,53 +6,58 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
-import Combine
-import SafariServices
-import CommonKit
 import AdvancedContextMenuKit
-import SwiftUI
+import Combine
+import CommonKit
 import ElegantEmojiPicker
+import SafariServices
+import SwiftUI
+import UIKit
 
 @MainActor
 final class ChatDialogManager {
     private let viewModel: ChatViewModel
     private let dialogService: DialogService
     private let emojiService: EmojiService?
-    
+    private let accountService: AccountService
+
     private var subscription: AnyCancellable?
     private lazy var contextMenu = AdvancedContextMenuManager()
-    
+
     typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
     typealias ContextMenuAction = ((_ messageId: String) -> Void)?
-    
+
     init(
         viewModel: ChatViewModel,
         dialogService: DialogService,
-        emojiService: EmojiService
+        emojiService: EmojiService,
+        accountService: AccountService
     ) {
         self.viewModel = viewModel
         self.dialogService = dialogService
         self.emojiService = emojiService
+        self.accountService = accountService
         subscription = viewModel.dialog.sink { [weak self] in self?.showDialog($0) }
     }
 }
 
-private extension ChatDialogManager {
-    var address: String? {
+extension ChatDialogManager {
+    fileprivate var address: String? {
         viewModel.chatroom?.partner?.address
     }
-    
-    var encodedAddress: String? {
+
+    fileprivate var encodedAddress: String? {
         guard let partner = viewModel.chatroom?.partner, let address = address else { return nil }
-        
-        return AdamantUriTools.encode(request: AdamantUri.address(
-            address: address,
-            params: partner.name.map { [.label($0)] }
-        ))
+
+        return AdamantUriTools.encode(
+            request: AdamantUri.address(
+                address: address,
+                params: partner.name.map { [.label($0)] }
+            )
+        )
     }
-    
-    func showDialog(_ dialog: ChatDialog) {
+
+    fileprivate func showDialog(_ dialog: ChatDialog) {
         switch dialog {
         case let .toast(message):
             dialogService.showToastMessage(message)
@@ -72,6 +77,10 @@ private extension ChatDialogManager {
             showMenu(sender: sender)
         case .freeTokenAlert:
             showFreeTokenAlert()
+        case .noActiveNodesAlert:
+            showNoActiveNodesAlert()
+        case .timestampIsInTheFuture:
+            showTimestampAlert()
         case let .removeMessageAlert(id):
             showRemoveMessageAlert(id: id)
         case let .reportMessageAlert(id):
@@ -110,8 +119,8 @@ private extension ChatDialogManager {
             showActionMenu()
         }
     }
-    
-    func showAlert(message: String) {
+
+    fileprivate func showAlert(message: String) {
         dialogService.showAlert(
             title: nil,
             message: message,
@@ -120,11 +129,11 @@ private extension ChatDialogManager {
             from: nil
         )
     }
-    
-    func showMenu(sender: UIBarButtonItem) {
+
+    fileprivate func showMenu(sender: UIBarButtonItem) {
         guard let partner = viewModel.chatroom?.partner else { return }
         guard !partner.isSystem else { return showSystemPartnerMenu(sender: sender) }
-        
+
         dialogService.showAlert(
             title: nil,
             message: nil,
@@ -138,12 +147,12 @@ private extension ChatDialogManager {
             from: .barButtonItem(sender)
         )
     }
-    
-    func showActionMenu() {
+
+    fileprivate func showActionMenu() {
         let didSelect: ((ShareType) -> Void)? = { [weak self] type in
             self?.viewModel.didSelectMenuAction(type)
         }
-        
+
         dialogService.presentShareAlertFor(
             string: .empty,
             types: [
@@ -158,18 +167,18 @@ private extension ChatDialogManager {
             didSelect: didSelect
         )
     }
-    
-    func showSystemPartnerMenu(sender: UIBarButtonItem) {
+
+    fileprivate func showSystemPartnerMenu(sender: UIBarButtonItem) {
         guard let address = address else { return }
-        
+
         let didSelect: ((ShareType) -> Void)? = { [weak self] type in
             guard case .partnerQR = type,
-                  let partner = self?.viewModel.chatroom?.partner
+                let partner = self?.viewModel.chatroom?.partner
             else { return }
-            
+
             self?.viewModel.didTapPartnerQR.send(partner)
         }
-        
+
         dialogService.presentShareAlertFor(
             string: address,
             types: [
@@ -184,22 +193,60 @@ private extension ChatDialogManager {
             didSelect: didSelect
         )
     }
-    
-    func showFreeTokenAlert() {
+
+    fileprivate func showNoActiveNodesAlert() {
         let alert = UIAlertController(
-            title: "",
-            message: String.adamant.chat.freeTokensMessage,
+            title: .adamant.chat.noActiveNodesTitle,
+            message: .adamant.chat.noActiveNodes,
             preferredStyleSafe: .alert,
             source: nil
         )
-        
-        alert.addAction(makeFreeTokensAlertAction())
-        alert.addAction(makeCancelAction())
+
+        alert.addAction(
+            .init(
+                title: .adamant.chat.reviewNodesList,
+                style: .destructive,
+                handler: { [weak self] _ in
+                    self?.viewModel.didTapAdmNodesList.send(())
+                }
+            )
+        )
+        let cancelButton = UIAlertAction(title: .adamant.alert.cancel, style: .default)
+        alert.addAction(cancelButton)
         alert.modalPresentationStyle = .overFullScreen
         dialogService.present(alert, animated: true, completion: nil)
     }
-    
-    func showRemoveMessageAlert(id: String) {
+
+    fileprivate func showTimestampAlert() {
+        dialogService.showAlert(
+            title: .adamant.chat.timestampIsInTheFutureTitle,
+            message: .adamant.chat.timestampIsInTheFuture,
+            style: .alert,
+            actions: [
+                .init(
+                    title: .adamant.chat.timeSettings,
+                    style: .destructive,
+                    handler: { [weak self] _ in
+                        self?.viewModel.didTapShowTimeSettings.send(())
+                    }
+                ),
+                UIAlertAction(title: .adamant.alert.cancel, style: .default)
+            ],
+            from: nil
+        )
+    }
+
+    fileprivate func showFreeTokenAlert() {
+        dialogService.showFreeTokenAlert(
+            url: accountService.account?.address,
+            type: .message,
+            showVC: { [weak self] in
+                self?.viewModel.showBuyAndSell.send()
+            }
+        )
+    }
+
+    fileprivate func showRemoveMessageAlert(id: String) {
         dialogService.showAlert(
             title: .adamant.chat.removeMessage,
             message: nil,
@@ -215,8 +262,8 @@ private extension ChatDialogManager {
             from: nil
         )
     }
-    
-    func showReportMessageAlert(id: String) {
+
+    fileprivate func showReportMessageAlert(id: String) {
         dialogService.showAlert(
             title: .adamant.chat.reportMessage,
             message: nil,
@@ -235,8 +282,8 @@ private extension ChatDialogManager {
             from: nil
         )
     }
-    
-    func showFailedMessageAlert(id: String, sender: UIAlertController.SourceView?) {
+
+    fileprivate func showFailedMessageAlert(id: String, sender: UIAlertController.SourceView?) {
         dialogService.showAlert(
             title: .adamant.alert.retryOrDeleteTitle,
             message: .adamant.alert.retryOrDeleteBody,
@@ -249,19 +296,34 @@ private extension ChatDialogManager {
             from: nil
         )
     }
-    
-    func showRenameAlert() {
-        guard let alert = makeRenameAlert() else { return }
+
+    fileprivate func showRenameAlert() {
+        guard let address = address else { return }
+
+        let alert = dialogService.makeRenameAlert(
+            titleFormat: String(format: .adamant.chat.actionsBody, address),
+            initialText: viewModel.partnerName,
+            isEnoughMoney: accountService.account?.isEnoughMoneyForTransaction ?? false,
+            url: accountService.account?.address,
+            showVC: { [weak self] in
+                self?.viewModel.showBuyAndSell.send()
+            },
+            onRename: handleRename(newName:)
+        )
+
         dialogService.present(alert, animated: true) { [weak self] in
             self?.dialogService.selectAllTextFields(in: alert)
         }
+    }
+    fileprivate func handleRename(newName: String) {
+        viewModel.setNewName(newName)
     }
 }
 
 // MARK: Alert actions
 
-private extension ChatDialogManager {
-    func makeBlockAction() -> UIAlertAction {
+extension ChatDialogManager {
+    fileprivate func makeBlockAction() -> UIAlertAction {
         .init(
             title: .adamant.chat.block,
             style: .destructive
@@ -286,8 +348,8 @@ private extension ChatDialogManager {
             )
         }
     }
-    
-    func makeRenameAction() -> UIAlertAction {
+
+    fileprivate func makeRenameAction() -> UIAlertAction {
         .init(
             title: .adamant.chat.rename,
             style: .default
@@ -295,42 +357,8 @@ private extension ChatDialogManager {
             self?.showRenameAlert()
         }
     }
-    
-    func makeRenameAlert() -> UIAlertController? {
-        guard let address = address else { return nil }
-        
-        let alert = UIAlertController(
-            title: .init(format: .adamant.chat.actionsBody, address),
-            message: nil,
-            preferredStyleSafe: .alert,
-            source: nil
-        )
-        
-        alert.addTextField { [weak viewModel] textField in
-            textField.placeholder = .adamant.chat.name
-            textField.autocapitalizationType = .words
-            textField.text = viewModel?.partnerName
-        }
-        
-        let renameAction = UIAlertAction(
-            title: .adamant.chat.rename,
-            style: .default
-        ) { [weak viewModel] _ in
-            guard
-                let textField = alert.textFields?.first,
-                let newName = textField.text
-            else { return }
-            
-            viewModel?.setNewName(newName)
-        }
-        
-        alert.addAction(renameAction)
-        alert.addAction(makeCancelAction())
-        alert.modalPresentationStyle = .overFullScreen
-        return alert
-    }
-    
-    func makeShareAction(sender: UIBarButtonItem) -> UIAlertAction {
+
+    fileprivate func makeShareAction(sender: UIBarButtonItem) -> UIAlertAction {
         .init(
             title: ShareType.share.localized,
             style: .default
@@ -339,15 +367,15 @@ private extension ChatDialogManager {
                 let self = self,
                 let address = self.address
             else { return }
-            
+
             let didSelect: ((ShareType) -> Void)? = { [weak self] type in
                 guard case .partnerQR = type,
-                      let partner = self?.viewModel.chatroom?.partner
+                    let partner = self?.viewModel.chatroom?.partner
                 else { return }
-                
+
                 self?.viewModel.didTapPartnerQR.send(partner)
             }
-            
+
             self.dialogService.presentShareAlertFor(
                 string: address,
                 types: [
@@ -363,26 +391,13 @@ private extension ChatDialogManager {
             )
         }
     }
-    
-    func makeFreeTokensAlertAction() -> UIAlertAction {
-        .init(
-            title: String.adamant.chat.freeTokens,
-            style: .default
-        ) { [weak self] _ in
-            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            self.dialogService.present(safari, animated: true, completion: nil)
-        }
-    }
-    
-    func showAdmMenuAction(_ adm: AdamantAddress, partnerAddress: String) {
+
+    fileprivate func showAdmMenuAction(_ adm: AdamantAddress, partnerAddress: String) {
         let shareTypes: [AddressChatShareType] = adm.address == partnerAddress ? [.send] : [.chat, .send]
         let name = adm.name ?? adm.address
-        
+
         let kvsName = viewModel.getKvsName(for: adm.address)
-        
+
         self.dialogService.presentShareAlertFor(
             adm: adm.address,
             name: kvsName ?? name,
@@ -397,13 +412,13 @@ private extension ChatDialogManager {
                     self.dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
                     return
                 }
-                
+
                 self.viewModel.process(adm: adm, action: action)
             }
         }
     }
-    
-    func showDummyAlert(for address: String) {
+
+    fileprivate func showDummyAlert(for address: String) {
         dialogService.presentDummyChatAlert(
             for: address,
             from: nil,
@@ -411,8 +426,8 @@ private extension ChatDialogManager {
             sendCompletion: nil
         )
     }
-    
-    func showUrl(_ url: URL) {
+
+    fileprivate func showUrl(_ url: URL) {
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
@@ -432,46 +447,46 @@ private extension ChatDialogManager {
             }
         }
     }
-    
-    func makeRetryAction(id: String) -> UIAlertAction {
+
+    fileprivate func makeRetryAction(id: String) -> UIAlertAction {
         .init(title: .adamant.alert.retry, style: .default) { [weak viewModel] _ in
             viewModel?.retrySendMessage(id: id)
         }
     }
-    
-    func makeCancelSendingAction(id: String) -> UIAlertAction {
+
+    fileprivate func makeCancelSendingAction(id: String) -> UIAlertAction {
         .init(title: .adamant.alert.delete, style: .default) { [weak viewModel] _ in
             viewModel?.cancelMessage(id: id)
         }
     }
-    
-    func setProgress(_ show: Bool) {
+
+    fileprivate func setProgress(_ show: Bool) {
         if show {
             dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         } else {
             dialogService.dismissProgress()
         }
     }
-    
-    func makeCancelAction() -> UIAlertAction {
+
+    fileprivate func makeCancelAction() -> UIAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
-    
-    func makeCancelAction() -> AdamantAlertAction {
+
+    fileprivate func makeCancelAction() -> AdamantAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }
 
 // MARK: Context Menu
 
-private extension ChatDialogManager {
-    func dismissMenu() {
+extension ChatDialogManager {
+    fileprivate func dismissMenu() {
         Task {
             await contextMenu.dismiss()
         }
     }
-    
-    func presentMenu(
+
+    fileprivate func presentMenu(
         presentReactions: Bool,
         arg: ChatContextMenuArguments,
         didSelectEmojiDelegate: ElegantEmojiPickerDelegate?,
@@ -481,32 +496,34 @@ private extension ChatDialogManager {
     ) {
         contextMenu.didPresentMenuAction = didPresentMenuAction
         contextMenu.didDismissMenuAction = didDismissMenuAction
-        
-        let reactionsContentView = !presentReactions
-        ? nil
-        : getUpperContentView(
-            messageId: arg.messageId,
-            selectedEmoji: arg.selectedEmoji,
-            didSelectEmojiAction: didSelectEmojiAction,
-            didSelectEmojiDelegate: didSelectEmojiDelegate
-        )
-        
-        let reactionsContentViewSize: CGSize = !presentReactions
-        ? .zero
-        : getUpperContentViewSize()
-        
+
+        let reactionsContentView =
+            !presentReactions
+            ? nil
+            : getUpperContentView(
+                messageId: arg.messageId,
+                selectedEmoji: arg.selectedEmoji,
+                didSelectEmojiAction: didSelectEmojiAction,
+                didSelectEmojiDelegate: didSelectEmojiDelegate
+            )
+
+        let reactionsContentViewSize: CGSize =
+            !presentReactions
+            ? .zero
+            : getUpperContentViewSize()
+
         contextMenu.presentMenu(
             arg: arg,
             upperView: reactionsContentView,
             upperViewSize: reactionsContentViewSize
         )
     }
-    
-    func getUpperContentViewSize() -> CGSize {
+
+    fileprivate func getUpperContentViewSize() -> CGSize {
         .init(width: 335, height: 50)
     }
-    
-    func getUpperContentView(
+
+    fileprivate func getUpperContentView(
         messageId: String,
         selectedEmoji: String?,
         didSelectEmojiAction: DidSelectEmojiAction,
@@ -532,16 +549,16 @@ private extension ChatDialogManager {
         }
         return AnyView(view)
     }
-    
-    func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
+
+    fileprivate func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
         var emojis = emojiService?.getFrequentlySelectedEmojis()
         guard let selectedEmoji = selectedEmoji else { return emojis }
-        
+
         if let index = emojis?.firstIndex(of: selectedEmoji) {
             emojis?.remove(at: index)
         }
         emojis?.insert(selectedEmoji, at: 0)
-        
+
         return emojis
     }
 }

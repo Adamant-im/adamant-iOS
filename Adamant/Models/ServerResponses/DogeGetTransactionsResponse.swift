@@ -12,7 +12,7 @@ final class DogeGetTransactionsResponse: Decodable, Sendable {
     let totalItems: Int
     let from: Int
     let to: Int
-    
+
     let items: [BTCRawTransaction]
 }
 
@@ -24,5 +24,5 @@ final class DogeGetTransactionsResponse: Decodable, Sendable {
     "to": 1,
     "items": []
 }
- 
+
 */

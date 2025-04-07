@@ -8,7 +8,8 @@
 
 import Foundation
 
-struct IPFSNodeStatus: Codable {
+struct IPFSNodeStatus: Decodable {
+    let timestamp: UInt64
     let version: String
 }
 

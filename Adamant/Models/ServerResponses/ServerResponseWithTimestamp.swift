@@ -6,8 +6,8 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 protocol ServerResponseWithTimestamp {
     var nodeTimestamp: TimeInterval { get }

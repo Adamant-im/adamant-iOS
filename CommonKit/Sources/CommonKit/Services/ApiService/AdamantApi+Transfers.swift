@@ -6,9 +6,9 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import CryptoSwift
 import BigInt
+import CryptoSwift
+import Foundation
 
 extension AdamantApiService {
     public func transferFunds(transaction: UnregisteredTransaction) async -> ApiServiceResult<UInt64> {
@@ -22,26 +22,29 @@ extension AdamantApiService {
         sender: String,
         recipient: String,
         amount: Decimal,
-        keypair: Keypair
+        keypair: Keypair,
+        date: Date
     ) async -> ApiServiceResult<UInt64> {
         let normalizedTransaction = NormalizedTransaction(
             type: .send,
             amount: amount,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: .now,
+            date: date,
             recipientId: recipient,
             asset: .init()
         )
-        
-        guard let transaction = adamantCore.makeSignedTransaction(
-            transaction: normalizedTransaction,
-            senderId: sender,
-            keypair: keypair
-        ) else {
+
+        guard
+            let transaction = adamantCore.makeSignedTransaction(
+                transaction: normalizedTransaction,
+                senderId: sender,
+                keypair: keypair
+            )
+        else {
             return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
-        
+
         return await transferFunds(transaction: transaction)
     }
 }

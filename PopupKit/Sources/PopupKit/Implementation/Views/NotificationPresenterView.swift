@@ -5,8 +5,8 @@
 //  Created by Yana Silosieva on 02.12.2024.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct NotificationPresenterView: View {
     enum DragDirection {
@@ -19,11 +19,11 @@ struct NotificationPresenterView: View {
     @State private var dynamicHeight: CGFloat = 0
     @State private var notificationHeight: CGFloat = 0
     @State private var offset: CGSize = .zero
-    
+
     let model: NotificationModel
     let safeAreaInsets: EdgeInsets
     let dismissAction: () -> Void
-    
+
     var body: some View {
         VStack {
             NotificationView(
@@ -37,7 +37,6 @@ struct NotificationPresenterView: View {
                     Color.clear
                         .onAppear {
                             notificationHeight = geometry.size.height
-                            print("onappier")
                         }
                         .onChange(of: geometry.size.height) { newValue in
                             notificationHeight = newValue
@@ -48,7 +47,7 @@ struct NotificationPresenterView: View {
         .frame(minHeight: notificationHeight + dynamicHeight)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.init(uiColor:.adamant.chatInputBarBorderColor), lineWidth: 1)
+                .stroke(Color.init(uiColor: .adamant.chatInputBarBorderColor), lineWidth: 1)
         )
         .background(GeometryReader(content: processGeometry))
         .onTapGesture(perform: onTap)
@@ -61,19 +60,19 @@ struct NotificationPresenterView: View {
         .transition(.move(edge: dismissEdge))
     }
 }
-private extension NotificationPresenterView {
-    func processGeometry(_ geometry: GeometryProxy) -> some View {
+extension NotificationPresenterView {
+    fileprivate func processGeometry(_ geometry: GeometryProxy) -> some View {
         return Color.init(uiColor: .adamant.swipeBlockColor)
             .cornerRadius(10)
     }
-    func onTap() {
+    fileprivate func onTap() {
         model.tapHandler?.value()
         dismissAction()
         dismissEdge = .top
     }
 }
-private extension NotificationPresenterView {
-    var dragGesture: some Gesture {
+extension NotificationPresenterView {
+    fileprivate var dragGesture: some Gesture {
         DragGesture()
             .onChanged { value in
                 if dragDirection == nil || (abs(value.translation.width) <= 5 && abs(value.translation.height) <= 5) {
@@ -107,9 +106,10 @@ private extension NotificationPresenterView {
                 offset = .zero
             }
     }
-    
-    func detectDragDirection(value: DragGesture.Value) {
-        let horizontalDistance = abs(value.translation.width), verticalDistance = abs(value.translation.height)
+
+    fileprivate func detectDragDirection(value: DragGesture.Value) {
+        let horizontalDistance = abs(value.translation.width)
+        let verticalDistance = abs(value.translation.height)
         dragDirection = verticalDistance > horizontalDistance ? .vertical : .horizontal
     }
 }

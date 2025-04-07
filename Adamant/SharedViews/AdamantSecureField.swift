@@ -11,7 +11,7 @@ import SwiftUI
 struct AdamantSecureField: View {
     let placeholder: String?
     let text: Binding<String>
-    
+
     var body: some View {
         GeometryReader { geometry in
             _AdamantSecureField(placeholder: placeholder, text: text)
@@ -23,9 +23,9 @@ struct AdamantSecureField: View {
 private struct _AdamantSecureField: UIViewRepresentable {
     let placeholder: String?
     let text: Binding<String>
-    
+
     func makeUIView(context _: Context) -> _View { .init() }
-    
+
     func updateUIView(_ view: _View, context _: Context) {
         view.text = text.wrappedValue
         view.placeholder = placeholder
@@ -36,19 +36,19 @@ private struct _AdamantSecureField: UIViewRepresentable {
 extension _AdamantSecureField {
     final class _View: UITextField {
         var onChanged: (String?) -> Void = { _ in }
-        
+
         override var intrinsicContentSize: CGSize {
             .init(
                 width: UIView.noIntrinsicMetric,
                 height: super.intrinsicContentSize.height
             )
         }
-        
+
         override init(frame: CGRect) {
             super.init(frame: frame)
             configure()
         }
-        
+
         required init?(coder: NSCoder) {
             super.init(coder: coder)
             configure()
@@ -56,14 +56,14 @@ extension _AdamantSecureField {
     }
 }
 
-private extension _AdamantSecureField._View {
-    func configure() {
+extension _AdamantSecureField._View {
+    fileprivate func configure() {
         isSecureTextEntry = true
         enablePasswordToggle()
         addTarget(self, action: #selector(_onChanged), for: .editingChanged)
     }
-    
-    @objc func _onChanged() {
+
+    @objc fileprivate func _onChanged() {
         onChanged(text)
     }
 }

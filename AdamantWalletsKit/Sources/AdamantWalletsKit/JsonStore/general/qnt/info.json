@@ -1,0 +1,29 @@
+{
+  "name": "Quant",
+  "website": "https://quant.network",
+  "description": "An operating system distributed ledger technology— and Overledger Network — for connecting different blockchain networks.",
+  "symbol": "QNT",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/quant_network"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/QuantNetwork/"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/quantnetwork"
+    },
+    {
+      "name": "whitepaper",
+      "url": "http://files.quant.network/files.quant.network/Quant_Overledger_Whitepaper_v0.1.pdf"
+    }
+  ]
+}

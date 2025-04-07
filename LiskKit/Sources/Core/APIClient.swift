@@ -42,7 +42,7 @@ public struct APIClient {
 
     /// Client that connects to Betanet
     public static let betanet = APIClient(options: .betanet)
-    
+
     public struct Service {
         public static let mainnet = APIClient(options: .Service.mainnet)
         public static let testnet = APIClient(options: .Service.testnet)
@@ -53,7 +53,7 @@ public struct APIClient {
         let jsonrpc: String
         let result: R
     }
-    
+
     // MARK: - Init
 
     public init(options: APIOptions = .mainnet) {
@@ -99,7 +99,12 @@ public struct APIClient {
 
     /// Perform request
     @discardableResult
-    public func request<R>(_ httpMethod: HTTPMethod, path: String, options: Any?, completionHandler: @escaping (Response<R>) -> Void) -> (URLRequest, URLSessionDataTask) {
+    public func request<R>(
+        _ httpMethod: HTTPMethod,
+        path: String,
+        options: Any?,
+        completionHandler: @escaping (Response<R>) -> Void
+    ) -> (URLRequest, URLSessionDataTask) {
         let request = urlRequest(httpMethod, path: path, options: options)
         let task = dataTask(request, completionHandler: completionHandler)
         return (request, task)
@@ -114,7 +119,7 @@ public struct APIClient {
         let response: R = try await dataTask(request)
         return response
     }
-    
+
     public func request<R: Decodable>(
         method: String,
         params: [String: Any]
@@ -123,7 +128,7 @@ public struct APIClient {
         let response: R = try await dataTask(request)
         return response
     }
-    
+
     // MARK: - Private
 
     /// Base url of all requests
@@ -143,7 +148,7 @@ public struct APIClient {
         let response: R = try processRequestCompletion(data.0, response: data.1)
         return response
     }
-    
+
     /// Create a json data task
     private func dataTask<R>(_ request: URLRequest, completionHandler: @escaping (Response<R>) -> Void) -> URLSessionDataTask {
         let task = urlSession.dataTask(with: request) { data, response, _ in
@@ -188,17 +193,17 @@ public struct APIClient {
     ) throws -> URLRequest {
         let url = baseURL.appendingPathComponent(rpcPath)
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
-        
+
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         let requestBody: [String: Any] = [
             "jsonrpc": "2.0",
             "id": "1",
             "method": method,
             "params": params
         ]
-        
+
         let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
         request.httpBody = jsonData
         return request
@@ -213,7 +218,7 @@ public struct APIClient {
             guard
                 let safeKey = key.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
                 let safeValue = "\(value)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
-                else { return nil }
+            else { return nil }
             return "\(safeKey)=\(safeValue)"
         }
 
@@ -226,7 +231,7 @@ public struct APIClient {
         response: URLResponse?
     ) -> Response<R> {
         let code = (response as? HTTPURLResponse)?.statusCode
-        
+
         guard let data = data else {
             return .error(response: .unexpected(code: code))
         }
@@ -235,8 +240,7 @@ public struct APIClient {
             if var error = try? JSONDecoder().decode(APIError.self, from: data) {
                 error.code = code
                 return .error(response: error)
-            } else if
-                let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+            } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
                 var first = error.errors.first
             {
                 first.code = code
@@ -247,35 +251,35 @@ public struct APIClient {
 
         return .success(response: result)
     }
-    
+
     /// Process a response
     private func processRequestCompletion<R: Decodable>(
         _ data: Data?,
         response: URLResponse?
     ) throws -> R {
         let code = (response as? HTTPURLResponse)?.statusCode
-        
+
         guard let data = data else {
             throw APIError.unexpected(code: code)
         }
 
         do {
-             if let jsonResponse = try? JSONDecoder().decode(JSONResponse<R>.self, from: data) {
-                 return jsonResponse.result
-             } else if let result = try? JSONDecoder().decode(R.self, from: data) {
-                 return result
-             } else if var error = try? JSONDecoder().decode(APIError.self, from: data) {
-                 error.code = code
-                 throw error
-             } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data), var first = error.errors.first {
-                 first.code = code
-                 throw first
-             } else {
-                 throw APIError.unknown(code: code)
-             }
-         } catch {
-             throw error
-         }
-        
+            if let jsonResponse = try? JSONDecoder().decode(JSONResponse<R>.self, from: data) {
+                return jsonResponse.result
+            } else if let result = try? JSONDecoder().decode(R.self, from: data) {
+                return result
+            } else if var error = try? JSONDecoder().decode(APIError.self, from: data) {
+                error.code = code
+                throw error
+            } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data), var first = error.errors.first {
+                first.code = code
+                throw first
+            } else {
+                throw APIError.unknown(code: code)
+            }
+        } catch {
+            throw error
+        }
+
     }
 }

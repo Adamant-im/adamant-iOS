@@ -6,16 +6,17 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
-import CommonKit
 import Combine
+import CommonKit
+import Foundation
 
 final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     @Atomic private var preservedMessages: [String: String] = [:]
     @Atomic private var preservedReplayMessage: [String: MessageModel] = [:]
     @Atomic private var preservedFiles: [String: [FileResult]] = [:]
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
-    
+
+    var updateNotifier = ObservableSender<Void>()
     init() {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -24,61 +25,74 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
             }
             .store(in: &notificationsSet)
     }
-    
+
     // MARK: Notification actions
-    
+
     private func clearPreservedMessages() {
         preservedMessages = [:]
         preservedReplayMessage = [:]
         preservedFiles = [:]
+
+        updateNotifier.send()
     }
-    
-    func preserveMessage(_ message: String, forAddress address: String) {
-        preservedMessages[address] = message
+
+    func preserveChatState(
+        message: String?,
+        replyMessage: MessageModel?,
+        files: [FileResult]?,
+        forAddress address: String
+    ) {
+        var shouldNotify = false
+
+        if let message = message, !message.isEmpty {
+            preservedMessages[address] = message
+            shouldNotify = true
+        } else if preservedMessages[address] != nil {
+            preservedMessages.removeValue(forKey: address)
+            shouldNotify = true
+        }
+
+        if let replyMessage = replyMessage {
+            preservedReplayMessage[address] = replyMessage
+            shouldNotify = true
+        } else if preservedReplayMessage[address] != nil {
+            preservedReplayMessage.removeValue(forKey: address)
+            shouldNotify = true
+        }
+
+        if let files = files {
+            preservedFiles[address] = files
+            shouldNotify = true
+
+        } else if preservedFiles[address] != nil {
+            preservedFiles.removeValue(forKey: address)
+            shouldNotify = true
+        }
+
+        if shouldNotify {
+            updateNotifier.send()
+        }
     }
-    
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+
+    func getPreservedMessageFor(address: String) -> String? {
         guard let message = preservedMessages[address] else {
             return nil
         }
 
-        if thenRemoveIt {
-            preservedMessages.removeValue(forKey: address)
-        }
-
         return message
     }
-    
-    func setReplyMessage(_ message: MessageModel?, forAddress address: String) {
-        preservedReplayMessage[address] = message
-    }
-    
-    func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
-        guard let replayMessage = preservedReplayMessage[address] else {
-            return nil
-        }
-        
-        if thenRemoveIt {
-            preservedMessages.removeValue(forKey: address)
-        }
-        
-        return replayMessage
-    }
-    
-    func preserveFiles(_ files: [FileResult]?, forAddress address: String) {
-        preservedFiles[address] = files
-    }
-    
-    func getPreservedFiles(
-        for address: String,
-        thenRemoveIt: Bool
-    ) -> [FileResult]? {
-        guard let files = preservedFiles[address] else {
+
+    func getReplyMessage(address: String) -> MessageModel? {
+        guard let replyMessage = preservedReplayMessage[address] else {
             return nil
         }
 
-        if thenRemoveIt {
-            preservedFiles.removeValue(forKey: address)
+        return replyMessage
+    }
+
+    func getPreservedFiles(for address: String) -> [FileResult]? {
+        guard let files = preservedFiles[address] else {
+            return nil
         }
 
         return files

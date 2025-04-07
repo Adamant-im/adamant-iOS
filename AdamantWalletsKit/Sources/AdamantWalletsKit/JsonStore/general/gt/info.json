@@ -1,0 +1,25 @@
+{
+  "name": "GateToken",
+  "website": "https://gatechain.io",
+  "description": "Public blockchain which facilitates digital asset transfers",
+  "symbol": "GT",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/gatechain_io"
+    },
+    {
+      "name": "github",
+      "url": "https://github.com/gatechain"
+    },
+    {
+      "name": "discord",
+      "url": "https://discord.gg/TADecrzfcP"
+    }
+  ]
+}

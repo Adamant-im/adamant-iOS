@@ -1,0 +1,8 @@
+{
+  "images" : [
+    { "filename" : "floki_wallet.png", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "floki_wallet@2x.png", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "floki_wallet@3x.png", "idiom" : "universal", "scale" : "3x" }
+  ],
+  "info": { "author": "xcode", "version": 1 }
+}

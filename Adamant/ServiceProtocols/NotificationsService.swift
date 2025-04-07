@@ -6,22 +6,22 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 enum NotificationsMode: Int {
     case disabled
     case backgroundFetch
     case push
-    
+
     var localized: String {
         switch self {
         case .disabled:
             return .localized("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
-            
+
         case .backgroundFetch:
             return .localized("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
-            
+
         case .push:
             return .localized("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
         }
@@ -48,7 +48,7 @@ enum NotificationSound: String {
     case rebound
     case slide
     case welcome
-    
+
     var tag: String {
         switch self {
         case .none: return "none"
@@ -72,7 +72,7 @@ enum NotificationSound: String {
         case .welcome: return "welcome"
         }
     }
-    
+
     var fileName: String {
         switch self {
         case .none: return ""
@@ -96,7 +96,7 @@ enum NotificationSound: String {
         case .welcome: return "welcome.mp3"
         }
     }
-    
+
     var localized: String {
         switch self {
         case .none: return "None"
@@ -120,7 +120,7 @@ enum NotificationSound: String {
         case .welcome: return "Welcome"
         }
     }
-    
+
     init?(fileName: String) {
         switch fileName {
         case "notification.mp3": self = .inputDefault
@@ -156,28 +156,28 @@ enum AdamantNotificationType {
     case newMessages(count: Int)
     case newTransactions(count: Int)
     case custom(identifier: String, badge: Int?)
-    
+
     var identifier: String {
         switch self {
         case .newMessages:
             return "newMessages"
-            
+
         case .newTransactions:
             return "newTransactions"
-            
+
         case .custom(let identifier, _):
             return identifier
         }
     }
-    
+
     var badge: Int? {
         switch self {
         case .newMessages(let count):
             return count
-            
+
         case .newTransactions(let count):
             return count
-            
+
         case .custom(_, let badge):
             return badge
         }
@@ -196,7 +196,7 @@ extension Notification.Name {
 extension AdamantUserInfoKey {
     struct NotificationsService {
         static let newNotificationsMode = "adamant.notificationsService.notificationsMode"
-        
+
         private init() {}
     }
 }
@@ -221,14 +221,14 @@ extension NotificationsServiceError: RichError {
         case .notStayedLoggedIn: return NotificationStrings.notStayedLoggedIn
         }
     }
-    
+
     var internalError: Error? {
         switch self {
         case .notEnoughMoney, .notStayedLoggedIn: return nil
         case .denied(let error): return error
         }
     }
-    
+
     var level: ErrorLevel {
         switch self {
         case .notEnoughMoney, .notStayedLoggedIn: return .warning
@@ -245,24 +245,24 @@ protocol NotificationsService: AnyObject, Sendable {
     var inAppSound: Bool { get }
     var inAppVibrate: Bool { get }
     var inAppToasts: Bool { get }
-    
+
     func setInAppSound(_ value: Bool)
     func setInAppVibrate(_ value: Bool)
     func setInAppToasts(_ value: Bool)
-    
+
     func setNotificationSound(
         _ sound: NotificationSound,
         for target: NotificationTarget
     )
     func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
-    
+
     func showNotification(title: String, body: String, type: AdamantNotificationType)
-    
+
     func setBadge(number: Int?)
-    
+
     func removeAllPendingNotificationRequests()
     func removeAllDeliveredNotifications()
-    
+
     // MARK: Background batch notifications
     func startBackgroundBatchNotifications()
     func stopBackgroundBatchNotifications()

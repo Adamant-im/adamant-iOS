@@ -92,6 +92,7 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+.idea/
 
 ### Xcode Patch ###
 *.xcodeproj/*
@@ -109,3 +110,6 @@ runkit ex.rtf
 to do.rtf
 tz.rtf
 profiles
+Generated/
+.swiftpm/
+adamant-cli

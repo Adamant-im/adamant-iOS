@@ -1,6 +1,6 @@
 //
 //  BitcoinError.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 06.06.2023.
 //
@@ -13,7 +13,7 @@ enum BitcoinError: LocalizedError {
     case invalidChecksum
     case wrongAddressPrefix
     case list(errors: [Error])
-    
+
     var errorDescription: String? {
         switch self {
         case .unknownAddressType:
@@ -25,7 +25,8 @@ enum BitcoinError: LocalizedError {
         case .wrongAddressPrefix:
             return "Wrong address prefix"
         case let .list(errors):
-            return errors
+            return
+                errors
                 .map { $0.localizedDescription }
                 .joined(separator: ". ")
         }

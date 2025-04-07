@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import Eureka
+import UIKit
 
 public class PassphraseCell: Cell<String>, CellType {
     @IBOutlet weak var passphraseLabel: UILabel!
     @IBOutlet weak var tipLabel: UILabel!
     @IBOutlet weak var bottomConstrain: NSLayoutConstraint!
-    
+
     var tipLabelIsHidden: Bool = false {
         didSet {
             if tipLabelIsHidden {
@@ -25,7 +25,7 @@ public class PassphraseCell: Cell<String>, CellType {
             }
         }
     }
-    
+
     var passphrase: String? {
         get {
             return passphraseLabel.text
@@ -34,7 +34,7 @@ public class PassphraseCell: Cell<String>, CellType {
             passphraseLabel.text = newValue
         }
     }
-    
+
     var tip: String? {
         get {
             return tipLabel.text
@@ -43,7 +43,7 @@ public class PassphraseCell: Cell<String>, CellType {
             tipLabel.text = newValue
         }
     }
-    
+
     public override func update() {
         passphraseLabel.text = row.value
     }

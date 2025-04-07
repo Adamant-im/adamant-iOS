@@ -12,7 +12,7 @@ import SwiftUI
 struct SelectTextView: View {
     let text: String
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         if #available(iOS 16.0, *) {
             NavigationStack {
@@ -24,13 +24,13 @@ struct SelectTextView: View {
             }
         }
     }
-    
+
     var contentView: some View {
         VStack {
             TextView(text: text)
                 .accentColor(.blue)
                 .padding()
-            
+
             Spacer()
         }
         .navigationBarTitle(String.adamant.chat.selectText, displayMode: .inline)

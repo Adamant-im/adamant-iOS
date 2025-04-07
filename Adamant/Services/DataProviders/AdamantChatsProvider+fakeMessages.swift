@@ -6,9 +6,9 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import CoreData
 import CommonKit
+import CoreData
+import Foundation
 
 extension AdamantChatsProvider {
     // MARK: - Public
@@ -25,7 +25,7 @@ extension AdamantChatsProvider {
                 let result = try await validate(message: message, partnerId: recipientId)
                 let loggedAddress = result.loggedAccount
                 let partner = result.partner
-                
+
                 switch message {
                 case .text(let text):
                     fakeSent(
@@ -38,7 +38,7 @@ extension AdamantChatsProvider {
                         showsChatroom: showsChatroom,
                         completion: completion
                     )
-                    
+
                 case .richMessage(let payload):
                     fakeSent(
                         text: payload.serialized(),
@@ -50,7 +50,7 @@ extension AdamantChatsProvider {
                         showsChatroom: showsChatroom,
                         completion: completion
                     )
-                    
+
                 case .markdownText(let text):
                     fakeSent(
                         text: text,
@@ -70,7 +70,7 @@ extension AdamantChatsProvider {
             }
         }
     }
-    
+
     func fakeReceived(
         message: AdamantMessage,
         senderId: String,
@@ -78,12 +78,12 @@ extension AdamantChatsProvider {
         unread: Bool,
         silent: Bool,
         showsChatroom: Bool
-    )  async throws -> ChatTransaction {
+    ) async throws -> ChatTransaction {
         do {
             let result = try await validate(message: message, partnerId: senderId)
             let loggedAccount = result.loggedAccount
             let partner = result.partner
-            
+
             switch message {
             case .text(let text):
                 return try await fakeReceived(
@@ -96,7 +96,7 @@ extension AdamantChatsProvider {
                     markdown: false,
                     showsChatroom: showsChatroom
                 )
-                
+
             case .richMessage(let payload):
                 return try await fakeReceived(
                     text: payload.serialized(),
@@ -108,7 +108,7 @@ extension AdamantChatsProvider {
                     markdown: false,
                     showsChatroom: showsChatroom
                 )
-                
+
             case .markdownText(let text):
                 return try await fakeReceived(
                     text: text,
@@ -127,14 +127,23 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.internalError(error)
         }
     }
-    
+
     // MARK: - Logic
-    
-    private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
+
+    private func fakeSent(
+        text: String,
+        loggedAddress: String,
+        recipient: CoreDataAccount,
+        date: Date,
+        status: MessageStatus,
+        markdown: Bool,
+        showsChatroom: Bool,
+        completion: @escaping (ChatsProviderResultWithTransaction) -> Void
+    ) {
         // MARK: 0. Prepare
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
-        
+
         // MARK: 1. Create transaction
         let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
         transaction.date = date as NSDate
@@ -148,16 +157,16 @@ extension AdamantChatsProvider {
         transaction.status = status.rawValue
         transaction.showsChatroom = showsChatroom
         transaction.partner = privateContext.object(with: recipient.objectID) as? BaseAccount
-        
+
         transaction.transactionId = UUID().uuidString
         transaction.blockId = UUID().uuidString
         transaction.chatMessageId = transaction.transactionId
-        
+
         // MARK: 2. Get Chatroom
         guard let id = recipient.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
             return
         }
-        
+
         // MARK: 3. Save it
         do {
             chatroom.addToTransactions(transaction)
@@ -168,7 +177,7 @@ extension AdamantChatsProvider {
             completion(.failure(.internalError(error)))
         }
     }
-    
+
     private func fakeReceived(
         text: String,
         loggedAddress: String,
@@ -182,7 +191,7 @@ extension AdamantChatsProvider {
         // MARK: 0. Prepare
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
-        
+
         // MARK: 1. Create transaction
         let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
         transaction.date = date as NSDate
@@ -198,22 +207,22 @@ extension AdamantChatsProvider {
         transaction.status = MessageStatus.delivered.rawValue
         transaction.showsChatroom = showsChatroom
         transaction.partner = privateContext.object(with: sender.objectID) as? BaseAccount
-        
+
         transaction.transactionId = UUID().uuidString
         transaction.blockId = UUID().uuidString
         transaction.chatMessageId = transaction.transactionId
-        
+
         // MARK: 2. Get Chatroom
         guard let id = sender.chatroom?.objectID,
-              let chatroom = privateContext.object(with: id) as? Chatroom
+            let chatroom = privateContext.object(with: id) as? Chatroom
         else {
             throw ChatsProviderError.requestCancelled
         }
-        
+
         if unread {
             chatroom.hasUnreadMessages = true
         }
-            
+
         // MARK: 3. Save it
         do {
             chatroom.addToTransactions(transaction)
@@ -224,32 +233,32 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.internalError(error)
         }
     }
-    
+
     // MARK: - Validate & prepare
-    
+
     private enum ValidateResult {
         case success(loggedAccount: String, partner: CoreDataAccount)
         case failure(ChatsProviderError)
     }
-    
+
     private func validate(message: AdamantMessage, partnerId: String) async throws -> (loggedAccount: String, partner: CoreDataAccount) {
         // MARK: 1. Logged account
         guard let loggedAddress = accountService.account?.address else {
             throw ChatsProviderError.notLogged
         }
-        
+
         // MARK: 2. Validate message
         switch validateMessage(message) {
         case .isValid:
             break
-            
+
         case .empty:
             throw ChatsProviderError.messageNotValid(.empty)
-            
+
         case .tooLong:
             throw ChatsProviderError.messageNotValid(.tooLong)
         }
-        
+
         // MARK: 3. Get recipient
         do {
             let account = try await accountsProvider.getAccount(byAddress: partnerId)
@@ -258,28 +267,29 @@ extension AdamantChatsProvider {
             switch error {
             case .notFound, .invalidAddress, .notInitiated, .dummy:
                 throw ChatsProviderError.accountNotFound(partnerId)
-                
+
             case .networkError:
                 throw ChatsProviderError.networkError
-                
+
             case .serverError(let error):
-                throw ChatsProviderError.serverError(error)
+                throw ChatsProviderError.serverError(.init(from: error))
             }
         } catch {
-            throw ChatsProviderError.serverError(error)
+            throw ChatsProviderError.serverError(.init(from: error))
         }
     }
-    
+
     // MARK: - Tools
-    
+
     private func recheckLastTransactionFor(chatroom: Chatroom, with transaction: ChatTransaction) {
         if let ch = transaction.chatroom, ch != chatroom {
             return
         }
-        
+
         if let lastTransaction = chatroom.lastTransaction {
             if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
-                dateA.compare(dateB) == ComparisonResult.orderedAscending {
+                dateA.compare(dateB) == ComparisonResult.orderedAscending
+            {
                 chatroom.lastTransaction = transaction
                 chatroom.updatedAt = transaction.date
             }

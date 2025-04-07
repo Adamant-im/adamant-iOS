@@ -8,28 +8,28 @@
 
 import CommonKit
 import Foundation
-import web3swift
 @preconcurrency import Web3Core
+import web3swift
 
-class EthApiService: ApiServiceProtocol, @unchecked Sendable {
+class EthApiService: EthApiServiceProtocol, @unchecked Sendable {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
-    
+
     var keystoreManager: KeystoreManager? {
         get async { await api.service.keystoreManager }
     }
-    
+
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { api.nodesInfo }
-    
+
     func healthCheck() { api.healthCheck() }
-    
+
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {
         self.api = api
     }
-    
+
     func requestWeb3<Output>(
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (Web3) async throws -> Output
@@ -38,7 +38,7 @@ class EthApiService: ApiServiceProtocol, @unchecked Sendable {
             await core.performRequest(origin: origin, request)
         }
     }
-    
+
     func requestApiCore<Output>(
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
@@ -47,13 +47,13 @@ class EthApiService: ApiServiceProtocol, @unchecked Sendable {
             await request(core.apiCore, origin).mapError { $0.asWalletServiceError() }
         }
     }
-    
+
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
         await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }
-    
+
     func setKeystoreManager(_ keystoreManager: KeystoreManager) async {
         await api.service.setKeystoreManager(keystoreManager)
     }

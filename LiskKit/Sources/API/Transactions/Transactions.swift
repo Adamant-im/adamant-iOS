@@ -44,16 +44,16 @@ extension Transactions {
 
         client.post(path: "transactions", options: signedTransaction.requestOptions, completionHandler: completionHandler)
     }
-    
+
     public func submit(signedTransaction: RequestOptions, completionHandler: @escaping (Response<TransactionSubmitResponse>) -> Void) {
         client.post(path: "transactions", options: signedTransaction, completionHandler: completionHandler)
     }
-    
+
     public func submit(transaction: TransactionEntity) async throws -> TransactionSubmitModel {
         guard let hash = transaction.getTxHash() else {
             throw APIError.unexpected(code: 0)
         }
-        
+
         return try await client.request(
             method: "txpool_postTransaction",
             params: ["transaction": hash]
@@ -66,7 +66,13 @@ extension Transactions {
 extension Transactions {
 
     /// Transfer LSK to a Lisk address using Local Signing
-    public func transfer(lsk: Double, to recipient: String, passphrase: String, secondPassphrase: String? = nil, completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void) {
+    public func transfer(
+        lsk: Double,
+        to recipient: String,
+        passphrase: String,
+        secondPassphrase: String? = nil,
+        completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void
+    ) {
         do {
             let transaction = LocalTransaction(.transfer, lsk: lsk, recipientId: recipient)
             let signedTransaction = try transaction.signed(passphrase: passphrase, secondPassphrase: secondPassphrase)
@@ -76,7 +82,7 @@ extension Transactions {
             completionHandler(.error(response: response))
         }
     }
-    
+
     /// Transfer LSK to a Lisk address using Local Signing with KeyPair
     public func transfer(lsk: Double, to recipient: String, keyPair: KeyPair, completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void) {
         do {
@@ -95,7 +101,11 @@ extension Transactions {
 extension Transactions {
 
     /// Register a second passphrase
-    public func registerSecondPassphrase(_ secondPassphrase: String, passphrase: String, completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void) {
+    public func registerSecondPassphrase(
+        _ secondPassphrase: String,
+        passphrase: String,
+        completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void
+    ) {
         do {
             let (publicKey, _) = try Crypto.keys(fromPassphrase: secondPassphrase)
             let asset = ["signature": ["publicKey": publicKey]]
@@ -114,7 +124,17 @@ extension Transactions {
 extension Transactions {
 
     /// List transaction objects
-    public func transactions(id: String? = nil, block: String? = nil, sender: String? = nil, recipient: String? = nil, senderIdOrRecipientId: String? = nil, limit: UInt? = nil, offset: UInt? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<TransactionsResponse>) -> Void) {
+    public func transactions(
+        id: String? = nil,
+        block: String? = nil,
+        sender: String? = nil,
+        recipient: String? = nil,
+        senderIdOrRecipientId: String? = nil,
+        limit: UInt? = nil,
+        offset: UInt? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Response<TransactionsResponse>) -> Void
+    ) {
         var options: RequestOptions = [:]
         if let value = id { options["id"] = value }
         if let value = block { options["blockId"] = value }

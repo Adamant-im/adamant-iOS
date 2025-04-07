@@ -13,11 +13,11 @@ public enum InternalAPIError: LocalizedError {
     case signTransactionFailed
     case parsingFailed
     case unknownError
-    
+
     public func apiServiceErrorWith(error: Error) -> ApiServiceError {
         .internalError(message: localizedDescription, error: error)
     }
-    
+
     public var errorDescription: String? {
         switch self {
         case .endpointBuildFailed:

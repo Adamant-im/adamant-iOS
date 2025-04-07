@@ -6,39 +6,39 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
-import CoreData
-import UIKit
-import MarkdownKit
 import CommonKit
+import CoreData
+import Foundation
+import MarkdownKit
+import UIKit
 
 actor AdamantChatTransactionService: ChatTransactionService {
-    
+
     // MARK: Dependencies
-    
+
     private let adamantCore: AdamantCore
     private let walletServiceCompose: WalletServiceCompose
-    
+
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-    
+
     private lazy var queue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
-    
+
     // MARK: Lifecycle
-    
+
     init(adamantCore: AdamantCore, walletServiceCompose: WalletServiceCompose) {
         self.adamantCore = adamantCore
         self.walletServiceCompose = walletServiceCompose
     }
-    
+
     /// Make operations serial
     func addOperations(_ op: Operation) {
         queue.addOperation(op)
     }
-    
+
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
@@ -47,7 +47,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
         request.predicate = NSPredicate(format: "transactionId == %@", String(id))
         request.fetchLimit = 1
-        
+
         do {
             let result = try context.fetch(request)
             return result.first
@@ -55,7 +55,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             return nil
         }
     }
-    
+
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
@@ -64,7 +64,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
         request.predicate = NSPredicate(format: "transactionId == %@", String(id))
         request.fetchLimit = 1
-        
+
         do {
             let result = try context.fetch(request)
             return result.first
@@ -72,7 +72,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             return nil
         }
     }
-    
+
     /// Parse raw transaction into CoreData chat transaction
     ///
     /// - Parameters:
@@ -93,15 +93,15 @@ actor AdamantChatTransactionService: ChatTransactionService {
         removedMessages: [String],
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
-        let messageTransaction: ChatTransaction
+        let chatTransaction: ChatTransaction
         guard let chat = transaction.asset.chat else {
             if transaction.type == .send {
-                messageTransaction = transferTransaction(from: transaction, isOut: isOutgoing, partner: partner, context: context)
-                return messageTransaction
+                chatTransaction = transferTransaction(from: transaction, isOut: isOutgoing, partner: partner, context: context)
+                return chatTransaction
             }
             return nil
         }
-        
+
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(
             rawMessage: chat.message,
@@ -111,11 +111,11 @@ actor AdamantChatTransactionService: ChatTransactionService {
         )?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
                 switch chat.type {
-                    // MARK: Text message
+                // MARK: Text message
                 case .message, .messageOld, .signal, .unknown:
                     if transaction.amount > 0 {
                         let trs: TransferTransaction
-                        
+
                         if let trsDB = getTransfer(
                             id: String(transaction.id),
                             context: context
@@ -127,75 +127,75 @@ actor AdamantChatTransactionService: ChatTransactionService {
                                 insertInto: context
                             )
                         }
-                        
+
                         trs.comment = decodedMessage
-                        messageTransaction = trs
+                        chatTransaction = trs
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
-                        messageTransaction = trs
-                        
+                        chatTransaction = trs
+
                         let markdown = markdownParser.parse(decodedMessage)
-                        
+
                         trs.isMarkdown = markdown.length != decodedMessage.count
                     }
-                    
-                    // MARK: Rich message
+
+                // MARK: Rich message
                 case .richMessage:
                     if let trs = baseRichTransaction(
                         decodedMessage,
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
-                    
+
                     if let trs = transferReplyTransaction(
                         decodedMessage,
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
-                    
+
                     if let trs = replyTransaction(
                         decodedMessage,
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
-                    
+
                     if let trs = reactionTransaction(
                         decodedMessage,
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
-                    
+
                     if let trs = fileTransaction(
                         decodedMessage,
                         transaction: transaction,
                         context: context
                     ) {
-                        messageTransaction = trs
+                        chatTransaction = trs
                         break
                     }
-                    
+
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
-                    messageTransaction = trs
+                    chatTransaction = trs
                 }
             } else {
                 let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                 trs.message = ""
                 trs.isHidden = true
-                messageTransaction = trs
+                chatTransaction = trs
             }
         }
         // MARK: Failed to decode, or message was empty
@@ -203,32 +203,33 @@ actor AdamantChatTransactionService: ChatTransactionService {
             let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
             trs.message = ""
             trs.isHidden = true
-            messageTransaction = trs
+            chatTransaction = trs
         }
-        
-        messageTransaction.amount = transaction.amount as NSDecimalNumber
-        messageTransaction.date = transaction.date as NSDate
-        messageTransaction.recipientId = transaction.recipientId
-        messageTransaction.senderId = transaction.senderId
-        messageTransaction.transactionId = String(transaction.id)
-        messageTransaction.type = Int16(chat.type.rawValue)
-        messageTransaction.height = Int64(transaction.height)
-        messageTransaction.isConfirmed = true
-        messageTransaction.isOutgoing = isOutgoing
-        messageTransaction.blockId = transaction.blockId
-        messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = String(transaction.id)
-        messageTransaction.fee = transaction.fee as NSDecimalNumber
-        messageTransaction.statusEnum = MessageStatus.delivered
-        messageTransaction.partner = partner
-        messageTransaction.senderPublicKey = transaction.senderPublicKey
-        
-        let transactionId = messageTransaction.transactionId
-        messageTransaction.isHidden = removedMessages.contains(transactionId)
-        
-        return messageTransaction
+
+        chatTransaction.date = transaction.date as NSDate
+        chatTransaction.timestampMs = Int64(transaction.timestampMs)
+        chatTransaction.amount = transaction.amount as NSDecimalNumber
+        chatTransaction.recipientId = transaction.recipientId
+        chatTransaction.senderId = transaction.senderId
+        chatTransaction.transactionId = String(transaction.id)
+        chatTransaction.type = Int16(chat.type.rawValue)
+        chatTransaction.height = Int64(transaction.height)
+        chatTransaction.isConfirmed = true
+        chatTransaction.isOutgoing = isOutgoing
+        chatTransaction.blockId = transaction.blockId
+        chatTransaction.confirmations = transaction.confirmations
+        chatTransaction.chatMessageId = String(transaction.id)
+        chatTransaction.fee = transaction.fee as NSDecimalNumber
+        chatTransaction.statusEnum = MessageStatus.delivered
+        chatTransaction.partner = partner
+        chatTransaction.senderPublicKey = transaction.senderPublicKey
+
+        let transactionId = chatTransaction.transactionId
+        chatTransaction.isHidden = removedMessages.contains(transactionId)
+
+        return chatTransaction
     }
-    
+
     func transferTransaction(
         from transaction: Transaction,
         isOut: Bool,
@@ -246,8 +247,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.blockId = transaction.blockId
         } else {
             transfer = TransferTransaction(context: context)
-            transfer.amount = transaction.amount as NSDecimalNumber
             transfer.date = transaction.date as NSDate
+            transfer.timestampMs = Int64(transaction.timestampMs)
+            transfer.amount = transaction.amount as NSDecimalNumber
             transfer.recipientId = transaction.recipientId
             transfer.senderId = transaction.senderId
             transfer.transactionId = String(transaction.id)
@@ -263,7 +265,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.statusEnum = MessageStatus.delivered
             transfer.partner = partner
         }
-        
+
         transfer.chatMessageId = String(transaction.id)
         transfer.isOutgoing = isOut
         transfer.partner = partner
@@ -271,51 +273,52 @@ actor AdamantChatTransactionService: ChatTransactionService {
     }
 }
 
-private extension AdamantChatTransactionService {
-    func baseRichTransaction(
+extension AdamantChatTransactionService {
+    fileprivate func baseRichTransaction(
         _ decodedMessage: String,
         transaction: Transaction,
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
         guard let data = decodedMessage.data(using: String.Encoding.utf8),
-              let richContent = RichMessageTools.richContent(from: data),
-              let type = richContent[RichContentKeys.type] as? String,
-              type != RichContentKeys.reply.reply,
-              type != RichContentKeys.file.file,
-              richContent[RichContentKeys.reply.replyToId] == nil,
-              richContent[RichContentKeys.file.files] == nil
+            let richContent = RichMessageTools.richContent(from: data),
+            let type = richContent[RichContentKeys.type] as? String,
+            type != RichContentKeys.reply.reply,
+            type != RichContentKeys.file.file,
+            richContent[RichContentKeys.reply.replyToId] == nil,
+            richContent[RichContentKeys.file.files] == nil
         else { return nil }
-        
+
         let trs = RichMessageTransaction(
             entity: RichMessageTransaction.entity(),
             insertInto: context
         )
-        
+
         trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = type
         trs.blockchainType = type
-        trs.transactionStatus = walletServiceCompose.getWallet(by: type) != nil
-        ? .notInitiated
-        : nil
+        trs.transactionStatus =
+            walletServiceCompose.getWallet(by: type) != nil
+            ? .notInitiated
+            : nil
         trs.additionalType = .base
-        
+
         return trs
     }
-    
-    func transferReplyTransaction(
+
+    fileprivate func transferReplyTransaction(
         _ decodedMessage: String,
         transaction: Transaction,
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
         guard let data = decodedMessage.data(using: String.Encoding.utf8),
-              let richContent = RichMessageTools.richContent(from: data),
-              richContent[RichContentKeys.reply.replyToId] != nil,
-              transaction.amount > 0
+            let richContent = RichMessageTools.richContent(from: data),
+            richContent[RichContentKeys.reply.replyToId] != nil,
+            transaction.amount > 0
         else { return nil }
-            
+
         let trs: TransferTransaction
-        
+
         if let trsDB = getTransfer(
             id: String(transaction.id),
             context: context
@@ -327,109 +330,110 @@ private extension AdamantChatTransactionService {
                 insertInto: context
             )
         }
-        
+
         trs.comment = richContent[RichContentKeys.reply.replyMessage] as? String
         trs.replyToId = richContent[RichContentKeys.reply.replyToId] as? String
-        
+
         return trs
     }
-    
-    func replyTransaction(
+
+    fileprivate func replyTransaction(
         _ decodedMessage: String,
         transaction: Transaction,
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
         guard let data = decodedMessage.data(using: String.Encoding.utf8),
-              let richContent = RichMessageTools.richContent(from: data),
-              richContent[RichContentKeys.reply.replyToId] != nil,
-              transaction.amount <= 0
+            let richContent = RichMessageTools.richContent(from: data),
+            richContent[RichContentKeys.reply.replyToId] != nil,
+            transaction.amount <= 0
         else { return nil }
-        
+
         if let trs = getChatTransactionFromDB(
             id: String(transaction.id),
             context: context
         ) {
             return trs
         }
-        
+
         let trs = RichMessageTransaction(
             entity: RichMessageTransaction.entity(),
             insertInto: context
         )
         let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String]
         let type = (transferContent?[RichContentKeys.type] as? String) ?? RichContentKeys.reply.reply
-        
+
         trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = type
         trs.blockchainType = type
-        trs.transactionStatus = walletServiceCompose.getWallet(by: type) != nil
-        ? .notInitiated
-        : nil
+        trs.transactionStatus =
+            walletServiceCompose.getWallet(by: type) != nil
+            ? .notInitiated
+            : nil
         trs.additionalType = .reply
-        
+
         return trs
     }
-    
-    func reactionTransaction(
+
+    fileprivate func reactionTransaction(
         _ decodedMessage: String,
         transaction: Transaction,
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
         guard let data = decodedMessage.data(using: String.Encoding.utf8),
-              let richContent = RichMessageTools.richContent(from: data),
-              richContent[RichContentKeys.react.reactto_id] != nil
+            let richContent = RichMessageTools.richContent(from: data),
+            richContent[RichContentKeys.react.reactto_id] != nil
         else { return nil }
-        
+
         if let trs = getChatTransactionFromDB(
             id: String(transaction.id),
             context: context
         ) {
             return trs
         }
-        
+
         let trs = RichMessageTransaction(
             entity: RichMessageTransaction.entity(),
             insertInto: context
         )
-        
+
         trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = RichContentKeys.react.react
         trs.transactionStatus = nil
         trs.additionalType = .reaction
-        
+
         return trs
     }
-    
-    func fileTransaction(
+
+    fileprivate func fileTransaction(
         _ decodedMessage: String,
         transaction: Transaction,
         context: NSManagedObjectContext
     ) -> ChatTransaction? {
         guard let data = decodedMessage.data(using: String.Encoding.utf8),
-              let richContent = RichMessageTools.richContent(from: data),
-              richContent[RichContentKeys.file.files] != nil
+            let richContent = RichMessageTools.richContent(from: data),
+            richContent[RichContentKeys.file.files] != nil
         else { return nil }
-        
+
         if let trs = getChatTransactionFromDB(
             id: String(transaction.id),
             context: context
         ) {
             return trs
         }
-        
+
         let trs = RichMessageTransaction(
             entity: RichMessageTransaction.entity(),
             insertInto: context
         )
-        
+
         trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = RichContentKeys.file.file
         trs.transactionStatus = nil
         trs.additionalType = .file
-        
+
         return trs
     }
 }

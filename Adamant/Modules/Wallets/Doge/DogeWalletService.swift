@@ -6,134 +6,144 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
 import CommonKit
+import Swinject
+import UIKit
+import Web3Core
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
         return "/api/addr/\(address)/balance"
     }
-    
+
     static func getTransactions(for address: String) -> String {
         return "/api/addrs/\(address)/txs"
     }
-    
+
     static func getTransaction(by hash: String) -> String {
         return "/api/tx/\(hash)"
     }
-    
+
     static func getBlock(by hash: String) -> String {
         return "/api/block/\(hash)"
     }
-    
+
     static func getBlocks() -> String {
         return "/api/blocks"
     }
-    
+
     static func getUnspentTransactions(for address: String) -> String {
         return "/api/addr/\(address)/utxo"
     }
-    
+
     static func sendTransaction() -> String {
         return "/api/tx/send"
     }
-    
+
     static func getInfo() -> String {
         return "/api/status"
     }
 }
 
-final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
+final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unchecked Sendable {
+    static let currencySymbol = "DOGE"
     var wallet: WalletAccount? { return dogeWallet }
-    
+
     // MARK: RichMessageProvider properties
     static let richMessageType = "doge_transaction"
-    
+
     // MARK: - Dependencies
     var apiService: AdamantApiServiceProtocol!
-    var dogeApiService: DogeApiService!
+    var dogeApiService: DogeApiServiceProtocol!
+    var btcTransactionFactory: BitcoinKitTransactionFactoryProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
     var chatsProvider: ChatsProvider!
-    
+
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
- 
+
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }
-    
+
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
-    
+
     static var tokenNetworkSymbol: String {
         return "DOGE"
     }
-   
+
     var tokenContract: String {
         return ""
     }
-    
-    var tokenUnicID: String {
+
+    var tokenUniqueID: String {
         Self.tokenNetworkSymbol + tokenSymbol
     }
-    
+
     var transactionFee: Decimal {
         return DogeWalletService.fixedFee
     }
-    
+
     var richMessageType: String {
         return Self.richMessageType
-	}
-    
+    }
+
     var explorerAddress: String {
         Self.explorerAddress
     }
-    
+
     var qqPrefix: String {
         return Self.qqPrefix
     }
-    
+
     var nodeGroups: [NodeGroup] {
         [.doge]
     }
-    
+
     static let kvsAddress = "doge:address"
-    
+
     @Atomic private(set) var isWarningGasPrice = false
-    
+
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.dogeWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.dogeWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.dogeWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.dogeWallet.feeUpdated")
-    
+
+    @MainActor
+    private let walletUpdateSender = ObservableSender<Void>()
+    @MainActor
+    var walletUpdatePublisher: AnyObservable<Void> {
+        walletUpdateSender.eraseToAnyPublisher()
+    }
+
     // MARK: - Delayed KVS save
     @Atomic private var balanceObserver: NSObjectProtocol?
-    
+
     // MARK: - Properties
     @Atomic private(set) var dogeWallet: DogeWallet?
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     @Atomic private var balanceInvalidationSubscription: AnyCancellable?
-    
+
     let defaultDispatchQueue = DispatchQueue(
         label: "im.adamant.dogeWalletService",
         qos: .userInteractive,
         attributes: [.concurrent]
     )
-    
+
     private static let jsonDecoder = JSONDecoder()
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
@@ -143,37 +153,37 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $historyTransactions.eraseToAnyPublisher()
     }
-    
+
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
-    
+
     @MainActor
     var hasEnabledNode: Bool {
         dogeApiService.hasEnabledNode
     }
-    
+
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         dogeApiService.hasEnabledNodePublisher
     }
-    
+
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
-        coinId: tokenUnicID,
+        coinId: tokenUniqueID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
-    
+
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .notInitiated
-    
+
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
             return
         }
-        
+
         state = newState
-        
+
         if !silent {
             NotificationCenter.default.post(
                 name: serviceStateChanged,
@@ -182,15 +192,15 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             )
         }
     }
-    
+
     init() {
         self.network = DogeMainnet()
         self.setState(.notInitiated)
-        
+
         // Notifications
         addObservers()
     }
-    
+
     func addObservers() {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
@@ -198,14 +208,14 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
                 self?.update()
             }
             .store(in: &subscriptions)
-        
+
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
             .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
-        
+
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
             .sink { @MainActor [weak self] _ in
@@ -221,7 +231,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             }
             .store(in: &subscriptions)
     }
-    
+
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
             .sink { [weak self] transactions in
@@ -229,50 +239,54 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             }
             .store(in: &subscriptions)
     }
-    
+
     func update() {
         Task {
             await update()
         }
     }
-    
+
     @MainActor
     func update() async {
         guard let wallet = dogeWallet else {
             return
         }
-        
+
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
-            
+
         case .upToDate:
             break
         }
-        
+
         setState(.updating)
-        
+
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
                 vibroService.applyVibration(.success)
             }
-            
+
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-            
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
+
+            walletUpdateSender.send()
+        } else {
+            wallet.isBalanceInitialized = false
         }
-        
+
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
+
         setState(.upToDate)
     }
-    
+
     func validate(address: String) -> AddressValidationResult {
         let address = try? addressConverter.convert(address: address)
-        
+
         switch address?.scriptType {
         case .p2pk, .p2pkh, .p2sh:
             return .valid
@@ -280,20 +294,22 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             return .invalid(description: nil)
         }
     }
-    
+
     private func markBalanceAsFresh(_ wallet: DogeWallet) {
         wallet.isBalanceInitialized = true
-        
+
         balanceInvalidationSubscription = Task { [weak self] in
             try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
             guard let self else { return }
             wallet.isBalanceInitialized = false
-            
+
             NotificationCenter.default.post(
                 name: walletUpdatedNotification,
                 object: self,
                 userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
             )
+
+            await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
 }
@@ -304,41 +320,46 @@ extension DogeWalletService {
         setState(.initiationFailed(reason: reason))
         dogeWallet = nil
     }
-    
-    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
+
+    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
-        
+
         setState(.notInitiated)
-        
+
         if enabled {
             enabled = false
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-        
-        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+
+        guard let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
+            throw WalletServiceError.internalError(message: "DOGE Wallet: failed to generate private key", error: nil)
+        }
+
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        
+
         let eWallet = try DogeWallet(
-            unicId: tokenUnicID,
+            unicId: tokenUniqueID,
             privateKey: privateKey,
             addressConverter: addressConverter
         )
         self.dogeWallet = eWallet
         let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-        
+
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
         )
-        
+
+        await walletUpdateSender.send()
+
         if !self.enabled {
             self.enabled = true
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
-        
+
         // MARK: 4. Save address into KVS
         let service = self
         do {
@@ -348,13 +369,13 @@ extension DogeWalletService {
                     service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
-            
+
             service.setState(.upToDate)
-            
+
             Task {
                 await service.update()
             }
-            
+
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
@@ -362,25 +383,33 @@ extension DogeWalletService {
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
                 service.setState(.upToDate)
-                
+
                 Task {
                     await service.update()
                 }
-                
+
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
                         service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                     }
                 }
-                
+
                 service.setState(.upToDate)
                 return eWallet
-                
+
             default:
                 service.setState(.upToDate)
                 throw error
             }
         }
+    }
+
+    private func makeBinarySeed(withMnemonicSentence passphrase: String, withSalt salt: String) -> Data? {
+        guard !salt.isEmpty else {
+            return passphrase.data(using: .utf8)!.sha256()
+        }
+
+        return BIP39.seedFromMmemonics(passphrase, password: salt, language: .english)
     }
 }
 
@@ -390,13 +419,14 @@ extension DogeWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
+        btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
         dogeApiService = container.resolve(DogeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         chatsProvider = container.resolve(ChatsProvider.self)
-        
+
         addTransactionObserver()
     }
 }
@@ -407,10 +437,10 @@ extension DogeWalletService {
         guard let address = dogeWallet?.address else {
             throw WalletServiceError.walletNotInitiated
         }
-        
+
         return try await getBalance(address: address)
     }
-    
+
     func getBalance(address: String) async throws -> Decimal {
         let data: Data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
@@ -418,9 +448,8 @@ extension DogeWalletService {
                 path: DogeApiCommands.balance(for: address)
             )
         }.get()
-        
-        if
-            let string = String(data: data, encoding: .utf8),
+
+        if let string = String(data: data, encoding: .utf8),
             let raw = Decimal(string: string)
         {
             let balance = raw / DogeWalletService.multiplier
@@ -429,21 +458,21 @@ extension DogeWalletService {
             throw WalletServiceError.internalError(InternalAPIError.parsingFailed)
         }
     }
-    
+
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-        
+
         do {
             let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address).get()
-            
+
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
-            
+
             cachedWalletAddress[address] = result
-            
+
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(
@@ -464,62 +493,65 @@ extension DogeWalletService {
             completion(.failure(error: .notLogged))
             return
         }
-        
+
         guard adamant.balance >= AdamantApiService.KvsFee else {
             completion(.failure(error: .notEnoughMoney))
             return
         }
-        
+
         Task { @Sendable in
-            let result = await apiService.store(model)
-            
+            let result = await apiService.store(model, date: .now)
             switch result {
             case .success:
                 completion(.success)
-                
+
             case .failure(let error):
                 completion(.failure(error: .apiError(error)))
             }
         }
     }
-    
+
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(_ model: KVSValueModel, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
             balanceObserver = nil
         }
-        
+
         switch result {
         case .success:
             break
-            
+
         case .failure(let error):
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
-                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+                let observer = NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name.AdamantAccountService.accountDataUpdated,
+                    object: nil,
+                    queue: nil
+                ) { [weak self] _ in
                     guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
                         return
                     }
-                    
+
                     self?.save(model) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(model, result: result)
                     }
                 }
-                
+
                 // Save referense to unregister it later
                 balanceObserver = observer
-                
+
             default:
                 print("\(error.localizedDescription)")
             }
         }
     }
-    
+
     private func makeKVSAddressModel(wallet: WalletAccount) -> KVSValueModel? {
         guard let keypair = accountService.keypair else { return nil }
-        
+
         return .init(
             key: Self.kvsAddress,
             value: wallet.address,
@@ -534,20 +566,20 @@ extension DogeWalletService {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
         }
-        
+
         let doge = try await getTransactions(
             for: address,
             from: from,
             to: from + DogeWalletService.chunkSize
         )
-        
+
         let hasMore = doge.to < doge.totalItems
-        
+
         let transactions = doge.items.filter { !$0.isDoubleSpend }.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
-        
+
         return (transactions: transactions, hasMore: hasMore)
     }
-    
+
     private func getTransactions(
         for address: String,
         from: Int,
@@ -557,7 +589,7 @@ extension DogeWalletService {
             "from": from,
             "to": to
         ]
-        
+
         return try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
@@ -568,18 +600,18 @@ extension DogeWalletService {
             )
         }.get()
     }
-    
+
     func getUnspentTransactions() async throws -> [UnspentTransaction] {
         guard let wallet = self.dogeWallet else {
             throw WalletServiceError.notLogged
         }
-        
+
         let address = wallet.address
-        
+
         let parameters = [
             "noCache": "1"
         ]
-        
+
         // MARK: Sending request
         let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
@@ -590,12 +622,13 @@ extension DogeWalletService {
                 encoding: .url
             )
         }.get()
-        
-        let items = try? JSONSerialization.jsonObject(
-            with: data,
-            options: []
-        ) as? [[String: Any]]
-        
+
+        let items =
+            try? JSONSerialization.jsonObject(
+                with: data,
+                options: []
+            ) as? [[String: Any]]
+
         guard let items = items else {
             throw WalletServiceError.remoteServiceError(
                 message: "DOGE Wallet: not valid response"
@@ -609,12 +642,13 @@ extension DogeWalletService {
                 let confirmations = item["confirmations"] as? NSNumber,
                 confirmations.intValue > 0,
                 let vout = item["vout"] as? NSNumber,
-                let amount = item["amount"] as? NSNumber else {
+                let amount = item["amount"] as? NSNumber
+            else {
                 continue
             }
 
             let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-            
+
             let lockScript = wallet.addressEntity.lockingScript
             let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
             let txIndex = vout.uint32Value
@@ -628,7 +662,7 @@ extension DogeWalletService {
 
         return utxos
     }
-    
+
     func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BTCRawTransaction {
         try await dogeApiService.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.sendRequestJsonResponse(
@@ -637,78 +671,88 @@ extension DogeWalletService {
             )
         }.get()
     }
-    
+
     func getBlockId(by hash: String) async throws -> String {
         let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(origin: origin, path: DogeApiCommands.getBlock(by: hash))
         }.get()
-        
-        let json = try? JSONSerialization.jsonObject(
-            with: data,
-            options: []
-        ) as? [String: Any]
-        
+
+        let json =
+            try? JSONSerialization.jsonObject(
+                with: data,
+                options: []
+            ) as? [String: Any]
+
         guard let json = json else {
             throw WalletServiceError.remoteServiceError(
                 message: "DOGE Wallet: not valid response"
             )
         }
-        
+
         if let height = json["height"] as? NSNumber {
             return height.stringValue
         } else {
             throw WalletServiceError.remoteServiceError(message: "Failed to parse block")
         }
     }
-    
+
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let tuple = try await getTransactions(from: offset)
-        
+
         let trs = tuple.transactions
         hasMoreOldTransactions = tuple.hasMore
-        
+
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
             return .zero
         }
-        
+
         coinStorage.append(trs)
-        
+
         return trs.count
     }
-    
+
     func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         try await getTransactions(from: offset).transactions
     }
-    
+
     func getLocalTransactionHistory() -> [TransactionDetails] {
         return historyTransactions
     }
-    
+
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
     }
 }
+
+#if DEBUG
+    extension DogeWalletService {
+        @available(*, deprecated, message: "For testing purposes only")
+        func setWalletForTests(_ wallet: DogeWallet?) {
+            self.dogeWallet = wallet
+        }
+    }
+#endif
 
 // MARK: - PrivateKey generator
 extension DogeWalletService: PrivateKeyGenerator {
     var rowTitle: String {
         return "Doge"
     }
-    
+
     var rowImage: UIImage? {
         return .asset(named: "doge_wallet_row")
     }
-    
+
     var keyFormat: KeyFormat { .WIF }
-    
+
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
             return nil
         }
-            
+
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        
+
         return privateKey.toWIF()
     }
 }

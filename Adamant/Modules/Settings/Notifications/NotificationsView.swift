@@ -6,24 +6,27 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
     private let baseSoundsView: () -> AnyView
     private let reactionSoundsView: () -> AnyView
-    
+    private let screensFactory: ScreensFactory
+
     init(
         viewModel: @escaping () -> NotificationsViewModel,
         baseSoundsView: @escaping () -> AnyView,
-        reactionSoundsView: @escaping () -> AnyView
+        reactionSoundsView: @escaping () -> AnyView,
+        screensFactory: ScreensFactory
     ) {
         _viewModel = .init(wrappedValue: viewModel())
         self.baseSoundsView = baseSoundsView
         self.reactionSoundsView = reactionSoundsView
+        self.screensFactory = screensFactory
     }
-    
+
     var body: some View {
         Form {
             notificationsSection()
@@ -41,20 +44,31 @@ struct NotificationsView: View {
                 toolbar()
             }
         }
-        .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
-            NavigationView(content: { baseSoundsView() })
-        })
-        .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
-            NavigationView(content: { reactionSoundsView() })
-        })
+        .sheet(
+            isPresented: $viewModel.presentSoundsPicker,
+            content: {
+                NavigationView(content: { baseSoundsView() })
+            }
+        )
+        .sheet(
+            isPresented: $viewModel.presentReactionSoundsPicker,
+            content: {
+                NavigationView(content: { reactionSoundsView() })
+            }
+        )
         .fullScreenCover(isPresented: $viewModel.openSafariURL) {
             SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            screensFactory.makeBuyAndSellView(action: {
+                viewModel.presentBuyAndSell = false
+            })
         }
     }
 }
 
-private extension NotificationsView {
-    func toolbar() -> some View {
+extension NotificationsView {
+    fileprivate func toolbar() -> some View {
         HStack {
             Text(viewModel.notificationsTitle)
                 .font(.headline)
@@ -63,8 +77,8 @@ private extension NotificationsView {
         }
         .frame(alignment: .center)
     }
-    
-    func notificationsSection() -> some View {
+
+    fileprivate func notificationsSection() -> some View {
         Section {
             NavigationButton(action: { viewModel.showAlert() }) {
                 HStack {
@@ -78,8 +92,8 @@ private extension NotificationsView {
             Text(viewModel.notificationsTitle)
         }
     }
-    
-    func messageSoundSection() -> some View {
+
+    fileprivate func messageSoundSection() -> some View {
         Section {
             NavigationButton(action: { viewModel.presentNotificationSoundsPicker() }) {
                 HStack {
@@ -93,8 +107,8 @@ private extension NotificationsView {
             Text(messagesHeader)
         }
     }
-    
-    func messageReactionsSection() -> some View {
+
+    fileprivate func messageReactionsSection() -> some View {
         Section {
             NavigationButton(action: { viewModel.presentReactionNotificationSoundsPicker() }) {
                 HStack {
@@ -108,19 +122,19 @@ private extension NotificationsView {
             Text(reactionsHeader)
         }
     }
-    
-    func inAppNotificationsSection() -> some View {
+
+    fileprivate func inAppNotificationsSection() -> some View {
         Section {
             Toggle(isOn: $viewModel.inAppSounds) {
                 Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            
+
             Toggle(isOn: $viewModel.inAppVibrate) {
                 Text(vibrateTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            
+
             Toggle(isOn: $viewModel.inAppToasts) {
                 Text(toastsTitle)
             }
@@ -129,8 +143,8 @@ private extension NotificationsView {
             Text(inAppNotifications)
         }
     }
-    
-    func settingsSection() -> some View {
+
+    fileprivate func settingsSection() -> some View {
         Section {
             NavigationButton(action: { viewModel.openAppSettings() }) {
                 HStack {
@@ -142,8 +156,8 @@ private extension NotificationsView {
             Text(settingsHeader)
         }
     }
-    
-    func moreDetailsSection() -> some View {
+
+    fileprivate func moreDetailsSection() -> some View {
         Section {
             if let description = viewModel.parsedMarkdownDescription {
                 Text(description)

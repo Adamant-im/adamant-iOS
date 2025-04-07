@@ -47,7 +47,7 @@ public struct BloomFilter {
 
     public mutating func insert(_ data: Data) {
         for i in 0..<nHashFuncs {
-            let seed = i &* 0xFBA4C795 &+ nTweak
+            let seed = i &* 0xFBA4_C795 &+ nTweak
             let nIndex = Int(MurmurHash.hashValue(data, seed) % (size * 8))
             filter[nIndex >> 3] |= (1 << (7 & nIndex))
         }

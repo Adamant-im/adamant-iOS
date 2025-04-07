@@ -19,7 +19,7 @@ public class _Hash {
         }
         return Data(result)
     }
-    
+
     public static func sha256(_ data: Data) -> Data {
         var result = [UInt8](repeating: 0, count: Int(SHA256_DIGEST_LENGTH))
         data.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
@@ -36,11 +36,11 @@ public class _Hash {
         }
         return Data(result)
     }
-    
+
     static func sha256ripemd160(_ data: Data) -> Data {
         return ripemd160(sha256(data))
     }
-    
+
     public static func hmacsha512(_ data: Data, key: Data) -> Data {
         var result = [UInt8](repeating: 0, count: Int(SHA512_DIGEST_LENGTH))
         var length: UInt32 = UInt32(SHA512_DIGEST_LENGTH)
@@ -56,7 +56,7 @@ public class _Hash {
 
 public class _Key {
     public static func computePublicKey(fromPrivateKey privateKey: Data, compression: Bool) -> Data {
-        
+
         let ctx = BN_CTX_new()
         defer {
             BN_CTX_free(ctx)
@@ -66,7 +66,7 @@ public class _Key {
             EC_KEY_free(key)
         }
         let group = EC_KEY_get0_group(key)
-        
+
         let prv = BN_new()
         defer {
             BN_free(prv)
@@ -75,7 +75,7 @@ public class _Key {
             BN_bin2bn(ptr, Int32(privateKey.count), prv)
             return
         }
-        
+
         let pub = EC_POINT_new(group)
         defer {
             EC_POINT_free(pub)
@@ -83,7 +83,7 @@ public class _Key {
         EC_POINT_mul(group, pub, prv, nil, nil, ctx)
         EC_KEY_set_private_key(key, prv)
         EC_KEY_set_public_key(key, pub)
-        
+
         if compression {
             EC_KEY_set_conv_form(key, POINT_CONVERSION_COMPRESSED)
             var ptr: UnsafeMutablePointer<UInt8>?
@@ -100,7 +100,7 @@ public class _Key {
             return Data(result)
         }
     }
-    public static func deriveKey(_ password: Data, salt: Data, iterations:Int, keyLength: Int) -> Data {
+    public static func deriveKey(_ password: Data, salt: Data, iterations: Int, keyLength: Int) -> Data {
         var result = [UInt8](repeating: 0, count: keyLength)
         password.withUnsafeBytes { (passwordPtr: UnsafePointer<Int8>) in
             salt.withUnsafeBytes { (saltPtr: UnsafePointer<UInt8>) in
@@ -119,7 +119,7 @@ public class _HDKey {
     public let depth: UInt8
     public let fingerprint: UInt32
     public let childIndex: UInt32
-    
+
     public init(privateKey: Data?, publicKey: Data?, chainCode: Data, depth: UInt8, fingerprint: UInt32, childIndex: UInt32) {
         self.privateKey = privateKey
         self.publicKey = publicKey
@@ -129,30 +129,30 @@ public class _HDKey {
         self.childIndex = childIndex
     }
     public func derived(at index: UInt32, hardened: Bool) -> _HDKey? {
-        
+
         let ctx = BN_CTX_new()
         defer {
             BN_CTX_free(ctx)
         }
         var data = Data()
         if hardened {
-            data.append(0) // padding
+            data.append(0)  // padding
             data += privateKey ?? Data()
         } else {
             data += publicKey ?? Data()
         }
-        
-        var childIndex = UInt32(hardened ? (0x80000000 | index) : index).bigEndian
+
+        var childIndex = UInt32(hardened ? (0x8000_0000 | index) : index).bigEndian
         withUnsafePointer(to: &childIndex) { data.append(UnsafeBufferPointer(start: $0, count: 1)) }
         let digest = _Hash.hmacsha512(data, key: self.chainCode)
         let derivedPrivateKey = digest[0..<32]
-        let derivedChainCode = digest[32..<(32+32)]
+        let derivedChainCode = digest[32..<(32 + 32)]
         var curveOrder = BN_new()
         defer {
             BN_free(curveOrder)
         }
         BN_hex2bn(&curveOrder, "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141")
-        
+
         let factor = BN_new()
         defer {
             BN_free(factor)
@@ -165,7 +165,7 @@ public class _HDKey {
         if BN_cmp(factor, curveOrder) >= 0 {
             return nil
         }
-        
+
         if let privateKey = self.privateKey {
             let privateKeyNum = BN_new()!
             defer {
@@ -176,15 +176,15 @@ public class _HDKey {
                 return
             }
             BN_mod_add(privateKeyNum, privateKeyNum, factor, curveOrder, ctx)
-            
+
             // Check for invalid derivation.
             if BN_is_zero(privateKeyNum) == 1 {
                 return nil
             }
-//            if privateKeyNum.pointee.top == 0 { // BN_is_zero
-//                return nil
-//            }
-            let numBytes = ((BN_num_bits(privateKeyNum)+7)/8) // BN_num_bytes
+            //            if privateKeyNum.pointee.top == 0 { // BN_is_zero
+            //                return nil
+            //            }
+            let numBytes = ((BN_num_bits(privateKeyNum) + 7) / 8)  // BN_num_bytes
             var result = [UInt8](repeating: 0, count: Int(numBytes))
             BN_bn2bin(privateKeyNum, &result)
             let fingerprintData = _Hash.sha256ripemd160(publicKey ?? Data())
@@ -192,18 +192,20 @@ public class _HDKey {
                 [UInt32](UnsafeBufferPointer(start: $0, count: fingerprintData.count))
             }
             let reusltData = Data(result)
-            return _HDKey(privateKey: reusltData,
-                               publicKey: reusltData,
-                               chainCode: derivedChainCode,
-                               depth: depth + 1,
-                               fingerprint: fingerprintArray[0],
-                               childIndex: childIndex)
+            return _HDKey(
+                privateKey: reusltData,
+                publicKey: reusltData,
+                chainCode: derivedChainCode,
+                depth: depth + 1,
+                fingerprint: fingerprintArray[0],
+                childIndex: childIndex
+            )
         } else if let publicKey = self.publicKey {
             let publicKeyNum = BN_new()
             defer {
                 BN_free(publicKeyNum)
             }
-            
+
             publicKey.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
                 BN_bin2bn(ptr, Int32(publicKey.count), publicKeyNum)
                 return
@@ -215,7 +217,7 @@ public class _HDKey {
             }
             EC_POINT_bn2point(group, publicKeyNum, point, ctx)
             EC_POINT_mul(group, point, factor, point, BN_value_one(), ctx)
-            
+
             // Check for invalid derivation.
             if EC_POINT_is_at_infinity(group, point) == 1 {
                 return nil
@@ -232,12 +234,14 @@ public class _HDKey {
                 [UInt32](UnsafeBufferPointer(start: $0, count: fingerprintData.count))
             }
             let reusltData = Data(result)
-            return _HDKey(privateKey: reusltData,
-                          publicKey: reusltData,
-                          chainCode: derivedChainCode,
-                          depth: depth + 1,
-                          fingerprint: fingerprintArray[0],
-                          childIndex: childIndex)
+            return _HDKey(
+                privateKey: reusltData,
+                publicKey: reusltData,
+                chainCode: derivedChainCode,
+                depth: depth + 1,
+                fingerprint: fingerprintArray[0],
+                childIndex: childIndex
+            )
         } else {
             return nil
         }
@@ -248,49 +252,51 @@ public class _Crypto {
     public static func signMessage(_ data: Data, withPrivateKey privateKey: Data) throws -> Data {
         let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN))!
         defer { secp256k1_context_destroy(ctx) }
-        
+
         let signature = UnsafeMutablePointer<secp256k1_ecdsa_signature>.allocate(capacity: 1)
         defer { signature.deallocate() }
         let status = data.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
             privateKey.withUnsafeBytes { secp256k1_ecdsa_sign(ctx, signature, ptr, $0, nil, nil) }
         }
         guard status == 1 else { throw CryptoError.signFailed }
-        
+
         let normalizedsig = UnsafeMutablePointer<secp256k1_ecdsa_signature>.allocate(capacity: 1)
         defer { normalizedsig.deallocate() }
         secp256k1_ecdsa_signature_normalize(ctx, normalizedsig, signature)
-        
+
         var length: size_t = 128
         var der = Data(count: length)
-        guard der.withUnsafeMutableBytes({ return secp256k1_ecdsa_signature_serialize_der(ctx, $0, &length, normalizedsig) }) == 1 else { throw CryptoError.noEnoughSpace }
+        guard der.withUnsafeMutableBytes({ return secp256k1_ecdsa_signature_serialize_der(ctx, $0, &length, normalizedsig) }) == 1 else {
+            throw CryptoError.noEnoughSpace
+        }
         der.count = length
-        
+
         return der
     }
-    
+
     public static func verifySignature(_ signature: Data, message: Data, publicKey: Data) throws -> Bool {
         let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_VERIFY))!
         defer { secp256k1_context_destroy(ctx) }
-        
+
         let signaturePointer = UnsafeMutablePointer<secp256k1_ecdsa_signature>.allocate(capacity: 1)
         defer { signaturePointer.deallocate() }
         guard signature.withUnsafeBytes({ secp256k1_ecdsa_signature_parse_der(ctx, signaturePointer, $0, signature.count) }) == 1 else {
             throw CryptoError.signatureParseFailed
         }
-        
+
         let pubkeyPointer = UnsafeMutablePointer<secp256k1_pubkey>.allocate(capacity: 1)
         defer { pubkeyPointer.deallocate() }
         guard publicKey.withUnsafeBytes({ secp256k1_ec_pubkey_parse(ctx, pubkeyPointer, $0, publicKey.count) }) == 1 else {
             throw CryptoError.publicKeyParseFailed
         }
-        
+
         guard message.withUnsafeBytes({ secp256k1_ecdsa_verify(ctx, signaturePointer, $0, pubkeyPointer) }) == 1 else {
             return false
         }
-        
+
         return true
     }
-    
+
     public enum CryptoError: Error {
         case signFailed
         case noEnoughSpace

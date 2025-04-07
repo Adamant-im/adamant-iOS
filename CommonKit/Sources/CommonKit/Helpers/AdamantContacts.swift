@@ -19,11 +19,11 @@ public enum AdamantContacts: CaseIterable {
     case donate
     case adamantWelcomeWallet
     case adelina
-    
+
     public static var systemAddresses: [String] {
         Self.allCases.map { $0.name }
     }
-    
+
     public var name: String {
         switch self {
         case .adamantWelcomeWallet:
@@ -46,16 +46,16 @@ public enum AdamantContacts: CaseIterable {
             return .localized("Accounts.AdamantBountyBot", comment: "System accounts: PWA ADM Bounty bot")
         }
     }
-    
+
     public var isSystem: Bool {
         switch self {
-        case .adamantExchange, .betOnBitcoin, .adelina:
+        case .adamantExchange, .betOnBitcoin, .adelina, .donate:
             return false
-        case .adamantWelcomeWallet, .adamantSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .donate, .pwaBountyBot:
+        case .adamantWelcomeWallet, .adamantSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .pwaBountyBot:
             return true
         }
     }
-    
+
     public var address: String {
         switch self {
         case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
@@ -70,7 +70,7 @@ public enum AdamantContacts: CaseIterable {
         case .pwaBountyBot: return AdamantResources.contacts.pwaBountyBot
         }
     }
-    
+
     public var publicKey: String? {
         switch self {
         case .adamantExchange: return AdamantResources.contacts.adamantExchangePK
@@ -85,21 +85,21 @@ public enum AdamantContacts: CaseIterable {
         case .pwaBountyBot: return AdamantResources.contacts.pwaBountyBotPK
         }
     }
-    
+
     public var isReadonly: Bool {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet, .adamantIco, .adamantWelcomeWallet: return true
         case .adamantSupport, .adamantExchange, .betOnBitcoin, .donate, .adelina, .pwaBountyBot: return false
         }
     }
-    
+
     public var isHidden: Bool {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet, .pwaBountyBot: return true
         case .adamantIco, .adamantSupport, .adamantExchange, .betOnBitcoin, .donate, .adamantWelcomeWallet, .adelina: return false
         }
     }
-    
+
     public var avatar: String {
         switch self {
         case .adamantExchange, .betOnBitcoin, .donate, .adamantBountyWallet, .adamantNewBountyWallet, .adelina, .pwaBountyBot:
@@ -108,7 +108,7 @@ public enum AdamantContacts: CaseIterable {
             return "avatar_bots"
         }
     }
-    
+
     public var nodeNameKey: String? {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet:
@@ -129,16 +129,16 @@ public enum AdamantContacts: CaseIterable {
     }
 }
 
-public extension AdamantContacts {
-    init?(nodeNameKey: String) {
+extension AdamantContacts {
+    public init?(nodeNameKey: String) {
         guard
             let contact = Self.allCases
                 .first(where: { nodeNameKey == $0.nodeNameKey })
         else { return nil }
         self = contact
     }
-    
-    init?(address: String) {
+
+    public init?(address: String) {
         guard
             let contact = Self.allCases
                 .first(where: { address == $0.address })

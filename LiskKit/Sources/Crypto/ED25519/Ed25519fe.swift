@@ -1,4 +1,5 @@
 import Foundation
+
 //
 //  ed25519_fe.swift
 //
@@ -23,14 +24,14 @@ import Foundation
 //    3. This notice may not be removed or altered from any source distribution.
 //
 struct shortsc {
-    var v: [UInt32] // 16
+    var v: [UInt32]  // 16
     init() {
         v = [UInt32](repeating: 0, count: 16)
     }
 }
 
 struct sc {
-    var v: [UInt32] // 32
+    var v: [UInt32]  // 32
     init() {
         v = [UInt32](repeating: 0, count: 32)
     }
@@ -49,8 +50,10 @@ struct sc {
 
     // little endian group order m
     private static let m: [UInt32] =
-        [0xED, 0xD3, 0xF5, 0x5C, 0x1A, 0x63, 0x12, 0x58, 0xD6, 0x9C, 0xF7, 0xA2, 0xDE, 0xF9, 0xDE, 0x14,
-         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10]
+        [
+            0xED, 0xD3, 0xF5, 0x5C, 0x1A, 0x63, 0x12, 0x58, 0xD6, 0x9C, 0xF7, 0xA2, 0xDE, 0xF9, 0xDE, 0x14,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
+        ]
 
     /*
      for barrett_reduce algorithm
@@ -62,8 +65,10 @@ struct sc {
      = 0x0fffffffffffffffffffffffffffffffeb2106215d086329a7ed9ce5a30a2c131b
      */
     private static let mu: [UInt32] =
-        [0x1B, 0x13, 0x2C, 0x0A, 0xA3, 0xE5, 0x9C, 0xED, 0xA7, 0x29, 0x63, 0x08, 0x5D, 0x21, 0x06, 0x21,
-         0xEB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]
+        [
+            0x1B, 0x13, 0x2C, 0x0A, 0xA3, 0xE5, 0x9C, 0xED, 0xA7, 0x29, 0x63, 0x08, 0x5D, 0x21, 0x06, 0x21,
+            0xEB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F
+        ]
 
     private static func lt(_ a: UInt32, _ b: UInt32) -> UInt32 /* 16-bit inputs */ {
         if a < b {
@@ -91,7 +96,7 @@ struct sc {
         }
         // no borrow: mask = 0xffffffff -> r = r - m
         // borrow   : mask = 0x0        -> r = r
-        let mask = UInt32(bitPattern: Int32(borrow)-1)
+        let mask = UInt32(bitPattern: Int32(borrow) - 1)
         for i in 0..<k {
             r.v[i] ^= mask & (r.v[i] ^ UInt32(t[i]))
         }
@@ -110,11 +115,11 @@ struct sc {
         // STEP1
         // q1 = floor(x / b^(k-1))
         // q2 <- q1 * mu
-        var q2 = [UInt32](repeating: 0, count: 2*k+2) // LSB
+        var q2 = [UInt32](repeating: 0, count: 2 * k + 2)  // LSB
         for i in 0...k {
             for j in 0...k {
-                if i+j >= k-1 {
-                    q2[i+j] += x[j+k-1] * mu[i]
+                if i + j >= k - 1 {
+                    q2[i + j] += x[j + k - 1] * mu[i]
                 }
             }
         }
@@ -123,30 +128,30 @@ struct sc {
         // q3 = (... + b^(k+1) * q2[k+1] + b^(k+2) * q2[k+2] + ... + b^(2k) * q2[2k] + b^(2k+1) * q2[2k+1])
         //    = q2[k+1] + b^1 * q2[k+1] + ... + b^(k-1) * q2[2k] + b^k * q2[2k+1]
         // Since q2[2k] has carry q2[2k+1] is zero.
-        let carry1 = q2[k-1] >> 8
+        let carry1 = q2[k - 1] >> 8
         q2[k] += carry1
         let carry2 = q2[k] >> 8
-        q2[k+1] += carry2
+        q2[k + 1] += carry2
 
         // STEP2,3
         // r1 = x (mod b^(k+1))
-        var r1 = [UInt32](repeating: 0, count: k+1)
+        var r1 = [UInt32](repeating: 0, count: k + 1)
         for i in 0...k {
             r1[i] = x[i]
         }
 
         // r2 = q3 * m (mod b^(k+1))
-        var r2 = [UInt32](repeating: 0, count: k+1)
-        for i in 0...k-1 {
+        var r2 = [UInt32](repeating: 0, count: k + 1)
+        for i in 0...k - 1 {
             for j in 0...k {
-                if i+j < k+1 {
-                    r2[i+j] += q2[j+k+1] * m[i]
+                if i + j < k + 1 {
+                    r2[i + j] += q2[j + k + 1] * m[i]
                 }
             }
         }
-        for i in 0...k-1 {
+        for i in 0...k - 1 {
             let carry = r2[i] >> 8
-            r2[i+1] += carry
+            r2[i + 1] += carry
             r2[i] &= 0xff
         }
         r2[k] &= 0xff
@@ -158,7 +163,7 @@ struct sc {
         // so r can represented for b^0 y\_0 + b^1 y\_1 + ... + b^(k-1) y\_(k-1)
         // it means r[v] is zero
         var val: UInt32 = 0
-        for i in 0...k-1 {
+        for i in 0...k - 1 {
             val += r2[i]
             let borrow = lt(r1[i], val)
             let vv = Int64(r1[i]) - Int64(val) + Int64(borrow << 8)
@@ -192,11 +197,11 @@ struct sc {
 
     static func sc25519_from32bytes(_ r: inout sc, _ x: [UInt8] /* 32 */) {
         assert(x.count >= k)
-        var t = [UInt32](repeating: 0, count: k*2)
+        var t = [UInt32](repeating: 0, count: k * 2)
         for i in 0..<k {
             t[i] = UInt32(x[i])
         }
-        for i in k..<k*2 {
+        for i in k..<k * 2 {
             t[i] = 0
         }
         // r = t mod m
@@ -211,9 +216,9 @@ struct sc {
     }
 
     static func sc25519_from64bytes(_ r: inout sc, _ x: [UInt8] /* 64 */) {
-        assert(x.count == k*2)
-        var t = [UInt32](repeating: 0, count: k*2)
-        for i in 0..<k*2 {
+        assert(x.count == k * 2)
+        var t = [UInt32](repeating: 0, count: k * 2)
+        for i in 0..<k * 2 {
             t[i] = UInt32(x[i])
         }
         // r = t mod b
@@ -225,7 +230,7 @@ struct sc {
             r.v[i] = x.v[i]
         }
         for i in 0..<16 {
-            r.v[16+i] = 0
+            r.v[16 + i] = 0
         }
     }
 
@@ -271,9 +276,9 @@ struct sc {
         for i in 0..<k {
             r.v[i] = x.v[i] + y.v[i]
         }
-        for i in 0..<k-1 {
+        for i in 0..<k - 1 {
             carry = r.v[i] >> 8
-            r.v[i+1] += carry
+            r.v[i + 1] += carry
             r.v[i] &= 0xff
         }
         sc.reduce_add_sub(&r)
@@ -290,18 +295,18 @@ struct sc {
     }
 
     static func sc25519_mul(_ r: inout sc, _ x: sc, _ y: sc) {
-        var t = [UInt32](repeating: 0, count: k*2)
+        var t = [UInt32](repeating: 0, count: k * 2)
 
         for i in 0..<k {
             for j in 0..<k {
-                t[i+j] += x.v[i] * y.v[j]
+                t[i + j] += x.v[i] * y.v[j]
             }
         }
 
         /* Reduce coefficients */
-        for i in 0..<2*k-1 {
+        for i in 0..<2 * k - 1 {
             let carry = t[i] >> 8
-            t[i+1] += carry
+            t[i + 1] += carry
             t[i] &= 0xff
         }
 
@@ -319,33 +324,33 @@ struct sc {
     static func sc25519_window3(_ r: inout [Int8] /* 85 */, _ s: sc) {
         assert(r.count == 85)
         for i in 0..<10 {
-            r[8*i+0]  = Int8(bitPattern: UInt8(s.v[3*i+0]       & 7))
-            r[8*i+1]  = Int8(bitPattern: UInt8((s.v[3*i+0] >> 3) & 7))
-            r[8*i+2]  = Int8(bitPattern: UInt8((s.v[3*i+0] >> 6) & 7))
-            r[8*i+2] ^= Int8(bitPattern: UInt8((s.v[3*i+1] << 2) & 7))
-            r[8*i+3]  = Int8(bitPattern: UInt8((s.v[3*i+1] >> 1) & 7))
-            r[8*i+4]  = Int8(bitPattern: UInt8((s.v[3*i+1] >> 4) & 7))
-            r[8*i+5]  = Int8(bitPattern: UInt8((s.v[3*i+1] >> 7) & 7))
-            r[8*i+5] ^= Int8(bitPattern: UInt8((s.v[3*i+2] << 1) & 7))
-            r[8*i+6]  = Int8(bitPattern: UInt8((s.v[3*i+2] >> 2) & 7))
-            r[8*i+7]  = Int8(bitPattern: UInt8((s.v[3*i+2] >> 5) & 7))
+            r[8 * i + 0] = Int8(bitPattern: UInt8(s.v[3 * i + 0] & 7))
+            r[8 * i + 1] = Int8(bitPattern: UInt8((s.v[3 * i + 0] >> 3) & 7))
+            r[8 * i + 2] = Int8(bitPattern: UInt8((s.v[3 * i + 0] >> 6) & 7))
+            r[8 * i + 2] ^= Int8(bitPattern: UInt8((s.v[3 * i + 1] << 2) & 7))
+            r[8 * i + 3] = Int8(bitPattern: UInt8((s.v[3 * i + 1] >> 1) & 7))
+            r[8 * i + 4] = Int8(bitPattern: UInt8((s.v[3 * i + 1] >> 4) & 7))
+            r[8 * i + 5] = Int8(bitPattern: UInt8((s.v[3 * i + 1] >> 7) & 7))
+            r[8 * i + 5] ^= Int8(bitPattern: UInt8((s.v[3 * i + 2] << 1) & 7))
+            r[8 * i + 6] = Int8(bitPattern: UInt8((s.v[3 * i + 2] >> 2) & 7))
+            r[8 * i + 7] = Int8(bitPattern: UInt8((s.v[3 * i + 2] >> 5) & 7))
         }
         let i = 10
-        r[8*i+0]  =  Int8(bitPattern: UInt8(s.v[3*i+0]       & 7))
-        r[8*i+1]  = Int8(bitPattern: UInt8((s.v[3*i+0] >> 3) & 7))
-        r[8*i+2]  = Int8(bitPattern: UInt8((s.v[3*i+0] >> 6) & 7))
-        r[8*i+2] ^= Int8(bitPattern: UInt8((s.v[3*i+1] << 2) & 7))
-        r[8*i+3]  = Int8(bitPattern: UInt8((s.v[3*i+1] >> 1) & 7))
-        r[8*i+4]  = Int8(bitPattern: UInt8((s.v[3*i+1] >> 4) & 7))
+        r[8 * i + 0] = Int8(bitPattern: UInt8(s.v[3 * i + 0] & 7))
+        r[8 * i + 1] = Int8(bitPattern: UInt8((s.v[3 * i + 0] >> 3) & 7))
+        r[8 * i + 2] = Int8(bitPattern: UInt8((s.v[3 * i + 0] >> 6) & 7))
+        r[8 * i + 2] ^= Int8(bitPattern: UInt8((s.v[3 * i + 1] << 2) & 7))
+        r[8 * i + 3] = Int8(bitPattern: UInt8((s.v[3 * i + 1] >> 1) & 7))
+        r[8 * i + 4] = Int8(bitPattern: UInt8((s.v[3 * i + 1] >> 4) & 7))
 
         /* Making it signed */
         var carry: Int8 = 0
         for i in 0..<84 {
             r[i] += carry
-            r[i+1] += (r[i] >> 3)
+            r[i + 1] += (r[i] >> 3)
             r[i] &= 7
             carry = r[i] >> 2
-            let vv: Int16 = Int16(r[i]) - Int16(carry<<3)
+            let vv: Int16 = Int16(r[i]) - Int16(carry << 3)
             assert(vv >= -128 && vv <= 127)
             r[i] = Int8(vv)
         }
@@ -360,10 +365,10 @@ struct sc {
             let a2 = UInt8(s2.v[i] & 0xff)
             // 8bits = 2bits * 4
             // s2 s1
-            r[4*i]   = ((a1 >> 0) & 3) ^ (((a2 >> 0) & 3) << 2)
-            r[4*i+1] = ((a1 >> 2) & 3) ^ (((a2 >> 2) & 3) << 2)
-            r[4*i+2] = ((a1 >> 4) & 3) ^ (((a2 >> 4) & 3) << 2)
-            r[4*i+3] = ((a1 >> 6) & 3) ^ (((a2 >> 6) & 3) << 2)
+            r[4 * i] = ((a1 >> 0) & 3) ^ (((a2 >> 0) & 3) << 2)
+            r[4 * i + 1] = ((a1 >> 2) & 3) ^ (((a2 >> 2) & 3) << 2)
+            r[4 * i + 2] = ((a1 >> 4) & 3) ^ (((a2 >> 4) & 3) << 2)
+            r[4 * i + 3] = ((a1 >> 6) & 3) ^ (((a2 >> 6) & 3) << 2)
         }
 
         let b1 = UInt8(s1.v[31] & 0xff)
@@ -383,10 +388,10 @@ struct fe: CustomDebugStringConvertible {
     //     + 2^(2*8) * v[2]
     //     + 2^(1*8) * v[1]
     //     + 2^(0*8) * v[0]
-    public var v: [UInt32] // size:32
+    public var v: [UInt32]  // size:32
 
     public var debugDescription: String {
-        return v.map({ String(format: "%d ", $0)}).joined()
+        return v.map({ String(format: "%d ", $0) }).joined()
     }
 
     public init() {
@@ -437,7 +442,7 @@ struct fe: CustomDebugStringConvertible {
             // move up
             for i in 0..<31 {
                 s = r.v[i] >> 8
-                r.v[i+1] += s
+                r.v[i + 1] += s
                 r.v[i] &= 0xff
             }
         }
@@ -446,18 +451,23 @@ struct fe: CustomDebugStringConvertible {
     static func reduce_mul(_ r: inout fe) {
         var t: UInt32
         var s: UInt32
-        for _ in 0..<2 {
+        var i = 0
+        while i < 2 {
             // use q = 2^(31*8)*(2^7) - 19
             t = r.v[31] >> 7
             r.v[31] &= 0x7f
             t = times19(t)
             r.v[0] += t
             // move up
-            for i in 0..<31 {
-                s = r.v[i] >> 8
-                r.v[i+1] += s
-                r.v[i] &= 0xff
+            var j = 0
+            while j < 31 {
+                s = r.v[j] >> 8
+                r.v[j + 1] += s
+                r.v[j] &= 0xff
+                j += 1
             }
+
+            i += 1
         }
     }
 
@@ -476,19 +486,19 @@ struct fe: CustomDebugStringConvertible {
         m = UInt32(bitPattern: Int32(m) * -1)
         // m is 0xffffffff or 0x0
 
-        r.v[31] -= (m&127)
+        r.v[31] -= (m & 127)
         for i in stride(from: 30, to: 0, by: -1) {
-            r.v[i] -= m&255
+            r.v[i] -= m & 255
         }
-        r.v[0] -= m&237
+        r.v[0] -= m & 237
     }
 
-    static func fe25519_unpack(_ r: inout fe, _ x: [UInt8]/* 32 */) {
+    static func fe25519_unpack(_ r: inout fe, _ x: [UInt8] /* 32 */) {
         assert(x.count == 32)
         for i in 0..<32 {
             r.v[i] = UInt32(x[i])
         }
-        r.v[31] &= 127 // remove parity
+        r.v[31] &= 127  // remove parity
     }
 
     /// Assumes input x being reduced mod 2^255
@@ -569,8 +579,10 @@ struct fe: CustomDebugStringConvertible {
 
     /// r = x + y
     static func fe25519_add(_ r: inout fe, _ x: fe, _ y: fe) {
-        for i in 0..<32 {
+        var i = 0
+        while i < 32 {
             r.v[i] = x.v[i] + y.v[i]
+            i += 1
         }
         fe.reduce_add_sub(&r)
     }
@@ -586,29 +598,43 @@ struct fe: CustomDebugStringConvertible {
     static func fe25519_sub(_ r: inout fe, _ x: fe, _ y: fe) {
         // t = 2 * q + x
         var t = [UInt32](repeating: 0, count: 32)
-        t[0] = x.v[0] + 0x1da    // LSB
-        for i in 1..<31 { t[i] = x.v[i] + 0x1fe }
-        t[31] = x.v[31] + 0xfe    // MSB
+        t[0] = x.v[0] + 0x1da  // LSB
+        var i = 1
+        while i < 31 {
+            t[i] = x.v[i] + 0x1fe
+            i += 1
+        }
+        t[31] = x.v[31] + 0xfe  // MSB
         // r = t - y
-        for i in 0..<32 { r.v[i] = t[i] - y.v[i] }
+        i = 0
+        while i < 32 {
+            r.v[i] = t[i] - y.v[i]
+            i += 1
+        }
         fe.reduce_add_sub(&r)
     }
 
     /// r = x * y
     static func fe25519_mul(_ r: inout fe, _ x: fe, _ y: fe) {
         var t = [UInt32](repeating: 0, count: 63)
-
-        for i in 0..<32 {
-            for j in 0..<32 {
-                t[i+j] += x.v[i] * y.v[j]
+        var i = 0
+        while i < 32 {
+            var j = 0
+            while j < 32 {
+                t[i + j] += x.v[i] * y.v[j]
+                j += 1
             }
+            i += 1
         }
 
         // 2q = 2^256 - 2*19
         // so 2^256 = 2*19
-        for i in 32..<63 {
-            r.v[i-32] = t[i-32] + fe.times38(t[i])
+        i = 32
+        while i < 63 {
+            r.v[i - 32] = t[i - 32] + fe.times38(t[i])
+            i += 1
         }
+
         r.v[31] = t[31] /* result now in r[0]...r[31] */
 
         fe.reduce_mul(&r)
@@ -652,32 +678,50 @@ struct fe: CustomDebugStringConvertible {
 
         /* 2^11 - 2^1 */ fe25519_square(&t0, z2_10_0)
         /* 2^12 - 2^2 */ fe25519_square(&t1, t0)
-        /* 2^20 - 2^10 */ for _ in stride(from: 2, to: 10, by: 2) { fe25519_square(&t0, t1); fe25519_square(&t1, t0) }
+        /* 2^20 - 2^10 */ for _ in stride(from: 2, to: 10, by: 2) {
+            fe25519_square(&t0, t1)
+            fe25519_square(&t1, t0)
+        }
         /* 2^20 - 2^0 */ fe25519_mul(&z2_20_0, t1, z2_10_0)
 
         /* 2^21 - 2^1 */ fe25519_square(&t0, z2_20_0)
         /* 2^22 - 2^2 */ fe25519_square(&t1, t0)
-        /* 2^40 - 2^20 */ for _ in stride(from: 2, to: 20, by: 2) { fe25519_square(&t0, t1); fe25519_square(&t1, t0) }
+        /* 2^40 - 2^20 */ for _ in stride(from: 2, to: 20, by: 2) {
+            fe25519_square(&t0, t1)
+            fe25519_square(&t1, t0)
+        }
         /* 2^40 - 2^0 */ fe25519_mul(&t0, t1, z2_20_0)
 
         /* 2^41 - 2^1 */ fe25519_square(&t1, t0)
         /* 2^42 - 2^2 */ fe25519_square(&t0, t1)
-        /* 2^50 - 2^10 */ for _ in stride(from: 2, to: 10, by: 2) { fe25519_square(&t1, t0); fe25519_square(&t0, t1) }
+        /* 2^50 - 2^10 */ for _ in stride(from: 2, to: 10, by: 2) {
+            fe25519_square(&t1, t0)
+            fe25519_square(&t0, t1)
+        }
         /* 2^50 - 2^0 */ fe25519_mul(&z2_50_0, t0, z2_10_0)
 
         /* 2^51 - 2^1 */ fe25519_square(&t0, z2_50_0)
         /* 2^52 - 2^2 */ fe25519_square(&t1, t0)
-        /* 2^100 - 2^50 */ for _ in stride(from: 2, to: 50, by: 2) { fe25519_square(&t0, t1); fe25519_square(&t1, t0) }
+        /* 2^100 - 2^50 */ for _ in stride(from: 2, to: 50, by: 2) {
+            fe25519_square(&t0, t1)
+            fe25519_square(&t1, t0)
+        }
         /* 2^100 - 2^0 */ fe25519_mul(&z2_100_0, t1, z2_50_0)
 
         /* 2^101 - 2^1 */ fe25519_square(&t1, z2_100_0)
         /* 2^102 - 2^2 */ fe25519_square(&t0, t1)
-        /* 2^200 - 2^100 */ for _ in stride(from: 2, to: 100, by: 2) { fe25519_square(&t1, t0); fe25519_square(&t0, t1) }
+        /* 2^200 - 2^100 */ for _ in stride(from: 2, to: 100, by: 2) {
+            fe25519_square(&t1, t0)
+            fe25519_square(&t0, t1)
+        }
         /* 2^200 - 2^0 */ fe25519_mul(&t1, t0, z2_100_0)
 
         /* 2^201 - 2^1 */ fe25519_square(&t0, t1)
         /* 2^202 - 2^2 */ fe25519_square(&t1, t0)
-        /* 2^250 - 2^50 */ for _ in stride(from: 2, to: 50, by: 2) { fe25519_square(&t0, t1); fe25519_square(&t1, t0) }
+        /* 2^250 - 2^50 */ for _ in stride(from: 2, to: 50, by: 2) {
+            fe25519_square(&t0, t1)
+            fe25519_square(&t1, t0)
+        }
         /* 2^250 - 2^0 */ fe25519_mul(&t0, t1, z2_50_0)
 
         /* 2^251 - 2^1 */ fe25519_square(&t1, t0)

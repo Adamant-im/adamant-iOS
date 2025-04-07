@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Swinject
-import SwiftUI
 import CommonKit
+import SwiftUI
+import Swinject
 
 enum CoinsNodesListContext {
     case login
@@ -19,17 +19,17 @@ enum CoinsNodesListContext {
 struct CoinsNodesListFactory {
     private let parent: Assembler
     private let assemblies = [CoinsNodesListAssembly()]
-    
+
     init(parent: Assembler) {
         self.parent = parent
     }
-    
+
     @MainActor
     func makeViewController(context: CoinsNodesListContext) -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = { assembler.resolver.resolve(CoinsNodesListViewModel.self)! }
         let view = CoinsNodesListView(viewModel: viewModel)
-        
+
         switch context {
         case .login:
             return SelfRemovableHostingController(rootView: view)
@@ -43,7 +43,7 @@ private struct CoinsNodesListAssembly: MainThreadAssembly {
     func assembleOnMainThread(container: Container) {
         container.register(CoinsNodesListViewModel.self) {
             let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
-            
+
             return .init(
                 mapper: .init(),
                 nodesStorage: $0.resolve(NodesStorageProtocol.self)!,

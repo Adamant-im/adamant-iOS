@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct ApiServiceCompose: ApiServiceComposeProtocol {
     let btc: ApiServiceProtocol
@@ -19,14 +19,14 @@ struct ApiServiceCompose: ApiServiceComposeProtocol {
     let adm: ApiServiceProtocol
     let ipfs: ApiServiceProtocol
     let infoService: ApiServiceProtocol
-    
+
     func get(_ group: NodeGroup) -> ApiServiceProtocol? {
         getApiService(group: group)
     }
 }
 
-private extension ApiServiceCompose {
-    func getApiService(group: NodeGroup) -> ApiServiceProtocol {
+extension ApiServiceCompose {
+    fileprivate func getApiService(group: NodeGroup) -> ApiServiceProtocol {
         switch group {
         case .btc:
             return btc

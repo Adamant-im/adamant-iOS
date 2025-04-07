@@ -6,10 +6,10 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import UIKit
-import SnapKit
-import FilesStorageKit
 import CommonKit
+import FilesStorageKit
+import SnapKit
+import UIKit
 
 final class FilesToolbarView: UIView {
     private lazy var collectionView: UICollectionView = {
@@ -17,9 +17,11 @@ final class FilesToolbarView: UIView {
         flow.minimumInteritemSpacing = 5
         flow.minimumLineSpacing = 5
         flow.scrollDirection = .horizontal
-        
+
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flow)
-        collectionView.register(FilesToolbarCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self)
+        collectionView.register(
+            FilesToolbarCollectionViewCell.self,
+            forCellWithReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self)
         )
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
@@ -27,7 +29,7 @@ final class FilesToolbarView: UIView {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    
+
     private lazy var containerView: UIView = {
         let view = UIView()
         view.addSubview(collectionView)
@@ -37,7 +39,7 @@ final class FilesToolbarView: UIView {
         }
         return view
     }()
-    
+
     private lazy var closeBtn: UIButton = {
         let btn = UIButton()
         btn.setImage(
@@ -45,39 +47,39 @@ final class FilesToolbarView: UIView {
             for: .normal
         )
         btn.addTarget(self, action: #selector(didTapCloseBtn), for: .touchUpInside)
-        
+
         btn.snp.makeConstraints { make in
             make.size.equalTo(30)
         }
         return btn
     }()
-    
+
     private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [containerView, closeBtn])
         stack.axis = .horizontal
         stack.spacing = horizontalStackSpacing
         return stack
     }()
-    
+
     // MARK: Proprieties
-    
+
     private var data: [FileResult] = []
     var closeAction: (() -> Void)?
     var updatedDataAction: (([FileResult]) -> Void)?
     var openFileAction: ((FileResult) -> Void)?
-    
+
     // MARK: Init
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
     }
-    
+
     func configure() {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
@@ -85,13 +87,13 @@ final class FilesToolbarView: UIView {
             $0.horizontalEdges.equalToSuperview().inset(horizontalInsets)
         }
     }
-    
+
     // MARK: Actions
-    
+
     @objc private func didTapCloseBtn() {
         closeAction?()
     }
-    
+
     private func removeFile(at index: Int) {
         data.remove(at: index)
         collectionView.reloadData()
@@ -120,25 +122,27 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
     ) -> Int {
         data.count
     }
-    
+
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self),
-            for: indexPath
-        ) as? FilesToolbarCollectionViewCell else {
+        guard
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self),
+                for: indexPath
+            ) as? FilesToolbarCollectionViewCell
+        else {
             return UICollectionViewCell()
         }
-        
+
         cell.update(data[indexPath.row], tag: indexPath.row)
         cell.buttonActionHandler = { [weak self] index in
             self?.removeFile(at: index)
         }
         return cell
     }
-    
+
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -149,7 +153,7 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
             height: self.frame.height - itemOffset
         )
     }
-    
+
     func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath

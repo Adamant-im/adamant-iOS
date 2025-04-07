@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct PartnerQRView: View {
+    let screenFactory: ScreensFactory
     @ObservedObject var viewModel: PartnerQRViewModel
-    
+
     var body: some View {
         GeometryReader { geometry in
             Form {
@@ -25,15 +26,21 @@ struct PartnerQRView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $viewModel.presentBuyAndSell) {
+            screenFactory.makeBuyAndSellView(action: {
+                viewModel.presentBuyAndSell = false
+            })
+        }
     }
-    
-    init(viewModel: @escaping () -> PartnerQRViewModel) {
+
+    init(viewModel: @escaping () -> PartnerQRViewModel, screenFactory: ScreensFactory) {
         _viewModel = .init(wrappedValue: viewModel())
+        self.screenFactory = screenFactory
     }
 }
 
-private extension PartnerQRView {
-    func toolbar(maxWidth: CGFloat) -> some View {
+extension PartnerQRView {
+    fileprivate func toolbar(maxWidth: CGFloat) -> some View {
         Button(action: viewModel.renameContact) {
             HStack {
                 if let uiImage = viewModel.partnerImage {
@@ -49,8 +56,8 @@ private extension PartnerQRView {
             .frame(maxWidth: maxWidth - toolbarSpace, alignment: .center)
         }
     }
-    
-    func infoSection() -> some View {
+
+    fileprivate func infoSection() -> some View {
         Section {
             if let uiImage = viewModel.image {
                 HStack {
@@ -62,21 +69,24 @@ private extension PartnerQRView {
                     Spacer()
                 }
             }
-            
+
             HStack {
                 Spacer()
-                Button(action: {
-                    viewModel.copyToPasteboard()
-                }, label: {
-                    Text(viewModel.title)
-                        .padding()
-                })
+                Button(
+                    action: {
+                        viewModel.copyToPasteboard()
+                    },
+                    label: {
+                        Text(viewModel.title)
+                            .padding()
+                    }
+                )
                 Spacer()
             }
         }
     }
-    
-    func toggleSection() -> some View {
+
+    fileprivate func toggleSection() -> some View {
         Section {
             Toggle(String.adamant.partnerQR.includePartnerName, isOn: $viewModel.includeContactsName)
                 .disabled(!viewModel.includeContactsNameEnabled)
@@ -84,7 +94,7 @@ private extension PartnerQRView {
                 .onChange(of: viewModel.includeContactsName) { _ in
                     viewModel.didToggle()
                 }
-            
+
             Toggle(String.adamant.partnerQR.includePartnerURL, isOn: $viewModel.includeWebAppLink)
                 .tint(.init(uiColor: .adamant.active))
                 .onChange(of: viewModel.includeWebAppLink) { _ in
@@ -92,17 +102,17 @@ private extension PartnerQRView {
                 }
         }
     }
-    
-    func buttonSection() -> some View {
+
+    fileprivate func buttonSection() -> some View {
         Section {
             Button(viewModel.renameTitle) {
                 viewModel.renameContact()
             }
-            
+
             Button(String.adamant.alert.saveToPhotolibrary) {
                 viewModel.saveToPhotos()
             }
-            
+
             Button(String.adamant.alert.share) {
                 viewModel.share()
             }

@@ -6,10 +6,10 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SnapKit
-import UIKit
 import CommonKit
 import FilesPickerKit
+import SnapKit
+import UIKit
 
 final class MediaContainerView: UIView {
     private lazy var filesStack: UIStackView = {
@@ -19,14 +19,14 @@ final class MediaContainerView: UIView {
         stack.alignment = .fill
         stack.distribution = .fill
         stack.layer.masksToBounds = true
-        
+
         for chunk in 0..<(FilesConstants.maxFilesCount / 2) {
             let stackView = UIStackView()
             stackView.axis = .horizontal
             stackView.spacing = stackSpacing
             stackView.alignment = .fill
             stackView.distribution = .fill
-            
+
             for file in 0..<2 {
                 let view = MediaContentView()
                 view.layer.masksToBounds = true
@@ -35,54 +35,54 @@ final class MediaContainerView: UIView {
                 }
                 stackView.addArrangedSubview(view)
             }
-            
+
             stack.addArrangedSubview(stackView)
         }
-        
+
         return stack
     }()
-    
+
     private lazy var previewDownloadNotAllowedLabel = EdgeInsetLabel(
         font: previewDownloadNotAllowedFont,
         textColor: .adamant.textColor.withAlphaComponent(0.4)
     )
-    
+
     // MARK: Proprieties
-    
+
     var model: ChatMediaContentView.FileModel = .default {
         didSet { update(old: oldValue) }
     }
-    
+
     var actionHandler: (ChatAction) -> Void = { _ in }
-    
+
     // MARK: - Init
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
     }
 }
 
-private extension MediaContainerView {
-    func configure() {
+extension MediaContainerView {
+    fileprivate func configure() {
         layer.masksToBounds = true
-        
+
         addSubview(filesStack)
         filesStack.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
             $0.width.equalTo(model.width())
         }
-        
+
         addSubview(previewDownloadNotAllowedLabel)
         previewDownloadNotAllowedLabel.snp.makeConstraints { make in
             make.center.equalTo(filesStack.snp.center)
         }
-        
+
         previewDownloadNotAllowedLabel.textInsets = previewTextInsets
         previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
         previewDownloadNotAllowedLabel.numberOfLines = .zero
@@ -93,36 +93,38 @@ private extension MediaContainerView {
         previewDownloadNotAllowedLabel.clipsToBounds = true
         previewDownloadNotAllowedLabel.sizeToFit()
     }
-    
-    func onAppear() {
+
+    fileprivate func onAppear() {
         let filesToDownload = model.files
             .prefix(FilesConstants.maxFilesCount)
             .filter { $0.fileType.isMedia }
-        
+
         guard !filesToDownload.isEmpty else { return }
-        
-        actionHandler(.autoDownloadContentIfNeeded(
-            messageId: model.messageId,
-            files: filesToDownload
-        ))
+
+        actionHandler(
+            .autoDownloadContentIfNeeded(
+                messageId: model.messageId,
+                files: filesToDownload
+            )
+        )
     }
-    
-    func update(old: ChatMediaContentView.FileModel) {
+
+    fileprivate func update(old: ChatMediaContentView.FileModel) {
         if model.messageId != old.messageId { onAppear() }
-        
+
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
         updatePreviewDownloadLabel()
-        
+
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
             guard let horizontalStackView = stackView as? UIStackView else { continue }
-            
+
             var isHorizontal = false
-            
+
             for (fileIndex, fileView) in horizontalStackView.arrangedSubviews.enumerated() {
                 guard let mediaView = fileView as? MediaContentView else { continue }
-                
+
                 let fileOverallIndex = index * horizontalStackView.arrangedSubviews.count + fileIndex
-                
+
                 if fileOverallIndex < fileList.count {
                     let file = fileList[fileOverallIndex]
                     mediaView.isHidden = false
@@ -131,23 +133,31 @@ private extension MediaContainerView {
                         txStatus: model.txStatus
                     )
                     mediaView.buttonActionHandler = { [weak self, file, model] in
-                        self?.actionHandler(
-                            .openFile(
-                                messageId: model.messageId,
-                                file: file
-                            )
-                        )
+                        let action: ChatAction =
+                            if file.isBusy, file.isUploading {
+                                .cancelUploading(
+                                    messageId: model.messageId,
+                                    file: file
+                                )
+                            } else {
+                                .openFile(
+                                    messageId: model.messageId,
+                                    file: file
+                                )
+                            }
+                        self?.actionHandler(action)
                     }
 
                     if let resolution = file.file.resolution,
-                       resolution.width > resolution.height {
+                        resolution.width > resolution.height
+                    {
                         isHorizontal = true
                     }
                 } else {
                     mediaView.isHidden = true
                 }
             }
-            
+
             updateCellsSize(
                 in: horizontalStackView,
                 isHorizontal: isHorizontal,
@@ -155,8 +165,8 @@ private extension MediaContainerView {
             )
         }
     }
-    
-    func updateCellsSize(
+
+    fileprivate func updateCellsSize(
         in horizontalStackView: UIStackView,
         isHorizontal: Bool,
         fileList: [ChatFile]
@@ -165,13 +175,14 @@ private extension MediaContainerView {
 
         let minimumWidth = calculateMinimumWidth(availableWidth: filesStackWidth)
         let maximumWidth = calculateMaximumWidth(availableWidth: filesStackWidth)
-        
-        let height: CGFloat = isHorizontal
-        ? rowHorizontalHeight
-        : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
+
+        let height: CGFloat =
+            isHorizontal
+            ? rowHorizontalHeight
+            : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
 
         var totalWidthForEqualAspectRatio: CGFloat = 0.0
-        
+
         for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
             if let resolution = mediaView.model.chatFile.file.resolution {
                 let aspectRatio = resolution.width / resolution.height
@@ -190,7 +201,7 @@ private extension MediaContainerView {
                 let widthForEqualAspectRatio = height * aspectRatio
                 var width = max(widthForEqualAspectRatio * scaleFactor, minimumWidth)
                 width = min(width, maximumWidth)
-                
+
                 mediaView.snp.remakeConstraints {
                     $0.width.equalTo(width - stackSpacing)
                     $0.height.equalTo(height)
@@ -203,16 +214,16 @@ private extension MediaContainerView {
             }
         }
     }
-    
-    func calculateMinimumWidth(availableWidth: CGFloat) -> CGFloat {
+
+    fileprivate func calculateMinimumWidth(availableWidth: CGFloat) -> CGFloat {
         (availableWidth - stackSpacing) * 0.3
     }
-    
-    func calculateMaximumWidth(availableWidth: CGFloat) -> CGFloat {
+
+    fileprivate func calculateMaximumWidth(availableWidth: CGFloat) -> CGFloat {
         (availableWidth - stackSpacing) * 0.7
     }
-    
-    func updatePreviewDownloadLabel() {
+
+    fileprivate func updatePreviewDownloadLabel() {
         previewDownloadNotAllowedLabel.isHidden = !model.showAutoDownloadWarningLabel
     }
 }
@@ -221,33 +232,35 @@ extension ChatMediaContentView.FileModel {
     @MainActor
     func height() -> CGFloat {
         let fileList = Array(files.prefix(FilesConstants.maxFilesCount))
-        
+
         guard isMediaFilesOnly else {
             return FileListContainerView.cellSize * CGFloat(fileList.count)
-            + FileListContainerView.stackSpacing * CGFloat(fileList.count)
+                + FileListContainerView.stackSpacing * CGFloat(fileList.count)
         }
-        
+
         let rows = fileList.chunked(into: 2)
         var totalHeight: CGFloat = .zero
-        
+
         for row in rows {
             var isHorizontal = false
             for row in row {
                 if let resolution = row.file.resolution,
-                   resolution.width > resolution.height {
+                    resolution.width > resolution.height
+                {
                     isHorizontal = true
                 }
             }
-            
-            let height: CGFloat = isHorizontal
-            ? rowHorizontalHeight
-            : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
-            
+
+            let height: CGFloat =
+                isHorizontal
+                ? rowHorizontalHeight
+                : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
+
             totalHeight += height
         }
-        
+
         return totalHeight
-        + stackSpacing * CGFloat(rows.count)
+            + stackSpacing * CGFloat(rows.count)
     }
 }
 

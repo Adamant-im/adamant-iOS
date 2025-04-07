@@ -6,15 +6,15 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
 import Swinject
+import UIKit
 
 @MainActor
 struct OnboardFactory {
     func makeOnboardVC() -> UIViewController {
         OnboardViewController(nibName: "OnboardViewController", bundle: nil)
     }
-    
+
     func makeEulaVC() -> UIViewController {
         EulaViewController(nibName: "EulaViewController", bundle: nil)
     }

@@ -6,18 +6,18 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct PKGeneratorView: View {
     @StateObject private var viewModel: PKGeneratorViewModel
-    
+
     var body: some View {
         List {
             if !viewModel.state.keys.isEmpty {
                 keysSection
             }
-            
+
             inputSection
         }
         .withoutListBackground()
@@ -25,42 +25,42 @@ struct PKGeneratorView: View {
         .navigationTitle(String.adamant.pkGenerator.title)
         .navigationBarTitleDisplayMode(.inline)
     }
-    
+
     init(viewModel: @escaping () -> PKGeneratorViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
 }
 
-private extension PKGeneratorView {
-    var loadingBackground: some View {
+extension PKGeneratorView {
+    fileprivate var loadingBackground: some View {
         HStack {
             Spacer()
-            
+
             if viewModel.state.isLoading {
                 ProgressView()
             }
         }
     }
-    
-    var keysSection: some View {
+
+    fileprivate var keysSection: some View {
         Section {
             ForEach(viewModel.state.keys, content: keyView)
                 .listRowBackground(Color(uiColor: .adamant.cellColor))
         }
     }
-    
-    var inputSection: some View {
+
+    fileprivate var inputSection: some View {
         Section {
             Group {
                 Text(viewModel.state.buttonDescription)
                     .multilineTextAlignment(.center)
                     .padding(.vertical, 5)
-                
+
                 AdamantSecureField(
                     placeholder: .adamant.qrGenerator.passphrasePlaceholder,
                     text: $viewModel.state.passphrase
                 )
-                
+
                 Button(action: { viewModel.generateKeys() }) {
                     Text(String.adamant.pkGenerator.generateButton)
                         .foregroundStyle(Color(uiColor: .adamant.primary))
@@ -71,25 +71,25 @@ private extension PKGeneratorView {
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }
     }
-    
-    func keyView(_ keyInfo: PKGeneratorState.KeyInfo) -> some View {
+
+    fileprivate func keyView(_ keyInfo: PKGeneratorState.KeyInfo) -> some View {
         NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }) {
             HStack {
                 Image(uiImage: keyInfo.icon)
                     .renderingMode(.template)
-                    .resizable()       
+                    .resizable()
                     .frame(squareSize: 25)
                     .foregroundStyle(Color(uiColor: .adamant.tableRowIcons))
-                 
+
                 VStack(alignment: .leading) {
                     Text(keyInfo.title)
                     Text(keyInfo.description)
                         .foregroundStyle(Color(uiColor: .adamant.secondary))
                         .font(.system(size: 12, weight: .ultraLight))
                 }
-                
+
                 Spacer(minLength: .zero)
-                
+
                 Text(keyInfo.key).lineLimit(1)
                     .foregroundStyle(Color(uiColor: .adamant.secondary))
             }

@@ -6,15 +6,15 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
-import Eureka
 @preconcurrency import BitcoinKit
 import CommonKit
+import Eureka
+import UIKit
 
 final class DogeTransferViewController: TransferViewControllerBase {
 
     // MARK: Send
-    
+
     @MainActor
     override func sendFunds() {
         let comments: String
@@ -23,38 +23,39 @@ final class DogeTransferViewController: TransferViewControllerBase {
         } else {
             comments = ""
         }
-        
+
         guard let service = walletCore as? DogeWalletService,
-              let recipient = recipientAddress,
-              let amount = amount
+            let recipient = recipientAddress,
+            let amount = amount
         else {
             return
         }
-        
+
         guard let wallet = service.wallet else {
             return
         }
-        
+
         dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
+
         Task {
             do {
                 // Create transaction
                 let transaction = try await service.createTransaction(
-                    recipient: recipient, 
+                    recipient: recipient,
                     amount: amount,
                     fee: transactionFee,
                     comment: nil
                 )
-                
+
                 if await !doesNotContainSendingTx() {
                     presentSendingError()
                     return
                 }
-                
+
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
-                   let hash = transaction.txHash {
+                    let hash = transaction.txHash
+                {
                     try await reportTransferTo(
                         admAddress: reportRecipient,
                         amount: amount,
@@ -62,7 +63,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
                         hash: hash
                     )
                 }
-                
+
                 do {
                     let simpleTransaction = SimpleTransactionDetails(
                         txId: transaction.txID,
@@ -76,7 +77,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
                         transactionStatus: nil,
                         nonceRaw: nil
                     )
-                    
+
                     service.coinStorage.append(simpleTransaction)
                     try await service.sendTransaction(transaction)
                 } catch {
@@ -84,17 +85,17 @@ final class DogeTransferViewController: TransferViewControllerBase {
                         for: transaction.txId,
                         status: .failed
                     )
-                    
+
                     throw error
                 }
-                
+
                 Task {
                     await service.update()
                 }
-                
+
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
-                
+
                 // Present detail VC
                 presentDetailTransactionVC(
                     transaction: transaction,
@@ -107,7 +108,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     private func presentDetailTransactionVC(
         transaction: BitcoinKit.Transaction,
         comments: String,
@@ -117,20 +118,20 @@ final class DogeTransferViewController: TransferViewControllerBase {
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
-        
+
         if comments.count > 0 {
             detailsVc.comment = comments
         }
-        
+
         delegate?.transferViewController(
             self,
             didFinishWithTransfer: transaction,
             detailsViewController: detailsVc
         )
     }
-    
+
     // MARK: Overrides
-    
+
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
@@ -138,11 +139,11 @@ final class DogeTransferViewController: TransferViewControllerBase {
             $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
-            
+
             $0.value = recipientAddress?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
@@ -155,15 +156,15 @@ final class DogeTransferViewController: TransferViewControllerBase {
             row.cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
-        
+
         return row
     }
-    
+
     override func defaultSceneTitle() -> String? {
         return String.adamant.sendDoge
     }
