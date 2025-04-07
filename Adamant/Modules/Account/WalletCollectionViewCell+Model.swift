@@ -32,12 +32,5 @@ struct WalletCollectionViewCellModel {
     )
 }
 
-// MARK: Comparable
-extension WalletCollectionViewCellModel: Comparable {
-    static func < (lhs: WalletCollectionViewCellModel, rhs: WalletCollectionViewCellModel) -> Bool {
-        fatalError()
-    }
-}
-
 // MARK: Hashable
 extension WalletCollectionViewCellModel: Hashable {}

@@ -9,7 +9,7 @@
 import CommonKit
 import Parchment
 
-struct AccountWalletsState: Equatable {
+struct AccountWalletsState {
     var wallets: [AccountWalletCellState]
     
     static let `default` = Self(wallets: [])
