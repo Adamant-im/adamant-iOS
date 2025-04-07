@@ -38,6 +38,7 @@ class WalletCollectionViewCell: PagingCell {
         
         item.$model
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] item in
                 self?.update(item: item)
             }
@@ -46,6 +47,7 @@ class WalletCollectionViewCell: PagingCell {
 }
 
 private extension WalletCollectionViewCell {
+    @MainActor
     func update(item: WalletCollectionViewCellModel) {
         currencyImageView.image = item.currencyImage
         if item.currencyNetwork == item.currencySymbol {
