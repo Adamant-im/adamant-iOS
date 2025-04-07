@@ -2058,8 +2058,8 @@ extension AdamantChatsProvider {
         privateContext.performAndWait {
             if let transaction = (try? privateContext.fetch(request))?.first {
                 transaction.isHidden = true
-                try? transaction.managedObjectContext?.save()
                 transaction.chatroom?.updateLastTransaction()
+                try? transaction.managedObjectContext?.save()
             }
         }
     }
