@@ -38,7 +38,7 @@ extension Delegates {
         public var hashValue: Int {
             return username.hashValue
         }
-        
+
         public func hash(into hasher: inout Hasher) {
             hasher.combine(username)
         }

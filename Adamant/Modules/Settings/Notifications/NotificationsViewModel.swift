@@ -6,15 +6,15 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
-import CommonKit
-import SafariServices
-import MarkdownKit
 import Combine
+import CommonKit
+import MarkdownKit
+import SafariServices
+import SwiftUI
 
 @MainActor
 final class NotificationsViewModel: ObservableObject {
-    
+
     @Published var notificationsMode: NotificationsMode = .disabled
     @Published var notificationSound: NotificationSound = .inputDefault
     @Published var notificationReactionSound: NotificationSound = .none
@@ -25,26 +25,26 @@ final class NotificationsViewModel: ObservableObject {
     @Published var inAppVibrate: Bool = true
     @Published var inAppToasts: Bool = true
     @Published var presentBuyAndSell: Bool = false
-    
+
     let notificationsTitle: String = .localized("SecurityPage.Row.Notifications")
     let safariURL = URL(string: "https://github.com/Adamant-im")!
-    
+
     private let descriptionText: String = .localized("SecurityPage.Row.Notifications.ModesDescription")
-    
+
     private let dialogService: DialogService
     private let notificationsService: NotificationsService
     private let accountService: AccountService
-    
+
     private var subscriptions = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
-    
+
     var parsedMarkdownDescription: AttributedString? {
         guard let attributedString = parseMarkdown(descriptionText) else {
             return nil
         }
         return AttributedString(attributedString)
     }
-    
+
     init(dialogService: DialogService, notificationsService: NotificationsService, accountService: AccountService) {
         self.dialogService = dialogService
         self.notificationsService = notificationsService
@@ -52,31 +52,31 @@ final class NotificationsViewModel: ObservableObject {
         configure()
         addObservers()
     }
-    
+
     func presentNotificationSoundsPicker() {
         presentSoundsPicker = true
     }
-    
+
     func presentReactionNotificationSoundsPicker() {
         presentReactionSoundsPicker = true
     }
-    
+
     func presentSafariURL() {
         openSafariURL = true
     }
-    
+
     func applyInAppSounds(value: Bool) {
         notificationsService.setInAppSound(value)
     }
-    
+
     func applyInAppVibrate(value: Bool) {
         notificationsService.setInAppVibrate(value)
     }
-    
+
     func applyInAppToasts(value: Bool) {
         notificationsService.setInAppToasts(value)
     }
-    
+
     func showAlert() {
         dialogService.showAlert(
             title: notificationsTitle,
@@ -106,12 +106,12 @@ final class NotificationsViewModel: ObservableObject {
             from: nil
         )
     }
-    
+
     func setNotificationMode(_ mode: NotificationsMode) {
         guard mode != notificationsService.notificationsMode else {
             return
         }
-        
+
         notificationsService.setNotificationsMode(mode) { [weak self] result in
             DispatchQueue.onMainAsync {
                 switch result {
@@ -121,10 +121,12 @@ final class NotificationsViewModel: ObservableObject {
                 case .failure(let error):
                     switch error {
                     case .notEnoughMoney, .notStayedLoggedIn:
-                        self?.dialogService.showFreeTokenAlert(url: self?.accountService.account?.address,
-                                                               type: .notification,
-                                                               showVC: { self?.presentBuyAndSell = true })
-                        
+                        self?.dialogService.showFreeTokenAlert(
+                            url: self?.accountService.account?.address,
+                            type: .notification,
+                            showVC: { self?.presentBuyAndSell = true }
+                        )
+
                     case .denied:
                         self?.presentNotificationsDeniedError()
                     }
@@ -132,7 +134,7 @@ final class NotificationsViewModel: ObservableObject {
             }
         }
     }
-    
+
     func openAppSettings() {
         if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
             if UIApplication.shared.canOpenURL(settingsURL) {
@@ -140,7 +142,7 @@ final class NotificationsViewModel: ObservableObject {
             }
         }
     }
-    
+
     func parseMarkdown(_ text: String) -> NSAttributedString? {
         let parser = MarkdownParser(
             font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
@@ -151,33 +153,33 @@ final class NotificationsViewModel: ObservableObject {
     }
 }
 
-private extension NotificationsViewModel {
-    func addObservers() {
+extension NotificationsViewModel {
+    fileprivate func addObservers() {
         NotificationCenter.default
             .notifications(named: .AdamantNotificationService.notificationsSoundChanged)
             .sink { [weak self] _ in await self?.configure() }
             .store(in: &subscriptions)
-        
+
         $inAppSounds
             .sink { [weak self] value in
                 self?.applyInAppSounds(value: value)
             }
             .store(in: &cancellables)
-        
+
         $inAppVibrate
             .sink { [weak self] value in
                 self?.applyInAppVibrate(value: value)
             }
             .store(in: &cancellables)
-        
+
         $inAppToasts
             .sink { [weak self] value in
                 self?.applyInAppToasts(value: value)
             }
             .store(in: &cancellables)
     }
-    
-    func configure() {
+
+    fileprivate func configure() {
         notificationsMode = notificationsService.notificationsMode
         notificationSound = notificationsService.notificationsSound
         notificationReactionSound = notificationsService.notificationsReactionSound
@@ -187,24 +189,24 @@ private extension NotificationsViewModel {
     }
 }
 
-private extension NotificationsViewModel {
-    func makeAction(title: String, action: ((UIAlertAction) -> Void)?) -> UIAlertAction {
+extension NotificationsViewModel {
+    fileprivate func makeAction(title: String, action: ((UIAlertAction) -> Void)?) -> UIAlertAction {
         .init(
             title: title,
             style: .default,
             handler: action
         )
     }
-    
-    func makeCancelAction() -> UIAlertAction {
+
+    fileprivate func makeCancelAction() -> UIAlertAction {
         .init(
             title: .adamant.alert.cancel,
             style: .cancel,
             handler: nil
         )
     }
-    
-    func presentNotificationsDeniedError() {
+
+    fileprivate func presentNotificationsDeniedError() {
         dialogService.showAlert(
             title: nil,
             message: NotificationStrings.notificationsDisabled,

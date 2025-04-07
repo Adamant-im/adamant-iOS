@@ -75,6 +75,15 @@ public struct BlockMessage {
         for _ in 0..<transactionCount.underlyingValue {
             transactions.append(Transaction.deserialize(byteStream))
         }
-        return BlockMessage(version: version, prevBlock: prevBlock, merkleRoot: merkleRoot, timestamp: timestamp, bits: bits, nonce: nonce, transactionCount: transactionCount, transactions: transactions)
+        return BlockMessage(
+            version: version,
+            prevBlock: prevBlock,
+            merkleRoot: merkleRoot,
+            timestamp: timestamp,
+            bits: bits,
+            nonce: nonce,
+            transactionCount: transactionCount,
+            transactions: transactions
+        )
     }
 }

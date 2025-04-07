@@ -6,21 +6,21 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-@preconcurrency import Combine
-import CoreData
-import MarkdownKit
-import UIKit
-import CommonKit
 import AdvancedContextMenuKit
+@preconcurrency import Combine
+import CommonKit
+import CoreData
 @preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
+import MarkdownKit
 import OrderedCollections
+import UIKit
 
 @MainActor
 final class ChatViewModel: NSObject {
     // MARK: Dependencies
-    
+
     private let chatsProvider: ChatsProvider
     private let markdownParser: MarkdownParser
     private let transfersProvider: TransfersProvider
@@ -42,11 +42,11 @@ final class ChatViewModel: NSObject {
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     private let visibleWalletsService: VisibleWalletsService
-    
+
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
     // MARK: Properties
-    
+
     private var tasksStorage = TaskManager()
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var subscriptions = Set<AnyCancellable>()
@@ -56,16 +56,16 @@ final class ChatViewModel: NSObject {
     var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
-    
+
     private var isNeedToLoadMoreMessages: Bool {
         get async {
             guard let address = chatroom?.partner?.address else { return false }
-            
+
             return await chatsProvider.chatLoadedMessages[address] ?? .zero
                 < chatsProvider.chatMaxMessages[address] ?? .zero
         }
     }
-    
+
     @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) private var needsToShowNoActiveNodesAlert: Bool?
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
@@ -74,7 +74,7 @@ final class ChatViewModel: NSObject {
             updatePositionIfNeeded()
         }
     }
-    
+
     private var tempCancellables = Set<AnyCancellable>()
     private var hideHeaderTimer: AnyCancellable?
     private let minDiffCountForOffset = 5
@@ -85,7 +85,7 @@ final class ChatViewModel: NSObject {
     private var lastDateHeaderUpdate: Date = Date()
     private var hasPartnerName: Bool = false
     private let delayHideHeaderInSeconds: Double = 2.0
-    
+
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
@@ -116,7 +116,7 @@ final class ChatViewModel: NSObject {
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
     let messagesUpdated = ObservableSender<Void>()
-    
+
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -140,40 +140,42 @@ final class ChatViewModel: NSObject {
             updateFeeValue()
         }
     }
-    
+
     var startPosition: ChatStartPosition? {
         if messageIdToShow != nil {
             return nil
         }
-        
+
         guard let address = chatroom?.partner?.address else { return nil }
         return chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
     }
-    
+
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
         let urlString: String = .adamant.wallets.getFreeTokensUrl(for: address)
-        
+
         guard let url = URL(string: urlString) else {
-            dialog.send(.error(
-                "Failed to create URL with string: \(urlString)",
-                supportEmail: true
-            ))
+            dialog.send(
+                .error(
+                    "Failed to create URL with string: \(urlString)",
+                    supportEmail: true
+                )
+            )
             return nil
         }
-        
+
         return url
     }
-    
+
     private var hiddenMessageID: String? {
         didSet { updateHiddenMessage(&messages) }
     }
-    
+
     lazy private(set) var mediaPickerDelegate = MediaPickerService(helper: filesPicker)
     lazy private(set) var documentPickerDelegate = DocumentPickerService(helper: filesPicker)
     lazy private(set) var documentViewerService = DocumentInteractionService()
     lazy private(set) var dropInteractionService = DropInteractionService(helper: filesPicker)
-    
+
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
@@ -220,11 +222,11 @@ final class ChatViewModel: NSObject {
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         self.visibleWalletsService = visibleWalletsService
-        
+
         super.init()
         setupObservers()
     }
-    
+
     func setup(
         account: AdamantAccount?,
         chatroom: Chatroom,
@@ -240,55 +242,56 @@ final class ChatViewModel: NSObject {
         isSendingAvailable = !chatroom.isReadonly
         updatePartnerInformation()
         updateAttachmentButtonAvailability()
-        
+
         if let account = account {
             sender = .init(senderId: account.address, displayName: account.address)
         }
-        
+
         if let partnerAddress = chatroom.partner?.address {
             chatPreservation.getPreservedMessageFor(
                 address: partnerAddress
             ).map { inputText = $0 }
-            
+
             let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
             messages = cachedMessages ?? []
             fullscreenLoading = cachedMessages == nil
-            
+
             replyMessage = chatPreservation.getReplyMessage(address: partnerAddress)
-            
+
             filesPicked = chatPreservation.getPreservedFiles(for: partnerAddress)
         }
         if isNewChat && !(accountService.account?.isEnoughMoneyForTransaction ?? false) {
             dialog.send(.freeTokenAlert)
         }
     }
-    
+
     func presentKeyboardOnStartIfNeeded() {
-        guard !inputText.isEmpty
+        guard
+            !inputText.isEmpty
                 || replyMessage != nil
                 || (filesPicked?.count ?? .zero) > .zero
         else { return }
-        
+
         presentKeyboard.send()
     }
-    
+
     func loadFirstMessagesIfNeeded() {
         Task {
             guard let address = chatroom?.partner?.address else {
                 fullscreenLoading = false
                 return
             }
-            
+
             async let chatLoadingState = (chatsProvider.isChatLoaded(with: address), chatsProvider.isChatLoading(with: address))
-            
+
             let (isChatLoaded, isChatLoading) = await chatLoadingState
-            
+
             guard !isChatLoading else {
                 await waitForChatLoading(with: address)
                 updateTransactions(performFetch: true)
                 return
             }
-            
+
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
             } else {
@@ -296,13 +299,13 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-    
+
     func updatePositionIfNeeded() {
         if let messageIdToShow = messageIdToShow {
             scroll(to: messageIdToShow)
         }
     }
-    
+
     func loadMoreMessagesIfNeeded() {
         guard !isLoading else { return }
         Task {
@@ -310,20 +313,20 @@ final class ChatViewModel: NSObject {
                 let address = chatroom?.partner?.address,
                 await isNeedToLoadMoreMessages
             else { return }
-            
+
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
             await loadMessages(address: address, offset: offset)
         }.stored(in: tasksStorage)
     }
-    
+
     func sendMessage(text: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        
+
         guard chatroom?.partner?.isDummy != true else {
             dialog.send(.dummy(partnerAddress))
             return
         }
-        
+
         Task {
             if !(filesPicked?.isEmpty ?? true) {
                 do {
@@ -337,9 +340,9 @@ final class ChatViewModel: NSObject {
                 }
                 return
             }
-    
+
             let message: AdamantMessage
-            
+
             if let replyMessage = replyMessage {
                 message = .richMessage(
                     payload: RichMessageReply(
@@ -348,15 +351,16 @@ final class ChatViewModel: NSObject {
                     )
                 )
             } else {
-                message = markdownParser.parse(text).length == text.count
-                ? .text(text)
-                : .markdownText(text)
+                message =
+                    markdownParser.parse(text).length == text.count
+                    ? .text(text)
+                    : .markdownText(text)
             }
-            
+
             guard await validateSendingMessage(message: message) else { return }
-            
+
             replyMessage = nil
-            
+
             do {
                 _ = try await chatsProvider.sendMessage(
                     message,
@@ -368,58 +372,58 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-    
+
     func forceUpdateTransactionStatus(id: String) {
         Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
                 let richMessageTransaction = transaction as? RichMessageTransaction
             else { return }
-            
+
             await richTransactionStatusService.forceUpdate(transaction: richMessageTransaction)
         }.stored(in: tasksStorage)
     }
-    
+
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
         chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
     }
-    
+
     func blockChat() {
         Task {
             guard let address = chatroom?.partner?.address else {
                 return assertionFailure("Can't block user without address")
             }
-            
+
             chatroom?.isHidden = true
             try? chatroom?.managedObjectContext?.save()
             await chatsProvider.blockChat(with: address)
             closeScreen.send()
         }
     }
-    
+
     func getKvsName(for address: String) -> String? {
         return addressBookService.getName(for: address)
     }
-    
+
     func setNewName(_ newName: String) {
         guard let address = chatroom?.partner?.address else {
             return assertionFailure("Can't set name without address")
         }
-        
+
         Task {
             await addressBookService.set(name: newName, for: address)
         }.stored(in: tasksStorage)
-        
+
         partnerName = newName
         hasPartnerName = !newName.isEmpty
     }
-    
+
     func saveChatOffset(_ offset: CGFloat?) {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
-    
+
     func markMessageAsRead(index: Int) {
         guard _messages.wrappedValue.indices.contains(index) else { return }
         guard let chatroom else { return }
@@ -429,49 +433,49 @@ final class ChatViewModel: NSObject {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
         }
     }
-    
+
     func hideMessage(id: String) {
         Task {
             await chatsProvider.removeMessage(with: id)
         }
     }
-    
+
     func didSelectURL(_ url: URL) {
         if url.scheme == "adm" {
             guard let adm = url.absoluteString.getLegacyAdamantAddress(),
-                  let partnerAddress = chatroom?.partner?.address
+                let partnerAddress = chatroom?.partner?.address
             else {
                 return
             }
-            
+
             dialog.send(.admMenu(adm, partnerAddress: partnerAddress))
             return
         }
-        
+
         dialog.send(.url(url))
     }
-    
+
     func process(adm: AdamantAddress, action: AddressChatShareType) {
         Task {
             if action == .send {
                 didTapAdmSend.send(adm)
                 return
             }
-            
+
             guard let room = await self.chatsProvider.getChatroom(for: adm.address) else {
                 await self.findAccount(with: adm.address, name: adm.name, message: adm.message)
                 return
             }
-            
+
             self.startNewChat(with: room, name: adm.name, message: adm.message)
         }
     }
-    
+
     func cancelMessage(id: String) {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-            
+
             do {
                 try await chatsProvider.cancelMessage(transaction)
             } catch {
@@ -484,14 +488,14 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-    
+
     func retrySendMessage(id: String) {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-            
+
             let message = messages.first(where: { $0.messageId == id })
-            
+
             if case let .file(model) = message?.content {
                 try? await chatFileService.resendMessage(
                     with: id,
@@ -502,7 +506,7 @@ final class ChatViewModel: NSObject {
                 )
                 return
             }
-            
+
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {
@@ -521,17 +525,17 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-    
+
     func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        
+
         Task {
             do {
                 guard await !chatsProvider.isMessageDeleted(id: messageId) else {
                     dialog.send(.alert(.adamant.chat.messageWasDeleted))
                     return
                 }
-                
+
                 if !chatTransactions.contains(
                     where: { $0.transactionId == messageId }
                 ) {
@@ -541,14 +545,14 @@ final class ChatViewModel: NSObject {
                         recipient: partnerAddress
                     )
                 }
-                
+
                 await waitForMessage(withId: messageId)
-                
+
                 if let lastMessageId = messages.last?.id {
                     let position: UICollectionView.ScrollPosition = (messageId == lastMessageId) ? .top : .bottom
                     scrollToIdAndPosition = (id: messageId, position: position)
                 }
-                
+
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
                     markMessageAsRead(index: index)
@@ -560,12 +564,12 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-        
+
     func waitForMessage(withId messageId: String) async {
         guard !messages.contains(where: { $0.messageId == messageId }) else {
             return
         }
-        
+
         await withUnsafeContinuation { continuation in
             $messages
                 .filter { $0.contains(where: { $0.messageId == messageId }) }
@@ -575,64 +579,64 @@ final class ChatViewModel: NSObject {
                 }.store(in: &tempCancellables)
         }
     }
-    
+
     func replyMessageIfNeeded(id: String) {
         let tx = chatTransactions.first(where: { $0.txId == id })
         guard isSendingAvailable, tx?.isFake == false else { return }
-        
+
         let message = messages.first(where: { $0.messageId == id })
         guard message?.status != .failed else {
             dialog.send(.warning(String.adamant.reply.failedMessageError))
             return
         }
-        
+
         guard message?.status != .pending else {
             dialog.send(.warning(String.adamant.reply.pendingMessageError))
             return
         }
-        
+
         replyMessage = message?.messageModel
     }
-    
+
     func animateScrollIfNeeded(to messageIndex: Int, visibleIndex: Int?) {
-        guard let visibleIndex = visibleIndex else {  return }
-        
+        guard let visibleIndex = visibleIndex else { return }
+
         let max = max(visibleIndex, messageIndex)
         let min = min(visibleIndex, messageIndex)
-        
+
         guard (max - min) >= minDiffCountForAnimateScroll else {
             isNeedToAnimateScroll = false
             return
         }
-        
+
         isNeedToAnimateScroll = true
     }
-    
+
     func copyMessageAction(_ text: String) {
         UIPasteboard.general.string = text
         dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
     }
-    
+
     func copyTextInPartAction(_ text: String) {
         didTapSelectText.send(text)
     }
-    
+
     func reportMessageAction(_ id: String) {
         dialog.send(.reportMessageAlert(id: id))
     }
-    
+
     func removeMessageAction(_ id: String) {
         dialog.send(.removeMessageAlert(id: id))
     }
-    
+
     func reactAction(_ id: String, emoji: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        
+
         guard chatroom?.partner?.isDummy != true else {
             dialog.send(.dummy(partnerAddress))
             return
         }
-        
+
         Task {
             let message: AdamantMessage = .richMessage(
                 payload: RichMessageReaction(
@@ -640,9 +644,9 @@ final class ChatViewModel: NSObject {
                     react_message: emoji
                 )
             )
-            
+
             guard await validateSendingMessage(message: message) else { return }
-            
+
             do {
                 _ = try await chatsProvider.sendMessage(
                     message,
@@ -654,58 +658,60 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
-    
+
     func clearReplyMessage() {
         replyMessage = nil
     }
-    
+
     func clearPickedFiles() {
         filesPicked = nil
     }
-    
+
     func presentMenu(arg: ChatContextMenuArguments) {
         let didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction = { [weak self] emoji, messageId in
             self?.dialog.send(.dismissMenu)
-            
-            let emoji = emoji == arg.selectedEmoji
-            ? ""
-            : emoji
-            
-            let type: EmojiUpdateType = emoji.isEmpty
-            ? .decrement
-            : .increment
-            
+
+            let emoji =
+                emoji == arg.selectedEmoji
+                ? ""
+                : emoji
+
+            let type: EmojiUpdateType =
+                emoji.isEmpty
+                ? .decrement
+                : .increment
+
             self?.emojiService.updateFrequentlySelectedEmojis(
                 selectedEmoji: emoji,
                 type: type
             )
-            
+
             self?.reactAction(messageId, emoji: emoji)
             self?.previousArg = nil
         }
-        
+
         let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
             self?.hiddenMessageID = messageId
         }
-        
+
         let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
             self?.hiddenMessageID = nil
             self?.layoutIfNeeded.send()
             self?.previousArg = nil
         }
-        
+
         previousArg = arg
-        
+
         let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
         guard tx?.statusEnum == .delivered else { return }
-        
+
         let amount = tx?.amountValue ?? .zero
         if !amount.isZero && !isSendingAvailable {
             return
         }
-        
+
         let presentReactions = isSendingAvailable && tx?.isFake == false
-        
+
         dialog.send(
             .presentMenu(
                 presentReactions: presentReactions,
@@ -717,27 +723,27 @@ final class ChatViewModel: NSObject {
             )
         )
     }
-    
+
     func canSendMessage(withText text: String) async -> Bool {
         guard text.count <= maxMessageLenght else {
             dialog.send(.alert(.adamant.chat.messageIsTooBig))
             return false
         }
-        
+
         return true
     }
-    
+
     /// If the user opens the app from the background
     /// update messages to refresh the header dates.
     func refreshDateHeadersIfNeeded() {
         guard !Calendar.current.isDate(Date(), inSameDayAs: lastDateHeaderUpdate) else {
             return
         }
-        
+
         lastDateHeaderUpdate = Date()
         updateMessages(resetLoadingProperty: false)
     }
-    
+
     func cancelFileUploading(messageId: String, file: ChatFile) {
         Task {
             await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
@@ -747,63 +753,64 @@ final class ChatViewModel: NSObject {
     func openFile(messageId: String, file: ChatFile) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
-        
+
         guard let tx = tx,
-              tx.statusEnum != .failed
+            tx.statusEnum != .failed
         else {
             dialog.send(.failedMessageAlert(id: messageId, sender: nil))
             return
         }
-        
+
         guard !chatFileService.downloadingFiles.keys.contains(file.file.id),
-              !chatFileService.uploadingFiles.contains(file.file.id),
-              case let(.file(fileModel)) = message?.content
+            !chatFileService.uploadingFiles.contains(file.file.id),
+            case let (.file(fileModel)) = message?.content
         else { return }
-        
+
         let chatFiles = fileModel.value.content.fileModel.files
-        
+
         let isPreviewAutoDownloadAllowed = chatFileService.isPreviewAutoDownloadAllowedByPolicy(
             hasPartnerName: hasPartnerName,
             isFromCurrentSender: file.isFromCurrentSender,
             downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
         )
-        
+
         if !isPreviewAutoDownloadAllowed,
-           file.previewImage == nil,
-           file.file.preview != nil,
-           !chatFileService.isDownloadPreviewLimitReached(for: file.file.id) {
+            file.previewImage == nil,
+            file.file.preview != nil,
+            !chatFileService.isDownloadPreviewLimitReached(for: file.file.id)
+        {
             forceDownloadAllFiles(messageId: messageId, files: chatFiles)
             return
         }
-        
+
         guard !file.isCached,
-              !filesStorage.isCachedLocally(file.file.id)
+            !filesStorage.isCachedLocally(file.file.id)
         else {
             self.presentFileInFullScreen(id: file.file.id, chatFiles: chatFiles)
             return
         }
-        
+
         guard tx.statusEnum == .delivered else { return }
-        
+
         downloadFile(
             file: file,
             previewDownloadAllowed: true,
             fullMediaDownloadAllowed: true
         )
     }
-    
+
     func autoDownloadContentIfNeeded(
         messageId: String,
         files: [ChatFile]
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
-        
+
         guard tx?.statusEnum == .delivered || tx?.statusEnum == nil else { return }
-        
+
         let chatFiles = files.filter {
             $0.fileType == .image || $0.fileType == .video
         }
-        
+
         chatFiles.forEach { file in
             Task {
                 await chatFileService.autoDownload(
@@ -817,81 +824,90 @@ final class ChatViewModel: NSObject {
             }
         }
     }
-    
+
     func forceDownloadAllFiles(messageId: String, files: [ChatFile]) {
         guard let message = messages.first(where: { $0.messageId == messageId })
         else { return }
-    
+
         let isPreviewDownloadAllowed = chatFileService.isPreviewAutoDownloadAllowedByPolicy(
             hasPartnerName: hasPartnerName,
             isFromCurrentSender: message.isFromCurrentSender,
             downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
         )
-        
+
         let isFullMediaDownloadAllowed = chatFileService.isOriginalAutoDownloadAllowedByPolicy(
             hasPartnerName: hasPartnerName,
             isFromCurrentSender: message.isFromCurrentSender,
             downloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy()
         )
-        
+
         let needToDownload: [ChatFile]
-        
+
         let shouldDownloadFile: (ChatFile) -> Bool = { file in
             !file.isCached || (file.fileType.isMedia && file.previewImage == nil && isPreviewDownloadAllowed)
         }
-        
+
         let previewFiles = files.filter { file in
             (file.fileType == .image || file.fileType == .video) && file.previewImage == nil
         }
-        
+
         let notCachedFiles = files.filter { !$0.isCached }
-        
+
         let downloadPreview: Bool
         let downloadFullMedia: Bool
-        
+
         switch (isPreviewDownloadAllowed, isFullMediaDownloadAllowed) {
         case (true, true):
             needToDownload = files.filter(shouldDownloadFile)
             downloadPreview = true
             downloadFullMedia = true
         case (true, false):
-            needToDownload = previewFiles.isEmpty 
-            ? notCachedFiles
-            : previewFiles
-            
-            downloadPreview = previewFiles.isEmpty
-            ? false
-            : true
-            
-            downloadFullMedia = previewFiles.isEmpty
-            ? true
-            : false
+            needToDownload =
+                previewFiles.isEmpty
+                ? notCachedFiles
+                : previewFiles
+
+            downloadPreview =
+                previewFiles.isEmpty
+                ? false
+                : true
+
+            downloadFullMedia =
+                previewFiles.isEmpty
+                ? true
+                : false
         case (false, true):
-            needToDownload = notCachedFiles.isEmpty 
-            ? previewFiles
-            : notCachedFiles
-            
-            downloadPreview = notCachedFiles.isEmpty
-            ? true
-            : false
-            
-            downloadFullMedia = notCachedFiles.isEmpty
-            ? false
-            : true
+            needToDownload =
+                notCachedFiles.isEmpty
+                ? previewFiles
+                : notCachedFiles
+
+            downloadPreview =
+                notCachedFiles.isEmpty
+                ? true
+                : false
+
+            downloadFullMedia =
+                notCachedFiles.isEmpty
+                ? false
+                : true
         case (false, false):
-            needToDownload = previewFiles.isEmpty 
-            ? notCachedFiles
-            : previewFiles
-            
-            downloadPreview = previewFiles.isEmpty
-            ? false
-            : true
-            
-            downloadFullMedia = previewFiles.isEmpty
-            ? true
-            : false
+            needToDownload =
+                previewFiles.isEmpty
+                ? notCachedFiles
+                : previewFiles
+
+            downloadPreview =
+                previewFiles.isEmpty
+                ? false
+                : true
+
+            downloadFullMedia =
+                previewFiles.isEmpty
+                ? true
+                : false
         }
-        
+
         needToDownload.forEach { file in
             downloadFile(
                 file: file,
@@ -900,7 +916,7 @@ final class ChatViewModel: NSObject {
             )
         }
     }
-    
+
     func downloadFile(
         file: ChatFile,
         previewDownloadAllowed: Bool,
@@ -916,37 +932,37 @@ final class ChatViewModel: NSObject {
             )
         }
     }
-    
+
     func presentActionMenu() {
         dialog.send(.actionMenu)
     }
-    
+
     func didSelectMenuAction(_ action: ShareType) {
-        if case(.sendTokens) = action {
+        if case (.sendTokens) = action {
             presentSendTokensVC.send()
         }
-        
-        if case(.uploadMedia) = action {
+
+        if case (.uploadMedia) = action {
             presentMediaPickerVC.send()
         }
-        
-        if case(.uploadFile) = action {
+
+        if case (.uploadFile) = action {
             presentDocumentPickerVC.send()
         }
     }
-    
+
     @MainActor
     func processFileResult(_ result: Result<[FileResult], Error>) {
         switch result {
         case .success(let files):
             var oldFiles = filesPicked ?? []
-            
+
             files.forEach { file in
                 if !oldFiles.contains(where: { $0.assetId == file.assetId }) {
                     oldFiles.append(file)
                 }
             }
-            
+
             if oldFiles.count > FilesConstants.maxFilesCount {
                 let numberOfExtraElements = oldFiles.count - FilesConstants.maxFilesCount
                 let extraFilesToRemove = oldFiles.prefix(numberOfExtraElements)
@@ -954,45 +970,45 @@ final class ChatViewModel: NSObject {
                     let urls = [file.url] + (file.previewUrl.map { [$0] } ?? [])
                     filesStorage.removeTempFiles(at: urls)
                 }
-                
+
                 oldFiles.removeFirst(numberOfExtraElements)
             }
-            
+
             filesPicked = oldFiles
         case .failure(let error):
             dialog.send(.alert(error.localizedDescription))
         }
     }
-    
+
     func presentDialog(progress: Bool) {
         dialog.send(.progress(progress))
     }
-    
+
     func dropSessionUpdated(_ value: Bool) {
         presentDropView.send(value)
     }
-    
+
     func updatePreviewFor(indexes: [IndexPath]) {
         indexes.forEach { index in
             guard let message = messages[safe: index.section],
-                  case let .file(model) = message.content
+                case let .file(model) = message.content
             else { return }
-            
+
             autoDownloadContentIfNeeded(
                 messageId: message.messageId,
                 files: model.value.content.fileModel.files
             )
         }
     }
-    
+
     func updateSwipeableId(_ id: String?) {
         swipeableMessage = id.map { .init(id: $0, state: .idle) } ?? .default
     }
-    
+
     func updateSwipingOffset(_ offset: CGFloat) {
         swipeableMessage.state = .offset(offset)
     }
-    
+
     func checkForADMNodesAvailability() {
         if apiServiceCompose.get(.adm)?.hasEnabledNode == false {
             guard needsToShowNoActiveNodesAlert == true else { return }
@@ -1002,7 +1018,7 @@ final class ChatViewModel: NSObject {
             needsToShowNoActiveNodesAlert = true
         }
     }
-    
+
     func checkUpdateState() {
         Task { @MainActor in
             let isUpdating = await chatsProvider.state.isUpdating
@@ -1014,33 +1030,33 @@ final class ChatViewModel: NSObject {
 extension ChatViewModel {
     func openPartnerQR() {
         guard let partner = chatroom?.partner,
-              isSendingAvailable
+            isSendingAvailable
         else { return }
-        
+
         didTapPartnerQR.send(partner)
     }
-    
+
     func renamePartner() {
         guard isSendingAvailable else { return }
-        
+
         dialog.send(.renameAlert)
     }
-    
+
     func updatePartnerName() {
         partnerName = chatroom?.getName(addressBookService: addressBookService)
-	}
+    }
 
     func updateFiles(_ data: [FileResult]?) {
         if (data?.count ?? .zero) == .zero {
             let previewUrls = filesPicked?.compactMap { $0.previewUrl } ?? []
             let fileUrls = filesPicked?.compactMap { $0.url } ?? []
-            
+
             filesStorage.removeTempFiles(at: previewUrls + fileUrls)
         }
-        
+
         filesPicked = data
     }
-    
+
     func handlePastedImage(_ image: UIImage) {
         do {
             let file = try filesPicker.getFileResult(for: image)
@@ -1049,27 +1065,32 @@ extension ChatViewModel {
             processFileResult(.failure(error))
         }
     }
-    
+
     func checkTopMessage(indexPath: IndexPath) {
         guard let message = messages[safe: indexPath.section],
-              let date = message.dateHeader?.string.string,
-              message.sentDate != .adamantNullDate
+            let date = message.dateHeader?.string.string,
+            message.sentDate != .adamantNullDate
         else { return }
         dateHeader = date
         dateHeaderHidden = false
         hideHeaderTimer?.cancel()
         hideHeaderTimer = nil
     }
-    
+
     func startHideDateTimer() {
         hideHeaderTimer?.cancel()
-        hideHeaderTimer = Timer
+        hideHeaderTimer =
+            Timer
             .publish(every: delayHideHeaderInSeconds, on: .main, in: .common)
             .autoconnect()
             .first()
             .sink { [weak self] _ in
                 self?.dateHeaderHidden = true
             }
+    }
+
+    func unredMessageCount() -> Int? {
+        unreadMessagesIds?.count
     }
 }
 
@@ -1080,21 +1101,25 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
     }
 }
 
-private extension ChatViewModel {
-    func sendFiles(with text: String) async throws {
+extension ChatViewModel {
+    fileprivate func sendFiles(with text: String) async throws {
         guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
-            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                nodeGroupName: NodeGroup.ipfs.name
-            ).localizedDescription))
+            dialog.send(
+                .alert(
+                    ApiServiceError.noEndpointsAvailable(
+                        nodeGroupName: NodeGroup.ipfs.name
+                    ).localizedDescription
+                )
+            )
             return
         }
-        
+
         let replyMessage = replyMessage
         let filesPicked = filesPicked
-        
+
         self.replyMessage = nil
         self.filesPicked = nil
-        
+
         try await chatFileService.sendFile(
             text: text,
             chatroom: chatroom,
@@ -1103,13 +1128,13 @@ private extension ChatViewModel {
             saveEncrypted: filesStorageProprieties.saveFileEncrypted()
         )
     }
-    
-    func setupObservers() {
+
+    fileprivate func setupObservers() {
         $inputText
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateFeeValue() }
             .store(in: &subscriptions)
-        
+
         $messages
             .map { messages in
                 Set(
@@ -1133,7 +1158,7 @@ private extension ChatViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self = self else { return }
-                
+
                 let fileProprieties = FileUpdateProperties(
                     id: data.id,
                     newId: data.newId,
@@ -1144,16 +1169,16 @@ private extension ChatViewModel {
                     uploading: data.uploading,
                     progress: data.progress
                 )
-                
+
                 self.updateFileFields(
                     &self.messages,
                     fileProprieties: fileProprieties
                 )
-                
+
                 updateAutoDownloadWarning(messages: &messages)
             }
             .store(in: &subscriptions)
-        
+
         $swipeableMessage
             .removeDuplicates()
             .sink { [weak self] _ in
@@ -1161,19 +1186,19 @@ private extension ChatViewModel {
                 updateSwipeStates(messages: &messages)
             }
             .store(in: &subscriptions)
-        
+
         $unreadMessagesIds
             .removeDuplicates()
             .sink { [weak self] newValue in
                 self?.updateScrolledMessageState(newUnreadIds: newValue)
             }
             .store(in: &subscriptions)
-        
+
         visibleWalletsService.statePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
-        
+
         Task {
             await chatsProvider.stateObserver
                 .receive(on: DispatchQueue.main)
@@ -1182,7 +1207,7 @@ private extension ChatViewModel {
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
-        
+
         dropInteractionService.onPreparedDataCallback = { [weak self] result in
             Task { @MainActor in
                 self?.dropSessionUpdated(false)
@@ -1190,43 +1215,43 @@ private extension ChatViewModel {
                 self?.processFileResult(result)
             }
         }
-        
+
         dropInteractionService.onPreparingDataCallback = { [weak self] in
             Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
-        
+
         dropInteractionService.onSessionCallback = { [weak self] fileOnScreen in
             self?.dropSessionUpdated(fileOnScreen)
         }
-        
+
         mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
             Task { @MainActor in
                 self?.presentDialog(progress: false)
                 self?.processFileResult(result)
             }
         }
-        
+
         mediaPickerDelegate.onPreparingDataCallback = { [weak self] in
             Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
-        
+
         documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
             Task { @MainActor in
                 self?.presentDialog(progress: false)
                 self?.processFileResult(result)
             }
         }
-        
+
         documentPickerDelegate.onPreparingDataCallback = { [weak self] in
             Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
-        
+
         filesStorageProprieties.autoDownloadFullMediaPolicyPublisher
             .combineLatest(filesStorageProprieties.autoDownloadPreviewPolicyPublisher)
             .sink { [weak self] _ in self?.autoDownloadPolicyChanged() }
@@ -1237,27 +1262,27 @@ private extension ChatViewModel {
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
     }
-    
-    func loadMessages(address: String, offset: Int) async {
+
+    fileprivate func loadMessages(address: String, offset: Int) async {
         guard !isLoading else { return }
         isLoading = true
-        
+
         await chatsProvider.getChatMessages(
             with: address,
             offset: offset
         )
         updateTransactions(performFetch: true)
     }
-    
-    func updateTransactions(performFetch: Bool) {
+
+    fileprivate func updateTransactions(performFetch: Bool) {
         if performFetch {
             try? controller?.performFetch()
         }
-        
+
         let newTransactions = controller?.fetchedObjects ?? []
         let isNewReaction = isNewReaction(old: chatTransactions, new: newTransactions)
         chatTransactions = newTransactions
-        
+
         updateMessages(
             resetLoadingProperty: performFetch,
             completion: isNewReaction
@@ -1265,28 +1290,28 @@ private extension ChatViewModel {
                 : {}
         )
     }
-    
-    func updateMessages(
+
+    fileprivate func updateMessages(
         resetLoadingProperty: Bool,
         completion: @MainActor @escaping () -> Void = {}
     ) {
         timerSubscription = nil
-        
+
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             defer { completion() }
             var expirationTimestamp: TimeInterval?
-            
+
             var (messages, reactId, messageId) = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
                 expirationTimestamp: &expirationTimestamp
             )
-            
+
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
             postProcess(messages: &messages)
-            
+
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
@@ -1296,30 +1321,30 @@ private extension ChatViewModel {
             messagesUpdated.send()
         }
     }
-    
-    func postProcess(messages: inout [ChatMessage]) {
+
+    fileprivate func postProcess(messages: inout [ChatMessage]) {
         let indexes = messages.indices.filter {
             messages[$0].getFiles().count > .zero
         }
-        
+
         indexes.forEach { index in
             guard case let .file(model) = messages[index].content else { return }
-            
+
             model.value.content.fileModel.files.forEach { file in
                 setupFileFields(file, messages: &messages, index: index)
             }
         }
-        
+
         updateAutoDownloadWarning(messages: &messages)
         updateSwipeStates(messages: &messages)
     }
-    
-    func autoDownloadPolicyChanged() {
+
+    fileprivate func autoDownloadPolicyChanged() {
         updateAutoDownloadWarning(messages: &messages)
-        
+
         indexPathsForVisibleItems().forEach { index in
             guard let message = messages[safe: index.section] else { return }
-            
+
             switch message.content {
             case let .file(model):
                 autoDownloadContentIfNeeded(
@@ -1331,8 +1356,8 @@ private extension ChatViewModel {
             }
         }
     }
-    
-    func updateAutoDownloadWarning(messages: inout [ChatMessage]) {
+
+    fileprivate func updateAutoDownloadWarning(messages: inout [ChatMessage]) {
         messages.indices.forEach {
             messages[$0].updateFileFields {
                 $0.content.fileModel.showAutoDownloadWarningLabel = showAutoDownloadWarning(
@@ -1342,16 +1367,17 @@ private extension ChatViewModel {
             }
         }
     }
-    
-    func updateSwipeStates(messages: inout [ChatMessage]) {
+
+    fileprivate func updateSwipeStates(messages: inout [ChatMessage]) {
         messages.indices.forEach {
-            messages[$0].swipeState = messages[$0].id == swipeableMessage.id
+            messages[$0].swipeState =
+                messages[$0].id == swipeableMessage.id
                 ? swipeableMessage.state
                 : .idle
         }
     }
-    
-    func showAutoDownloadWarning(
+
+    fileprivate func showAutoDownloadWarning(
         files: [ChatFile],
         isFromCurrentSender: Bool
     ) -> Bool {
@@ -1360,34 +1386,34 @@ private extension ChatViewModel {
             isFromCurrentSender: isFromCurrentSender,
             downloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy()
         )
-        
+
         let hasNoPreview = files.contains {
             $0.fileType.isMedia
-            && $0.previewImage == nil
-            && $0.file.preview.map { !filesStorage.isCachedLocally($0.id) } ?? false
+                && $0.previewImage == nil
+                && $0.file.preview.map { !filesStorage.isCachedLocally($0.id) } ?? false
         }
 
         return !isPreviewDownloadAllowed && hasNoPreview
     }
-    
-    func setupFileFields(
+
+    fileprivate func setupFileFields(
         _ file: ChatFile,
-        messages: inout[ChatMessage],
+        messages: inout [ChatMessage],
         index: Int
     ) {
         let fileId = file.file.id
-        
+
         let previewImage = (file.file.preview?.id).flatMap {
             !$0.isEmpty
-            ? filesStorage.getPreview(for: $0)
-            : nil
+                ? filesStorage.getPreview(for: $0)
+                : nil
         }
-        
+
         let progress = chatFileService.filesLoadingProgress[fileId]
         let downloadStatus = chatFileService.downloadingFiles[fileId] ?? .default
         let cached = filesStorage.isCachedLocally(fileId)
         let isUploading = chatFileService.uploadingFiles.contains(fileId)
-        
+
         let fileProprieties = FileUpdateProperties(
             id: file.file.id,
             newId: nil,
@@ -1398,46 +1424,46 @@ private extension ChatViewModel {
             uploading: isUploading,
             progress: progress
         )
-        
+
         updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
     }
-    
-    func setupNewMessages(
+
+    fileprivate func setupNewMessages(
         newMessages: [ChatMessage],
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) {
         var newMessages = newMessages
         updateHiddenMessage(&newMessages)
-        
+
         messages = newMessages
-        
+
         if let address = chatroom?.partner?.address {
             chatCacheService.setMessages(address: address, messages: newMessages)
         }
-        
+
         if resetLoadingProperty {
             isLoading = false
             fullscreenLoading = false
         }
-        
+
         guard let expirationTimestamp = expirationTimestamp else { return }
         setupMessagesUpdateTimer(expirationTimestamp: expirationTimestamp)
     }
-    
-    func setupMessagesUpdateTimer(expirationTimestamp: TimeInterval) {
+
+    fileprivate func setupMessagesUpdateTimer(expirationTimestamp: TimeInterval) {
         let currentTimestamp = Date().timeIntervalSince1970
         guard currentTimestamp < expirationTimestamp else { return }
         let interval = expirationTimestamp - currentTimestamp
-        
+
         timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
     }
-    
-    func validateSendingMessage(message: AdamantMessage) async -> Bool {
+
+    fileprivate func validateSendingMessage(message: AdamantMessage) async -> Bool {
         let validationStatus = await chatsProvider.validateMessage(message)
-        
+
         switch validationStatus {
         case .isValid:
             return true
@@ -1448,8 +1474,8 @@ private extension ChatViewModel {
             return false
         }
     }
-    
-    func handleMessageSendingError(
+
+    fileprivate func handleMessageSendingError(
         error: Error,
         sentText: String,
         filesPicked: [FileResult]? = nil
@@ -1468,43 +1494,47 @@ private extension ChatViewModel {
             if case .timestampIsInTheFuture = error {
                 dialog.send(.timestampIsInTheFuture)
             }
-        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound, .invalidTransactionStatus, .none:
+        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
+            .invalidTransactionStatus, .none:
             break
         }
     }
-    
-    func updateFeeValue() {
+
+    fileprivate func updateFeeValue() {
         let pickedFilesCount = filesPicked?.count ?? .zero
-        guard let feeValue: Decimal = switch (inputText, pickedFilesCount) {
-        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount == .zero:
-            nil
-        case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount > .zero:
-            0.001
-        default:
-            AdamantMessage.text(inputText).fee
-        } else {
+        guard
+            let feeValue: Decimal =
+                switch (inputText, pickedFilesCount) {
+                case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount == .zero:
+                    nil
+                case (inputText, pickedFilesCount) where inputText.isEmpty && pickedFilesCount > .zero:
+                    0.001
+                default:
+                    AdamantMessage.text(inputText).fee
+                }
+        else {
             fee = ""
             return
         }
-        
+
         let feeString = AdamantBalanceFormat.full.format(
             feeValue,
             withCurrencySymbol: AdmWalletService.currencySymbol
         )
-        
+
         fee = "~\(feeString)"
     }
-    
-    func updatePartnerInformation() {
+
+    fileprivate func updatePartnerInformation() {
         guard let publicKey = chatroom?.partner?.publicKey else {
             return
         }
-        
+
         partnerName = chatroom?.getName(addressBookService: addressBookService)
         hasPartnerName = chatroom?.hasPartnerName(addressBookService: addressBookService) ?? false
-        
+
         guard let avatarName = chatroom?.partner?.avatar,
-              let avatar = UIImage.asset(named: avatarName)
+            let avatar = UIImage.asset(named: avatarName)
         else {
             partnerImage = avatarService.avatar(
                 for: publicKey,
@@ -1512,23 +1542,23 @@ private extension ChatViewModel {
             )
             return
         }
-        
+
         partnerImage = avatar
     }
-    
-    func updateAttachmentButtonAvailability() {
+
+    fileprivate func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = walletServiceCompose.getWallets()
             .map { walletsStoreService.isInvisible($0) }
             .contains(false)
-        
+
         isAttachmentButtonAvailable = isAnyWalletVisible
     }
-    
-    func findAccount(with address: String, name: String?, message: String?) async {
+
+    fileprivate func findAccount(with address: String, name: String?, message: String?) async {
         dialog.send(.progress(true))
         do {
             let account = try await accountProvider.getAccount(byAddress: address)
-            
+
             self.dialog.send(.progress(false))
             guard let chatroom = account.chatroom else { return }
             self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
@@ -1545,48 +1575,51 @@ private extension ChatViewModel {
             case .serverError(let apiError):
                 self.dialog.send(.progress(false))
                 if let apiError = apiError as? ApiServiceError,
-                   case .internalError(let message, _) = apiError,
-                   message == String.adamant.sharedErrors.unknownError {
+                    case .internalError(let message, _) = apiError,
+                    message == String.adamant.sharedErrors.unknownError
+                {
                     self.dialog.send(.alert(AccountsProviderError.notFound(address: address).localized))
                     return
                 }
-                
+
                 self.dialog.send(.error(error.localized, supportEmail: false))
             }
         } catch {
-            self.dialog.send(.error(
-                error.localizedDescription,
-                supportEmail: false
-            ))
+            self.dialog.send(
+                .error(
+                    error.localizedDescription,
+                    supportEmail: false
+                )
+            )
         }
     }
-    
-    func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
+
+    fileprivate func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
         guard let name = name,
-              let account = account,
-              let address = account.address,
-              account.name == nil,
-              addressBookService.getName(for: address) == nil
+            let account = account,
+            let address = account.address,
+            account.name == nil,
+            addressBookService.getName(for: address) == nil
         else {
             return
         }
-        
+
         Task {
             await addressBookService.set(name: name, for: address)
         }.stored(in: tasksStorage)
-        
+
         account.name = name
         if let chatroom = chatroom, chatroom.title == nil {
             chatroom.title = name
         }
     }
-    
-    func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
+
+    fileprivate func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
     }
-    
-    func waitForChatLoading(with address: String) async {
+
+    fileprivate func waitForChatLoading(with address: String) async {
         await withUnsafeContinuation { continuation in
             Task {
                 await chatsProvider.chatLoadingStatusPublisher
@@ -1603,32 +1636,32 @@ private extension ChatViewModel {
             }
         }
     }
-    
+
     // TODO: Post process
-    func updateHiddenMessage(_ messages: inout [ChatMessage]) {
+    fileprivate func updateHiddenMessage(_ messages: inout [ChatMessage]) {
         messages.indices.forEach {
             messages[$0].isHidden = messages[$0].id == hiddenMessageID
         }
     }
-    
-    func updateFileFields(
+
+    fileprivate func updateFileFields(
         _ messages: inout [ChatMessage],
         fileProprieties: FileUpdateProperties
     ) {
         let indexes = messages.indices.filter {
             messages[$0].getFiles().contains { $0.file.id == fileProprieties.id }
         }
-        
+
         guard !indexes.isEmpty else {
             return
         }
-        
+
         indexes.forEach { index in
             updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
         }
     }
-    
-    func updateFileMessageFields(
+
+    fileprivate func updateFileMessageFields(
         for message: inout ChatMessage,
         fileProprieties: FileUpdateProperties
     ) {
@@ -1646,46 +1679,46 @@ private extension ChatViewModel {
             model.status = getStatus(from: model)
         }
     }
-    
-    func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
+
+    fileprivate func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
         if model.txStatus == .failed {
             return .failed
         }
-        
+
         if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
             return .busy
         }
-        
+
         if model.content.fileModel.files.contains(where: {
-            !$0.isCached ||
-            ($0.isCached
-             && $0.file.preview != nil
-             && $0.previewImage == nil
-             && ($0.fileType == .image || $0.fileType == .video))
+            !$0.isCached
+                || ($0.isCached
+                    && $0.file.preview != nil
+                    && $0.previewImage == nil
+                    && ($0.fileType == .image || $0.fileType == .video))
         }) {
             let failed = model.content.fileModel.files.contains(where: {
                 guard let progress = $0.progress else { return false }
                 return progress < 100
             })
-            
+
             return .needToDownload(failed: failed)
         }
-        
+
         return .success
     }
-    
-    func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
+
+    fileprivate func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
         guard
             let processedDate = old.getMostRecentElementDate(),
             let newLastReactionDate = new.getMostRecentReactionDate()
         else { return false }
-        
+
         return newLastReactionDate > processedDate
     }
-    
-    func presentFileInFullScreen(id: String, chatFiles: [ChatFile]) {
+
+    fileprivate func presentFileInFullScreen(id: String, chatFiles: [ChatFile]) {
         dialog.send(.progress(true))
-        
+
         let files: [FileResult] = chatFiles.compactMap { file in
             guard
                 file.isCached,
@@ -1695,13 +1728,13 @@ private extension ChatViewModel {
             else {
                 return nil
             }
-            
+
             let data = try? chatFileService.getDecodedData(
                 file: fileDTO,
                 nonce: file.file.nonce,
                 chatroom: chatroom
             )
-            
+
             return FileResult.init(
                 assetId: file.file.id,
                 url: fileDTO.url,
@@ -1716,55 +1749,55 @@ private extension ChatViewModel {
                 data: data
             )
         }
-      
+
         dialog.send(.progress(false))
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
     }
-    
-    func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
+
+    fileprivate func updateScrolledMessageState(newUnreadIds: OrderedSet<String>?) {
         let newUnreadIds = newUnreadIds ?? []
         let previousUnreadIds = scrolledMessageId ?? []
         let hasNewIds = !newUnreadIds.isSubset(of: previousUnreadIds)
-        
+
         if hasNewIds {
             scrolledMessageId = previousUnreadIds.union(newUnreadIds)
             shouldScrollToBottom = false
         }
-        
+
         if newUnreadIds.isEmpty {
             shouldScrollToBottom = true
         }
     }
-    
-    func updateSeparatorId() {
+
+    fileprivate func updateSeparatorId() {
         guard !didAddSeparator, !messages.isEmpty else { return }
-        
+
         didAddSeparator = true
         guard let firstUnreadId = unreadMessagesIds?.first else {
             separatorId = nil
             separatorIndex = nil
             return
         }
-        
+
         separatorId = firstUnreadId
         updateSeparatorIndex()
     }
 
-    func updateSeparatorIndex() {
+    fileprivate func updateSeparatorIndex() {
         guard let separatorId = separatorId,
-              let index = messages.firstIndex(where: { $0.id == separatorId })
+            let index = messages.firstIndex(where: { $0.id == separatorId })
         else {
             separatorIndex = nil
             return
         }
-        
+
         separatorIndex = index - 1
     }
 }
 
-private extension ChatMessage {
-    var messageModel: MessageModel {
+extension ChatMessage {
+    fileprivate var messageModel: MessageModel {
         switch content {
         case let .message(model):
             return model.value
@@ -1776,8 +1809,8 @@ private extension ChatMessage {
             return model.value
         }
     }
-    
-    var isFromCurrentSender: Bool {
+
+    fileprivate var isFromCurrentSender: Bool {
         switch content {
         case let .message(model):
             return model.value.isFromCurrentSender
@@ -1789,8 +1822,8 @@ private extension ChatMessage {
             return model.value.isFromCurrentSender
         }
     }
-    
-    var isHidden: Bool {
+
+    fileprivate var isHidden: Bool {
         get {
             switch content {
             case let .message(model):
@@ -1803,7 +1836,7 @@ private extension ChatMessage {
                 return model.value.content.isHidden
             }
         }
-        
+
         set {
             switch content {
             case let .message(model):
@@ -1825,8 +1858,8 @@ private extension ChatMessage {
             }
         }
     }
-    
-    var swipeState: ChatSwipeWrapperModel.State {
+
+    fileprivate var swipeState: ChatSwipeWrapperModel.State {
         get {
             switch content {
             case let .message(model):
@@ -1839,7 +1872,7 @@ private extension ChatMessage {
                 return model.value.swipeState
             }
         }
-        
+
         set {
             switch content {
             case let .message(model):
@@ -1861,61 +1894,63 @@ private extension ChatMessage {
             }
         }
     }
-    
-    func getFiles() -> [ChatFile] {
+
+    fileprivate func getFiles() -> [ChatFile] {
         guard case let .file(model) = content else { return [] }
         return model.value.content.fileModel.files
     }
-    
-    mutating func updateFileFields(
+
+    fileprivate mutating func updateFileFields(
         id: String,
         mutateFile: (inout ChatFile) -> Void,
         mutateModel: (inout ChatMediaContainerView.Model) -> Void
     ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
-        
-        guard let index = model.content.fileModel.files.firstIndex(
-            where: { $0.file.id == id }
-        ) else { return }
-        
+
+        guard
+            let index = model.content.fileModel.files.firstIndex(
+                where: { $0.file.id == id }
+            )
+        else { return }
+
         let previousValue = model
-        
+
         mutateFile(&model.content.fileModel.files[index])
         mutateModel(&model)
-        
+
         guard model != previousValue else {
             return
         }
-        
+
         content = .file(.init(value: model))
     }
-    
-    mutating func updateFileFields(
+
+    fileprivate mutating func updateFileFields(
         mutateModel: (inout ChatMediaContainerView.Model) -> Void
     ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         let previousValue = model
         mutateModel(&model)
-        
+
         guard model != previousValue else { return }
         content = .file(.init(value: model))
     }
 }
 
-private extension Sequence where Element == ChatTransaction {
-    func getMostRecentElementDate() -> Date? {
+extension Sequence where Element == ChatTransaction {
+    fileprivate func getMostRecentElementDate() -> Date? {
         map { $0.sentDate ?? .adamantNullDate }.max()
     }
-    
-    func getMostRecentReactionDate() -> Date? {
+
+    fileprivate func getMostRecentReactionDate() -> Date? {
         compactMap {
             guard
                 let tx = $0 as? RichMessageTransaction,
                 tx.additionalType == .reaction
             else { return nil }
-            
+
             return $0.sentDate ?? .adamantNullDate
         }.max()
     }
@@ -1924,25 +1959,27 @@ private extension Sequence where Element == ChatTransaction {
 extension ChatViewModel: ElegantEmojiPickerDelegate {
     nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
         let sendableEmoji = Atomic(emoji)
-        
+
         MainActor.assumeIsolatedSafe {
             dialog.send(.dismissMenu)
-            
+
             guard let previousArg = previousArg else { return }
-            
-            let emoji = sendableEmoji.value?.emoji == previousArg.selectedEmoji
-            ? ""
-            : (sendableEmoji.value?.emoji ?? "")
-            
-            let type: EmojiUpdateType = emoji.isEmpty
-            ? .decrement
-            : .increment
-            
+
+            let emoji =
+                sendableEmoji.value?.emoji == previousArg.selectedEmoji
+                ? ""
+                : (sendableEmoji.value?.emoji ?? "")
+
+            let type: EmojiUpdateType =
+                emoji.isEmpty
+                ? .decrement
+                : .increment
+
             emojiService.updateFrequentlySelectedEmojis(
                 selectedEmoji: emoji,
                 type: type
             )
-            
+
             reactAction(previousArg.messageId, emoji: emoji)
         }
     }

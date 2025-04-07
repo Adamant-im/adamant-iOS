@@ -6,17 +6,17 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-public extension Collection {
+extension Collection {
     /// Returns the element at the specified index if it is within bounds, otherwise nil.
-    subscript(safe index: Index) -> Element? {
+    public subscript(safe index: Index) -> Element? {
         indices.contains(index)
             ? self[index]
             : nil
     }
 }
 
-public extension Collection where Element: AnyObject {
-    func hasTheSameReferences(as collection: Self) -> Bool {
+extension Collection where Element: AnyObject {
+    public func hasTheSameReferences(as collection: Self) -> Bool {
         count == collection.count
             && !zip(self, collection)
                 .map({ $0 === $1 })

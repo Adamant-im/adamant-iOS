@@ -29,7 +29,7 @@ public struct OpBoolOr: OpCodeProtocol {
     public var name: String { return "OP_BOOLOR" }
 
     // (x1 x2 -- out)
-     public func mainProcess(_ context: ScriptExecutionContext) throws {
+    public func mainProcess(_ context: ScriptExecutionContext) throws {
         try context.assertStackHeightGreaterThanOrEqual(2)
 
         let x1 = context.data(at: -2)

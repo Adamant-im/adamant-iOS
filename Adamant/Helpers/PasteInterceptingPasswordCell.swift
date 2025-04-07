@@ -6,19 +6,19 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import UIKit
 import Eureka
+import UIKit
 
 final class PasteInterceptingPasswordCell: CustomFieldCell<String, PasteInterceptingTextField>, CellType {
-    
+
     required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-    
+
     override func setup() {
         super.setup()
         textField.autocorrectionType = .no

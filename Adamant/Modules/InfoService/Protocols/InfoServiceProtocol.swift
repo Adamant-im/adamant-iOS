@@ -6,8 +6,8 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension Notification.Name {
     struct AdamantCurrencyInfoService {
@@ -28,7 +28,7 @@ enum Currency: String, CaseIterable {
     case EUR
     case CNY
     case JPY
-    
+
     var symbol: String {
         switch self {
         case .RUB: return "₽"
@@ -38,7 +38,7 @@ enum Currency: String, CaseIterable {
         case .JPY: return "¥"
         }
     }
-    
+
     static let `default` = Currency.USD
 }
 
@@ -46,13 +46,13 @@ enum Currency: String, CaseIterable {
 @MainActor
 protocol InfoServiceProtocol: AnyObject, Sendable {
     var currentCurrency: Currency { get set }
-    
+
     // Check rates for list of coins
     func update()
-    
+
     // Get rate for pair Crypto / Fiat currencies
     func getRate(for coin: String) -> Decimal?
-    
+
     func getHistory(
         for coin: String,
         date: Date

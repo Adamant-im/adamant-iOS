@@ -32,12 +32,12 @@ public class SegWitBech32 {
             if bits != 0 {
                 odata.append(UInt8((acc << (to - bits)) & maxv))
             }
-        } else if (bits >= from || ((acc << (to - bits)) & maxv) != 0) {
+        } else if bits >= from || ((acc << (to - bits)) & maxv) != 0 {
             throw CoderError.bitsConversionFailed
         }
         return odata
     }
-    
+
     /// Decode segwit address
     public static func decode(hrp: String, addr: String, hasAdvanced: Bool = true) throws -> (version: UInt8, program: Data) {
         let dec = try Bech32.shared.decode(addr)
@@ -63,13 +63,13 @@ public class SegWitBech32 {
         }
         return (dec.checksum[0], conv)
     }
-    
+
     /// Encode segwit address
     public static func encode(hrp: String, version: UInt8, program: Data, encoding: Bech32.Encoding) throws -> String {
         var enc = Data([version])
         enc.append(try convertBits(from: 8, to: 5, pad: true, idata: program))
         let result = Bech32.shared.encode(hrp, values: enc, encoding: encoding)
-        guard let _ = try? decode(hrp: hrp, addr: result) else {
+        guard (try? decode(hrp: hrp, addr: result)) != nil else {
             throw CoderError.encodingCheckFailed
         }
         return result
@@ -84,14 +84,14 @@ extension SegWitBech32 {
         case bitsConversionFailed
         case hrpMismatch(String, String)
         case checksumSizeTooLow
-        
+
         case dataSizeMismatch(Int)
         case segwitVersionNotSupported(UInt8)
         case segwitV0ProgramSizeMismatch(Int)
         case segwitVersionAndEncodingMismatch
 
         case encodingCheckFailed
-        
+
         public var errorDescription: String? {
             switch self {
             case .bitsConversionFailed:

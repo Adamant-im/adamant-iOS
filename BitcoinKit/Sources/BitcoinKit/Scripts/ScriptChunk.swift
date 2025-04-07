@@ -127,7 +127,7 @@ public struct DataChunk: ScriptChunk {
     public var string: String {
         var string: String
         guard !data.isEmpty else {
-            return "OP_0" // Empty data is encoded as OP_0.
+            return "OP_0"  // Empty data is encoded as OP_0.
         }
 
         if isASCIIData(data: data) {
@@ -165,13 +165,13 @@ public struct DataChunk: ScriptChunk {
     public var isDataCompact: Bool {
         switch opCode.value {
         case ...OpCode.OP_PUSHDATA1.value:
-            return true // length fits in one byte under OP_PUSHDATA1.
+            return true  // length fits in one byte under OP_PUSHDATA1.
         case OpCode.OP_PUSHDATA1.value:
-            return data.count >= OpCode.OP_PUSHDATA1.value // length should not be less than OP_PUSHDATA1
+            return data.count >= OpCode.OP_PUSHDATA1.value  // length should not be less than OP_PUSHDATA1
         case OpCode.OP_PUSHDATA2.value:
-            return data.count > (0xff) // length should not fit in one byte
+            return data.count > (0xff)  // length should not fit in one byte
         case OpCode.OP_PUSHDATA4.value:
-            return data.count > (0xffff) // length should not fit in two bytes
+            return data.count > (0xffff)  // length should not fit in two bytes
         default:
             return false
         }

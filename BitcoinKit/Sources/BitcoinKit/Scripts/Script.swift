@@ -178,7 +178,7 @@ public class Script {
             return false
         }
         return opcode(at: 0) == OpCode.OP_HASH160
-            && pushedData(at: 1)?.count == 20 // this is enough to match the exact byte template, any other encoding will be larger.
+            && pushedData(at: 1)?.count == 20  // this is enough to match the exact byte template, any other encoding will be larger.
             && opcode(at: 2) == OpCode.OP_EQUAL
     }
 
@@ -281,10 +281,12 @@ public class Script {
 
     @discardableResult
     public func append(_ opcode: OpCode) throws -> Script {
-        let invalidOpCodes: [OpCode] = [.OP_PUSHDATA1,
-                                                .OP_PUSHDATA2,
-                                                .OP_PUSHDATA4,
-                                                .OP_INVALIDOPCODE]
+        let invalidOpCodes: [OpCode] = [
+            .OP_PUSHDATA1,
+            .OP_PUSHDATA2,
+            .OP_PUSHDATA4,
+            .OP_INVALIDOPCODE
+        ]
         guard !invalidOpCodes.contains(where: { $0 == opcode }) else {
             throw ScriptError.error("\(opcode.name) cannot be executed alone.")
         }
@@ -409,9 +411,8 @@ extension Script {
     }
 
     public static func isPublicKeyHashOut(_ script: Data) -> Bool {
-        return script.count == 25 &&
-            script[0] == OpCode.OP_DUP && script[1] == OpCode.OP_HASH160 && script[2] == 20 &&
-            script[23] == OpCode.OP_EQUALVERIFY && script[24] == OpCode.OP_CHECKSIG
+        return script.count == 25 && script[0] == OpCode.OP_DUP && script[1] == OpCode.OP_HASH160 && script[2] == 20 && script[23] == OpCode.OP_EQUALVERIFY
+            && script[24] == OpCode.OP_CHECKSIG
     }
 
     public static func getPublicKeyHash(from script: Data) -> Data {

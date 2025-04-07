@@ -30,7 +30,7 @@ public struct OpIfDup: OpCodeProtocol {
     public var name: String { return "OP_IFDUP" }
 
     // input : x
-    // output : x / x x    
+    // output : x / x x
     public func mainProcess(_ context: ScriptExecutionContext) throws {
         try context.assertStackHeightGreaterThanOrEqual(1)
         if context.bool(at: -1) {

@@ -23,7 +23,15 @@ public struct Blocks: APIService {
 extension Blocks {
 
     /// List blocks
-    public func blocks(id: String? = nil, height: Int? = nil, generatorPublicKey: String? = nil, limit: Int? = nil, offset: Int? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<BlocksResponse>) -> Void) {
+    public func blocks(
+        id: String? = nil,
+        height: Int? = nil,
+        generatorPublicKey: String? = nil,
+        limit: Int? = nil,
+        offset: Int? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Response<BlocksResponse>) -> Void
+    ) {
         var options: RequestOptions = [:]
         if let value = id { options["blockId"] = value }
         if let value = height { options["height"] = value }

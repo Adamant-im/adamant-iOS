@@ -6,9 +6,9 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Swinject
 import CommonKit
 import Foundation
+import Swinject
 
 @MainActor
 protocol MainThreadAssembly: Assembly, Sendable {
@@ -18,7 +18,7 @@ protocol MainThreadAssembly: Assembly, Sendable {
 extension MainThreadAssembly {
     nonisolated func assemble(container: Container) {
         let sendable = Atomic(container)
-        
+
         MainActor.assumeIsolatedSafe {
             assembleOnMainThread(container: sendable.value)
         }

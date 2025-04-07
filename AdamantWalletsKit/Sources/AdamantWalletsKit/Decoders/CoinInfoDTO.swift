@@ -39,7 +39,7 @@ public struct CoinInfoDTO: Codable {
     public let timeout: Timeout?
     public let contractId: String?
     public let txConsistencyMaxTime: Int?
-    
+
     public struct Node: Codable {
         public let url: String
         public let altIP: String?
@@ -58,7 +58,7 @@ public struct CoinInfoDTO: Codable {
         public let healthCheck: NodeHealthCheck?
         let minVersion: String?
     }
-    
+
     public struct Description: Codable {
         let software: String
         let github: String

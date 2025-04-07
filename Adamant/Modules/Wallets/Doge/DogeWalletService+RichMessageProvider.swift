@@ -6,28 +6,28 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import MessageKit
 import UIKit
-import CommonKit
 
 extension DogeWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }
-    
+
     var oldPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).oldPendingInterval)
     }
-    
+
     var registeredInterval: TimeInterval {
         .init(milliseconds: type(of: self).registeredInterval)
     }
-    
+
     var newPendingAttempts: Int {
         type(of: self).newPendingAttempts
     }
-    
+
     var oldPendingAttempts: Int {
         type(of: self).oldPendingAttempts
     }
@@ -35,30 +35,30 @@ extension DogeWalletService {
     var dynamicRichMessageType: String {
         return type(of: self).richMessageType
     }
-    
+
     // MARK: Short description
-    
+
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
-        
+
         guard let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount)
         else {
             return NSAttributedString(string: "⬅️  \(DogeWalletService.currencySymbol)")
         }
-        
+
         if let decimal = Decimal(string: raw) {
             amount = AdamantBalanceFormat.full.format(decimal)
         } else {
             amount = raw
         }
-        
+
         let string: String
         if transaction.isOutgoing {
             string = "⬅️  \(amount) \(DogeWalletService.currencySymbol)"
         } else {
             string = "➡️  \(amount) \(DogeWalletService.currencySymbol)"
         }
-        
+
         return NSAttributedString(string: string)
     }
 }

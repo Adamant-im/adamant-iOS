@@ -6,10 +6,10 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import Combine
 import CommonKit
 import Photos
+import SwiftUI
 
 @MainActor
 final class PartnerQRViewModel: NSObject, ObservableObject {
@@ -21,7 +21,7 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     @Published var includeWebAppLink = false
     @Published var includeContactsName = false
     @Published var presentBuyAndSell = false
-    
+
     private var partner: CoreDataAccount?
     private let dialogService: DialogService
     private let addressBookService: AddressBookService
@@ -29,13 +29,13 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     private let partnerQRService: PartnerQRService
     private let accountService: AccountService
     private var subscriptions = Set<AnyCancellable>()
-    
+
     let partnerImageSize: CGFloat = 25
-    
+
     var title: String {
         partner?.address ?? ""
     }
-    
+
     init(
         dialogService: DialogService,
         addressBookService: AddressBookService,
@@ -49,13 +49,13 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         self.avatarService = avatarService
         self.partnerQRService = partnerQRService
     }
-    
+
     func setup(partner: CoreDataAccount) {
         self.partner = partner
         updatePartnerInfo()
         generateQR()
     }
-    
+
     func renameContact() {
         let alert = dialogService.makeRenameAlert(
             titleFormat: String(format: .adamant.chat.actionsBody, self.title),
@@ -69,27 +69,27 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
             self.dialogService.selectAllTextFields(in: alert)
         }
     }
-    
+
     func saveToPhotos() {
         guard let qrCode = image else { return }
-        
+
         switch PHPhotoLibrary.authorizationStatus() {
         case .authorized, .limited:
             UIImageWriteToSavedPhotosAlbum(
                 qrCode,
                 self,
-                #selector(image(_: didFinishSavingWithError: contextInfo:)),
+                #selector(image(_:didFinishSavingWithError:contextInfo:)),
                 nil
             )
-            
+
         case .notDetermined:
             UIImageWriteToSavedPhotosAlbum(
                 qrCode,
                 self,
-                #selector(image(_: didFinishSavingWithError: contextInfo:)),
+                #selector(image(_:didFinishSavingWithError:contextInfo:)),
                 nil
             )
-            
+
         case .restricted, .denied:
             dialogService.presentGoToSettingsAlert(
                 title: nil,
@@ -107,10 +107,10 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
             activityItems: [qrCode],
             applicationActivities: nil
         )
-        
+
         vc.completionWithItemsHandler = { [weak self] (_: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
             guard completed else { return }
-            
+
             if let error = error {
                 self?.dialogService.showWarning(withMessage: error.localizedDescription)
             } else {
@@ -120,32 +120,32 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         vc.modalPresentationStyle = .overFullScreen
         dialogService.present(vc, animated: true, completion: nil)
     }
-    
+
     func didToggle() {
         partnerQRService.setIncludeURLEnabled(includeWebAppLink)
         partnerQRService.setIncludeNameEnabled(includeContactsName)
         generateQR()
     }
-    
+
     func copyToPasteboard() {
         UIPasteboard.general.string = title
         dialogService.showToastMessage(.adamant.alert.copiedToPasteboardNotification)
     }
 }
 
-private extension PartnerQRViewModel {
-    func updatePartnerInfo() {
+extension PartnerQRViewModel {
+    fileprivate func updatePartnerInfo() {
         guard let publicKey = partner?.publicKey,
-              let address = partner?.address
+            let address = partner?.address
         else {
             includeContactsNameEnabled = false
             includeContactsName = false
             includeWebAppLink = false
             return
         }
-        
+
         let name = addressBookService.getName(for: partner)
-        
+
         if let name = name {
             partnerName = name
             includeContactsNameEnabled = true
@@ -157,11 +157,11 @@ private extension PartnerQRViewModel {
             includeContactsName = false
             renameTitle = .adamant.alert.renameContactInitial
         }
-        
+
         includeWebAppLink = partnerQRService.isIncludeURLEnabled()
-        
+
         guard let avatarName = partner?.avatar,
-              let avatar = UIImage.asset(named: avatarName)
+            let avatar = UIImage.asset(named: avatarName)
         else {
             partnerImage = avatarService.avatar(
                 for: publicKey,
@@ -169,41 +169,46 @@ private extension PartnerQRViewModel {
             )
             return
         }
-        
+
         partnerImage = avatar
     }
-    
-    func generateQR() {
+
+    fileprivate func generateQR() {
         guard let address = partner?.address else { return }
-        
+
         var params: [AdamantAddressParam] = []
-        
+
         let name = addressBookService.getName(for: partner)
-        
+
         if includeContactsName,
-           let name = name {
+            let name = name
+        {
             params.append(.label(name))
         }
-        
+
         var data: String = address
-        
+
         if includeWebAppLink {
-            data = AdamantUriTools.encode(request: AdamantUri.address(
-                address: address,
-                params: params
-            ))
+            data = AdamantUriTools.encode(
+                request: AdamantUri.address(
+                    address: address,
+                    params: params
+                )
+            )
         } else {
-            data = AdamantUriTools.encode(request: AdamantUri.addressLegacy(
-                address: address,
-                params: params
-            ))
+            data = AdamantUriTools.encode(
+                request: AdamantUri.addressLegacy(
+                    address: address,
+                    params: params
+                )
+            )
         }
-        
+
         let qr = AdamantQRTools.generateQrFrom(
             string: data,
             withLogo: true
         )
-        
+
         switch qr {
         case .success(let uIImage):
             image = uIImage
@@ -211,7 +216,7 @@ private extension PartnerQRViewModel {
             dialogService.showError(withMessage: "", supportEmail: false, error: error)
         }
     }
-    
+
     @objc private func image(
         _ image: UIImage,
         didFinishSavingWithError error: NSError?,
@@ -221,14 +226,14 @@ private extension PartnerQRViewModel {
             dialogService.presentGoToSettingsAlert(title: String.adamant.shared.photolibraryNotAuthorized, message: nil)
             return
         }
-        
+
         dialogService.showSuccess(withMessage: String.adamant.alert.done)
     }
-    
-    func makeCancelAction() -> UIAlertAction {
+
+    fileprivate func makeCancelAction() -> UIAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
-    func handleRename(newName: String) {
+    fileprivate func handleRename(newName: String) {
         Task { [weak self] in
             guard let self else { return }
             self.partnerName = newName
@@ -236,7 +241,7 @@ private extension PartnerQRViewModel {
             await self.addressBookService.set(name: newName, for: self.title)
         }
     }
-    func showBuyAndSell() {
+    fileprivate func showBuyAndSell() {
         presentBuyAndSell = true
     }
 }

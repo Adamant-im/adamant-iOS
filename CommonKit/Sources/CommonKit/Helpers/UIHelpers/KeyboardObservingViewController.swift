@@ -6,64 +6,63 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import Combine
+import UIKit
 
 open class KeyboardObservingViewController: UIViewController {
     private var subscription: AnyCancellable?
     private var keyboardFrame: CGRect = .zero
-    
+
     open override func viewDidLoad() {
         super.viewDidLoad()
         subscription = makeKeyboardSubscription()
     }
-    
+
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         additionalSafeAreaInsets.bottom = getAdditionalBottomInset(keyboardFrame: keyboardFrame)
     }
 }
 
-private extension KeyboardObservingViewController {
-    func getAdditionalBottomInset(keyboardFrame: CGRect) -> CGFloat {
+extension KeyboardObservingViewController {
+    fileprivate func getAdditionalBottomInset(keyboardFrame: CGRect) -> CGFloat {
         let keyboardFrameInView = view.convert(keyboardFrame, from: nil)
-        
+
         let safeAreaFrame = view.safeAreaLayoutGuide.layoutFrame.insetBy(
             dx: .zero,
             dy: -additionalSafeAreaInsets.bottom
         )
-        
+
         return safeAreaFrame.intersection(keyboardFrameInView).height
     }
-    
-    func makeKeyboardSubscription() -> AnyCancellable {
+
+    fileprivate func makeKeyboardSubscription() -> AnyCancellable {
         NotificationCenter.default
             .notifications(named: UIResponder.keyboardWillChangeFrameNotification, object: nil)
             .sink { @MainActor [weak self] in self?.onKeyboardFrameChange($0) }
     }
-    
-    func onKeyboardFrameChange(_ notification: Notification) {
+
+    fileprivate func onKeyboardFrameChange(_ notification: Notification) {
         guard
             let userInfo = notification.userInfo,
             let keyboardFrameInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey],
             let keyboardFrame = (keyboardFrameInfo as? NSValue)?.cgRectValue
         else { return }
-        
+
         self.keyboardFrame = keyboardFrame
-        
-        let animationDuration: TimeInterval = (
-            notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey]
-                as? NSNumber
-        )?.doubleValue ?? .zero
-        
-        let animationCurveRawNSN = notification
+
+        let animationDuration: TimeInterval =
+            (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey]
+            as? NSNumber)?.doubleValue ?? .zero
+
+        let animationCurveRawNSN =
+            notification
             .userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber
-        
-        let animationCurveRaw = animationCurveRawNSN?.uintValue ??
-            UIView.AnimationOptions.curveEaseInOut.rawValue
-        
+
+        let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIView.AnimationOptions.curveEaseInOut.rawValue
+
         let animationCurve = UIView.AnimationOptions(rawValue: animationCurveRaw)
-        
+
         UIView.animate(
             withDuration: animationDuration,
             delay: .zero,

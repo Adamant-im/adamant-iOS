@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension ChatMediaContainerView {
     struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
@@ -20,7 +20,7 @@ extension ChatMediaContainerView {
         let txStatus: MessageStatus
         var status: FileMessageStatus
         var swipeState: ChatSwipeWrapperModel.State
-        
+
         static var `default`: Self {
             Self(
                 id: "",
@@ -34,12 +34,12 @@ extension ChatMediaContainerView {
                 swipeState: .idle
             )
         }
-        
+
         func makeReplyContent() -> NSAttributedString {
             let mediaFilesCount = content.fileModel.files.filter { file in
                 return file.fileType == .image || file.fileType == .video
             }.count
-            
+
             let otherFilesCount = content.fileModel.files.count - mediaFilesCount
                         
             let result = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaFilesCount, otherFilesCount: otherFilesCount, comment: content.comment.string, parsedWith: ChatMessageFactory.markdownParser)

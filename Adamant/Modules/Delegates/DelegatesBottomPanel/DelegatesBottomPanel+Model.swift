@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension DelegatesBottomPanel {
     struct Model {
@@ -20,7 +20,7 @@ extension DelegatesBottomPanel {
         let newVotesColor: UIColor
         let totalVotesColor: UIColor
         let sendAction: () -> Void
-        
+
         static var `default`: Self {
             Self(
                 upvotes: .zero,

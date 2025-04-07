@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
 import Swinject
+import UIKit
 
 @MainActor
 struct SettingsFactory {
     let assembler: Assembler
-    
+
     func makeSecurityVC(screensFactory: ScreensFactory) -> UIViewController {
         let c = SecurityViewController()
         c.accountService = assembler.resolve(AccountService.self)
@@ -23,13 +23,13 @@ struct SettingsFactory {
         c.screensFactory = screensFactory
         return c
     }
-    
+
     func makeQRGeneratorVC() -> UIViewController {
         let c = QRGeneratorViewController()
         c.dialogService = assembler.resolve(DialogService.self)
         return c
     }
-    
+
     func makeAboutVC(screensFactory: ScreensFactory) -> UIViewController {
         AboutViewController(
             accountService: assembler.resolve(AccountService.self)!,
@@ -39,7 +39,7 @@ struct SettingsFactory {
             vibroService: assembler.resolve(VibroService.self)!
         )
     }
-    
+
     func makeVisibleWalletsVC() -> UIViewController {
         VisibleWalletsViewController(
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,

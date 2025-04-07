@@ -8,21 +8,21 @@
 
 import Foundation
 
-public extension DispatchQueue {
+extension DispatchQueue {
     @discardableResult
-    static func onMainThreadSyncSafe<T: Sendable>(_ action: @MainActor () -> T) -> T {
+    public static func onMainThreadSyncSafe<T: Sendable>(_ action: @MainActor () -> T) -> T {
         Thread.isMainThread
             ? MainActor.assumeIsolated(action)
             : DispatchQueue.main.sync(execute: action)
     }
-    
+
     /// Do not use it anymore. It makes unclear in which order code is executed.
-    static func onMainAsync(_ action: @escaping @MainActor () -> Void) {
+    public static func onMainAsync(_ action: @escaping @MainActor () -> Void) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async(execute: action)
             return
         }
-        
+
         MainActor.assumeIsolated(action)
     }
 }

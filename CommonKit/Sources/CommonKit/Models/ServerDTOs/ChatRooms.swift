@@ -8,11 +8,11 @@
 
 import Foundation
 
-public struct ChatRooms : Codable, Sendable {
+public struct ChatRooms: Codable, Sendable {
     public let chats: [ChatRoomsChats]?
     public let messages: [Transaction]?
     public let count: Int?
-    
+
     public enum CodingKeys: String, CodingKey {
         case chats = "chats"
         case count = "count"

@@ -18,7 +18,7 @@ extension ChatTransactionContainerView {
         let address: String
         let opponentAddress: String
         var swipeState: ChatSwipeWrapperModel.State
-        
+
         static var `default`: Self {
             Self(
                 id: "",
@@ -31,15 +31,16 @@ extension ChatTransactionContainerView {
                 swipeState: .idle
             )
         }
-        
+
         func makeReplyContent() -> NSAttributedString {
             let commentRaw = content.comment ?? ""
-            let comment = commentRaw.isEmpty
-            ? commentRaw
-            : ": \(commentRaw)"
-            
+            let comment =
+                commentRaw.isEmpty
+                ? commentRaw
+                : ": \(commentRaw)"
+
             let content = "\(content.title) \(content.currency) \(content.amount)\(comment)"
-            
+
             return ChatMessageFactory.markdownParser.parse(content)
         }
     }

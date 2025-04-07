@@ -1,6 +1,6 @@
 //
 //  FilePresentationHelper.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 26.04.2024.
 //
@@ -31,7 +31,7 @@ public class FilePresentationHelper {
         
         return result
     }
-    
+
     public static func getFilePresentationText(_ richContent: [String: Any]) -> String {
         return getFilePrefix(richContent) + getText(from: richContent)
     }
@@ -67,15 +67,15 @@ public class FilePresentationHelper {
     
     private static func getFilePrefix(_ richContent: [String: Any]) -> String {
         let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
-        
+
         let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
-        
+
         let mediaFilesCount = files.filter { file in
             let mimeType = file[RichContentKeys.file.mimeType] as? String ?? .empty
             let fileType = FileType(mimeType: mimeType) ?? .other
             return fileType == .image || fileType == .video
         }.count
-        
+
         let otherFilesCount = files.count - mediaFilesCount
         
         return Self.getFilePrefix(

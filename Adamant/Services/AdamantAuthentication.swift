@@ -14,12 +14,12 @@ final class AdamantAuthentication: LocalAuthentication {
         let context = LAContext()
         var error: NSError?
         let available: Bool
-        
+
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             available = true
         } else if let errorCode = error?.code {
             let lockoutCode = LAError.biometryLockout.rawValue
-            
+
             if errorCode == lockoutCode {
                 available = true
             } else {
@@ -28,15 +28,15 @@ final class AdamantAuthentication: LocalAuthentication {
         } else {
             available = false
         }
-        
+
         if available {
             switch context.biometryType {
             case .none, .opticID:
                 return .none
-                
+
             case .touchID:
                 return .touchID
-                
+
             case .faceID:
                 return .faceID
             @unknown default:
@@ -46,7 +46,7 @@ final class AdamantAuthentication: LocalAuthentication {
             return .none
         }
     }
-    
+
     func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void) {
         let context = LAContext()
         context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { (success, error) in
@@ -54,28 +54,28 @@ final class AdamantAuthentication: LocalAuthentication {
                 completion(.success)
                 return
             }
-            
+
             guard let error = error as? LAError else {
                 completion(.failed)
                 return
             }
-            
+
             if error.code == LAError.userFallback {
                 completion(.fallback)
                 return
             }
-            
+
             if error.code == LAError.userCancel {
                 completion(.cancel)
                 return
             }
-            
+
             let tryDeviceOwner = error.code == LAError.biometryLockout
-            
+
             if tryDeviceOwner {
                 context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, error) in
                     let result: AuthenticationResult
-                    
+
                     if success {
                         result = .success
                     } else if let error = error as? LAError, error.code == LAError.userCancel {
@@ -83,7 +83,7 @@ final class AdamantAuthentication: LocalAuthentication {
                     } else {
                         result = .failed
                     }
-                    
+
                     completion(result)
                 }
             } else {

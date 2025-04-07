@@ -12,7 +12,7 @@ public struct MultipartFormDataModel: Sendable {
     public let keyName: String
     public let fileName: String
     public let data: Data
-    
+
     public init(keyName: String, fileName: String, data: Data) {
         self.keyName = keyName
         self.fileName = fileName

@@ -13,11 +13,13 @@ extension UITableView {
         top: .zero,
         left: 15,
         bottom: .zero,
-        right: .zero)
-    
+        right: .zero
+    )
+
     static let defaultTransactionsSeparatorInset = UIEdgeInsets(
         top: .zero,
         left: 80,
         bottom: .zero,
-        right: .zero)
+        right: .zero
+    )
 }

@@ -6,17 +6,17 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 @preconcurrency import Alamofire
+import Foundation
 
 public actor APICore: APICoreProtocol {
     private let responseQueue = DispatchQueue(
         label: "com.adamant.response-queue",
         qos: .userInteractive
     )
-    
+
     private var sessions: [TimeoutSize: Session] = .init()
-    
+
     public func sendRequestMultipartFormData(
         origin: NodeOrigin,
         path: String,
@@ -37,7 +37,7 @@ public actor APICore: APICoreProtocol {
                 },
                 to: try buildUrl(origin: origin, path: path)
             ).uploadProgress(queue: .global(), closure: uploadProgress)
-            
+
             return await sendRequest(request: request)
         } catch {
             return .init(
@@ -47,7 +47,7 @@ public actor APICore: APICoreProtocol {
             )
         }
     }
-    
+
     public func sendRequestBasic<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
@@ -65,7 +65,7 @@ public actor APICore: APICoreProtocol {
                 encoding: encoding.parametersEncoding,
                 headers: HTTPHeaders(["Content-Type": "application/json"])
             ).downloadProgress(closure: downloadProgress)
-            
+
             return await sendRequest(request: request)
         } catch {
             return .init(
@@ -75,7 +75,7 @@ public actor APICore: APICoreProtocol {
             )
         }
     }
-    
+
     public func sendRequestBasic(
         origin: NodeOrigin,
         path: String,
@@ -87,12 +87,12 @@ public actor APICore: APICoreProtocol {
             let data = try JSONSerialization.data(
                 withJSONObject: jsonParameters
             )
-            
+
             var request = try URLRequest(
                 url: try buildUrl(origin: origin, path: path),
                 method: method
             )
-            
+
             request.httpBody = data
             request.headers.update(.contentType("application/json"))
             return await sendRequest(request: getSession(timeout).request(request))
@@ -104,52 +104,55 @@ public actor APICore: APICoreProtocol {
             )
         }
     }
-    
+
     public init() {}
 }
 
-private extension APICore {
-    func sendRequest(request: DataRequest) async -> APIResponseModel {
+extension APICore {
+    fileprivate func sendRequest(request: DataRequest) async -> APIResponseModel {
         await withTaskCancellationHandler(
             operation: {
                 await withCheckedContinuation { continuation in
                     request.responseData(queue: responseQueue) { response in
-                        continuation.resume(returning: .init(
-                            result: response.result.mapError { .init(error: $0) },
-                            data: response.data,
-                            code: response.response?.statusCode
-                        ))
+                        continuation.resume(
+                            returning: .init(
+                                result: response.result.mapError { .init(error: $0) },
+                                data: response.data,
+                                code: response.response?.statusCode
+                            )
+                        )
                     }
                 }
             },
             onCancel: { request.cancel() }
         )
     }
-    
-    func buildUrl(origin: NodeOrigin, path: String) throws -> URL {
+
+    fileprivate func buildUrl(origin: NodeOrigin, path: String) throws -> URL {
         guard let url = origin.asURL()?.appendingPathComponent(path, conformingTo: .url)
         else { throw InternalAPIError.endpointBuildFailed }
         return url
     }
-    
-    func getSession(_ timeout: TimeoutSize) -> Session {
+
+    fileprivate func getSession(_ timeout: TimeoutSize) -> Session {
         if let session = sessions[timeout] {
             return session
         }
-        
+
         let configuration = AF.sessionConfiguration
         configuration.waitsForConnectivity = true
         configuration.timeoutIntervalForRequest = requestTimeout
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpMaximumConnectionsPerHost = maximumConnectionsPerHost
-        
-        configuration.timeoutIntervalForResource = switch timeout {
-        case .common:
-            resourceTimeout
-        case .extended:
-            extendedResourceTimeout
-        }
-        
+
+        configuration.timeoutIntervalForResource =
+            switch timeout {
+            case .common:
+                resourceTimeout
+            case .extended:
+                extendedResourceTimeout
+            }
+
         let session = Alamofire.Session.init(configuration: configuration)
         sessions[timeout] = session
         return session
