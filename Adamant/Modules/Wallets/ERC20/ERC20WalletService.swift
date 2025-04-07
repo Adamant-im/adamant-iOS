@@ -297,8 +297,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
     func calculateFee(for address: EthereumAddress? = nil) async {
         // Setting initial
-        async let pricePriceAsync = getGasPrices()
-        async let gasLimitAsync = getGasLimit(to: address)
         var gasPriceCoeficient: Decimal = 1
         if isIncreaseFeeEnabled {
             gasPriceCoeficient += token.increasedGasPricePercent / 100
@@ -309,8 +307,10 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
         // Getting gas data
         do {
-            let (gasPriceFromChain, gasLimitFromChain) = try await (pricePriceAsync, gasLimitAsync)
+            let gasPriceFromChain = try await getGasPrices()
+            let gasLimitFromChain = try await getGasLimit(to: address)
             try Task.checkCancellation()
+            
             gasPrice = gasPriceFromChain
             gasLimit = gasLimitFromChain
         } catch {
