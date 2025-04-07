@@ -8,6 +8,7 @@
 
 import Foundation
 import JavaScriptCore
+
 @testable import Adamant
 
 // MARK: Keypair
@@ -20,12 +21,12 @@ import JavaScriptCore
 @objc class JSKeypair: NSObject, JSKeypairProtocol {
     dynamic var publicKey: String
     dynamic var privateKey: String
-    
+
     init(publicKey: String, privateKey: String) {
         self.publicKey = publicKey
         self.privateKey = privateKey
     }
-    
+
     init(keypair: Keypair) {
         self.publicKey = keypair.publicKey
         self.privateKey = keypair.privateKey
@@ -58,7 +59,7 @@ import JavaScriptCore
     dynamic var message: String
     dynamic var own_message: String
     dynamic var type: Int
-    
+
     init(type: Int, message: String, own_message: String) {
         self.message = message
         self.own_message = own_message
@@ -78,7 +79,7 @@ import JavaScriptCore
     dynamic var key: String
     dynamic var value: String
     dynamic var type: Int
-    
+
     init(key: String, value: String, type: Int) {
         self.key = key
         self.value = value
@@ -121,7 +122,22 @@ import JavaScriptCore
     dynamic var confirmations: UInt64
     dynamic var asset: JSAsset
 
-    init(id: UInt64, height: Int, blockId: UInt64, type: Int, timestamp: UInt64, senderPublicKey: String?, senderId: String?, recipientId: String?, recipientPublicKey: String?, amount: UInt64, fee: UInt64, signature: String?, confirmations: UInt64, asset: JSAsset) {
+    init(
+        id: UInt64,
+        height: Int,
+        blockId: UInt64,
+        type: Int,
+        timestamp: UInt64,
+        senderPublicKey: String?,
+        senderId: String?,
+        recipientId: String?,
+        recipientPublicKey: String?,
+        amount: UInt64,
+        fee: UInt64,
+        signature: String?,
+        confirmations: UInt64,
+        asset: JSAsset
+    ) {
         self.id = id
         self.height = height
         self.blockId = blockId

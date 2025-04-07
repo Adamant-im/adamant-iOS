@@ -38,7 +38,7 @@ public struct CoinInfoDTO: Codable {
     public let timeout: Timeout?
     public let contractId: String?
     public let txConsistencyMaxTime: Int?
-    
+
     public struct Node: Codable {
         public enum CodingKeys: String, CodingKey {
             case url
@@ -68,7 +68,7 @@ public struct CoinInfoDTO: Codable {
         public let healthCheck: NodeHealthCheck?
         let minVersion: String?
     }
-    
+
     public struct Services: Codable {
         public let infoService: Service?
         public let klyService: Service?

@@ -26,21 +26,29 @@ import Foundation
 
 public enum OpCode: OpCodeProtocol {
     // swiftlint:disable:next line_length
-    case OP_0, OP_FALSE, OP_PUSHDATA1, OP_PUSHDATA2, OP_PUSHDATA4, OP_1NEGATE, OP_RESERVED, OP_1, OP_TRUE, OP_2, OP_3, OP_4, OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP_11, OP_12, OP_13, OP_14, OP_15, OP_16, OP_NOP, OP_VER, OP_IF, OP_NOTIF, OP_VERIF, OP_VERNOTIF, OP_ELSE, OP_ENDIF, OP_VERIFY, OP_RETURN, OP_TOALTSTACK, OP_FROMALTSTACK, OP_2DROP, OP_2DUP, OP_3DUP, OP_2OVER, OP_2ROT, OP_2SWAP, OP_IFDUP, OP_DEPTH, OP_DROP, OP_DUP, OP_NIP, OP_OVER, OP_PICK, OP_ROLL, OP_ROT, OP_SWAP, OP_TUCK, OP_CAT, OP_SIZE, OP_SPLIT, OP_NUM2BIN, OP_BIN2NUM, OP_INVERT, OP_AND, OP_OR, OP_XOR, OP_EQUAL, OP_EQUALVERIFY, OP_RESERVED1, OP_RESERVED2, OP_1ADD, OP_1SUB, OP_2MUL, OP_2DIV, OP_NEGATE, OP_ABS, OP_NOT, OP_0NOTEQUAL, OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD, OP_LSHIFT, OP_RSHIFT, OP_BOOLAND, OP_BOOLOR, OP_NUMEQUAL, OP_NUMEQUALVERIFY, OP_NUMNOTEQUAL, OP_LESSTHAN, OP_GREATERTHAN, OP_LESSTHANOREQUAL, OP_GREATERTHANOREQUAL, OP_MIN, OP_MAX, OP_WITHIN, OP_RIPEMD160, OP_SHA1, OP_SHA256, OP_HASH160, OP_HASH256, OP_CODESEPARATOR, OP_CHECKSIG, OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_CHECKLOCKTIMEVERIFY, OP_CHECKSEQUENCEVERIFY, OP_PUBKEYHASH, OP_PUBKEY, OP_INVALIDOPCODE, OP_NOP1, OP_NOP4, OP_NOP5, OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10
-    
+    case OP_0, OP_FALSE, OP_PUSHDATA1, OP_PUSHDATA2, OP_PUSHDATA4, OP_1NEGATE, OP_RESERVED, OP_1, OP_TRUE, OP_2, OP_3, OP_4, OP_5, OP_6, OP_7, OP_8, OP_9,
+        OP_10, OP_11, OP_12, OP_13, OP_14, OP_15, OP_16, OP_NOP, OP_VER, OP_IF, OP_NOTIF, OP_VERIF, OP_VERNOTIF, OP_ELSE, OP_ENDIF, OP_VERIFY, OP_RETURN,
+        OP_TOALTSTACK, OP_FROMALTSTACK, OP_2DROP, OP_2DUP, OP_3DUP, OP_2OVER, OP_2ROT, OP_2SWAP, OP_IFDUP, OP_DEPTH, OP_DROP, OP_DUP, OP_NIP, OP_OVER, OP_PICK,
+        OP_ROLL, OP_ROT, OP_SWAP, OP_TUCK, OP_CAT, OP_SIZE, OP_SPLIT, OP_NUM2BIN, OP_BIN2NUM, OP_INVERT, OP_AND, OP_OR, OP_XOR, OP_EQUAL, OP_EQUALVERIFY,
+        OP_RESERVED1, OP_RESERVED2, OP_1ADD, OP_1SUB, OP_2MUL, OP_2DIV, OP_NEGATE, OP_ABS, OP_NOT, OP_0NOTEQUAL, OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD,
+        OP_LSHIFT, OP_RSHIFT, OP_BOOLAND, OP_BOOLOR, OP_NUMEQUAL, OP_NUMEQUALVERIFY, OP_NUMNOTEQUAL, OP_LESSTHAN, OP_GREATERTHAN, OP_LESSTHANOREQUAL,
+        OP_GREATERTHANOREQUAL, OP_MIN, OP_MAX, OP_WITHIN, OP_RIPEMD160, OP_SHA1, OP_SHA256, OP_HASH160, OP_HASH256, OP_CODESEPARATOR, OP_CHECKSIG,
+        OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_CHECKLOCKTIMEVERIFY, OP_CHECKSEQUENCEVERIFY, OP_PUBKEYHASH, OP_PUBKEY, OP_INVALIDOPCODE,
+        OP_NOP1, OP_NOP4, OP_NOP5, OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10
+
     static let p2pkhStart = Data([OpCode.OP_DUP.value, OpCode.OP_HASH160.value])
     static let p2pkhFinish = Data([OpCode.OP_EQUALVERIFY.value, OpCode.OP_CHECKSIG.value])
     static let p2pkFinish = Data([OpCode.OP_CHECKSIG.value])
     static let p2shStart = Data([OpCode.OP_HASH160.value])
     static let p2shFinish = Data([OpCode.OP_EQUAL.value])
-    
+
     static let pFromShCodes = [
         OpCode.OP_CHECKSIG.value,
         OpCode.OP_CHECKSIGVERIFY.value,
         OpCode.OP_CHECKMULTISIG.value,
         OpCode.OP_CHECKMULTISIGVERIFY.value
     ]
-    
+
     static let pushData1: UInt8 = 0x4c
     static let pushData2: UInt8 = 0x4d
     static let pushData4: UInt8 = 0x4e
@@ -54,7 +62,7 @@ public enum OpCode: OpCodeProtocol {
         case .OP_PUSHDATA2: return OpPushData2()
         case .OP_PUSHDATA4: return OpPushData4()
         case .OP_1NEGATE: return Op1Negate()
-        case .OP_RESERVED: return OpReserved() // reserved and fail if executed
+        case .OP_RESERVED: return OpReserved()  // reserved and fail if executed
         case .OP_1: return OpN(1)
         case .OP_TRUE: return OpCode.OP_1.opcode
         case .OP_2: return OpN(2)
@@ -120,8 +128,8 @@ public enum OpCode: OpCodeProtocol {
         case .OP_XOR: return OpXor()
         case .OP_EQUAL: return OpEqual()
         case .OP_EQUALVERIFY: return OpEqualVerify()
-        case .OP_RESERVED1: return OpReserved1() // reserved and fail if executed
-        case .OP_RESERVED2: return OpReserved2() // reserved and fail if executed
+        case .OP_RESERVED1: return OpReserved1()  // reserved and fail if executed
+        case .OP_RESERVED2: return OpReserved2()  // reserved and fail if executed
 
         // 6. Arithmetic
         case .OP_1ADD: return Op1Add()
@@ -165,8 +173,8 @@ public enum OpCode: OpCodeProtocol {
         case .OP_CHECKMULTISIGVERIFY: return OpCheckMultiSigVerify()
 
         // Lock Times
-        case .OP_CHECKLOCKTIMEVERIFY: return OpCheckLockTimeVerify() // previously OP_NOP2
-        case .OP_CHECKSEQUENCEVERIFY: return OpCheckSequenceVerify() // previously OP_NOP3
+        case .OP_CHECKLOCKTIMEVERIFY: return OpCheckLockTimeVerify()  // previously OP_NOP2
+        case .OP_CHECKSEQUENCEVERIFY: return OpCheckSequenceVerify()  // previously OP_NOP3
 
         // Pseudo Words
         case .OP_PUBKEYHASH: return OpPubkeyHash()
@@ -186,7 +194,17 @@ public enum OpCode: OpCodeProtocol {
     }
 
     // swiftlint:disable:next line_length
-    internal static let list: [OpCode] = [OP_0, OP_FALSE, OP_PUSHDATA1, OP_PUSHDATA2, OP_PUSHDATA4, OP_1NEGATE, OP_RESERVED, OP_1, OP_TRUE, OP_2, OP_3, OP_4, OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP_11, OP_12, OP_13, OP_14, OP_15, OP_16, OP_NOP, OP_VER, OP_IF, OP_NOTIF, OP_VERIF, OP_VERNOTIF, OP_ELSE, OP_ENDIF, OP_VERIFY, OP_RETURN, OP_TOALTSTACK, OP_FROMALTSTACK, OP_2DROP, OP_2DUP, OP_3DUP, OP_2OVER, OP_2ROT, OP_2SWAP, OP_IFDUP, OP_DEPTH, OP_DROP, OP_DUP, OP_NIP, OP_OVER, OP_PICK, OP_ROLL, OP_ROT, OP_SWAP, OP_TUCK, OP_CAT, OP_SIZE, OP_SPLIT, OP_NUM2BIN, OP_INVERT, OP_AND, OP_OR, OP_XOR, OP_EQUAL, OP_EQUALVERIFY, OP_RESERVED1, OP_RESERVED2, OP_BIN2NUM, OP_1ADD, OP_1SUB, OP_2MUL, OP_2DIV, OP_NEGATE, OP_ABS, OP_NOT, OP_0NOTEQUAL, OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD, OP_LSHIFT, OP_RSHIFT, OP_BOOLAND, OP_BOOLOR, OP_NUMEQUAL, OP_NUMEQUALVERIFY, OP_NUMNOTEQUAL, OP_LESSTHAN, OP_GREATERTHAN, OP_LESSTHANOREQUAL, OP_GREATERTHANOREQUAL, OP_MIN, OP_MAX, OP_WITHIN, OP_RIPEMD160, OP_SHA1, OP_SHA256, OP_HASH160, OP_HASH256, OP_CODESEPARATOR, OP_CHECKSIG, OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_CHECKLOCKTIMEVERIFY, OP_CHECKSEQUENCEVERIFY, OP_PUBKEYHASH, OP_PUBKEY, OP_INVALIDOPCODE, OP_NOP1, OP_NOP4, OP_NOP5, OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10]
+    internal static let list: [OpCode] = [
+        OP_0, OP_FALSE, OP_PUSHDATA1, OP_PUSHDATA2, OP_PUSHDATA4, OP_1NEGATE, OP_RESERVED, OP_1, OP_TRUE, OP_2, OP_3, OP_4, OP_5, OP_6, OP_7, OP_8, OP_9, OP_10,
+        OP_11, OP_12, OP_13, OP_14, OP_15, OP_16, OP_NOP, OP_VER, OP_IF, OP_NOTIF, OP_VERIF, OP_VERNOTIF, OP_ELSE, OP_ENDIF, OP_VERIFY, OP_RETURN,
+        OP_TOALTSTACK, OP_FROMALTSTACK, OP_2DROP, OP_2DUP, OP_3DUP, OP_2OVER, OP_2ROT, OP_2SWAP, OP_IFDUP, OP_DEPTH, OP_DROP, OP_DUP, OP_NIP, OP_OVER, OP_PICK,
+        OP_ROLL, OP_ROT, OP_SWAP, OP_TUCK, OP_CAT, OP_SIZE, OP_SPLIT, OP_NUM2BIN, OP_INVERT, OP_AND, OP_OR, OP_XOR, OP_EQUAL, OP_EQUALVERIFY, OP_RESERVED1,
+        OP_RESERVED2, OP_BIN2NUM, OP_1ADD, OP_1SUB, OP_2MUL, OP_2DIV, OP_NEGATE, OP_ABS, OP_NOT, OP_0NOTEQUAL, OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD,
+        OP_LSHIFT, OP_RSHIFT, OP_BOOLAND, OP_BOOLOR, OP_NUMEQUAL, OP_NUMEQUALVERIFY, OP_NUMNOTEQUAL, OP_LESSTHAN, OP_GREATERTHAN, OP_LESSTHANOREQUAL,
+        OP_GREATERTHANOREQUAL, OP_MIN, OP_MAX, OP_WITHIN, OP_RIPEMD160, OP_SHA1, OP_SHA256, OP_HASH160, OP_HASH256, OP_CODESEPARATOR, OP_CHECKSIG,
+        OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_CHECKLOCKTIMEVERIFY, OP_CHECKSEQUENCEVERIFY, OP_PUBKEYHASH, OP_PUBKEY, OP_INVALIDOPCODE,
+        OP_NOP1, OP_NOP4, OP_NOP5, OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10
+    ]
 
     public var name: String {
         return opcode.name
@@ -203,7 +221,7 @@ public enum OpCode: OpCodeProtocol {
     public func mainProcess(_ context: ScriptExecutionContext) throws {
         try opcode.mainProcess(context)
     }
-    
+
     public static func push(_ value: Int) -> Data {
         guard value != 0 else {
             return Data([0])
@@ -213,7 +231,7 @@ public enum OpCode: OpCodeProtocol {
         }
         return Data([UInt8(value + 0x50)])
     }
-    
+
     public static func push(_ data: Data) -> Data {
         let length = data.count
         var bytes = Data()
@@ -222,13 +240,13 @@ public enum OpCode: OpCodeProtocol {
         case 0x00...0x4b: bytes = Data([UInt8(length)])
         case 0x4c...0xff: bytes = Data([OpCode.pushData1]) + UInt8(length).littleEndian
         case 0x0100...0xffff: bytes = Data([OpCode.pushData2]) + UInt16(length).littleEndian
-        case 0x10000...0xffffffff: bytes = Data([OpCode.pushData4]) + UInt32(length).littleEndian
+        case 0x10000...0xffff_ffff: bytes = Data([OpCode.pushData4]) + UInt32(length).littleEndian
         default: return data
         }
 
         return bytes + data
     }
-    
+
     public static func segWitOutputScript(_ data: Data, versionByte: Int = 0) -> Data {
         return OpCode.push(versionByte) + OpCode.push(data)
     }

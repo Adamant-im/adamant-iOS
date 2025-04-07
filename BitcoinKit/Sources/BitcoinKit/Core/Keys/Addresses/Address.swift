@@ -1,6 +1,6 @@
 //
 //  Address.swift
-//  
+//
 //
 //  Created by Andrey Golubenko on 05.06.2023.
 //
@@ -15,7 +15,7 @@ public protocol AddressProtocol {
 }
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-public typealias Address = AddressProtocol & QRCodeConvertible
+    public typealias Address = AddressProtocol & QRCodeConvertible
 #else
-public typealias Address = AddressProtocol
+    public typealias Address = AddressProtocol
 #endif

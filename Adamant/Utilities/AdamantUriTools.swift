@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 enum AdamantUri {
     case passphrase(passphrase: String)
@@ -20,13 +20,13 @@ enum AdamantAddressParam {
     case label(String)
     case message(String)
     case amount(Double)
-    
+
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
         if keyValue.count != 2 {
             return nil
         }
-        
+
         switch keyValue[0] {
         case "address":
             self = .address(String(keyValue[1]))
@@ -41,7 +41,7 @@ enum AdamantAddressParam {
             return nil
         }
     }
-    
+
     var encoded: String {
         switch self {
         case .address(let value):
@@ -59,10 +59,10 @@ enum AdamantAddressParam {
 final class AdamantUriTools {
     static func encode(request: AdamantUri) -> String {
         switch request {
-        case .passphrase(passphrase: let passphrase):
+        case .passphrase(let passphrase):
             return passphrase
-            
-        case .address(address: let address, params: let params):
+
+        case .address(let address, let params):
             var components = URLComponents()
             components.scheme = "https"
             components.host = "msg.adamant.im"
@@ -82,16 +82,16 @@ final class AdamantUriTools {
                     components.queryItems?.append(.init(name: "amount", value: String(value)))
                 }
             }
-            
+
             guard let uri = components.url?.absoluteString else { return "" }
 
             return uri
-        case .addressLegacy(address: let address, params: let params):
+        case .addressLegacy(let address, let params):
             var components = URLComponents()
             components.scheme = AdmWalletService.qqPrefix
             components.host = address
             components.queryItems = (params?.count ?? .zero) > .zero ? [] : nil
-            
+
             params?.forEach {
                 switch $0 {
                 case .address:
@@ -104,50 +104,50 @@ final class AdamantUriTools {
                     components.queryItems?.append(.init(name: "amount", value: String(value)))
                 }
             }
-            
+
             guard let uri = components.url?.absoluteString.replacingOccurrences(of: "://", with: ":")
             else { return "" }
 
             return uri
         }
     }
-    
+
     static func decode(uri: String) -> AdamantUri? {
         if uri.count == 0 {
             return nil
         }
-        
+
         if AdamantUtilities.validateAdamantPassphrase(passphrase: uri) {
             return AdamantUri.passphrase(passphrase: uri)
         }
-        
+
         let request = uri.split(separator: ":")
         guard request.count == 2,
-              request[0].caseInsensitiveCompare(AdmWalletService.qqPrefix) == .orderedSame
+            request[0].caseInsensitiveCompare(AdmWalletService.qqPrefix) == .orderedSame
         else { return nil }
-        
+
         let addressAndParams = request[1].split(separator: "?")
         guard let addressRaw = addressAndParams.first else {
             return nil
         }
-        
+
         let address = String(addressRaw)
         switch AdamantUtilities.validateAdamantAddress(address: address) {
         case .valid:
             break
-            
+
         case .system, .invalid:
             return nil
         }
-        
+
         let params: [AdamantAddressParam]?
         if addressAndParams.count > 1 {
             var p = [AdamantAddressParam]()
-            
+
             for param in addressAndParams[1].split(separator: "&").compactMap({ AdamantAddressParam(raw: String($0)) }) {
                 p.append(param)
             }
-            
+
             if p.count > 0 {
                 params = p
             } else {
@@ -156,9 +156,9 @@ final class AdamantUriTools {
         } else {
             params = nil
         }
-        
+
         return AdamantUri.address(address: address, params: params)
     }
-    
+
     private init() {}
 }

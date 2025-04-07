@@ -10,7 +10,7 @@ import CommonKit
 
 struct UserDefaultsManager {
     @UserDefaultsStorage(.needsToShowNoActiveNodesAlert) static var needsToShowNoActiveNodesAlert: Bool?
-    
+
     static func setInitialUserDefaults() {
         needsToShowNoActiveNodesAlert = true
     }

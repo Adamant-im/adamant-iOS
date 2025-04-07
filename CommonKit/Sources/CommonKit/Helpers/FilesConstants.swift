@@ -1,6 +1,6 @@
 //
 //  FilesConstants.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 10.04.2024.
 //

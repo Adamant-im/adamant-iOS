@@ -8,38 +8,38 @@
 
 import AdamantWalletsKit
 import CommonKit
-import UIKit
 import SnapKit
+import UIKit
 
 final class TokensAndCoinsViewController: UIViewController {
     private lazy var tableView: UITableView = .init(frame: view.bounds)
-    
+
     private var chainsData: [AnyBlockchain] = []
     private var coinsData: [CoinInfoDTO] = []
     private let dialogService: DialogService?
-    
+
     init(dialogService: DialogService?) {
         self.dialogService = dialogService
         super.init(nibName: nil, bundle: nil)
         title = "Coins and Tokens storage"
         setupDataSource()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
-    
+
     private func setupDataSource() {
         guard let coinsData = CoinInfoProvider.storage?.getCoinsAndChains() else { return }
         self.chainsData = coinsData.chains.map { $0.key }.sorted(by: { $0.rawValue < $1.rawValue })
         self.coinsData = coinsData.coins.sorted(by: { $0.key < $1.key }).map({ $0.value })
     }
-    
+
     private func setupViews() {
         view.addSubview(tableView)
         view.backgroundColor = .white
@@ -54,7 +54,7 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
     func numberOfSections(in tableView: UITableView) -> Int {
         2
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             chainsData.count
@@ -62,7 +62,7 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
             coinsData.count
         }
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             cellForChain(at: indexPath, in: tableView)
@@ -70,7 +70,7 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
             cellForCoin(at: indexPath, in: tableView)
         }
     }
-    
+
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
             "Blockchains"
@@ -78,13 +78,13 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
             "Coins"
         }
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let viewController = viewControllerFor(indexPath: indexPath)
         navigationController?.pushViewController(viewController, animated: true)
     }
-    
+
     private func viewControllerFor(indexPath: IndexPath) -> UIViewController {
         if indexPath.section == 0 {
             let chain = chainsData[indexPath.row]
@@ -98,7 +98,7 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
             return CoinInfoDTOViewController(coinInfo: model, dialogService: dialogService)
         }
     }
-    
+
     private func cellForChain(at indexPath: IndexPath, in tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         var config = cell.defaultContentConfiguration()
@@ -106,7 +106,7 @@ extension TokensAndCoinsViewController: UITableViewDataSource, UITableViewDelega
         cell.contentConfiguration = config
         return cell
     }
-    
+
     private func cellForCoin(at indexPath: IndexPath, in tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         var config = cell.defaultContentConfiguration()

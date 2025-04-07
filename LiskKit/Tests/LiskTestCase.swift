@@ -6,6 +6,7 @@
 //
 
 import XCTest
+
 @testable import LiskKit
 
 class LiskTestCase: XCTestCase {

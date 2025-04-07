@@ -6,16 +6,16 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-@preconcurrency import LiskKit
-import Foundation
 import CommonKit
+import Foundation
+@preconcurrency import LiskKit
 
 final class KlyServiceApiCore: KlyApiCore, @unchecked Sendable {
     override func getStatusInfo(
         origin: NodeOrigin
     ) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        
+
         return await request(origin: origin) { client in
             let service = LiskKit.Service(client: client)
             return try await (fee: service.fees(), info: service.info())
@@ -33,19 +33,19 @@ final class KlyServiceApiCore: KlyApiCore, @unchecked Sendable {
 
 final class KlyServiceApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyServiceApiCore>
-    
+
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { api.nodesInfo }
-    
+
     func healthCheck() { api.healthCheck() }
-    
+
     init(api: BlockchainHealthCheckWrapper<KlyServiceApiCore>) {
         self.api = api
     }
-    
+
     func requestServiceApi<Output>(
         waitsForConnectivity: Bool,
         body: @escaping @Sendable (
@@ -57,7 +57,7 @@ final class KlyServiceApiService: ApiServiceProtocol {
             body(.init(client: client, version: .v3), completion)
         }
     }
-    
+
     func requestServiceApi<Output>(
         waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (LiskKit.Service) async throws -> Output
@@ -68,8 +68,8 @@ final class KlyServiceApiService: ApiServiceProtocol {
     }
 }
 
-private extension KlyServiceApiService {
-    func requestClient<Output>(
+extension KlyServiceApiService {
+    fileprivate func requestClient<Output>(
         waitsForConnectivity: Bool,
         body: @escaping @Sendable (
             _ client: APIClient,
@@ -80,8 +80,8 @@ private extension KlyServiceApiService {
             await core.request(origin: origin, body: body)
         }
     }
-    
-    func requestClient<Output>(
+
+    fileprivate func requestClient<Output>(
         waitsForConnectivity: Bool,
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {

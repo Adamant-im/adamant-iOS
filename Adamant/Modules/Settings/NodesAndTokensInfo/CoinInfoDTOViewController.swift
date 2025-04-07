@@ -7,8 +7,8 @@
 //
 
 import AdamantWalletsKit
-import UIKit
 import CommonKit
+import UIKit
 
 private protocol AnyPrimitive: Sendable {}
 
@@ -22,23 +22,23 @@ final class CoinInfoDTOViewController: UIViewController {
     private var keys: [String] = []
     private lazy var tableView: UITableView = .init(frame: view.bounds)
     private let dialogService: DialogService?
-    
+
     init(coinInfo: CoinInfoDTO, dialogService: DialogService?) {
         self.dialogService = dialogService
         super.init(nibName: nil, bundle: nil)
         setDataSource(for: coinInfo)
         title = "Description for \(coinInfo.symbol.uppercased())"
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
-    
+
     private func setupViews() {
         view.addSubview(tableView)
         view.backgroundColor = .white
@@ -47,7 +47,7 @@ final class CoinInfoDTOViewController: UIViewController {
         tableView.delegate = self
         tableView.reloadData()
     }
-    
+
     private func setDataSource(for coinInfo: CoinInfoDTO) {
         guard let data = try? JSONEncoder().encode(coinInfo) else { return }
 
@@ -108,7 +108,7 @@ extension CoinInfoDTOViewController: UITableViewDataSource, UITableViewDelegate 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         keys.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         var config = cell.defaultContentConfiguration()
@@ -118,14 +118,14 @@ extension CoinInfoDTOViewController: UITableViewDataSource, UITableViewDelegate 
         cell.contentConfiguration = config
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if let cell = tableView.cellForRow(at: indexPath),
-           let value = (cell.contentConfiguration as? UIListContentConfiguration)?.secondaryText {
+            let value = (cell.contentConfiguration as? UIListContentConfiguration)?.secondaryText
+        {
             UIPasteboard.general.string = value
             dialogService?.showToastMessage("Value copied")
         }
     }
 }
-

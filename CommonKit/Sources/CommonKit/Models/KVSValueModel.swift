@@ -9,7 +9,7 @@ public struct KVSValueModel: Sendable {
     public let key: String
     public let value: String
     public let keypair: Keypair
-    
+
     public init(
         key: String,
         value: String,

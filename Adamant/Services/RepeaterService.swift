@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 final class RepeaterService {
     private class Client: @unchecked Sendable {
@@ -15,28 +15,28 @@ final class RepeaterService {
         let queue: DispatchQueue?
         var timer: Timer?
         let callback: @Sendable () -> Void
-        
+
         init(interval: TimeInterval, queue: DispatchQueue?, callback: @escaping @Sendable () -> Void) {
             self.interval = interval
             self.queue = queue
             self.callback = callback
         }
     }
-    
+
     // MARK: Properties
     @Atomic private var foregroundTimers = [String: Client]()
     @Atomic private(set) var isPaused = false
-    
+
     private let pauseLock = NSLock()
-    
+
     deinit {
-//        DispatchQueue.main.async {
-//            for (_, timer) in foregroundTimers {
-//                timer.invalidate()
-//            }
-//        }
+        //        DispatchQueue.main.async {
+        //            for (_, timer) in foregroundTimers {
+        //                timer.invalidate()
+        //            }
+        //        }
     }
-    
+
     /// Register a function to call each seconds on specified queue.
     ///
     /// - Parameters:
@@ -46,66 +46,66 @@ final class RepeaterService {
     ///   - call: function to call
     func registerForegroundCall(label: String, interval: TimeInterval, queue: DispatchQueue?, callback: @escaping @Sendable () -> Void) {
         let client = Client(interval: interval, queue: queue, callback: callback)
-        
+
         if let t = foregroundTimers[label]?.timer {
             t.invalidate()
         }
-        
+
         foregroundTimers[label] = client
-        
+
         // Start timer
         pauseLock.lock()
         defer { pauseLock.unlock() }
-        
+
         if !isPaused {
             let timer = Timer(timeInterval: interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
             client.timer = timer
-            
+
             RunLoop.main.add(timer, forMode: .common)
         }
     }
-    
+
     func unregisterForegroundCall(label: String) {
         if let client = foregroundTimers[label] {
             client.timer?.invalidate()
             foregroundTimers.removeValue(forKey: label)
         }
     }
-    
+
     func pauseAll() {
         pauseLock.lock()
         defer { pauseLock.unlock() }
-        
+
         if isPaused {
             return
         }
-        
+
         for (_, client) in self.foregroundTimers {
             client.timer?.invalidate()
             client.timer = nil
         }
-        
+
         isPaused = true
     }
-    
+
     func resumeAll() {
         pauseLock.lock()
         defer { pauseLock.unlock() }
-        
+
         if !isPaused {
             return
         }
-        
+
         for (_, client) in self.foregroundTimers {
             let timer = Timer(timeInterval: client.interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
             client.timer = timer
-            
+
             RunLoop.main.add(timer, forMode: .common)
         }
-        
+
         isPaused = false
     }
-    
+
     @objc private func timerFired(timer: Timer) {
         if let client = timer.userInfo as? Client {
             let queue = client.queue ?? DispatchQueue.main

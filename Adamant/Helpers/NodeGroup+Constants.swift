@@ -1,3 +1,4 @@
+import CommonKit
 //
 //  NodeGroup+Constants.swift
 //  Adamant
@@ -6,7 +7,6 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 import Foundation
-import CommonKit
 
 extension NodeGroup {
     var onScreenUpdateInterval: TimeInterval {
@@ -26,7 +26,7 @@ extension NodeGroup {
         case .dash:
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
         case .ipfs:
-            return 10 // TODO: Fix the adamant-wallets script and the repo itself
+            return 10  // TODO: Fix the adamant-wallets script and the repo itself
         case .infoService:
             return AdmWalletService.healthCheckParameters.onScreenServiceUpdateInterval
         }
@@ -100,7 +100,7 @@ extension NodeGroup {
             return AdmWalletService.healthCheckParameters.normalServiceUpdateInterval
         }
     }
-    
+
     var minNodeVersion: Version? {
         let version: String?
         switch self {
@@ -121,11 +121,11 @@ extension NodeGroup {
         case .ipfs, .infoService:
             version = nil
         }
-        guard let version = version  else { return nil }
-        
+        guard let version = version else { return nil }
+
         return .init(version)
     }
-    
+
     var name: String {
         switch self {
         case .btc:
@@ -136,7 +136,7 @@ extension NodeGroup {
             return KlyWalletService.tokenNetworkSymbol
         case .klyService:
             return KlyWalletService.tokenNetworkSymbol
-            + " " + .adamant.coinsNodesList.serviceNode
+                + " " + .adamant.coinsNodesList.serviceNode
         case .doge:
             return DogeWalletService.tokenNetworkSymbol
         case .dash:
@@ -149,7 +149,7 @@ extension NodeGroup {
             return InfoService.name
         }
     }
-    
+
     var heightType: Node.HeightType? {
         switch self {
         case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
@@ -158,7 +158,7 @@ extension NodeGroup {
             .date
         }
     }
-    
+
     var blockchainHealthCheckParams: BlockchainHealthCheckParams {
         .init(
             group: self,

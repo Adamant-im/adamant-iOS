@@ -29,7 +29,7 @@ public struct Op1Add: OpCodeProtocol {
     public var name: String { return "OP_1ADD" }
 
     // (in -- out)
-     public func mainProcess(_ context: ScriptExecutionContext) throws {
+    public func mainProcess(_ context: ScriptExecutionContext) throws {
         try context.assertStackHeightGreaterThanOrEqual(1)
 
         let input = try context.number(at: -1)

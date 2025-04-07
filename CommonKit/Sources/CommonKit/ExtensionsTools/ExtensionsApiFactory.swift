@@ -9,37 +9,39 @@ import Combine
 
 public struct ExtensionsApiFactory {
     public let core: AdamantCore
-    public let securedStore: SecuredStore
-    
-    public init(core: AdamantCore, securedStore: SecuredStore) {
+    public let SecureStore: SecureStore
+
+    public init(core: AdamantCore, SecureStore: SecureStore) {
         self.core = core
-        self.securedStore = securedStore
+        self.SecureStore = SecureStore
     }
-    
+
     public func make() -> ExtensionsApi {
-        .init(apiService: AdamantApiService(
-            healthCheckWrapper: .init(
-                service: AdamantApiCore(apiCore: APICore()),
-                nodesStorage: NodesStorage(
-                    securedStore: securedStore,
-                    nodesMergingService: NodesMergingService(),
-                    defaultNodes: { _ in .init() }
+        .init(
+            apiService: AdamantApiService(
+                healthCheckWrapper: .init(
+                    service: AdamantApiCore(apiCore: APICore()),
+                    nodesStorage: NodesStorage(
+                        SecureStore: SecureStore,
+                        nodesMergingService: NodesMergingService(),
+                        defaultNodes: { _ in .init() }
+                    ),
+                    nodesAdditionalParamsStorage: NodesAdditionalParamsStorage(
+                        SecureStore: SecureStore
+                    ),
+                    isActive: false,
+                    params: .init(
+                        group: .adm,
+                        name: "ADM",
+                        normalUpdateInterval: .infinity,
+                        crucialUpdateInterval: .infinity,
+                        minNodeVersion: nil,
+                        nodeHeightEpsilon: .zero
+                    ),
+                    connection: Just(true).eraseToAnyPublisher()
                 ),
-                nodesAdditionalParamsStorage: NodesAdditionalParamsStorage(
-                    securedStore: securedStore
-                ),
-                isActive: false,
-                params: .init(
-                    group: .adm,
-                    name: "ADM",
-                    normalUpdateInterval: .infinity,
-                    crucialUpdateInterval: .infinity,
-                    minNodeVersion: nil,
-                    nodeHeightEpsilon: .zero
-                ),
-                connection: Just(true).eraseToAnyPublisher()
-            ),
-            adamantCore: core
-        ))
+                adamantCore: core
+            )
+        )
     }
 }

@@ -12,7 +12,7 @@ public struct NodeOrigin: Codable, Equatable, Hashable, @unchecked Sendable {
     public var host: String
     public var port: Int?
     public var wsPort: Int?
-    
+
     public init(
         scheme: URLScheme,
         host: String,
@@ -26,8 +26,8 @@ public struct NodeOrigin: Codable, Equatable, Hashable, @unchecked Sendable {
     }
 }
 
-public extension NodeOrigin {
-    enum URLScheme: String, Codable, Sendable {
+extension NodeOrigin {
+    public enum URLScheme: String, Codable, Sendable {
         case http, https
 
         public static let `default`: URLScheme = .https
@@ -39,34 +39,34 @@ public extension NodeOrigin {
             }
         }
     }
-    
-    init(url: URL) {
+
+    public init(url: URL) {
         self.init(
             scheme: URLScheme(rawValue: url.scheme ?? .empty) ?? .https,
             host: url.host ?? .empty,
             port: url.port
         )
     }
-    
-    func asString() -> String {
+
+    public func asString() -> String {
         if let url = asURL(forcePort: scheme != .https) {
             return url.absoluteString
         } else {
             return host
         }
     }
-    
-    func asSocketURL() -> URL? {
+
+    public func asSocketURL() -> URL? {
         asURL(forcePort: false, useWsPort: true)
     }
 
-    func asURL() -> URL? {
+    public func asURL() -> URL? {
         asURL(forcePort: true)
     }
 }
 
-private extension NodeOrigin {
-    func asURL(forcePort: Bool, useWsPort: Bool = false) -> URL? {
+extension NodeOrigin {
+    fileprivate func asURL(forcePort: Bool, useWsPort: Bool = false) -> URL? {
         var components = URLComponents()
         components.scheme = scheme.rawValue
         components.host = host

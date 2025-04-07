@@ -6,17 +6,17 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
-import SwiftUI
 import FilesStorageKit
+import Foundation
+import SwiftUI
 
 @MainActor
 final class StorageUsageViewModel: ObservableObject {
     private let filesStorage: FilesStorageProtocol
     private let dialogService: DialogService
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
-    
+
     @Published var storageUsedDescription: String?
     @Published var autoDownloadPreview: DownloadPolicy = .everybody
     @Published var autoDownloadFullMedia: DownloadPolicy = .everybody
@@ -26,7 +26,7 @@ final class StorageUsageViewModel: ObservableObject {
     enum AutoDownloadMediaType {
         case preview
         case fullMedia
-        
+
         var title: String {
             switch self {
             case .preview:
@@ -36,7 +36,7 @@ final class StorageUsageViewModel: ObservableObject {
             }
         }
     }
-    
+
     init(
         filesStorage: FilesStorageProtocol,
         dialogService: DialogService,
@@ -46,19 +46,19 @@ final class StorageUsageViewModel: ObservableObject {
         self.dialogService = dialogService
         self.filesStorageProprieties = filesStorageProprieties
     }
-    
+
     func loadData() {
         autoDownloadPreview = filesStorageProprieties.autoDownloadPreviewPolicy()
         autoDownloadFullMedia = filesStorageProprieties.autoDownloadFullMediaPolicy()
         saveEncrypted = filesStorageProprieties.saveFileEncrypted()
         updateCacheSize()
     }
-    
+
     func saveFileEncrypted(_ value: Bool) {
         filesStorageProprieties.setSaveFileEncrypted(value)
         saveEncrypted = value
     }
-    
+
     func clearStorage() {
         do {
             dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
@@ -76,11 +76,11 @@ final class StorageUsageViewModel: ObservableObject {
             )
         }
     }
-    
+
     func presentPicker(for type: AutoDownloadMediaType) {
         let action: ((DownloadPolicy) -> Void)? = { [weak self] policy in
             guard let self = self else { return }
-            
+
             switch type {
             case .preview:
                 self.filesStorageProprieties.setAutoDownloadPreview(policy)
@@ -91,7 +91,7 @@ final class StorageUsageViewModel: ObservableObject {
             }
             NotificationCenter.default.post(name: .Storage.storageProprietiesUpdated, object: nil)
         }
-        
+
         dialogService.showAlert(
             title: nil,
             message: nil,
@@ -116,25 +116,25 @@ final class StorageUsageViewModel: ObservableObject {
     }
 }
 
-private extension StorageUsageViewModel {
-    func updateCacheSize() {
+extension StorageUsageViewModel {
+    fileprivate func updateCacheSize() {
         Task.detached { [filesStorage] in
             let size = (try? filesStorage.getCacheSize().get()) ?? .zero
-            
+
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 storageUsedDescription = formatSize(size)
             }
         }
     }
-    
-    func formatSize(_ bytes: Int64) -> String {
+
+    fileprivate func formatSize(_ bytes: Int64) -> String {
         if #available(iOS 16.0, *) {
             let count = Measurement(
                 value: Double(bytes),
                 unit: UnitInformationStorage.bytes
             )
-            
+
             let style = Measurement.FormatStyle.ByteCount(
                 style: .file,
                 allowedUnits: .all,
@@ -142,10 +142,10 @@ private extension StorageUsageViewModel {
                 includesActualByteCount: false,
                 locale: String.locale()
             )
-            
+
             return style.format(count)
         }
-        
+
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = .useAll
         formatter.countStyle = .file
@@ -153,16 +153,16 @@ private extension StorageUsageViewModel {
     }
 }
 
-private extension StorageUsageViewModel {
-    func makeAction(title: String, action: ((UIAlertAction) -> Void)?) -> UIAlertAction {
+extension StorageUsageViewModel {
+    fileprivate func makeAction(title: String, action: ((UIAlertAction) -> Void)?) -> UIAlertAction {
         .init(
             title: title,
             style: .default,
             handler: action
         )
     }
-    
-    func makeCancelAction() -> UIAlertAction {
+
+    fileprivate func makeCancelAction() -> UIAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }

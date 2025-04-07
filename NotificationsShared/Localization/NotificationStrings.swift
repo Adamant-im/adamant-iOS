@@ -13,47 +13,47 @@ enum NotificationStrings {
         "NotificationsService.Error.RegistrationRemotesFormat",
         comment: "Notifications: Something went wrong while registering remote notifications. %@ for description"
     )
-    
+
     static let newMessageTitle = NSLocalizedString(
         "NotificationsService.NewMessage.Title",
         comment: "Notifications: New message notification title"
     )
-    
+
     static let newMessageBodySingle = NSLocalizedString(
         "Notifications: New single message notification body",
         comment: "Notifications: Something went wrong while registering remote notifications. %@ for description"
     )
-    
+
     static let newTransferTitle = NSLocalizedString(
         "NotificationsService.NewTransfer.Title",
         comment: "Notifications: New transfer transaction title"
     )
-    
+
     static let newTransferBodySingle = NSLocalizedString(
         "NotificationsService.NewTransfer.BodySingle",
         comment: "Notifications: New single transfer transaction body"
     )
-    
+
     static let notificationsDisabled = NSLocalizedString(
         "NotificationsService.NotificationsDisabled",
         comment: "Notifications disabled. You can enable notifications in Settings"
     )
-    
+
     static let notStayedLoggedIn = NSLocalizedString(
         "NotificationsService.NotStayedLoggedIn",
         comment: "Can't turn on notifications without staying logged in"
     )
-    
+
     static let reacted = NSLocalizedString(
         "NotificationsService.Reacted",
         comment: "Notifications: Reacted"
     )
-    
+
     static let modifiedReaction = NSLocalizedString(
         "NotificationsService.ModifiedReaction",
         comment: "Notifications: Modified Reaction"
     )
-    
+
     static func newTransferBody(_ count: Int) -> String {
         .localizedStringWithFormat(
             NSLocalizedString(
@@ -63,7 +63,7 @@ enum NotificationStrings {
             count
         )
     }
-    
+
     static func newMessageBody(_ count: Int) -> String {
         .localizedStringWithFormat(
             NSLocalizedString(

@@ -23,6 +23,7 @@
 //
 
 import Foundation
+
 // Any opcode with value < PUSHDATA1 is a length of the string to be pushed on the stack.
 // So opcode 0x01 is followed by 1 byte of data, 0x09 by 9 bytes and so on up to 0x4b (75 bytes)
 // PUSHDATA<N> opcode is followed by N-byte length of the string that follows.

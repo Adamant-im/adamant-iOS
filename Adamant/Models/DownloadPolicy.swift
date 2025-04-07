@@ -6,29 +6,29 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension Notification.Name {
-     struct Storage {
-         public static let storageClear = Notification.Name("adamant.storage.clear")
-         public static let storageProprietiesUpdated = Notification.Name("adamant.storage.ProprietiesUpdated")
-     }
- }
+    struct Storage {
+        public static let storageClear = Notification.Name("adamant.storage.clear")
+        public static let storageProprietiesUpdated = Notification.Name("adamant.storage.ProprietiesUpdated")
+    }
+}
 
- enum DownloadPolicy: String {
-     case everybody
-     case nobody
-     case contacts
+enum DownloadPolicy: String {
+    case everybody
+    case nobody
+    case contacts
 
-     var title: String {
-         switch self {
-         case .everybody:
-             return .localized("Storage.DownloadPolicy.Everybody.Title")
-         case .nobody:
-             return .localized("Storage.DownloadPolicy.Nobody.Title")
-         case .contacts:
-             return .localized("Storage.DownloadPolicy.Contacts.Title")
-         }
-     }
- }
+    var title: String {
+        switch self {
+        case .everybody:
+            return .localized("Storage.DownloadPolicy.Everybody.Title")
+        case .nobody:
+            return .localized("Storage.DownloadPolicy.Nobody.Title")
+        case .contacts:
+            return .localized("Storage.DownloadPolicy.Contacts.Title")
+        }
+    }
+}

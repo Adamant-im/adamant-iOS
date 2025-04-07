@@ -11,14 +11,14 @@ import UIKit
 extension NSAttributedString {
     func resolveLinkColor(_ color: UIColor = UIColor.adamant.active) -> NSMutableAttributedString {
         let mutableText = NSMutableAttributedString(attributedString: self)
-        
+
         mutableText.enumerateAttribute(
             .link,
             in: NSRange(location: 0, length: self.length),
             options: []
         ) { (value, range, _) in
             guard value != nil else { return }
-            
+
             mutableText.removeAttribute(.link, range: range)
             mutableText.addAttribute(
                 .foregroundColor,
@@ -26,7 +26,7 @@ extension NSAttributedString {
                 range: range
             )
         }
-        
+
         return mutableText
     }
 }

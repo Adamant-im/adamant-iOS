@@ -6,20 +6,20 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import SafariServices
-import Eureka
 import CommonKit
+import Eureka
+import SafariServices
+import UIKit
 
 extension String.adamant.wallets {
     static var adamant: String {
         String.localized("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
     }
-    
+
     static var sendAdm: String {
         String.localized("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
     }
-    
+
     static var buyAdmTokens: String {
         String.localized("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
     }
@@ -27,24 +27,30 @@ extension String.adamant.wallets {
     static var exchangeInChatAdmTokens: String {
         String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
     }
-    
+
     static var exchangesOnCoinMarketCap: String {
         String.localized("AccountTab.Row.ExchangesOnCoinMarketCap", comment: "Account tab: Exchanges on CMC")
     }
-    
+
     static var exchangesOnCoinGecko: String {
         String.localized("AccountTab.Row.ExchangesOnCoinGecko", comment: "Account tab: Exchanges on CoinGecko")
     }
-    
+
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
-        return String.localizedStringWithFormat(.localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
+        return String.localizedStringWithFormat(
+            .localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"),
+            address
+        )
     }
-    
+
     static func buyTokensUrl(for address: String) -> String {
-        return String.localizedStringWithFormat(.localized("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address"), address)
+        return String.localizedStringWithFormat(
+            .localized("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address"),
+            address
+        )
     }
-    
+
     static let getFreeTokensUrlFormat = ""
     static let buyTokensUrlFormat = ""
 }
@@ -53,7 +59,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
     // MARK: - Rows & Sections
     enum Rows {
         case stakeAdm, buyTokens, freeTokens
-        
+
         var tag: String {
             switch self {
             case .stakeAdm: return "stakeAdm"
@@ -61,7 +67,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             case .freeTokens: return "frrTkns"
             }
         }
-        
+
         var localized: String {
             switch self {
             case .stakeAdm: return .localized("AccountTab.Row.StakeAdm", comment: "Stake ADM tokens' row")
@@ -69,7 +75,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             case .freeTokens: return .localized("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
             }
         }
-        
+
         var image: UIImage? {
             switch self {
             case .stakeAdm: return .asset(named: "row_stake")
@@ -78,27 +84,27 @@ final class AdmWalletViewController: WalletViewControllerBase {
             }
         }
     }
-    
+
     // MARK: - Props & Deps
     var hideFreeTokensRow = false
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if let balance = service?.core.wallet?.balance {
             hideFreeTokensRow = balance > 0
         } else {
             hideFreeTokensRow = true
         }
-        
+
         guard let section = form.allSections.last else {
             return
         }
-        
+
         // MARK: Rows
-        
+
         let stakeAdmRow = LabelRow {
             $0.tag = Rows.stakeAdm.tag
             $0.title = Rows.stakeAdm.localized
@@ -108,7 +114,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.backgroundColor = UIColor.adamant.cellColor
         }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
-        
+
             row.title = Rows.stakeAdm.localized
         }.onCellSelection { [weak self] (_, row) in
             guard let self = self else { return }
@@ -116,13 +122,13 @@ final class AdmWalletViewController: WalletViewControllerBase {
             row.deselect()
 
             if let split = splitViewController {
-                let details = UINavigationController(rootViewController:vc)
+                let details = UINavigationController(rootViewController: vc)
                 split.showDetailViewController(details, sender: self)
             } else {
                 navigationController?.pushViewController(vc, animated: true)
             }
         }
-        
+
         let buyTokensRow = LabelRow {
             $0.tag = Rows.buyTokens.tag
             $0.title = Rows.buyTokens.localized
@@ -142,22 +148,25 @@ final class AdmWalletViewController: WalletViewControllerBase {
             row.deselect()
 
             if let split = splitViewController {
-                let details = UINavigationController(rootViewController:vc)
+                let details = UINavigationController(rootViewController: vc)
                 split.showDetailViewController(details, sender: self)
             } else {
                 navigationController?.pushViewController(vc, animated: true)
             }
         }
-        
+
         let freeTokensRow = LabelRow {
             $0.tag = Rows.freeTokens.tag
             $0.title = Rows.freeTokens.localized
             $0.cell.imageView?.image = Rows.freeTokens.image
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
             $0.cell.selectionStyle = .gray
-            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.hideFreeTokensRow ?? true
-            })
+            $0.hidden = Condition.function(
+                [],
+                { [weak self] _ -> Bool in
+                    return self?.hideFreeTokensRow ?? true
+                }
+            )
             $0.cell.backgroundColor = UIColor.adamant.cellColor
         }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
@@ -175,19 +184,19 @@ final class AdmWalletViewController: WalletViewControllerBase {
                     )
                     return
                 }
-                
+
                 let safari = SFSafariViewController(url: url)
                 safari.preferredControlTintColor = UIColor.adamant.primary
                 safari.modalPresentationStyle = .overFullScreen
                 self?.present(safari, animated: true, completion: nil)
             }
         }
-        
+
         section.append(stakeAdmRow)
         section.append(buyTokensRow)
         section.append(freeTokensRow)
-        
-         // Notifications
+
+        // Notifications
         if let service = service {
             NotificationCenter.default.addObserver(
                 forName: service.core.walletUpdatedNotification,
@@ -196,7 +205,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
             )
         }
-        
+
         NotificationCenter.default.addObserver(
             forName: .AdamantAccountService.userLoggedIn,
             object: nil,
@@ -207,18 +216,18 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 self?.tableView.reloadData()
             }
         }
-        
+
         setColors()
     }
-    
+
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.wallets.sendAdm)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
     }
-    
+
     override func adressRow() -> LabelRow {
         let addressRow = LabelRow {
             $0.tag = BaseRows.address.tag
@@ -242,51 +251,54 @@ final class AdmWalletViewController: WalletViewControllerBase {
             }
 
             if let address = self?.service?.core.wallet?.address,
-               let explorerAddress = self?.service?.core.explorerAddress,
-               let explorerAddressUrl = URL(string: explorerAddress + address) {
+                let explorerAddress = self?.service?.core.explorerAddress,
+                let explorerAddressUrl = URL(string: explorerAddress + address)
+            {
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
                 self?.dialogService.presentShareAlertFor(
                     stringForPasteboard: address,
                     stringForShare: encodedAddress,
                     stringForQR: encodedAddress,
-                    types: [.copyToPasteboard,
-                            .share,
-                            .generateQr(
-                                encodedContent: encodedAddress,
-                                sharingTip: address,
-                                withLogo: true
-                            ),
-                            .openInExplorer(url: explorerAddressUrl)
+                    types: [
+                        .copyToPasteboard,
+                        .share,
+                        .generateQr(
+                            encodedContent: encodedAddress,
+                            sharingTip: address,
+                            withLogo: true
+                        ),
+                        .openInExplorer(url: explorerAddressUrl)
                     ],
                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                     animated: true,
                     from: cell,
-                    completion: completion)
+                    completion: completion
+                )
             }
         }
         return addressRow
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = String.adamant.wallets.adamant
     }
-    
+
     func updateRows() {
         guard let admService = service?.core as? AdmWalletService,
-              let wallet = admService.wallet as? AdmWallet
+            let wallet = admService.wallet as? AdmWallet
         else {
             return
         }
-        
+
         hideFreeTokensRow = wallet.balance > 0
-        
+
         if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
             row.evaluateHidden()
         }
 
         NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
     }
-    
+
     override func includeLogoInQR() -> Bool {
         return true
     }

@@ -13,27 +13,27 @@ public enum RichMessageTools {
         guard let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) else {
             return nil
         }
-        
+
         switch jsonRaw {
-            // Valid format
-        case var json as [String:String]:
+        // Valid format
+        case var json as [String: String]:
             if let key = json[RichContentKeys.type] {
                 json[RichContentKeys.type] = key.lowercased()
             }
-            
+
             return json
-            
-            // Broken format, try to fix it
-        case var json as [String:Any]:
+
+        // Broken format, try to fix it
+        case var json as [String: Any]:
             if let key = json[RichContentKeys.type] as? String {
                 json[RichContentKeys.type] = key.lowercased()
             }
-            
+
             var fixedJson: [String: Any] = [:]
-            
+
             let formatter = AdamantBalanceFormat.rawNumberDotFormatter
             formatter.decimalSeparator = "."
-            
+
             for (key, raw) in json {
                 if let value = raw as? String {
                     fixedJson[key] = value
@@ -45,9 +45,9 @@ public enum RichMessageTools {
                     fixedJson[key] = raw
                 }
             }
-            
+
             return fixedJson
-            
+
         default:
             return nil
         }

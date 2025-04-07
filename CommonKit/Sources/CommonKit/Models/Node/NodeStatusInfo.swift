@@ -14,7 +14,7 @@ public struct NodeStatusInfo: Equatable, Sendable {
     public let wsEnabled: Bool
     public let wsPort: Int?
     public let version: Version?
-    
+
     public init(
         ping: TimeInterval,
         height: Int,

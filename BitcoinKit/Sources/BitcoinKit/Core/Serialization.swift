@@ -29,12 +29,12 @@ import Foundation
 // swiftlint:disable operator_whitespace
 
 protocol BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data
-    static func +=(lhs: inout Data, rhs: Self)
+    static func + (lhs: Data, rhs: Self) -> Data
+    static func += (lhs: inout Data, rhs: Self)
 }
 
 extension BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data {
+    static func + (lhs: Data, rhs: Self) -> Data {
         var value = rhs
         let data = withUnsafePointer(to: &value) { ptr -> Data in
             return Data(buffer: UnsafeBufferPointer(start: ptr, count: 1))
@@ -42,7 +42,7 @@ extension BinaryConvertible {
         return lhs + data
     }
 
-    static func +=(lhs: inout Data, rhs: Self) {
+    static func += (lhs: inout Data, rhs: Self) {
         lhs = lhs + rhs
     }
 }
@@ -58,19 +58,19 @@ extension Int64: BinaryConvertible {}
 extension Int: BinaryConvertible {}
 
 extension Bool: BinaryConvertible {
-    static func +(lhs: Data, rhs: Bool) -> Data {
+    static func + (lhs: Data, rhs: Bool) -> Data {
         return lhs + (rhs ? UInt8(0x01) : UInt8(0x00)).littleEndian
     }
 }
 
 extension String: BinaryConvertible {
-    static func +(lhs: Data, rhs: String) -> Data {
+    static func + (lhs: Data, rhs: String) -> Data {
         guard let data = rhs.data(using: .ascii) else { return lhs }
         return lhs + data
     }
 }
 
-func +(lhs: Data, rhs: OpCodeProtocol) -> Data {
+func + (lhs: Data, rhs: OpCodeProtocol) -> Data {
     return lhs + rhs.value
 }
 func += (lhs: inout Data, rhs: OpCodeProtocol) {
@@ -78,7 +78,7 @@ func += (lhs: inout Data, rhs: OpCodeProtocol) {
 }
 
 extension Data: BinaryConvertible {
-    static func +(lhs: Data, rhs: Data) -> Data {
+    static func + (lhs: Data, rhs: Data) -> Data {
         var data = Data()
         data.append(lhs)
         data.append(rhs)

@@ -6,15 +6,15 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 enum FileMessageStatus: Equatable {
     case busy
     case needToDownload(failed: Bool)
     case failed
     case success
-    
+
     var image: UIImage {
         switch self {
         case .busy: return .asset(named: "status_pending") ?? .init()
@@ -27,7 +27,7 @@ enum FileMessageStatus: Equatable {
             return .asset(named: "download-circular") ?? .init()
         }
     }
-    
+
     var imageTintColor: UIColor {
         switch self {
         case .busy, .needToDownload, .success: return .adamant.primary

@@ -6,33 +6,34 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import XCTest
-@testable import Adamant
-import Swinject
 import BitcoinKit
 import CommonKit
+import Swinject
+import XCTest
+
+@testable import Adamant
 
 final class DashWalletServiceIntegrationTests: XCTestCase {
-    
+
     private var apiCoreMock: APICoreProtocolMock!
     private var lastTransactionStorageMock: DashLastTransactionStorageProtocolMock!
     private var dashApiServiceProtocolMock: DashApiServiceProtocolMock!
     private var sut: DashWalletService!
-    
+
     override func setUp() {
         super.setUp()
         apiCoreMock = APICoreProtocolMock()
         dashApiServiceProtocolMock = DashApiServiceProtocolMock()
         dashApiServiceProtocolMock.api = DashApiCore(apiCore: apiCoreMock)
         lastTransactionStorageMock = DashLastTransactionStorageProtocolMock()
-        
+
         sut = DashWalletService()
         sut.lastTransactionStorage = lastTransactionStorageMock
         sut.addressConverter = AddressConverterFactory().make(network: DashMainnet())
         sut.dashApiService = dashApiServiceProtocolMock
         sut.transactionFactory = BitcoinKitTransactionFactory()
     }
-    
+
     override func tearDown() {
         apiCoreMock = nil
         dashApiServiceProtocolMock = nil
@@ -40,16 +41,31 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
         sut = nil
         super.tearDown()
     }
-    
+
     func test_createAndSendTransaction_createsValidTxIdAndHash() async throws {
-        // given
+        // GIVEN
         sut.setWalletForTests(try makeWallet())
         let data = Constants.unspentTranscationsData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(data), data: data, code: 200)
+            mock.given(
+                .sendRequestBasic(
+                    origin: .any,
+                    path: .any,
+                    method: .any,
+                    parameters: .any(DashGetUnspentTransactionDTO.self),
+                    encoding: .any,
+                    timeout: .any,
+                    downloadProgress: .any,
+                    willReturn: APIResponseModel(
+                        result: .success(data),
+                        data: data,
+                        code: 200
+                    )
+                )
+            )
         }
-        
-        // when 1
+
+        // WHEN 1
         let result = await Result(catchingAsync: {
             try await self.sut.createTransaction(
                 recipient: Constants.recipient,
@@ -58,34 +74,72 @@ final class DashWalletServiceIntegrationTests: XCTestCase {
                 comment: nil
             )
         })
-        
-        // then 1
+
+        // THEN 1
         let transaction = try XCTUnwrap(result.value)
         XCTAssertEqual(transaction.serialized().hex, Constants.expectedTransactionHex)
         XCTAssertEqual(transaction.txID, Constants.expectedTransactionID)
-        
-        // given 2
+
+        // GIVEN 2
         let txData = Constants.sendTransactionResponseData
         await apiCoreMock.isolated { mock in
-            mock.stubbedSendRequestBasicGenericResult = APIResponseModel(result: .success(txData), data: txData, code: 200)
+            mock.given(
+                .sendRequestBasic(
+                    origin: .any,
+                    path: .any,
+                    method: .any,
+                    parameters: .any(DashSendRawTransactionDTO.self),
+                    encoding: .any,
+                    timeout: .any,
+                    downloadProgress: .any,
+                    willReturn: APIResponseModel(
+                        result: .success(txData),
+                        data: txData,
+                        code: 200
+                    )
+                )
+            )
         }
-        
-        // when 2
+
+        // WHEN 2
         let result2 = await Result {
             try await self.sut.sendTransaction(transaction)
         }
-        // then 2
+        // THEN 2
         XCTAssertNil(result2.error)
         await apiCoreMock.isolated { mock in
-            XCTAssertEqual(mock.invokedSendRequestBasicGenericCount, 2)
+            mock.verify(
+                .sendRequestBasic(
+                    origin: .any,
+                    path: .any,
+                    method: .any,
+                    parameters: .any(DashGetUnspentTransactionDTO.self),
+                    encoding: .any,
+                    timeout: .any,
+                    downloadProgress: .any
+                ),
+                count: 1
+            )
+            mock.verify(
+                .sendRequestBasic(
+                    origin: .any,
+                    path: .any,
+                    method: .any,
+                    parameters: .any(DashSendRawTransactionDTO.self),
+                    encoding: .any,
+                    timeout: .any,
+                    downloadProgress: .any
+                ),
+                count: 1
+            )
         }
     }
 }
 
 // MARK: Private
 
-private extension DashWalletServiceIntegrationTests {
-    func makeWallet() throws -> DashWallet {
+extension DashWalletServiceIntegrationTests {
+    fileprivate func makeWallet() throws -> DashWallet {
         let privateKeyData = Constants.passphrase
             .data(using: .utf8)!
             .sha256()
@@ -103,15 +157,16 @@ private extension DashWalletServiceIntegrationTests {
 }
 
 private enum Constants {
-    
+
     static let passphrase = "village lunch say patrol glow first hurt shiver name method dolphin dead"
-    
+
     static let expectedTransactionID = "d4cf3fde45d0e7ba855db9621bdc6da091856011d86f199bebd1937f7b63020a"
-    
+
     static let recipient = "Xp6kFbogHMD4QRBDLQdqRp5zUgzmfj1KPn"
-    
-    static let expectedTransactionHex = "0100000001721f0c2437124acb8a20fea5af60908057b086118b240119adcb39c890b4c3a2010000006a473044022002e19bc62748ca3f34a6e5f1aeab31bb3dc43997792d9551e9b8c51a094abbae02200e3c9bde7c60326ef6984045a81304a9915e8fbce96de01813fe89886ef26453012102cd3dcbdfc1b77e54b3a8f273310806ab56b0c2463c2f1677c7694a89a713e0d0ffffffff0240420f00000000001976a914931ef5cbdad28723ba9596de5da1145ae969a71888acb695a905000000001976a91457f6f900ac7a7e3ccab712326cd7b85638fc15a888ac00000000"
-    
+
+    static let expectedTransactionHex =
+        "0100000001721f0c2437124acb8a20fea5af60908057b086118b240119adcb39c890b4c3a2010000006a473044022002e19bc62748ca3f34a6e5f1aeab31bb3dc43997792d9551e9b8c51a094abbae02200e3c9bde7c60326ef6984045a81304a9915e8fbce96de01813fe89886ef26453012102cd3dcbdfc1b77e54b3a8f273310806ab56b0c2463c2f1677c7694a89a713e0d0ffffffff0240420f00000000001976a914931ef5cbdad28723ba9596de5da1145ae969a71888acb695a905000000001976a91457f6f900ac7a7e3ccab712326cd7b85638fc15a888ac00000000"
+
     static let unspentTranscationsData = Data.readResource(
         name: "dash_unspent_transaction_intergration_test",
         withExtension: "json"

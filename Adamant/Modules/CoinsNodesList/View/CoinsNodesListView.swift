@@ -6,12 +6,12 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct CoinsNodesListView: View {
     @StateObject private var viewModel: CoinsNodesListViewModel
-    
+
     var body: some View {
         List {
             ForEach(viewModel.state.sections, content: makeSection)
@@ -30,14 +30,14 @@ struct CoinsNodesListView: View {
         }
         .navigationTitle(String.adamant.coinsNodesList.title)
     }
-    
+
     init(viewModel: @escaping () -> CoinsNodesListViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
 }
 
-private extension CoinsNodesListView {
-    func makeSection(_ model: CoinsNodesListState.Section) -> some View {
+extension CoinsNodesListView {
+    fileprivate func makeSection(_ model: CoinsNodesListState.Section) -> some View {
         Section(
             header: Text(model.title),
             content: {
@@ -56,8 +56,8 @@ private extension CoinsNodesListView {
             }
         )
     }
-    
-    func makeFastestNodeModeSection() -> some View {
+
+    fileprivate func makeFastestNodeModeSection() -> some View {
         Section(
             content: {
                 Toggle(
@@ -70,8 +70,8 @@ private extension CoinsNodesListView {
             footer: { Text(String.adamant.coinsNodesList.fastestNodeTip) }
         )
     }
-    
-    func makeResetSection() -> some View {
+
+    fileprivate func makeResetSection() -> some View {
         Section {
             Button(action: showResetAlert) {
                 Text(String.adamant.coinsNodesList.reset)
@@ -80,8 +80,8 @@ private extension CoinsNodesListView {
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }
     }
-    
-    func showResetAlert() {
+
+    fileprivate func showResetAlert() {
         viewModel.state.isAlertShown = true
     }
 }
