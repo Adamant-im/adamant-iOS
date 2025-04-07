@@ -90,8 +90,10 @@ final class AccountViewController: FormViewController {
     }()
 
     private var walletViewControllers: [WalletViewController] = []
-
-    private var currentSelectedWallet: AccountWalletCellState? = .none
+    
+    private lazy var currentSelectedWallet: AccountWalletCellState? = { viewModel.state.wallets.first(where: { wallet in
+        wallet.model.index == 0
+    })}()
 
     private var initiated = false
 
@@ -960,18 +962,18 @@ final class AccountViewController: FormViewController {
     }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        guard let currencyNetwork = currentSelectedWallet?.model.currencyNetwork else { return }
+        
         let unavailableNodes: Set<NodeGroup> = Set(NodeGroup.allCases.filter {
             !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
         })
-        
-        let currencyNetwork = currentSelectedWallet?.model.currencyNetwork
         
         if unavailableNodes.contains(where: {
             $0.name == currencyNetwork
         }) {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: currencyNetwork ?? ""
+                    nodeGroupName: currencyNetwork
                 ).localizedDescription
             )
         }
