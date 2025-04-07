@@ -38,7 +38,7 @@ public struct AddressMessage {
         let count = byteStream.read(VarInt.self)
         var addressList = [NetworkAddress]()
         for _ in 0..<count.underlyingValue {
-            _ = byteStream.read(UInt32.self) // Timestamp
+            _ = byteStream.read(UInt32.self)  // Timestamp
             addressList.append(NetworkAddress.deserialize(byteStream))
         }
         return AddressMessage(count: count, addressList: addressList)

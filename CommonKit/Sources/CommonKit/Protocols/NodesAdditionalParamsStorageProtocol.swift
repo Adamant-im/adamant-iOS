@@ -6,9 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-// MARK: - SecuredStore keys
-public extension StoreKey {
-    enum NodesAdditionalParamsStorage {
+// MARK: - SecureStore keys
+extension StoreKey {
+    public enum NodesAdditionalParamsStorage {
         public static let fastestNodeMode = "nodesAdditionalParamsStorage.fastestNodeMode"
     }
 }

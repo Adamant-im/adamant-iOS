@@ -11,7 +11,7 @@ import SwiftUI
 public struct NavigationButton<Content: View>: View {
     private let action: () -> Void
     private let content: () -> Content
-    
+
     public var body: some View {
         Button(action: action) {
             HStack {
@@ -22,7 +22,7 @@ public struct NavigationButton<Content: View>: View {
             }
         }.buttonStyle(.plain)
     }
-    
+
     public init(action: @escaping () -> Void, content: @escaping () -> Content) {
         self.action = action
         self.content = content

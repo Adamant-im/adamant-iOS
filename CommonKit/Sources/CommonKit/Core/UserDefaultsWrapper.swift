@@ -11,11 +11,12 @@ import Foundation
 public struct UserDefaultsStorage<T> {
     private let defaults = UserDefaults.standard
     private let key: String
-    
+
     public var wrappedValue: T? {
         get {
             defaults.object(forKey: key) as? T
-        } set {
+        }
+        set {
             if newValue == nil {
                 defaults.removeObject(forKey: key)
             } else {
@@ -23,7 +24,7 @@ public struct UserDefaultsStorage<T> {
             }
         }
     }
-    
+
     public init(_ key: UserDefaultsKey) {
         self.key = key.rawValue
     }

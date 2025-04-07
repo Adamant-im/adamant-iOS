@@ -6,8 +6,8 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-public extension ServerModelResponse {
-    func resolved() -> ApiServiceResult<T> {
+extension ServerModelResponse {
+    public func resolved() -> ApiServiceResult<T> {
         if let model = model {
             return .success(model)
         } else {
@@ -16,8 +16,8 @@ public extension ServerModelResponse {
     }
 }
 
-public extension ServerCollectionResponse {
-    func resolved() -> ApiServiceResult<[T]> {
+extension ServerCollectionResponse {
+    public func resolved() -> ApiServiceResult<[T]> {
         if let collection = collection {
             return .success(collection)
         } else {
@@ -26,8 +26,8 @@ public extension ServerCollectionResponse {
     }
 }
 
-public extension TransactionIdResponse {
-    func resolved() -> ApiServiceResult<UInt64> {
+extension TransactionIdResponse {
+    public func resolved() -> ApiServiceResult<UInt64> {
         if let ransactionId = transactionId {
             return .success(ransactionId)
         } else {
@@ -36,8 +36,8 @@ public extension TransactionIdResponse {
     }
 }
 
-public extension GetPublicKeyResponse {
-    func resolved() -> ApiServiceResult<String> {
+extension GetPublicKeyResponse {
+    public func resolved() -> ApiServiceResult<String> {
         if let publicKey = publicKey {
             return .success(publicKey)
         } else {
@@ -48,7 +48,7 @@ public extension GetPublicKeyResponse {
 
 private func translateServerError(_ error: String?) -> ApiServiceError {
     guard let error = error else { return .internalError(error: InternalAPIError.unknownError) }
-    
+
     switch error {
     case "Account not found":
         return .accountNotFound

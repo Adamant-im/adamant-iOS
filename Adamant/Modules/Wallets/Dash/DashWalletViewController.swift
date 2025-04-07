@@ -6,9 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import UIKit
-import CommonKit
 
 extension String.adamant {
     static var dash: String {
@@ -28,11 +28,11 @@ final class DashWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendDash)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "dash:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

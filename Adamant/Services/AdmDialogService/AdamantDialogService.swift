@@ -6,12 +6,12 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
+import AVFoundation
+import CommonKit
 import MessageUI
 import PopupKit
 import SafariServices
-import CommonKit
-import AVFoundation
+import UIKit
 
 @MainActor
 final class AdamantDialogService: DialogService {
@@ -20,9 +20,9 @@ final class AdamantDialogService: DialogService {
     private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
-    
+
     private weak var window: UIWindow?
-    
+
     init(
         vibroService: VibroService,
         notificationsService: NotificationsService
@@ -30,7 +30,7 @@ final class AdamantDialogService: DialogService {
         self.vibroService = vibroService
         self.notificationsService = notificationsService
     }
-    
+
     func setup(window: UIWindow) {
         self.window = window
         popupManager.setup()
@@ -43,13 +43,13 @@ extension AdamantDialogService {
         viewController.modalPresentationStyle = .overFullScreen
         getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
     }
-    
+
     func getTopmostViewController() -> UIViewController? {
         if var topController = window?.rootViewController {
             if let tab = topController as? UITabBarController, let selected = tab.selectedViewController {
                 topController = selected
             }
-            
+
             if let nav = topController as? UINavigationController, let visible = nav.visibleViewController {
                 if let presented = visible.presentedViewController {
                     return presented
@@ -57,14 +57,14 @@ extension AdamantDialogService {
                     return visible
                 }
             }
-            
+
             while let presentedViewController = topController.presentedViewController {
                 topController = presentedViewController
             }
-            
+
             return topController
         }
-        
+
         return nil
     }
 }
@@ -74,7 +74,7 @@ extension AdamantDialogService {
     func showToastMessage(_ message: String) {
         popupManager.showToastMessage(message)
     }
-    
+
     func dismissToast() {
         popupManager.dismissToast()
     }
@@ -85,21 +85,21 @@ extension AdamantDialogService {
     func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
         popupManager.showProgressAlert(message: message, userInteractionEnabled: enabled)
     }
-    
+
     func dismissProgress() {
         popupManager.dismissAlert()
     }
-    
+
     func showSuccess(withMessage message: String?) {
         vibroService.applyVibration(.success)
         popupManager.showSuccessAlert(message: message)
     }
-    
+
     func showWarning(withMessage message: String) {
         vibroService.applyVibration(.error)
         popupManager.showWarningAlert(message: message)
     }
-    
+
     func showError(withMessage message: String, supportEmail: Bool, error: Error? = nil) {
         internalShowError(
             withMessage: message,
@@ -109,7 +109,7 @@ extension AdamantDialogService {
             error: error
         )
     }
-    
+
     private func internalShowError(
         withMessage message: String,
         supportEmail: Bool,
@@ -118,28 +118,30 @@ extension AdamantDialogService {
         error: Error? = nil
     ) {
         vibroService.applyVibration(.error)
-        popupManager.showAdvancedAlert(model: .init(
-            icon: icon ?? .init(),
-            title: title,
-            text: message,
-            secondaryButton: supportEmail
-                ? .init(
-                    title: AdamantResources.supportEmail,
-                    action: .init(id: .empty) { [weak self] in
-                        self?.sendErrorEmail(errorDescription: message)
-                        self?.popupManager.dismissAdvancedAlert()
+        popupManager.showAdvancedAlert(
+            model: .init(
+                icon: icon ?? .init(),
+                title: title,
+                text: message,
+                secondaryButton: supportEmail
+                    ? .init(
+                        title: AdamantResources.supportEmail,
+                        action: .init(id: .empty) { [weak self] in
+                            self?.sendErrorEmail(errorDescription: message)
+                            self?.popupManager.dismissAdvancedAlert()
+                        }
+                    )
+                    : nil,
+                primaryButton: .init(
+                    title: .adamant.alert.ok,
+                    action: .init(id: .empty) { [weak popupManager] in
+                        popupManager?.dismissAdvancedAlert()
                     }
                 )
-                : nil,
-            primaryButton: .init(
-                title: .adamant.alert.ok,
-                action: .init(id: .empty) { [weak popupManager] in
-                    popupManager?.dismissAdvancedAlert()
-                }
             )
-        ))
+        )
     }
-    
+
     func showRichError(error: RichError) {
         switch error.level {
         case .warning:
@@ -158,7 +160,7 @@ extension AdamantDialogService {
             )
         }
     }
-    
+
     func showRichError(error: Error) {
         if let error = error as? RichError {
             showRichError(error: error)
@@ -170,7 +172,7 @@ extension AdamantDialogService {
             )
         }
     }
-    
+
     func showNoConnectionNotification() {
         popupManager.showNotification(
             icon: .asset(named: "error"),
@@ -180,18 +182,18 @@ extension AdamantDialogService {
             tapHandler: nil
         )
     }
-    
+
     func dissmisNoConnectionNotification() {
         popupManager.dismissNotification()
     }
-    
+
     private func sendErrorEmail(errorDescription: String) {
         let body = String(
             format: .adamant.alert.emailErrorMessageBody,
             errorDescription,
             AdamantUtilities.deviceInfo
         )
-        
+
         if let vc = getTopmostViewController() {
             vc.openEmailScreen(
                 recipient: AdamantResources.supportEmail,
@@ -213,7 +215,7 @@ extension AdamantDialogService {
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
         guard notificationsService.inAppToasts else { return }
-        
+
         popupManager.showNotification(
             icon: image,
             title: title,
@@ -222,7 +224,7 @@ extension AdamantDialogService {
             tapHandler: tapHandler
         )
     }
-    
+
     func dismissNotification() {
         popupManager.dismissNotification()
     }
@@ -240,25 +242,26 @@ extension AdamantDialogService {
         didSelect: ((AddressChatShareType) -> Void)?
     ) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
-        
+
         let alert = UIAlertController(
             title: adm,
             message: nil,
             preferredStyleSafe: .actionSheet,
             source: source
         )
-        
+
         for type in types {
             alert.addAction(
                 UIAlertAction(title: type.localized + name, style: .default) { _ in
-                didSelect?(type)
-            })
+                    didSelect?(type)
+                }
+            )
         }
-        
+
         let encodedAddress = AdamantUriTools.encode(
             request: AdamantUri.address(address: adm, params: nil)
         )
-        
+
         addActions(
             to: alert,
             stringForPasteboard: adm,
@@ -267,20 +270,21 @@ extension AdamantDialogService {
             types: [
                 .copyToPasteboard,
                 .share,
-                .generateQr(encodedContent: encodedAddress,
-                            sharingTip: adm,
-                            withLogo: true
-                           )
+                .generateQr(
+                    encodedContent: encodedAddress,
+                    sharingTip: adm,
+                    withLogo: true
+                )
             ],
             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
             from: source,
             completion: nil
         )
-        
+
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
-    
+
     func presentShareAlertFor(
         string: String,
         types: [ShareType],
@@ -303,38 +307,92 @@ extension AdamantDialogService {
             completion: completion,
             didSelect: didSelect
         )
-        
+
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
-    
-    func presentShareAlertFor(title: String? = nil, string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+
+    func presentShareAlertFor(
+        title: String? = nil,
+        string: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIView?,
+        completion: (() -> Void)?
+    ) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
-        
-        let alert = createShareAlertFor(title: title, stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
-        
+
+        let alert = createShareAlertFor(
+            title: title,
+            stringForPasteboard: string,
+            stringForShare: string,
+            stringForQR: string,
+            types: types,
+            excludedActivityTypes: excludedActivityTypes,
+            animated: animated,
+            from: source,
+            completion: completion
+        )
+
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
-    
-    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
+
+    func presentShareAlertFor(
+        string: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIBarButtonItem?,
+        completion: (() -> Void)?
+    ) {
         let source: UIAlertController.SourceView? = from.map { .barButtonItem($0) }
-        
-        let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
-        
+
+        let alert = createShareAlertFor(
+            stringForPasteboard: string,
+            stringForShare: string,
+            stringForQR: string,
+            types: types,
+            excludedActivityTypes: excludedActivityTypes,
+            animated: animated,
+            from: source,
+            completion: completion
+        )
+
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
-    
-    func presentShareAlertFor(title: String?, stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+
+    func presentShareAlertFor(
+        title: String? = nil,
+        stringForPasteboard: String,
+        stringForShare: String,
+        stringForQR: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIView?,
+        completion: (() -> Void)?
+    ) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
-        
-        let alert = createShareAlertFor(title: title, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
-        
+
+        let alert = createShareAlertFor(
+            title: title,
+            stringForPasteboard: stringForPasteboard,
+            stringForShare: stringForShare,
+            stringForQR: stringForQR,
+            types: types,
+            excludedActivityTypes: excludedActivityTypes,
+            animated: animated,
+            from: source,
+            completion: completion
+        )
+
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
-    
+
     private func createShareAlertFor(
         title: String? = nil,
         stringForPasteboard: String,
@@ -365,10 +423,10 @@ extension AdamantDialogService {
             completion: completion,
             didSelect: didSelect
         )
-        
+
         return alert
     }
-        
+
     private func addActions(
         to alert: UIAlertController,
         stringForPasteboard: String,
@@ -383,99 +441,105 @@ extension AdamantDialogService {
         for type in types {
             switch type {
             case .copyToPasteboard:
-                alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
-                    UIPasteboard.general.string = stringForPasteboard
-                    self?.showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
-                    didSelect?(.copyToPasteboard)
-                })
-                
+                alert.addAction(
+                    UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                        UIPasteboard.general.string = stringForPasteboard
+                        self?.showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
+                        didSelect?(.copyToPasteboard)
+                    }
+                )
+
             case .share:
-                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    didSelect?(.share)
-                    let vc = UIActivityViewController(activityItems: [stringForShare], applicationActivities: nil)
-                    vc.excludedActivityTypes = excludedActivityTypes
-                    
-                    switch from {
-                    case .view(let view)?:
-                        vc.popoverPresentationController?.sourceView = view
-                        vc.popoverPresentationController?.sourceRect = view.bounds
-                        vc.popoverPresentationController?.canOverlapSourceViewRect = false
-                        
-                    case .barButtonItem(let item)?:
-                        vc.popoverPresentationController?.barButtonItem = item
-                        
-                    default:
-                        if UIDevice.current.userInterfaceIdiom == .pad {
-                            vc.popoverPresentationController?.sourceView = alert.view
-                            vc.popoverPresentationController?.sourceRect = alert.view.bounds
+                alert.addAction(
+                    UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                        didSelect?(.share)
+                        let vc = UIActivityViewController(activityItems: [stringForShare], applicationActivities: nil)
+                        vc.excludedActivityTypes = excludedActivityTypes
+
+                        switch from {
+                        case .view(let view)?:
+                            vc.popoverPresentationController?.sourceView = view
+                            vc.popoverPresentationController?.sourceRect = view.bounds
                             vc.popoverPresentationController?.canOverlapSourceViewRect = false
+
+                        case .barButtonItem(let item)?:
+                            vc.popoverPresentationController?.barButtonItem = item
+
+                        default:
+                            if UIDevice.current.userInterfaceIdiom == .pad {
+                                vc.popoverPresentationController?.sourceView = alert.view
+                                vc.popoverPresentationController?.sourceRect = alert.view.bounds
+                                vc.popoverPresentationController?.canOverlapSourceViewRect = false
+                            }
+                        }
+                        vc.modalPresentationStyle = .overFullScreen
+                        self?.present(vc, animated: true, completion: completion)
+                    }
+                )
+
+            case .generateQr(let encodedContent, let sharingTip, let withLogo):
+                alert.addAction(
+                    UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                        guard let self = self else { return }
+
+                        didSelect?(.generateQr(encodedContent: encodedContent, sharingTip: sharingTip, withLogo: withLogo))
+
+                        switch AdamantQRTools.generateQrFrom(
+                            string: encodedContent ?? stringForQR,
+                            withLogo: withLogo
+                        ) {
+                        case .success(let qr):
+                            let vc = ShareQrViewController(dialogService: self)
+                            vc.qrCode = qr
+                            vc.sharingTip = sharingTip
+                            vc.excludedActivityTypes = excludedActivityTypes
+                            vc.modalPresentationStyle = .overFullScreen
+                            present(vc, animated: true, completion: completion)
+
+                        case .failure(let error):
+                            showError(
+                                withMessage: error.localizedDescription,
+                                supportEmail: true,
+                                error: error
+                            )
                         }
                     }
-                    vc.modalPresentationStyle = .overFullScreen
-                    self?.present(vc, animated: true, completion: completion)
-                })
-                
-            case .generateQr(let encodedContent, let sharingTip, let withLogo):
-                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    guard let self = self else { return }
-                    
-                    didSelect?(.generateQr(encodedContent: encodedContent, sharingTip: sharingTip, withLogo: withLogo))
-                    
-                    switch AdamantQRTools.generateQrFrom(
-                        string: encodedContent ?? stringForQR,
-                        withLogo: withLogo
-                    ) {
-                    case .success(let qr):
-                        let vc = ShareQrViewController(dialogService: self)
-                        vc.qrCode = qr
-                        vc.sharingTip = sharingTip
-                        vc.excludedActivityTypes = excludedActivityTypes
-                        vc.modalPresentationStyle = .overFullScreen
-                        present(vc, animated: true, completion: completion)
-                        
-                    case .failure(error: let error):
-                        showError(
-                            withMessage: error.localizedDescription,
-                            supportEmail: true,
-                            error: error
-                        )
-                    }
-                })
+                )
             case .openInExplorer(let url):
                 let action = UIAlertAction(
                     title: String.adamant.alert.openInExplorer,
                     style: .default
                 ) { [weak self] _ in
                     didSelect?(.openInExplorer(url: url))
-                    
+
                     let safari = SFSafariViewController(url: url)
                     safari.preferredControlTintColor = UIColor.adamant.primary
                     safari.modalPresentationStyle = .overFullScreen
                     self?.present(safari, animated: true, completion: completion)
                 }
-                
+
                 alert.addAction(action)
-                
+
             case .saveToPhotolibrary(let image):
                 let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
                     didSelect?(.saveToPhotolibrary(image: image))
                     UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
                 }
-                
+
                 alert.addAction(action)
-            
+
             default:
                 let action = UIAlertAction(title: type.localized, style: .default) { [didSelect] _ in
                     didSelect?(type)
                 }
-                
+
                 alert.addAction(action)
             }
         }
-        
+
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
     }
-    
+
     func presentDummyAlert(
         for adm: String,
         from: UIView?,
@@ -490,7 +554,7 @@ extension AdamantDialogService {
             sendCompletion: sendCompletion
         )
     }
-    
+
     func presentDummyChatAlert(
         for adm: String,
         from: UIView?,
@@ -505,7 +569,7 @@ extension AdamantDialogService {
             sendCompletion: sendCompletion
         )
     }
-    
+
     func presentDummyAlert(
         for adm: String,
         from: UIView?,
@@ -521,19 +585,20 @@ extension AdamantDialogService {
             preferredStyleSafe: .alert,
             source: from.map { .view($0) }
         )
-        
+
         if let url = URL(string: NewChatViewController.faqUrl) {
             let faq = UIAlertAction(
                 title: String.adamant.newChat.whatDoesItMean,
-                style: UIAlertAction.Style.default) { [weak self] _ in
-                    let safari = SFSafariViewController(url: url)
-                    safari.preferredControlTintColor = UIColor.adamant.primary
-                    safari.modalPresentationStyle = .overFullScreen
-                    self?.present(safari, animated: true, completion: nil)
-                }
+                style: UIAlertAction.Style.default
+            ) { [weak self] _ in
+                let safari = SFSafariViewController(url: url)
+                safari.preferredControlTintColor = UIColor.adamant.primary
+                safari.modalPresentationStyle = .overFullScreen
+                self?.present(safari, animated: true, completion: nil)
+            }
             alert.addAction(faq)
         }
-        
+
         if canSend {
             let send = UIAlertAction(
                 title: String.adamant.transfer.send,
@@ -542,18 +607,18 @@ extension AdamantDialogService {
             )
             alert.addAction(send)
         }
-        
+
         let cancel = UIAlertAction(
             title: String.adamant.alert.cancel,
             style: .cancel,
             handler: nil
         )
-        
+
         alert.addAction(cancel)
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }
-    
+
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if let error = error {
             showError(withMessage: error.localizedDescription, supportEmail: true)
@@ -561,7 +626,7 @@ extension AdamantDialogService {
             showSuccess(withMessage: String.adamant.alert.done)
         }
     }
-    
+
     func presentGoToSettingsAlert(title: String?, message: String?) {
         let alert = UIAlertController(
             title: title,
@@ -569,22 +634,24 @@ extension AdamantDialogService {
             preferredStyleSafe: .alert,
             source: nil
         )
-        
-        alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+
+        alert.addAction(
+            UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+                }
             }
-        })
-        
+        )
+
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
-        
+
         present(alert, animated: true, completion: nil)
     }
 }
 
-fileprivate extension AdamantAlertStyle {
-    func asUIAlertControllerStyle() -> UIAlertController.Style {
+extension AdamantAlertStyle {
+    fileprivate func asUIAlertControllerStyle() -> UIAlertController.Style {
         switch self {
         case .alert:
             return .alert
@@ -594,9 +661,9 @@ fileprivate extension AdamantAlertStyle {
     }
 }
 
-fileprivate extension AdamantAlertAction {
+extension AdamantAlertAction {
     @MainActor
-    func asUIAlertAction() -> UIAlertAction {
+    fileprivate func asUIAlertAction() -> UIAlertAction {
         let handler = self.handler
         return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
     }
@@ -614,7 +681,7 @@ extension AdamantDialogService {
         let uiActions = actions?.map { $0.asUIAlertAction() }
         showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
     }
-    
+
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?) {
         let alert = UIAlertController(
             title: title,
@@ -622,7 +689,7 @@ extension AdamantDialogService {
             preferredStyleSafe: style,
             source: from
         )
-        
+
         if let actions = actions {
             for action in actions {
                 alert.addAction(action)
@@ -630,7 +697,7 @@ extension AdamantDialogService {
         } else {
             alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
         }
-        
+
         present(alert, animated: true, completion: nil)
     }
 }

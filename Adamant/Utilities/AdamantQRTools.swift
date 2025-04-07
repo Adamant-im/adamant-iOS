@@ -6,9 +6,9 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import EFQRCode
 import CommonKit
+import EFQRCode
+import UIKit
 
 enum QRToolGenerateResult {
     case success(UIImage)
@@ -22,7 +22,7 @@ enum QRToolDecodeResult {
 }
 
 final class AdamantQRTools {
-    static func generateQrFrom(string: String, withLogo: Bool = false ) -> QRToolGenerateResult {
+    static func generateQrFrom(string: String, withLogo: Bool = false) -> QRToolGenerateResult {
         let generator = EFQRCodeGenerator(
             content: string,
             size: EFIntSize(width: 600, height: 600)
@@ -33,27 +33,27 @@ final class AdamantQRTools {
             let logoSize = hasAdm ? EFIntSize(width: 156, height: 156) : EFIntSize(width: 138, height: 138)
             generator.withIcon(UIImage.asset(named: "logo")?.cgImage, size: logoSize)
         }
-        
+
         if let qr = generator.generate() {
             let image = UIImage(cgImage: qr)
             return .success(image)
         }
-        
+
         return .failure(error: AdamantError(message: "Failed to generate QR from: \(string)"))
     }
-    
+
     static func readQR(_ qr: UIImage) -> QRToolDecodeResult {
         guard let image = qr.cgImage else {
             print("Failed to get image?")
             return .none
         }
-        
+
         if let result = EFQRCode.recognize(image).first {
             return .success(result)
         }
-        
+
         return .none
     }
-    
+
     private init() {}
 }

@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension String.adamant {
     static var kly: String {
@@ -27,11 +27,11 @@ final class KlyWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendKly)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "klayr:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

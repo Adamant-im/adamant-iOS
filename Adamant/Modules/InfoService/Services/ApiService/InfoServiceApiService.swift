@@ -6,13 +6,13 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 final class InfoServiceApiService: Sendable {
     let core: BlockchainHealthCheckWrapper<InfoServiceApiCore>
     let mapper: InfoServiceMapperProtocol
-    
+
     func request<Output>(
         _ request: @Sendable (
             APICoreProtocol,
@@ -23,7 +23,7 @@ final class InfoServiceApiService: Sendable {
             await request(core.apiCore, origin)
         }.mapError { .apiError($0) }
     }
-    
+
     init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>, mapper: InfoServiceMapperProtocol) {
         self.core = core
         self.mapper = mapper

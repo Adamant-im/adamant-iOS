@@ -6,18 +6,18 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct NotificationSoundsView: View {
     @StateObject var viewModel: NotificationSoundsViewModel
-    
+
     @Environment(\.dismiss) var dismiss
-    
+
     init(viewModel: @escaping () -> NotificationSoundsViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
-    
+
     var body: some View {
         GeometryReader { _ in
             Form {
@@ -30,15 +30,18 @@ struct NotificationSoundsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }, label: {
-                        HStack {
-                            Text(cancelTitle)
+                    Button(
+                        action: {
+                            dismiss()
+                        },
+                        label: {
+                            HStack {
+                                Text(cancelTitle)
+                            }
                         }
-                    })
+                    )
                 }
-                
+
                 ToolbarItem(placement: .principal) {
                     Text(toolbarTitle)
                         .font(.headline)
@@ -46,15 +49,18 @@ struct NotificationSoundsView: View {
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
-                
+
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        viewModel.save()
-                    }, label: {
-                        HStack {
-                            Text(saveTitle)
+                    Button(
+                        action: {
+                            viewModel.save()
+                        },
+                        label: {
+                            HStack {
+                                Text(saveTitle)
+                            }
                         }
-                    })
+                    )
                 }
             }
             .onReceive(viewModel.dismissAction) {
@@ -64,38 +70,44 @@ struct NotificationSoundsView: View {
     }
 }
 
-private extension NotificationSoundsView {
-    func toolbar() -> some View {
+extension NotificationSoundsView {
+    fileprivate func toolbar() -> some View {
         HStack {
-            Button(action: {
-                dismiss()
-            }, label: {
-                HStack {
-                    Text(cancelTitle)
+            Button(
+                action: {
+                    dismiss()
+                },
+                label: {
+                    HStack {
+                        Text(cancelTitle)
+                    }
                 }
-            })
-            
+            )
+
             Spacer()
-            
+
             Text(toolbarTitle)
                 .font(.headline)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .center)
-            
+
             Spacer()
-            
-            Button(action: {
-                viewModel.save()
-            }, label: {
-                HStack {
-                    Text(saveTitle)
+
+            Button(
+                action: {
+                    viewModel.save()
+                },
+                label: {
+                    HStack {
+                        Text(saveTitle)
+                    }
                 }
-            })
+            )
         }
     }
-    
-    func listSounds() -> some View {
+
+    fileprivate func listSounds() -> some View {
         List {
             ForEach(viewModel.sounds, id: \.self) { sound in
                 Button(

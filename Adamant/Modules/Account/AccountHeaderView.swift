@@ -15,7 +15,7 @@ protocol AccountHeaderViewDelegate: AnyObject {
 }
 
 final class AccountHeaderView: UIView {
-    
+
     // MARK: - IBOutlets
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var addressButton: UIButton!

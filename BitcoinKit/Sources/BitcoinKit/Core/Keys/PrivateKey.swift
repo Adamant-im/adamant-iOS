@@ -24,10 +24,11 @@
 //
 
 import Foundation
+
 #if BitcoinKitXcode
-import BitcoinKit.Private
+    import BitcoinKit.Private
 #else
-import BitcoinKitPrivate
+    import BitcoinKitPrivate
 #endif
 
 public struct PrivateKey {
@@ -74,7 +75,7 @@ public struct PrivateKey {
         var status: Int32 = 0
         repeat {
             status = key.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, count, $0) }
-        } while (status != 0 || !check([UInt8](key)))
+        } while status != 0 || !check([UInt8](key))
 
         self.data = key
     }
@@ -156,7 +157,7 @@ extension PrivateKey: CustomStringConvertible {
 }
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-extension PrivateKey: QRCodeConvertible {}
+    extension PrivateKey: QRCodeConvertible {}
 #endif
 
 public enum PrivateKeyError: Error {

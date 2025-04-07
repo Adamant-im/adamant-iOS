@@ -22,7 +22,7 @@ extension ChatTransactionContentView {
         var replyMessage: NSAttributedString
         var replyId: String
         var isHidden: Bool
-        
+
         static var `default`: Self {
             Self(
                 id: "",

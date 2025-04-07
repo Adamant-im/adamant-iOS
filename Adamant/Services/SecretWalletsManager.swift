@@ -6,9 +6,9 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import Swinject
-import CommonKit
 
 private extension AdamantSecretWalletsManager {
     struct State: SecretWalletsManagerStateProtocol {
@@ -42,12 +42,12 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
         let wallet = secretWalletsFactory.makeSecretWallet(withPassword: password)
         state.secretWallets.append(wallet)
     }
-    
+
     func removeSecretWallet(at index: Int) -> WalletStoreServiceProtocol? {
         guard state.secretWallets.indices.contains(index) else { return nil }
         return state.secretWallets.remove(at: index)
     }
-    
+
     func getCurrentWallet() -> WalletStoreServiceProtocol {
         state.currentWallet
     }
@@ -59,13 +59,13 @@ final class AdamantSecretWalletsManager: SecretWalletsManagerProtocol {
     func getSecretWallets() -> [WalletStoreServiceProtocol] {
         state.secretWallets
     }
-    
+
     func activateSecretWallet(at index: Int) {
         guard index < state.secretWallets.count else { return }
         state.currentWallet = state.secretWallets[index]
         statePublisher.send(state)
     }
-    
+
     func activateDefaultWallet() {
         state.currentWallet = state.regularWallet
         statePublisher.send(state)

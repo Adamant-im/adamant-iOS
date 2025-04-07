@@ -1,3 +1,4 @@
+import SafariServices
 //
 //  AdmDialogServiceExtent.swift
 //  Adamant
@@ -6,7 +7,6 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 import UIKit
-import SafariServices
 
 extension AdamantDialogService {
     @MainActor
@@ -28,7 +28,7 @@ extension AdamantDialogService {
             textField.autocapitalizationType = .words
             textField.text = initialText
         }
-        
+
         let renameAction = UIAlertAction(
             title: .adamant.chat.rename,
             style: .default
@@ -38,19 +38,19 @@ extension AdamantDialogService {
                 let newName = textField.text,
                 !newName.isEmpty
             else { return }
-            
+
             onRename(newName)
             if !(isEnoughMoney) {
                 self.showFreeTokenAlert(url: url, type: .contacts, showVC: showVC)
             }
         }
-        
+
         alert.addAction(renameAction)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.modalPresentationStyle = .overFullScreen
         return alert
     }
-    
+
     @MainActor
     func showFreeTokenAlert(url: String?, type: FreeTokensAlertType, showVC: @escaping () -> Void) {
         let window = UIWindow(frame: UIScreen.main.bounds)
@@ -59,24 +59,24 @@ extension AdamantDialogService {
         rootViewController.view.backgroundColor = .clear
         window.rootViewController = rootViewController
         window.makeKeyAndVisible()
-        
+
         let alert = UIAlertController(
             title: type.alertTitle,
             message: .adamant.chat.freeTokensMessage,
             preferredStyle: .alert
         )
-        
+
         alert.addAction(makeFreeTokensAlertAction(url: url, window: window))
         alert.addAction(makeBuyTokensAction(action: showVC))
         alert.addAction(makeCancelAction(window: window))
         alert.modalPresentationStyle = .overFullScreen
-        
+
         rootViewController.present(alert, animated: true, completion: nil)
     }
-    
+
 }
-private extension AdamantDialogService {
-    func makeFreeTokensAlertAction(url: String?, window: UIWindow) -> UIAlertAction {
+extension AdamantDialogService {
+    fileprivate func makeFreeTokensAlertAction(url: String?, window: UIWindow) -> UIAlertAction {
         let action = UIAlertAction(
             title: .adamant.chat.freeTokens,
             style: .destructive
@@ -85,20 +85,20 @@ private extension AdamantDialogService {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
-            
+
             window.rootViewController?.present(safari, animated: true)
         }
         return action
     }
-    func makeBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
+    fileprivate func makeBuyTokensAction(action: @escaping () -> Void) -> UIAlertAction {
         .init(
             title: .adamant.chat.freeTokensBuyADM,
             style: .default
-        ) {  _ in
+        ) { _ in
             action()
         }
     }
-    func makeCancelAction(window: UIWindow) -> UIAlertAction {
+    fileprivate func makeCancelAction(window: UIWindow) -> UIAlertAction {
         .init(
             title: .adamant.alert.cancel,
             style: .default
@@ -106,13 +106,13 @@ private extension AdamantDialogService {
             window.isHidden = true
         }
     }
-    func freeTokensURL(url: String?) -> URL? {
+    fileprivate func freeTokensURL(url: String?) -> URL? {
         guard let url = url else {
             return nil
         }
         let urlString: String = .adamant.wallets.getFreeTokensUrl(for: url)
         let tokenUrl = URL(string: urlString)
-        
+
         return tokenUrl
     }
 }
@@ -120,7 +120,7 @@ enum FreeTokensAlertType {
     case contacts
     case message
     case notification
-    
+
     var alertTitle: String {
         switch self {
         case .contacts:

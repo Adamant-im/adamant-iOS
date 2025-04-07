@@ -12,7 +12,7 @@ extension AccountViewController {
     // MARK: - Rows & Sections
     enum Sections {
         case wallet, application, delegates, actions, security
-        
+
         var tag: String {
             switch self {
             case .wallet: return "wllt"
@@ -22,10 +22,10 @@ extension AccountViewController {
             case .security: return "scrty"
             }
         }
-        
+
         var localized: String {
             switch self {
-            case .wallet: return "Wallet"    // Depends on selected wallet
+            case .wallet: return "Wallet"  // Depends on selected wallet
             case .application: return .localized("AccountTab.Section.Application", comment: "Account tab: Application section title")
             case .actions: return .localized("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
             case .delegates: return .localized("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
@@ -33,7 +33,7 @@ extension AccountViewController {
             }
         }
     }
-    
+
     enum Rows {
         case balance, sendTokens // Wallet
         case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, secretWallets, contribute, storage // Application
@@ -64,7 +64,7 @@ extension AccountViewController {
             case .storage: return "storage"
             }
         }
-        
+
         var localized: String {
             switch self {
             case .balance: return .localized("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
@@ -89,7 +89,7 @@ extension AccountViewController {
             case .storage: return .localized("StorageUsage.Title", comment: "Storage Usage: Title")
             }
         }
-        
+
         var image: UIImage? {
             var image: UIImage?
             switch self {
@@ -106,7 +106,7 @@ extension AccountViewController {
             case .generateQr: image = .asset(named: "row_QR.png")
             case .generatePk: image = .asset(named: "privateKey_row")
             case .stayIn: image = .asset(named: "row_security")
-            case .biometry: image = nil // Determined by localAuth service
+            case .biometry: image = nil  // Determined by localAuth service
             case .notifications: image = .asset(named: "row_Notifications.png")
             case .visibleWallets: image = .asset(named: "row_balance")
             case .secretWallets: image = .asset(named: "secret_wallets_active")
@@ -114,11 +114,11 @@ extension AccountViewController {
             case .language: image = .asset(named: "row_language")
             case .storage: image = .asset(named: "row_storage")
             }
-            
+
             return image?
                 .imageResized(to: .init(squareSize: 24))
                 .withTintColor(.adamant.tableRowIcons)
         }
     }
-    
+
 }

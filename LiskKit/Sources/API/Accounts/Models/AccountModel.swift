@@ -32,12 +32,12 @@ extension Accounts {
         public var hashValue: Int {
             return address.hashValue
         }
-        
+
         public func hash(into hasher: inout Hasher) {
             hasher.combine(address)
         }
     }
-    
+
     public struct AccountModel: APIModel {
 
         private struct Sequence: APIModel {

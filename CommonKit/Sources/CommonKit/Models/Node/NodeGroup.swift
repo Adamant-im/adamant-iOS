@@ -1,6 +1,6 @@
 //
 //  NodeGroup.swift
-//  
+//
 //
 //  Created by Andrew G on 30.10.2023.
 //

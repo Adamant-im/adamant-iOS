@@ -6,21 +6,21 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
-import MessageKit
 import Combine
 import CommonKit
+import Foundation
+import MessageKit
 import OrderedCollections
 
 actor ChatMessagesListFactory {
     private let chatMessageFactory: ChatMessageFactory
     private let coreDataRelationMapper: CoreDataRealationMapperProtocol
-    
+
     init(chatMessageFactory: ChatMessageFactory, coreDataRelationMapper: CoreDataRealationMapperProtocol) {
         self.chatMessageFactory = chatMessageFactory
         self.coreDataRelationMapper = coreDataRelationMapper
     }
-    
+
     func makeMessages(
         transactions: [ChatTransaction],
         sender: ChatSender,
@@ -34,8 +34,8 @@ actor ChatMessagesListFactory {
         await withTaskGroup(of: [String].self) { group in
             for chatTransaction in transactions {
                 guard let transaction = chatTransaction as? RichMessageTransaction,
-                      transaction.additionalType == .reaction,
-                      transaction.isUnread
+                    transaction.additionalType == .reaction,
+                    transaction.isUnread
                 else { continue }
 
                 group.addTask { [weak self] in
@@ -49,9 +49,9 @@ actor ChatMessagesListFactory {
         }
         let transactionsWithoutReact = transactions.filter { chatTransaction in
             guard let transaction = chatTransaction as? RichMessageTransaction,
-                  transaction.additionalType == .reaction
+                transaction.additionalType == .reaction
             else { return true }
-            
+
             return false
         }
         let transactionIdsWithoutReact: OrderedSet<String> = OrderedSet(
@@ -71,11 +71,11 @@ actor ChatMessagesListFactory {
                 topSpinnerOn: isNeedToLoadMoreMessages && index == .zero,
                 willExpireAfter: &expTimestamp
             )
-            
+
             if let timestamp = expTimestamp, timestamp < minExpTimestamp ?? .greatestFiniteMagnitude {
                 minExpTimestamp = timestamp
             }
-            
+
             return message
         }
 
@@ -83,8 +83,8 @@ actor ChatMessagesListFactory {
     }
 }
 
-private extension ChatMessagesListFactory {
-    func makeMessage(
+extension ChatMessagesListFactory {
+    fileprivate func makeMessage(
         _ transaction: ChatTransaction,
         sender: SenderType,
         dateHeaderOn: Bool,
@@ -99,7 +99,7 @@ private extension ChatMessagesListFactory {
             dateHeaderOn: dateHeaderOn,
             topSpinnerOn: topSpinnerOn
         )
-        
+
         willExpireAfter = expireDate?.timeIntervalSince1970
         return message
     }
@@ -111,11 +111,11 @@ private func isNeedToDisplayDateHeader(
 ) -> Bool {
     guard transactions[index].sentDate != .adamantNullDate else { return false }
     guard index > .zero else { return true }
-    
+
     guard
         let previousDate = transactions[index - 1].sentDate,
         let currentDate = transactions[index].sentDate
     else { return false }
-    
+
     return !Calendar.current.isDate(currentDate, inSameDayAs: previousDate)
 }

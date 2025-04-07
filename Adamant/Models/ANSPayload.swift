@@ -17,7 +17,7 @@ extension ANSPayload {
         case apns
         case apnsSandbox = "apns-sandbox"
     }
-    
+
     enum Action: String, Codable {
         case add
         case remove

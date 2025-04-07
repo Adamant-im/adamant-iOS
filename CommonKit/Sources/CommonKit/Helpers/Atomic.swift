@@ -1,6 +1,6 @@
 //
 //  Atomic.swift
-//  
+//
 //
 //  Created by Andrew on 21.08.2023.
 //
@@ -19,14 +19,14 @@ import Foundation
 public final class Atomic<Value>: @unchecked Sendable {
     private var _value: Value
     private let lock = NSLock()
-    
+
     public var projectedValue: Atomic<Value> { self }
-    
+
     public var wrappedValue: Value {
         get { value }
         set { value = newValue }
     }
-    
+
     public var value: Value {
         get {
             lock.lock()
@@ -39,11 +39,11 @@ public final class Atomic<Value>: @unchecked Sendable {
             _value = newValue
         }
     }
-    
+
     public init(_ value: Value) {
         _value = value
     }
-    
+
     public convenience init(wrappedValue: Value) {
         self.init(wrappedValue)
     }
@@ -56,7 +56,7 @@ public final class Atomic<Value>: @unchecked Sendable {
         defer { lock.unlock() }
         return mutation(&_value)
     }
-    
+
     @discardableResult
     public func isolated<T>(_ processing: (Value) -> T) -> T {
         lock.lock()

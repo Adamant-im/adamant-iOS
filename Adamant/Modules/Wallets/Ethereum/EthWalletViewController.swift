@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension String.adamant.wallets {
     static var ethereum: String {
@@ -27,11 +27,11 @@ final class EthWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.wallets.sendEth)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

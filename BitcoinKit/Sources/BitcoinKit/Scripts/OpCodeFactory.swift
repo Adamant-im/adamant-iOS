@@ -24,17 +24,15 @@
 
 import Foundation
 
-/**
- This struct represents a factory that creates OpCodes from integers or strings.
- */
+/// This struct represents a factory that creates OpCodes from integers or strings.
 public struct OpCodeFactory {
 
     /**
      Returns the OpCode which a given UInt8 value.
      Returns OP_INVALIDOPCODE for outranged value.
-     
+
      - parameter value: UInt8 value corresponding to the OpCode
-     
+
      - returns: The OpCode corresponding to value
     */
     public static func get(with value: UInt8) -> OpCode {
@@ -47,9 +45,9 @@ public struct OpCodeFactory {
     /**
      Returns the OpCode which a given name.
      Returns OP_INVALIDOPCODE for unknown names.
-     
+
      - parameter name: String corresponding to the OpCode
-     
+
      - returns: The OpCode corresponding to name
      */
     public static func get(with name: String) -> OpCode {
@@ -62,9 +60,9 @@ public struct OpCodeFactory {
     /**
      Returns OP_1NEGATE, OP_0 .. OP_16 for ints from -1 to 16.
      Returns OP_INVALIDOPCODE for other ints.
-     
+
      - parameter smallInteger: Int value from -1 to 16
- 
+
      - returns: The OpCode corresponding to smallInteger
     */
     public typealias SmallInteger = Int
@@ -84,9 +82,9 @@ public struct OpCodeFactory {
     /**
      Converts opcode OP_<N> or OP_1NEGATE to an Int value.
      If incorrect opcode is given, Int.max is returned.
-     
+
      - parameter opcode: OpCode which can be OP_<N> or OP_1NEGATE
-     
+
      - returns: Int value correspondint to OpCode
     */
     public static func smallInteger(from opcode: OpCode) -> SmallInteger {

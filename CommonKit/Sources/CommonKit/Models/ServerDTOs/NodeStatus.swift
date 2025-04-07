@@ -19,18 +19,18 @@ public struct NodeStatus: Codable, Sendable {
         public let reward: Int?
         public let supply: Int?
     }
-    
+
     public struct Version: Codable, Sendable {
         public let build: String?
         public let commit: String?
         public let version: String?
     }
-    
+
     public struct WsClient: Codable, Sendable {
         public let enabled: Bool?
         public let port: Int?
     }
-    
+
     public let success: Bool
     public let nodeTimestamp: TimeInterval
     public let network: Network?

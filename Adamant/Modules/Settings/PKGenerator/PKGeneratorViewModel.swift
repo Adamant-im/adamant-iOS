@@ -6,10 +6,10 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
 import Combine
 import CommonKit
 import MarkdownKit
+import SwiftUI
 
 // MARK: - Localization
 extension String.adamant {
@@ -32,7 +32,7 @@ extension String.adamant {
                 comment: "PrivateKeyGenerator: Generate button"
             )
         }
-        
+
         static func keyFormat(_ format: String) -> String {
             .localizedStringWithFormat(
                 .localized(
@@ -48,10 +48,10 @@ extension String.adamant {
 @MainActor
 final class PKGeneratorViewModel: ObservableObject {
     @Published var state: PKGeneratorState = .default
-    
+
     private let dialogService: DialogService
     private let walletServiceCompose: WalletServiceCompose
-    
+
     nonisolated init(
         dialogService: DialogService,
         walletServiceCompose: WalletServiceCompose
@@ -60,7 +60,7 @@ final class PKGeneratorViewModel: ObservableObject {
         self.walletServiceCompose = walletServiceCompose
         Task { @MainActor in configure() }
     }
-    
+
     func onTap(key: String) {
         dialogService.presentShareAlertFor(
             title: nil,
@@ -80,7 +80,7 @@ final class PKGeneratorViewModel: ObservableObject {
             completion: nil
         )
     }
-    
+
     func generateKeys() {
         guard !state.isLoading else { return }
         withAnimation { state.isLoading = true }
@@ -89,7 +89,7 @@ final class PKGeneratorViewModel: ObservableObject {
         
         Task {
             defer { withAnimation { state.isLoading = false } }
-            
+
             do {
                 let keys = try await Task.detached { [walletServiceCompose] in
                     try await generatePrivateKeys(
@@ -98,7 +98,7 @@ final class PKGeneratorViewModel: ObservableObject {
                         walletServiceCompose: walletServiceCompose
                     )
                 }.value
-                
+
                 withAnimation { state.keys = keys }
             } catch {
                 dialogService.showToastMessage(error.localizedDescription)
@@ -107,30 +107,30 @@ final class PKGeneratorViewModel: ObservableObject {
     }
 }
 
-private extension PKGeneratorViewModel {
-    func configure() {
+extension PKGeneratorViewModel {
+    fileprivate func configure() {
         state.buttonDescription = getButtonDescription()
     }
-    
-    func getButtonDescription() -> AttributedString {
+
+    fileprivate func getButtonDescription() -> AttributedString {
         let parser = MarkdownParser(
             font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
             color: .adamant.primary
         )
-        
+
         let style = NSMutableParagraphStyle()
         style.alignment = NSTextAlignment.center
-        
+
         let mutableText = NSMutableAttributedString(
             attributedString: parser.parse(.adamant.pkGenerator.alert)
         )
-        
+
         mutableText.addAttribute(
             .paragraphStyle,
             value: style,
             range: .init(location: .zero, length: mutableText.length)
         )
-        
+
         return .init(mutableText)
     }
 }

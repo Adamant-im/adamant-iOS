@@ -76,10 +76,12 @@ public struct TransactionSignatureSerializer {
             outputsToSerialize = tx.outputs
         }
 
-        let tmp = Transaction(version: tx.version,
-                                        inputs: inputsToSerialize,
-                                        outputs: outputsToSerialize,
-                                        lockTime: tx.lockTime)
+        let tmp = Transaction(
+            version: tx.version,
+            inputs: inputsToSerialize,
+            outputs: outputsToSerialize,
+            lockTime: tx.lockTime
+        )
         return tmp.serialized()
     }
 }

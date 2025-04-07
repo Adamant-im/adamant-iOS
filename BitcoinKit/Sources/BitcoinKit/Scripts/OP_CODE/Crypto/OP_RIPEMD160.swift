@@ -19,7 +19,7 @@ public struct OpRipemd160: OpCodeProtocol {
         try context.assertStackHeightGreaterThanOrEqual(1)
 
         let data: Data = context.stack.removeLast()
-         let hash: Data = Crypto.ripemd160(data)
+        let hash: Data = Crypto.ripemd160(data)
         context.stack.append(hash)
     }
 }

@@ -6,17 +6,17 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import SwiftUI
-import CommonKit
 import Charts
+import CommonKit
+import SwiftUI
 
 struct StorageUsageView: View {
     @StateObject private var viewModel: StorageUsageViewModel
-    
+
     init(viewModel: @escaping () -> StorageUsageViewModel) {
         _viewModel = .init(wrappedValue: viewModel())
     }
-    
+
     var body: some View {
         VStack {
             List {
@@ -26,9 +26,9 @@ struct StorageUsageView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle(storageTitle)
-            
+
             Spacer()
-            
+
             makeClearButton()
         }
         .alert(
@@ -46,8 +46,8 @@ struct StorageUsageView: View {
     }
 }
 
-private extension StorageUsageView {
-    var storageSection: some View {
+extension StorageUsageView {
+    fileprivate var storageSection: some View {
         Section(
             content: {
                 content
@@ -56,8 +56,8 @@ private extension StorageUsageView {
             footer: { Text(verbatim: storageDescription) }
         )
     }
-    
-    var autoDownloadSection: some View {
+
+    fileprivate var autoDownloadSection: some View {
         Section(
             content: {
                 autoDownloadContent(for: .preview)
@@ -69,8 +69,8 @@ private extension StorageUsageView {
             footer: { Text(verbatim: autDownloadDescription) }
         )
     }
-    
-    var saveEncryptedSection: some View {
+
+    fileprivate var saveEncryptedSection: some View {
         Section(
             content: {
                 Toggle(
@@ -87,8 +87,8 @@ private extension StorageUsageView {
             footer: { Text(verbatim: saveEncryptedDescription) }
         )
     }
-    
-    var content: some View {
+
+    fileprivate var content: some View {
         HStack {
             Image(uiImage: storageImage)
             Text(verbatim: storageUsedTitle)
@@ -101,8 +101,8 @@ private extension StorageUsageView {
             }
         }
     }
-    
-    func autoDownloadContent(
+
+    fileprivate func autoDownloadContent(
         for type: StorageUsageViewModel.AutoDownloadMediaType
     ) -> some View {
         Button {
@@ -111,22 +111,22 @@ private extension StorageUsageView {
             HStack {
                 Image(uiImage: previewImage)
                 Text(type.title)
-                
+
                 Spacer()
-                
+
                 switch type {
                 case .preview:
                     Text(viewModel.autoDownloadPreview.title)
                 case .fullMedia:
                     Text(viewModel.autoDownloadFullMedia.title)
                 }
-                
+
                 NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
             }
         }
     }
-    
-    func makeClearButton() -> some View {
+
+    fileprivate func makeClearButton() -> some View {
         Button(action: showClearAlert) {
             Text(clearTitle)
                 .expanded(axes: .horizontal)
@@ -137,8 +137,8 @@ private extension StorageUsageView {
         .clipShape(.rect(cornerRadius: 8.0))
         .padding()
     }
-    
-    func showClearAlert() {
+
+    fileprivate func showClearAlert() {
         viewModel.isRemoveAlertShown = true
     }
 }

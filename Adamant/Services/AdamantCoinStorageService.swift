@@ -6,53 +6,53 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
-import CoreData
 import Combine
 import CommonKit
+import CoreData
+import Foundation
 
 final class AdamantCoinStorageService: NSObject, CoinStorageService {
-    
+
     // MARK: Proprieties
-    
+
     private let blockchainType: String
     private let coinId: String
     private let coinAddress: String
     private let coreDataStack: CoreDataStack
     private lazy var transactionController = getTransactionController()
     private var subscriptions = Set<AnyCancellable>()
-    
+
     @ObservableValue private var transactions: [TransactionDetails] = []
     
     var transactionsPublisher: any Observable<[TransactionDetails]> {
         $transactions
     }
-    
+
     // MARK: Init
-    
+
     init(coinId: String, coinAddress: String, coreDataStack: CoreDataStack, blockchainType: String) {
         self.coinId = coinId
         self.coinAddress = coinAddress
         self.coreDataStack = coreDataStack
         self.blockchainType = blockchainType
         super.init()
-        
+
         try? transactionController.performFetch()
         transactions = transactionController.fetchedObjects ?? []
-        
+
         setupObserver()
     }
-    
+
     func append(_ transaction: TransactionDetails) {
         append([transaction])
     }
-    
+
     func append(_ transactions: [TransactionDetails]) {
         let privateContext = coreDataStack.container.viewContext
         privateContext.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
-        
+
         var coinTransactions: [CoinTransaction] = []
-        
+
         transactions.forEach { transaction in
             let isExist = self.transactions.contains { tx in
                 tx.txId == transaction.txId
@@ -61,7 +61,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
                 tx.txId == transaction.txId
             }
             guard !isExist, !isLocalExist else { return }
-            
+
             let coinTransaction = CoinTransaction(context: privateContext)
             coinTransaction.amount = NSDecimalNumber(decimal: transaction.amountValue ?? 0)
             coinTransaction.date = (transaction.dateValue ?? Date()) as NSDate
@@ -75,32 +75,34 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
             coinTransaction.blockchainType = blockchainType
             coinTransaction.fee = NSDecimalNumber(decimal: transaction.feeValue ?? 0)
             coinTransaction.nonceRaw = transaction.nonceRaw
-            
+
             coinTransactions.append(coinTransaction)
         }
-        
+
         try? privateContext.save()
     }
-    
+
     func updateStatus(for transactionId: String, status: TransactionStatus?) {
         let privateContext = coreDataStack.container.viewContext
-        
-        guard let transaction = getTransactionFromDB(
-            id: transactionId,
-            context: privateContext
-        ) else { return }
-        
+
+        guard
+            let transaction = getTransactionFromDB(
+                id: transactionId,
+                context: privateContext
+            )
+        else { return }
+
         transaction.transactionStatus = status
         try? privateContext.save()
     }
-    
+
     func clear() {
         transactions = []
     }
 }
 
-private extension AdamantCoinStorageService {
-    func setupObserver() {
+extension AdamantCoinStorageService {
+    fileprivate func setupObserver() {
         NotificationCenter.default.publisher(
             for: .NSManagedObjectContextObjectsDidChange,
             object: coreDataStack.container.viewContext
@@ -120,7 +122,7 @@ private extension AdamantCoinStorageService {
                 }
                 self.transactions.append(contentsOf: filteredInserted)
             }
-            
+
             if let updated = changes.updated, !updated.isEmpty {
                 let filteredUpdated = updated.filter { $0.uniqueId == uniqueId }
                 
@@ -156,8 +158,8 @@ private extension AdamantCoinStorageService {
         }
         .store(in: &subscriptions)
     }
-    
-    func getTransactionController() -> NSFetchedResultsController<CoinTransaction> {
+
+    fileprivate func getTransactionController() -> NSFetchedResultsController<CoinTransaction> {
         let request: NSFetchRequest<CoinTransaction> = NSFetchRequest(
             entityName: CoinTransaction.entityCoinName
         )
@@ -168,7 +170,7 @@ private extension AdamantCoinStorageService {
             NSSortDescriptor(key: "date", ascending: true),
             NSSortDescriptor(key: "transactionId", ascending: true)
         ]
-        
+
         return NSFetchedResultsController(
             fetchRequest: request,
             managedObjectContext: coreDataStack.container.viewContext,
@@ -176,16 +178,16 @@ private extension AdamantCoinStorageService {
             cacheName: nil
         )
     }
-    
+
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
     /// - Returns: Transaction, if found
-    func getTransactionFromDB(id: String, context: NSManagedObjectContext) -> CoinTransaction? {
+    fileprivate func getTransactionFromDB(id: String, context: NSManagedObjectContext) -> CoinTransaction? {
         let request = NSFetchRequest<CoinTransaction>(entityName: CoinTransaction.entityCoinName)
         request.predicate = NSPredicate(format: "transactionId == %@ AND uniqueId == %@", String(id), coinId + coinAddress)
         request.fetchLimit = 1
-        
+
         do {
             let result = try context.fetch(request)
             return result.first
@@ -206,9 +208,10 @@ extension Notification {
         return ManagedObjectContextChanges<Object>(
             updated: objects(forKey: NSUpdatedObjectsKey),
             inserted: objects(forKey: NSInsertedObjectsKey),
-            deleted: objects(forKey: NSDeletedObjectsKey))
+            deleted: objects(forKey: NSDeletedObjectsKey)
+        )
     }
-    
+
     private func objects<Object: NSManagedObject>(forKey key: String) -> Set<Object>? {
         guard let userInfo = userInfo else {
             assertionFailure()

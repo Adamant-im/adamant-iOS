@@ -1,3 +1,4 @@
+import AdamantWalletsKit
 //
 //  UIImage+adamant.swift
 //  Adamant
@@ -6,10 +7,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 import UIKit
-import AdamantWalletsKit
 
-public extension UIImage {
-    static func asset(named: String) -> UIImage? {
+extension UIImage {
+    public static func asset(named: String) -> UIImage? {
         if let image = UIImage(named: named, in: .module, with: nil) {
             return image
         }
@@ -19,8 +19,8 @@ public extension UIImage {
 
         return nil
     }
-    
-    func imageResized(to size: CGSize) -> UIImage {
+
+    public func imageResized(to size: CGSize) -> UIImage {
         return UIGraphicsImageRenderer(size: size).image { _ in
             draw(in: CGRect(origin: .zero, size: size))
         }

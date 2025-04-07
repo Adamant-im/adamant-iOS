@@ -6,59 +6,60 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import UIKit
+import CommonKit
 import Eureka
 import LiskKit
-import CommonKit
+import UIKit
 
 @MainActor
 final class KlyTransferViewController: TransferViewControllerBase {
-    
+
     // MARK: Properties
-    
+
     private let prefix = "kly"
-    
+
     override var blockchainCommentsEnabled: Bool {
         !commentsEnabled
     }
-    
+
     override var transactionFee: Decimal {
-        let blockchainComment: String = (form.rowBy(
-            tag: BaseRows.blockchainComments(
-                coin: walletCore.tokenName
-            ).tag
-        ) as? TextAreaRow)?.value ?? .empty
-        
+        let blockchainComment: String =
+            (form.rowBy(
+                tag: BaseRows.blockchainComments(
+                    coin: walletCore.tokenName
+                ).tag
+            ) as? TextAreaRow)?.value ?? .empty
+
         let baseFee = walletCore.getFee(comment: blockchainComment)
         let additionalyFee = walletCore.additionalFee
-        
+
         return addAdditionalFee
-        ? baseFee + additionalyFee
-        : baseFee
+            ? baseFee + additionalyFee
+            : baseFee
     }
-    
+
     override func checkForAdditionalFee() {
         Task {
             guard let recipientAddress = recipientAddress,
-                  validateRecipient(recipientAddress).isValid
+                validateRecipient(recipientAddress).isValid
             else {
                 addAdditionalFee = false
                 return
             }
-            
+
             let exist = try await walletCore.isExist(address: recipientAddress)
-            
+
             guard !exist else {
                 addAdditionalFee = false
                 return
             }
-            
+
             addAdditionalFee = true
         }
     }
-    
+
     // MARK: Send
-    
+
     @MainActor
     override func sendFunds() {
         let comments: String
@@ -67,32 +68,33 @@ final class KlyTransferViewController: TransferViewControllerBase {
         } else {
             comments = ""
         }
-        
-        let blockchainComment: String? = (form.rowBy(
-            tag: BaseRows.blockchainComments(
-                coin: walletCore.tokenName
-            ).tag
-        ) as? TextAreaRow)?.value
-        
+
+        let blockchainComment: String? =
+            (form.rowBy(
+                tag: BaseRows.blockchainComments(
+                    coin: walletCore.tokenName
+                ).tag
+            ) as? TextAreaRow)?.value
+
         guard let service = walletCore as? KlyWalletService,
-              let recipient = recipientAddress,
-              let amount = amount
+            let recipient = recipientAddress,
+            let amount = amount
         else {
             return
         }
-        
+
         dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
+
         Task {
             do {
                 // Create transaction
                 let transaction = try await service.createTransaction(
                     recipient: recipient,
                     amount: amount,
-                    fee: transactionFee, 
+                    fee: transactionFee,
                     comment: blockchainComment
                 )
-                
+
                 if await !doesNotContainSendingTx(
                     with: String(transaction.nonce),
                     senderAddress: transaction.senderAddress
@@ -100,7 +102,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
                     presentSendingError()
                     return
                 }
-                
+
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
@@ -110,7 +112,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
                         hash: transaction.id
                     )
                 }
-                
+
                 do {
                     service.coinStorage.append(transaction)
                     try await service.sendTransaction(transaction)
@@ -119,15 +121,15 @@ final class KlyTransferViewController: TransferViewControllerBase {
                         for: transaction.id,
                         status: .failed
                     )
-                    
+
                     throw error
                 }
-                
+
                 service.update()
-                
+
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
-                
+
                 // Present detail VC
                 presentDetailTransactionVC(
                     transactionId: transaction.id,
@@ -141,7 +143,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
+
     private func presentDetailTransactionVC(
         transactionId: String,
         transaction: TransactionEntity,
@@ -152,24 +154,24 @@ final class KlyTransferViewController: TransferViewControllerBase {
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
-        
+
         if comments.count > 0 {
             detailsVc.comment = comments
         }
-        
+
         delegate?.transferViewController(
             self,
             didFinishWithTransfer: transaction,
             detailsViewController: detailsVc
         )
     }
-    
+
     // MARK: Overrides
-    
+
     override var recipientAddress: String? {
         set {
             let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
-            
+
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
@@ -180,12 +182,12 @@ final class KlyTransferViewController: TransferViewControllerBase {
             return row?.value?.addPrefixIfNeeded(prefix: prefix)
         }
     }
-    
+
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
         return walletCore.validate(address: fixedAddress)
     }
-    
+
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
@@ -193,7 +195,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
             $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
-            
+
             $0.value = recipientAddress?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
@@ -201,13 +203,13 @@ final class KlyTransferViewController: TransferViewControllerBase {
             let prefixLabel = UILabel()
             prefixLabel.text = prefix
             prefixLabel.sizeToFit()
-            
+
             let view = UIView()
             view.addSubview(prefixLabel)
             view.frame = prefixLabel.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
-            
+
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
@@ -217,11 +219,11 @@ final class KlyTransferViewController: TransferViewControllerBase {
             cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             self?.checkForAdditionalFee()
-            
+
             guard self?.recipientIsReadonly == false else { return }
-    
+
             cell.textField.leftView?.subviews.forEach { view in
                 guard let label = view as? UILabel else { return }
                 label.textColor = UIColor.adamant.primary
@@ -230,19 +232,20 @@ final class KlyTransferViewController: TransferViewControllerBase {
             defer {
                 self?.updateToolbar(for: row)
             }
-            
+
             guard let text = row.value else { return }
-            
+
             var trimmed = text.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-            
+
             if let prefix = self?.prefix,
-               trimmed.starts(with: prefix) {
+                trimmed.starts(with: prefix)
+            {
                 let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
                 trimmed = String(trimmed[i...])
             }
-            
+
             if text != trimmed {
                 DispatchQueue.main.async {
                     row.value = trimmed
@@ -255,7 +258,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
 
         return row
     }
-    
+
     override func defaultSceneTitle() -> String? {
         String.adamant.sendKly
     }

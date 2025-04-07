@@ -9,7 +9,7 @@
 struct AdamantWalletStoreService: WalletStoreServiceProtocol {
     let visibleWalletsService: VisibleWalletsService
     let walletServiceCompose: WalletServiceCompose
-    
+
     init(
         visibleWalletsService: VisibleWalletsService,
         walletServiceCompose: WalletServiceCompose
@@ -17,7 +17,7 @@ struct AdamantWalletStoreService: WalletStoreServiceProtocol {
         self.visibleWalletsService = visibleWalletsService
         self.walletServiceCompose = walletServiceCompose
     }
-        
+
     func isInvisible(_ wallet: WalletService) -> Bool {
         visibleWalletsService.isInvisible(wallet.core.tokenUniqueID)
     }
@@ -30,26 +30,29 @@ struct AdamantWalletStoreService: WalletStoreServiceProtocol {
      */
     func sorted(includeInvisible: Bool) -> [WalletService] {
         let wallets = walletServiceCompose.getWallets()
-        var availableServices = includeInvisible
-        ? wallets
-        : wallets.filter { !isInvisible($0) }
-        
+        var availableServices =
+            includeInvisible
+            ? wallets
+            : wallets.filter { !isInvisible($0) }
+
         for (newIndex, tokenUniqueID) in visibleWalletsService.getSortedWallets(includeInvisible: includeInvisible).enumerated() {
-            guard let index = availableServices.firstIndex(
-                where: { $0.core.tokenUniqueID == tokenUniqueID }
-            ) else {
+            guard
+                let index = availableServices.firstIndex(
+                    where: { $0.core.tokenUniqueID == tokenUniqueID }
+                )
+            else {
                 continue
             }
-            
+
             let wallet = availableServices.remove(at: index)
-            
+
             if availableServices.indices.contains(newIndex) {
                 availableServices.insert(wallet, at: newIndex)
             } else {
                 availableServices.append(wallet)
             }
         }
-        
+
         return availableServices
     }
 }

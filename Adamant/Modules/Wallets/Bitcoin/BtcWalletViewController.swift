@@ -6,8 +6,8 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension String.adamant {
     static var bitcoin: String {
@@ -24,15 +24,15 @@ extension String.adamant {
 }
 
 final class BtcWalletViewController: WalletViewControllerBase {
-    
+
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendBtc)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "bitcoin:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

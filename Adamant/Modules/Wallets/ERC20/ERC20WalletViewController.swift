@@ -6,9 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import UIKit
-import CommonKit
 
 extension String.adamant.wallets {
     enum erc20 {
@@ -34,7 +34,7 @@ final class ERC20WalletViewController: WalletViewControllerBase {
         let networkFont = currencyFont.withSize(8)
         let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
         let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
-        
+
         let defaultString = NSMutableAttributedString(
             string: tokenSymbol,
             attributes: currencyAttributes
@@ -43,16 +43,16 @@ final class ERC20WalletViewController: WalletViewControllerBase {
             string: " \(networkSymbol)",
             attributes: networkAttributes
         )
-        
+
         defaultString.append(underlineString)
-        
+
         return defaultString
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

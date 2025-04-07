@@ -1,3 +1,5 @@
+import CommonKit
+import MessageKit
 //
 //  NewMessagesCell.swift
 //  Adamant
@@ -6,8 +8,6 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 import UIKit
-import CommonKit
-import MessageKit
 
 final class NewMessagesCell: MessageReusableView {
     private let separatorLine: UIView = {
@@ -15,7 +15,7 @@ final class NewMessagesCell: MessageReusableView {
         view.backgroundColor = .adamant.newMessageLineColor
         return view
     }()
-    
+
     private let label: UILabel = {
         let label = UILabel()
         label.text = String.localized("chat.NewMessages")
@@ -24,28 +24,28 @@ final class NewMessagesCell: MessageReusableView {
         label.textAlignment = .right
         return label
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         addSubview(separatorLine)
         addSubview(label)
-        
+
         separatorLine.translatesAutoresizingMaskIntoConstraints = false
         label.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let pixelSize = 1 / UIScreen.main.scale
         NSLayoutConstraint.activate([
             separatorLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             separatorLine.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             separatorLine.topAnchor.constraint(equalTo: topAnchor),
             separatorLine.heightAnchor.constraint(equalToConstant: pixelSize),
-            
+
             label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             label.topAnchor.constraint(equalTo: separatorLine.bottomAnchor, constant: 1)
         ])
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

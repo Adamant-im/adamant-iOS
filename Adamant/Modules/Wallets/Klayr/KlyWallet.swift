@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 import LiskKit
 
 final class KlyWallet: WalletAccount, @unchecked Sendable {
@@ -15,7 +15,7 @@ final class KlyWallet: WalletAccount, @unchecked Sendable {
     let legacyAddress: String
     let kly32Address: String
     let keyPair: KeyPair
-    
+
     @Atomic var balance: Decimal = 0.0
     @Atomic var notifications: Int = 0
     @Atomic var isNewApi: Bool = true
@@ -23,15 +23,15 @@ final class KlyWallet: WalletAccount, @unchecked Sendable {
     @Atomic var minBalance: Decimal = 0.05
     @Atomic var minAmount: Decimal = 0
     @Atomic var isBalanceInitialized: Bool = false
-    
+
     var address: String {
         return isNewApi ? kly32Address : legacyAddress
     }
 
     var binaryAddress: String {
-        return isNewApi 
-        ? LiskKit.Crypto.getBinaryAddressFromBase32(kly32Address) ?? .empty
-        : legacyAddress
+        return isNewApi
+            ? LiskKit.Crypto.getBinaryAddressFromBase32(kly32Address) ?? .empty
+            : legacyAddress
     }
 
     init(

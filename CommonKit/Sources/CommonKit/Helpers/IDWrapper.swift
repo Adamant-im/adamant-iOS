@@ -11,7 +11,7 @@ import Foundation
 public struct IDWrapper<T>: Identifiable {
     public let id: String
     public let value: T
-    
+
     public init(id: String, value: T) {
         self.id = id
         self.value = value

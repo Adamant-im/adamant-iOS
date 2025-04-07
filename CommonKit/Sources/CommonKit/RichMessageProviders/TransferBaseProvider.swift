@@ -6,12 +6,12 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import MarkdownKit
 import UIKit
 import UserNotifications
-import MarkdownKit
 
 public class TransferBaseProvider: TransferNotificationContentProvider {
-    
+
     /// Create notification content for Rich messages
     public func notificationContent(
         for transaction: Transaction,
@@ -20,87 +20,91 @@ public class TransferBaseProvider: TransferNotificationContentProvider {
         richContent: [String: Any]
     ) -> NotificationContent? {
         guard let amountRaw = richContent[RichContentKeys.transfer.amount] as? String,
-              let amount = Decimal(string: amountRaw) else {
+            let amount = Decimal(string: amountRaw)
+        else {
             return nil
         }
-        
+
         let comment: String?
         if let raw = richContent[RichContentKeys.transfer.comments] as? String,
-           raw.count > 0 {
+            raw.count > 0
+        {
             comment = raw
         } else {
             comment = nil
         }
-        
+
         return notificationContent(partnerAddress: partnerAddress, partnerName: partnerName, amount: amount, comment: comment)
     }
-    
+
     /// Create notification content for rich transfers with comments, such as ADM transfer
     public func notificationContent(partnerAddress: String, partnerName: String?, amount: Decimal, comment: String?) -> NotificationContent? {
         let amountFormated = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
         var body = String.adamant.notifications.yourTransferBody(with: amountFormated)
-        
+
         if let comment = comment {
             let stripped = MarkdownParser().parse(comment).string
             body = "\(body)\n\(stripped)"
         }
-        
+
         let identifier = type(of: self).richMessageType
         let attachments: [UNNotificationAttachment]?
         if let url = currencyLogoUrl,
-            let attachment = try? UNNotificationAttachment(identifier: identifier, url: url) {
+            let attachment = try? UNNotificationAttachment(identifier: identifier, url: url)
+        {
             attachments = [attachment]
         } else {
             attachments = nil
         }
-        
+
         return NotificationContent(
             title: partnerName ?? partnerAddress,
             subtitle: .adamant.notifications.newTransfer,
             body: body,
             attachments: attachments,
-            categoryIdentifier: AdamantNotificationCategories.transfer)
+            categoryIdentifier: AdamantNotificationCategories.transfer
+        )
     }
-    
+
     // MARK: - To override
-    
+
     public class var richMessageType: String {
         assertionFailure("Provide richMessageType")
         return .empty
     }
-    
+
     public var currencyLogoLarge: UIImage {
         assertionFailure("Provide currency logo")
         return .init()
     }
-    
+
     public var currencyLogoUrl: URL? {
         assertionFailure("Provide currencyLogoUrl")
         return nil
     }
-    
+
     public var currencySymbol: String {
         assertionFailure("Provide currencySymbol")
         return .empty
     }
-    
+
     public init() {}
-    
+
     // MARK: - Private
-    
+
     private func saveLocally(image: UIImage, name: String) -> URL? {
         let fileManager = FileManager.default
         let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         let url = cacheDirectory.appendingPathComponent("\(name).png")
-        
+
         if fileManager.fileExists(atPath: url.path) {
             return url
         }
-        
+
         guard let data = image.pngData() else {
             return nil
         }
-        
+
         fileManager.createFile(atPath: url.path, contents: data, attributes: nil)
         return url
     }

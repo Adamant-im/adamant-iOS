@@ -5,13 +5,13 @@
 //  Created by Andrey Golubenko on 06.12.2022.
 //
 
-import SwiftUI
 import CommonKit
+import SwiftUI
 
 struct NotificationView: View {
     @Binding var isTextLimited: Bool
     let model: NotificationModel
-    
+
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             HStack(alignment: .top, spacing: 10) {
@@ -28,8 +28,8 @@ struct NotificationView: View {
     }
 }
 
-private extension NotificationView {
-    func makeIcon(image: UIImage) -> some View {
+extension NotificationView {
+    fileprivate func makeIcon(image: UIImage) -> some View {
         Image(uiImage: image)
             .resizable()
             .renderingMode(.original)
@@ -38,8 +38,8 @@ private extension NotificationView {
             .frame(squareSize: 30)
             .padding(.top, 2)
     }
-    
-    var textStack: some View {
+
+    fileprivate var textStack: some View {
         VStack(alignment: .leading, spacing: 3) {
             if let title = model.title {
                 Text(title)

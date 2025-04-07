@@ -6,14 +6,14 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import Foundation
-import CommonKit
 import Combine
+import CommonKit
+import Foundation
 
 @MainActor
 final class AccountWalletsViewModel {
     @ObservableValue var state: AccountWalletsState = .default
-    
+
     private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var walletSubscriptions: Set<AnyCancellable> = []
     private var currentWalletPublisherSubscription: Set<AnyCancellable> = []
@@ -24,8 +24,8 @@ final class AccountWalletsViewModel {
     }
 }
 
-private extension AccountWalletsViewModel {
-    func setup() {
+extension AccountWalletsViewModel {
+    fileprivate func setup() {
         addObservers()
     }
     
@@ -60,7 +60,7 @@ private extension AccountWalletsViewModel {
             state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
         } else {
             let network = type(of: coreService).tokenNetworkSymbol
-            
+
             let model = WalletCollectionViewCell.Model(
                 index: state.wallets.count,
                 coinID: coreService.tokenUniqueID,
@@ -71,7 +71,7 @@ private extension AccountWalletsViewModel {
                 balance: coreService.wallet?.balance ?? 0,
                 notificationBadgeCount: coreService.wallet?.notifications ?? 0
             )
-            
+
             state.wallets.append(model)
         }
     }

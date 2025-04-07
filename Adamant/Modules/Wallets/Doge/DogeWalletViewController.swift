@@ -6,8 +6,8 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
+import UIKit
 
 extension String.adamant {
     static var doge: String {
@@ -27,11 +27,11 @@ final class DogeWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendDoge)
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "doge:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = makeTitle()
     }

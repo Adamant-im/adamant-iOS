@@ -12,7 +12,7 @@ import UIKit
 @MainActor
 struct ShareQRFactory {
     let assembler: Assembler
-    
+
     func makeViewController() -> ShareQrViewController {
         ShareQrViewController(dialogService: assembler.resolve(DialogService.self)!)
     }

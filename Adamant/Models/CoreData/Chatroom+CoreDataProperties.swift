@@ -7,8 +7,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 // TODO: remove desynchronization between hasUnreadMessages and lastTransaction.isUnread
 extension Chatroom {

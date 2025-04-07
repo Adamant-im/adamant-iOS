@@ -30,7 +30,7 @@ public struct OpAbsolute: OpCodeProtocol {
     public var name: String { return "OP_ABS" }
 
     // (in -- out)
-     public func mainProcess(_ context: ScriptExecutionContext) throws {
+    public func mainProcess(_ context: ScriptExecutionContext) throws {
         try context.assertStackHeightGreaterThanOrEqual(1)
 
         let input = try context.number(at: -1)
