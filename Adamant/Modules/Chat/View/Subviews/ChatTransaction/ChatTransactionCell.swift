@@ -17,6 +17,11 @@ final class ChatTransactionCell: MessageContentCell, ChatModelView {
     private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
 
     var subscription: AnyCancellable?
+    var copyNotification: (() -> Void)? {
+        didSet {
+            transactionView.copyNotification = copyNotification
+        }
+    }
 
     var model: ChatTransactionContainerView.Model = .default {
         didSet {

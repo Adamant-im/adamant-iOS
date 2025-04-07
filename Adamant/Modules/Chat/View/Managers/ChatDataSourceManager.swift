@@ -152,6 +152,9 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+                cell.copyNotification = { [weak self] in
+                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                }
                 return cell
             }
 
