@@ -23,6 +23,10 @@ protocol WalletViewControllerDelegate: AnyObject {
 }
 
 class WalletViewControllerBase: FormViewController, WalletViewController {
+    var walletName: String {
+        fatalError("Should be overridden")
+    }
+    
     // MARK: - Rows
     enum BaseRows {
         case address, balance, send
@@ -330,8 +334,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     }
     
     func makeTitle() -> String {
-        guard let service = service else { return "" }
-        return secretWalletsViewModel.getCurrentWalletCoinName(withWalletService: service)
+        guard service != nil else { return "" }
+        return secretWalletsViewModel.getCurrentWalletCoinName(withCoinName: walletName)
     }
     
     func setTitle() {

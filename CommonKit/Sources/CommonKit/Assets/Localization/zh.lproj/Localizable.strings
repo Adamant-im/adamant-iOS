@@ -248,25 +248,25 @@
 "AccountTab.Section.Application" = "应用";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT钱包";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
+"AccountTab.Wallets.ethereum" = "以太坊";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr钱包";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
+"AccountTab.Wallets.bitcoin" = "比特币";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "狗狗钱包";
+"AccountTab.Wallets.doge" = "狗狗";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "达世币钱包";
+"AccountTab.Wallets.dash" = "达世币";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "%@钱包";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account page: scene title */
 "AccountTab.Title" = "帐户";

@@ -10,16 +10,16 @@ import CommonKit
 import UIKit
 
 extension String.adamant {
-    static var doge: String {
-        String.localized("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
-    }
-    
     static var sendDoge: String {
         String.localized("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
     }
 }
 
 final class DogeWalletViewController: WalletViewControllerBase {
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.doge", comment: "Account tab: Doge wallet")
+    }
+    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendDoge)
     }

@@ -251,25 +251,25 @@
 "AccountTab.Section.Application" = "Application";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT Wallet";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
+"AccountTab.Wallets.ethereum" = "Ethereum";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr Wallet";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
+"AccountTab.Wallets.bitcoin" = "Bitcoin";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+"AccountTab.Wallets.doge" = "Doge";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "Dash Wallet";
+"AccountTab.Wallets.dash" = "Dash";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "%@ Wallet";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";

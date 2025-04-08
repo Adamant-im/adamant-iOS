@@ -10,17 +10,16 @@ import CommonKit
 import UIKit
 
 extension String.adamant {
-    static var bitcoin: String {
-        String.localized("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
-    }
-    
     static var sendBtc: String {
         String.localized("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
     }
 }
 
 final class BtcWalletViewController: WalletViewControllerBase {
-
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.bitcoin", comment: "Account tab: Bitcoin wallet")
+    }
+    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendBtc)
     }

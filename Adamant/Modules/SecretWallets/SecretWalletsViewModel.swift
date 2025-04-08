@@ -94,14 +94,14 @@ extension SecretWalletsViewModel {
     }
     
     // Used in walletViewControllerBase
-    func getCurrentWalletCoinName(withWalletService wallet: WalletService) -> String {
+    func getCurrentWalletCoinName(withCoinName name: String) -> String {
         if state.wallets.count == 1 {
             return String.localizedStringWithFormat(
                 String.localized(
                     "SecretWallets.Coin.Regular",
                     comment: "Regular Wallet"
                 ),
-                wallet.core.tokenName
+                name
             )
         }
         
@@ -111,7 +111,7 @@ extension SecretWalletsViewModel {
                     "SecretWallets.Coin.Secret\(state.currentActiveIndex)",
                     comment: "Secret Wallet"
                 ),
-                wallet.core.tokenName
+                name
             )
         }
         
@@ -120,7 +120,7 @@ extension SecretWalletsViewModel {
                 "SecretWallets.Coin.SecretRegular",
                 comment: "Regular Wallet"
             ),
-            wallet.core.tokenName
+            name
         )
     }
 }

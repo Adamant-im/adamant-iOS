@@ -248,25 +248,25 @@
 "AccountTab.Section.Application" = "Приложение";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "Кошелек ADAMANT";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
+"AccountTab.Wallets.ethereum" = "Ethereum";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Кошелек Klayr";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "Кошелек Bitcoin";
+"AccountTab.Wallets.bitcoin" = "Bitcoin";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "Кошелек Doge";
+"AccountTab.Wallets.doge" = "Doge";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "Кошелек Dash";
+"AccountTab.Wallets.dash" = "Dash";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "Кошелек %@";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";

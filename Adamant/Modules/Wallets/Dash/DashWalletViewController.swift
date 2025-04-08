@@ -11,16 +11,16 @@ import Foundation
 import UIKit
 
 extension String.adamant {
-    static var dash: String {
-        String.localized("AccountTab.Wallets.dash_wallet", comment: "Account tab: Dash wallet")
-    }
-    
     static var sendDash: String {
         String.localized("AccountTab.Row.SendDash", comment: "Account tab: 'Send Dash tokens' button")
     }
 }
 
 final class DashWalletViewController: WalletViewControllerBase {
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.dash", comment: "Account tab: Dash wallet")
+    }
+    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendDash)
     }

@@ -10,16 +10,15 @@ import CommonKit
 import UIKit
 
 extension String.adamant.wallets {
-    static var ethereum: String {
-        String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
-    }
-    
     static var sendEth: String {
         String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
     }
 }
 
 final class EthWalletViewController: WalletViewControllerBase {
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.ethereum", comment: "Account tab: Ethereum wallet")
+    }
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.wallets.sendEth)
     }
