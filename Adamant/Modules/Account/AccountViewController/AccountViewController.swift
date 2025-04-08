@@ -91,9 +91,9 @@ final class AccountViewController: FormViewController {
 
     private var walletViewControllers: [WalletViewController] = []
     
-    private lazy var currentSelectedWallet: AccountWalletCellState? = { viewModel.state.wallets.first(where: { wallet in
-        wallet.model.index == 0
-    })}()
+    private lazy var currentSelectedWallet: AccountWalletCellState? = {
+        viewModel.state.wallets.first(where: { $0.model.index == 0 })
+    }()
 
     private var initiated = false
 

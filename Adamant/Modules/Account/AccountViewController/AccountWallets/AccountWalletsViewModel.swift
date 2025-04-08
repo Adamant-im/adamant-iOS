@@ -46,11 +46,11 @@ extension AccountWalletsViewModel {
         let tokenID = coreService.tokenUniqueID
         if let index = state.wallets.firstIndex(where: { $0.model.coinID == tokenID }) {
             let cellState = state.wallets[index]
-            var newModel = cellState.model
-            newModel.balance = coreService.wallet?.balance ?? 0
-            newModel.isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
-            newModel.notificationBadgeCount = coreService.wallet?.notifications ?? 0
-            cellState.model = newModel
+            var currentModel = cellState.model
+            currentModel.balance = coreService.wallet?.balance ?? 0
+            currentModel.isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
+            currentModel.notificationBadgeCount = coreService.wallet?.notifications ?? 0
+            cellState.model = currentModel
             state.wallets[index] = cellState
         } else {
             let network = type(of: coreService).tokenNetworkSymbol
