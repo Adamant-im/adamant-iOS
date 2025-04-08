@@ -2,6 +2,8 @@
   "name": "Uniswap",
   "symbol": "UNI",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 1000,
   "contractId": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
   "decimals": 18
 }

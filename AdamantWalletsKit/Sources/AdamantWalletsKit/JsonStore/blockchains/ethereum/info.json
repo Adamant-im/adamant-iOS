@@ -3,5 +3,9 @@
   "type": "ERC20",
   "mainCoin": "ethereum",
   "fees": "ethereum",
+  "reliabilityGasPricePercent": 15,
+  "reliabilityGasLimitPercent": 10,
+  "increasedGasPricePercent": 30,
+  "defaultGasPriceGwei": 10,
   "defaultGasLimit": 58000
 }

@@ -2,6 +2,8 @@
   "name": "Polygon",
   "symbol": "MATIC",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 1000,
   "contractId": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
   "decimals": 18
 }
