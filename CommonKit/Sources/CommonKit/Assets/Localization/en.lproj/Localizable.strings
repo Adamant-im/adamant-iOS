@@ -1384,11 +1384,17 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "💰 Regular";
+"SecretWallets.Menu.Regular.WithoutEmodji" = "Regular";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ Secret 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ Secret 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ Secret 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ Secret 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
+"SecretWallets.Menu.Secret1.Emodji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emodji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emodji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emodji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emodji" = "🔐5️⃣";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
@@ -1398,12 +1404,13 @@
 "SecretWallets.Menu.AddSecretWallet.Title" = "Enter password to add secret wallet";
 "SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Password";
 "SecretWallets.Menu.AddSecretWallet.Add" = "Add";
-"SecretWallets.Row.Title" = "Secret wallets";
+"SecretWallets.Row.Title" = "Secret wallets (Add)";
 
-/* Secret Wallets Coins name*/
-"SecretWallets.Bitcoin.Secret" = "Secret Bitcoin Wallet";
-"SecretWallets.Doge.Secret" = "Secret Doge Wallet";
-"SecretWallets.erc20_wallet.Secret" = "Secret %@ Wallet";
-"SecretWallets.Dash.Secret" = "Secret Dash Wallet";
-"SecretWallets.Ethereum.Secret" = "Secret Ethereum Wallet";
-"SecretWallets.kly.Secret" = "Secret KLY Wallet";
+/* Secret Wallets Coins names*/
+"SecretWallets.Coin.Regular" = "%@ Wallet";
+"SecretWallets.Coin.SecretRegular" = "Regular %@ Wallet";
+"SecretWallets.Coin.Secret1" = "Secret %@ Wallet 🔐1️⃣";
+"SecretWallets.Coin.Secret2" = "Secret %@ Wallet 🔐2️⃣";
+"SecretWallets.Coin.Secret3" = "Secret %@ Wallet 🔐3️⃣";
+"SecretWallets.Coin.Secret4" = "Secret %@ Wallet 🔐4️⃣";
+"SecretWallets.Coin.Secret5" = "Secret %@ Wallet 🔐5️⃣";

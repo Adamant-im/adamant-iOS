@@ -329,8 +329,14 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return addressRow
     }
     
-    func makeTitle() -> String { fatalError("Should be overriden") }
-    func setTitle() { }
+    func makeTitle() -> String {
+        guard let service = service else { return "" }
+        return secretWalletsViewModel.getCurrentWalletCoinName(withWalletService: service)
+    }
+    
+    func setTitle() {
+        walletTitleLabel.text = makeTitle()
+    }
     
     // MARK: - Other
 

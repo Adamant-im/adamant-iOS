@@ -1408,11 +1408,17 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "💰 Normal";
+"SecretWallets.Menu.Regular.WithoutEmodji" = "Normal";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ Geheim 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ Geheim 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ Geheim 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ Geheim 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Geheim 5";
+"SecretWallets.Menu.Secret1.Emodji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emodji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emodji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emodji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emodji" = "🔐5️⃣";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Geheimen hinzufügen";
 "SecretWallets.Menu.TellMeMore" = "💡 Über Wallets";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
@@ -1422,12 +1428,13 @@
 "SecretWallets.Menu.AddSecretWallet.Title" = "Geben Sie das Passwort ein, um eine geheime Wallet hinzuzufügen";
 "SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Passwort";
 "SecretWallets.Menu.AddSecretWallet.Add" = "Hinzufügen";
-"SecretWallets.Row.Title" = "Geheime Geldbörsen";
+"SecretWallets.Row.Title" = "Geheime Wallets (Hinzufügen)";
 
-/* Secret Wallets Coins name*/
-"SecretWallets.Bitcoin.Secret" = "Geheime Bitcoin-Wallet";
-"SecretWallets.Doge.Secret" = "Geheime Doge-Wallet";
-"SecretWallets.erc20_wallet.Secret" = "Geheime %@-Wallet";
-"SecretWallets.Dash.Secret" = "Geheime Dash-Wallet";
-"SecretWallets.Ethereum.Secret" = "Geheime Ethereum-Wallet";
-"SecretWallets.kly.Secret" = "Geheime KLY-Wallet";
+/* Secret Wallets Coins names*/
+"SecretWallets.Coin.Regular" = "%@ Wallet";
+"SecretWallets.Coin.SecretRegular" = "Reguläres %@ Wallet";
+"SecretWallets.Coin.Secret1" = "Geheimes %@ Wallet 🔐1️⃣";
+"SecretWallets.Coin.Secret2" = "Geheimes %@ Wallet 🔐2️⃣";
+"SecretWallets.Coin.Secret3" = "Geheimes %@ Wallet 🔐3️⃣";
+"SecretWallets.Coin.Secret4" = "Geheimes %@ Wallet 🔐4️⃣";
+"SecretWallets.Coin.Secret5" = "Geheimes %@ Wallet 🔐5️⃣";

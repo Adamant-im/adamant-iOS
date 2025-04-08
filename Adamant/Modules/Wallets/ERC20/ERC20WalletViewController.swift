@@ -16,10 +16,6 @@ extension String.adamant.wallets {
             return String(format: .localized("AccountTab.Wallets.erc20_wallet", comment: "Account tab: Ethereum wallet"), token)
         }
         
-        static func secretTokenWallet(_ token: String) -> String {
-            return String(format: .localized("SecretWallets.erc20_wallet.Secret", comment: "Account tab: Ethereum wallet"), token)
-        }
-        
         static func sendToken(_ token: String) -> String {
             return String(format: .localized("AccountTab.Row.SendToken", comment: "Account tab: 'Send ERC20 tokens' button"), token)
         }
@@ -51,18 +47,5 @@ final class ERC20WalletViewController: WalletViewControllerBase {
 
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
-    }
-
-    override func setTitle() {
-        walletTitleLabel.text = makeTitle()
-    }
-    
-    override func makeTitle() -> String {
-        let index = secretWalletsViewModel.state.currentActiveIndex
-        if index <= 0 {
-            return String.adamant.wallets.erc20.tokenWallet(service?.core.tokenName ?? "")
-        } else {
-            return String.adamant.wallets.erc20.secretTokenWallet(service?.core.tokenName ?? "") + " \(index)"
-        }
     }
 }
