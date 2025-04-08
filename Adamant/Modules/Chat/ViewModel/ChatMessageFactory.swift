@@ -571,17 +571,8 @@ extension ChatMessageFactory {
     }
 
     fileprivate func checkTransactionForUnreadReaction(transaction: ChatTransaction) -> Bool {
-        if let messageTransaction = transaction as? MessageTransaction,
-            let richTransactions = messageTransaction.richMessageTransactions,
-            !richTransactions.isEmpty
-        {
-            return richTransactions.contains { $0.isUnread }
-        }
-
-        if let transferTransaction = transaction as? TransferTransaction,
-            let richTransactions = transferTransaction.richMessageTransactions,
-            !richTransactions.isEmpty
-        {
+        if let richTransactions = transaction.richMessageTransactions,
+           !richTransactions.isEmpty {
             return richTransactions.contains { $0.isUnread }
         }
 
