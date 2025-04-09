@@ -129,7 +129,7 @@ extension WalletStaticCoreProtocol {
         coinInfo?.nodes?.list.map { walletNode in
             Node.makeDefaultNode(
                 url: URL(string: walletNode.url)!,
-                altUrl: walletNode.altIP.flatMap { URL(string: $0) }
+                altUrl: walletNode.altIp.flatMap { URL(string: $0) }
             )
         } ?? []
     }
@@ -138,7 +138,7 @@ extension WalletStaticCoreProtocol {
         coinInfo?.services?.infoService?.list.map { serviceNode in
             Node.makeDefaultNode(
                 url: URL(string: serviceNode.url)!,
-                altUrl: serviceNode.altIP.flatMap { URL(string: $0) }
+                altUrl: serviceNode.altIp.flatMap { URL(string: $0) }
             )
         } ?? []
     }

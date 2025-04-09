@@ -2,6 +2,8 @@
   "name": "Binance Coin",
   "symbol": "BNB",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 1000,
   "contractId": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
   "decimals": 18
 }

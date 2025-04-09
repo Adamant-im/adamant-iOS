@@ -237,8 +237,12 @@ extension AdamantAccountService {
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         update(completion, updateOnlyVisible: true)
     }
+    
+    func updateWithRefreshUI() {
+        update(nil, updateOnlyVisible: true, shouldUpdateUIBalance: true)
+    }
 
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool, shouldUpdateUIBalance: Bool = false) {
         switch state {
         case .notLogged, .isLoggingIn, .updating:
             return
@@ -287,7 +291,11 @@ extension AdamantAccountService {
 
         for wallet in wallets {
             if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
-                wallet.core.update()
+                if shouldUpdateUIBalance {
+                    wallet.core.updateWithRefreshUIBalance()
+                } else {
+                    wallet.core.update()
+                }
             }
         }
     }

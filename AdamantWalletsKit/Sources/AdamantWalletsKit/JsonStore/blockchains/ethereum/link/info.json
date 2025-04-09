@@ -2,6 +2,8 @@
   "name": "Chainlink",
   "symbol": "LINK",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 200,
   "contractId": "0x514910771af9ca656af840dff83e8264ecf986ca",
   "decimals": 18
 }

@@ -2,6 +2,8 @@
   "name": "Binance USD",
   "symbol": "BUSD",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 1000,
   "contractId": "0x4fabb145d64652a948d72533023f6e7a623c7c53",
   "decimals": 18
 }
