@@ -18,7 +18,7 @@
 		557AC306287B10D8004699D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 557AC305287B10D8004699D7 /* SnapKit */; };
 		55D1D84F287B78F200F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D84E287B78F200F94A4E /* SnapKit */; };
 		55D1D851287B78FC00F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D850287B78FC00F94A4E /* SnapKit */; };
-		6403F5DB2272389800D58779 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		6FB686162D3AAE8800CAB6DD /* AdamantWalletsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6FB686152D3AAE8800CAB6DD /* AdamantWalletsKit */; };
 		9342F6C22A6A35E300A9B39F /* CommonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9342F6C12A6A35E300A9B39F /* CommonKit */; };
 		937751A52A68B3320054BD65 /* CommonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 937751A42A68B3320054BD65 /* CommonKit */; };
@@ -31,7 +31,7 @@
 		A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B6F262DEDE1009FA43E /* Clibsodium */; };
 		A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B76262DEDEF009FA43E /* Clibsodium */; };
 		A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B7D262DEDFE009FA43E /* Clibsodium */; };
-		A530B0D82842110D003F0210 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		A530B0D82842110D003F0210 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		A544F0D4262C9878001F1A6D /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* Eureka */; };
 		A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* DateToolsSwift */; };
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
@@ -249,8 +249,6 @@
 		};
 		D3A860F82DA1C1980007B599 /* NotificationsShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = NotificationsShared;
 			sourceTree = "<group>";
 		};
@@ -317,7 +315,7 @@
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				6FB686162D3AAE8800CAB6DD /* AdamantWalletsKit in Frameworks */,
 				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
-				A530B0D82842110D003F0210 /* BuildFile in Frameworks */,
+				A530B0D82842110D003F0210 /* (null) in Frameworks */,
 				4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
@@ -669,12 +667,12 @@
 				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */,
 				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */,
 				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */,
-				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
+				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */,
 				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
 				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 				3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */,
 				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
+				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
@@ -824,7 +822,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6403F5DB2272389800D58779 /* BuildFile in Sources */,
+				6403F5DB2272389800D58779 /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1367,7 +1365,7 @@
 				kind = branch;
 			};
 		};
-		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
 			requirement = {
@@ -1447,7 +1445,7 @@
 				minimumVersion = 1.2.2;
 			};
 		};
-		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
+		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -1526,7 +1524,7 @@
 		};
 		416F5EA3290162EB00EF0400 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
 		};
 		4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */ = {
@@ -1644,7 +1642,7 @@
 		};
 		A5C99E0D262C9E3A00F7B1B7 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
+			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
 		A5D87BA2262CA01D00DC28F0 /* ProcedureKit */ = {
