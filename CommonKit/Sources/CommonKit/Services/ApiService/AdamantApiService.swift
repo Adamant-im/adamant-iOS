@@ -8,14 +8,25 @@
 
 import Foundation
 
+
+///
+/// I need to override HealthCheckWrapped because of now we have an option to cancel the tasks
+/// and there is some situations when we are waiting for connection on the node and recursevly calling `request`
+/// function without any break condition and that is bad and unsafe. I've added a functionality of pushing the assosiated with the task `UUID`
+/// and checking it for a cancellation before doing something in the recursive function
+/// `request(waitsForConnectivity:taskId:isCancelled:_ request:)`
+/// 
+
+
 public final class AdamantApiService: @unchecked Sendable {
     @Atomic private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
+    private var cancelled: Bool = false
 
     public let adamantCore: AdamantCore
-    public let service: BlockchainHealthCheckWrapper<AdamantApiCore>
+    public let service: AdamantHealthCheck
 
     public init(
-        healthCheckWrapper: BlockchainHealthCheckWrapper<AdamantApiCore>,
+        healthCheckWrapper: AdamantHealthCheck,
         adamantCore: AdamantCore
     ) {
         service = healthCheckWrapper
@@ -26,23 +37,30 @@ public final class AdamantApiService: @unchecked Sendable {
         waitsForConnectivity: Bool = false,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
+        let taskId: UUID = .init()
         let task = AdamantApiTask<Output>(
             task: Task {
                 await service.request(
-                    waitsForConnectivity: waitsForConnectivity
-                ) { admApiCore, origin in
-                    let result = await request(admApiCore.apiCore, origin)
-                    do {
-                        try Task.checkCancellation()
-                    } catch {
-                        return .failure(.requestCancelled)
+                    waitsForConnectivity: waitsForConnectivity,
+                    taskId: taskId,
+                    isCancelled: {
+                        adamantApiTaskStorage[taskId]?.isCancelled
+                        ?? true
                     }
-                    return result
+                ) { admApiCore, origin in
+                    return await request(admApiCore.apiCore, origin)
                 }
             }
         )
-        task.storeIn(taskStorage: &adamantApiTaskStorage)
-        defer { task.removeFrom(taskStorage: &adamantApiTaskStorage) }
+        task.id = taskId
+        _adamantApiTaskStorage.mutate { storage in
+            storage[taskId] = task
+        }
+        defer {
+            _adamantApiTaskStorage.mutate { storage in
+                storage[taskId] = nil
+            }
+        }
         return await task.value
     }
 
@@ -61,4 +79,50 @@ extension AdamantApiService: AdamantApiServiceProtocol {
     public var nodesInfo: NodesListInfo { service.nodesInfo }
 
     public func healthCheck() { service.healthCheck() }
+}
+
+public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCore> {
+    func request<Output>(
+        waitsForConnectivity: Bool,
+        taskId: UUID,
+        isCancelled: () -> Bool,
+        _ requestAction: (AdamantApiCore, NodeOrigin) async -> Result<Output, AdamantApiCore.Error>
+    ) async -> Result<Output, AdamantApiCore.Error> {
+        var usedNodesIds: Set<UUID> = .init()
+        var lastConnectionError: Error?
+        
+        /// Check the cancellation of the task from the outside
+        guard !isCancelled() else {
+            return .failure(.requestCancelled)
+        }
+
+        while true {
+            let node = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
+                .first { !usedNodesIds.contains($0.id) }
+
+            guard let node else { break }
+            usedNodesIds.insert(node.id)
+            let response = await requestAction(service, node.preferredOrigin)
+
+            switch response {
+            case .success:
+                return response
+            case let .failure(error):
+                guard error.isNetworkError else { return response }
+                lastConnectionError = error
+            }
+        }
+        
+        healthCheck()
+
+        lastConnectionError =
+            lastConnectionError
+            ?? (nodes.contains { $0.isEnabled }
+                ? ApiServiceError.noNetworkError
+                : ApiServiceError.noEndpointsError(nodeGroupName: name))
+        
+        return await waitsForConnectivity
+        ? request(waitsForConnectivity: waitsForConnectivity, taskId: taskId, isCancelled: isCancelled, requestAction)
+        : .failure(lastConnectionError as? AdamantApiCore.Error ?? .noEndpointsAvailable(nodeGroupName: name))
+    }
 }
