@@ -50,9 +50,8 @@ public final class AdamantApiService: @unchecked Sendable {
                 ) { admApiCore, origin in
                     return await request(admApiCore.apiCore, origin)
                 }
-            }
+            }, id: taskId
         )
-        task.id = taskId
         _adamantApiTaskStorage.mutate { storage in
             storage[taskId] = task
         }

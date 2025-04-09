@@ -9,7 +9,7 @@ import Foundation
 
 final class AdamantApiTask<Output>: CancellableTask {
     private let task: Task<Result<Output, ApiServiceError>, Never>
-    var id: UUID!
+    private let id: UUID
     
     var isCancelled: Bool {
         task.isCancelled
@@ -25,8 +25,9 @@ final class AdamantApiTask<Output>: CancellableTask {
         }
     }
 
-    init(task: Task<Result<Output, ApiServiceError>, Never>) {
+    init(task: Task<Result<Output, ApiServiceError>, Never>, id: UUID) {
         self.task = task
+        self.id = id
     }
 
     func cancel() {
