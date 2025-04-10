@@ -212,7 +212,23 @@ final class ChatViewController: MessagesViewController {
         }
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
-
+    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        canPerformAction action: Selector,
+        forItemAt indexPath: IndexPath,
+        withSender sender: Any?
+    ) -> Bool {
+        return false
+    }
+    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        shouldShowMenuForItemAt indexPath: IndexPath
+    ) -> Bool {
+        return false
+    }
+    
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
         scrollDidStop()
     }
@@ -765,6 +781,9 @@ extension ChatViewController {
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
+        if !messagesLoaded {
+            viewModel.startPosition.map { scrollToPosition($0) }
+        }
     }
 
     fileprivate func updateMessagesPosition() {
@@ -773,9 +792,7 @@ extension ChatViewController {
         if viewModel.messageIdToShow == nil {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: true)
-            } else if let position = viewModel.startPosition {
-                scrollToPosition(position)
-            }
+           }
         }
     }
 

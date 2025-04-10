@@ -1311,13 +1311,13 @@ extension ChatViewModel {
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
             postProcess(messages: &messages)
+            updateSeparatorId()
 
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
-            updateSeparatorId()
             messagesUpdated.send()
         }
     }
