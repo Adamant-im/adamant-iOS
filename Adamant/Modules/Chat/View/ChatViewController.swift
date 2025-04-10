@@ -46,8 +46,10 @@ final class ChatViewController: MessagesViewController {
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
     private var isAnimatingCellHighlight = false
-    private var isAutoScrolling: Bool = false
+    private var isAutoScrolling = false
     private var isAppActive = true
+    //need separate var to read messages but dont animate button
+    private var isScrollingToBottom = false
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -811,7 +813,7 @@ extension ChatViewController {
             self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
             self.updateScrollToUnreadButtonPosition()
         }
-        if messagesLoaded && !isAutoScrolling {
+        if messagesLoaded && !isAutoScrolling && !isScrollingToBottom {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
                 buttonUpdate()
             }
@@ -830,7 +832,7 @@ extension ChatViewController {
         }
         previousUnreadCount = count
         let updateAlpha = { self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1 }
-        if messagesLoaded && !isAutoScrolling {
+        if messagesLoaded && !isAutoScrolling && !isScrollingToBottom {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: updateAlpha)
         } else {
             updateAlpha()
@@ -867,7 +869,7 @@ extension ChatViewController {
         button.action = { [weak self] in
             guard let self else { return }
             if viewModel.shouldScrollToBottom {
-                isAutoScrolling = true
+                isScrollingToBottom = true
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
                 self.scrollToPosition(.messageId(id), animated: true)
@@ -1272,6 +1274,7 @@ extension ChatViewController {
     override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         animateScroll(isStarted: false)
         isAutoScrolling = false
+        isScrollingToBottom = false
         updateUnreadMessages()
         
         guard !isAnimatingCellHighlight else { return }
