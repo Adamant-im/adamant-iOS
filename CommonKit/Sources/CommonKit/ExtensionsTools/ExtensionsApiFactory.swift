@@ -19,7 +19,7 @@ public struct ExtensionsApiFactory {
     public func make() -> ExtensionsApi {
         .init(
             apiService: AdamantApiService(
-                healthCheckWrapper: .init(
+                healthCheckWrapper: AdamantHealthCheck(
                     service: AdamantApiCore(apiCore: APICore()),
                     nodesStorage: NodesStorage(
                         SecureStore: SecureStore,
