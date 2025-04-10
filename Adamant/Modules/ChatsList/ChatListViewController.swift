@@ -77,6 +77,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
     }
     private var chatDeselectedIndex: IndexPath?
+    private var isScrolling = false
+    private var isRefreshing = false
 
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
 
@@ -394,17 +396,8 @@ final class ChatListViewController: KeyboardObservingViewController {
 
         lastDatesUpdate = Date()
         indexPaths.removeAll { $0 == swipedIndex }
-        tableView.reloadRowsAndPreserveSelection(at: indexPaths)
-    }
-
-    private func updateChats() {
-        guard accountService.account?.address != nil,
-            accountService.keypair?.privateKey != nil
-        else {
-            return
-        }
-        Task {
-            await handleRefresh()
+        if !isScrolling {
+            tableView.reloadRowsAndPreserveSelection(at: indexPaths)
         }
     }
 
@@ -490,6 +483,7 @@ final class ChatListViewController: KeyboardObservingViewController {
 
     @MainActor
     private func handleRefresh() async {
+        defer { isRefreshing = false }
         guard let result = await chatsProvider.update(notifyState: true) else { return }
 
         switch result {
@@ -615,12 +609,24 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
         scrollUpButton.isHidden = offsetY < cellHeight * 0.75
     }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard scrollView.contentOffset.y <= 0, scrollView.contentOffset.y < -100 else { return }
 
-        Task {
-            await handleRefresh()
+        if !isRefreshing {
+            isRefreshing = true
+            Task {
+                await handleRefresh()
+            }
         }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isScrolling = true
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isScrolling = false
     }
 }
 
