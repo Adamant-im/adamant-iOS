@@ -1375,17 +1375,17 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "💰 普通";
-"SecretWallets.Menu.Regular.WithoutEmodji" = "普通";
+"SecretWallets.Menu.Regular.WithoutEmoji" = "普通";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ 秘密 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ 秘密 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ 秘密 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ 秘密 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ 秘密 5";
-"SecretWallets.Menu.Secret1.Emodji" = "🔐1️⃣";
-"SecretWallets.Menu.Secret2.Emodji" = "🔐2️⃣";
-"SecretWallets.Menu.Secret3.Emodji" = "🔐3️⃣";
-"SecretWallets.Menu.Secret4.Emodji" = "🔐4️⃣";
-"SecretWallets.Menu.Secret5.Emodji" = "🔐5️⃣";
+"SecretWallets.Menu.Secret1.Emoji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emoji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emoji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emoji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emoji" = "🔐5️⃣";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 添加秘密";
 "SecretWallets.Menu.TellMeMore" = "💡 关于钱包";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";

@@ -1078,7 +1078,7 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.type.tag
                 $0.disabled = true
                 
-                $0.value = secretWalletViewModel.getNameFor(walletCore: walletCore, regularWithEmodji: false)
+                $0.value = secretWalletViewModel.getNameFor(walletCore: walletCore, regularWithEmoji: false)
             }
             
         case .balance:

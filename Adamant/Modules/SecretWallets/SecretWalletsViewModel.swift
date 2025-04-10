@@ -60,21 +60,21 @@ private extension SecretWalletsViewModel {
 
 // MARK: Naming generation
 extension SecretWalletsViewModel {
-    func getCurrentWalletName(regularWithEmodji: Bool = true) -> String {
-        guard !regularWithEmodji else {
+    func getCurrentWalletName(regularWithEmoji: Bool = true) -> String {
+        guard !regularWithEmoji else {
             return state.wallets[state.currentActiveIndex].name
         }
         
         if state.currentActiveIndex == 0 {
-            return String.localized("SecretWallets.Menu.Regular.WithoutEmodji", comment: "Regular Wallet")
+            return String.localized("SecretWallets.Menu.Regular.WithoutEmoji", comment: "Regular Wallet")
         } else {
             return state.wallets[state.currentActiveIndex].name
         }
     }
     
     // Used in transferViewControllerBase
-    func getNameFor(walletCore: WalletCoreProtocol, regularWithEmodji: Bool = true) -> String {
-        let regular = regularWithEmodji ? String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet") : String.localized("SecretWallets.Menu.Regular.WithoutEmodji", comment: "Regular Wallet")
+    func getNameFor(walletCore: WalletCoreProtocol, regularWithEmoji: Bool = true) -> String {
+        let regular = regularWithEmoji ? String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet") : String.localized("SecretWallets.Menu.Regular.WithoutEmoji", comment: "Regular Wallet")
         var name = state.currentWallet?.name ?? regular
         
         for wallet in secretWalletsManager.getRegularWallet().sorted(includeInvisible: false) where wallet.core.wallet?.address == walletCore.wallet?.address {
@@ -86,11 +86,11 @@ extension SecretWalletsViewModel {
     }
     
     // Used in wallet list, transactions list
-    func getCurrentWalletEmodji() -> String {
+    func getCurrentWalletEmoji() -> String {
         guard state.currentActiveIndex != 0 else {
             return ""
         }
-        return String.localized("SecretWallets.Menu.Secret\(state.currentActiveIndex).Emodji")
+        return String.localized("SecretWallets.Menu.Secret\(state.currentActiveIndex).Emoji")
     }
     
     // Used in walletViewControllerBase

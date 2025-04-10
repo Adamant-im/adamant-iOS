@@ -155,7 +155,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     private func setupView() {
-        navigationItem.title = String.adamant.visibleWallets.title + " \(secretWalletsViewModel.getCurrentWalletEmodji())"
+        navigationItem.title = String.adamant.visibleWallets.title + " \(secretWalletsViewModel.getCurrentWalletEmoji())"
         navigationItem.searchController = searchController
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
 

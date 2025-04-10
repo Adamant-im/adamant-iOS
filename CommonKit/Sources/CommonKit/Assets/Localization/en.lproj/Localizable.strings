@@ -1384,17 +1384,17 @@
 
 /* Secret Wallets */
 "SecretWallets.Menu.Regular" = "💰 Regular";
-"SecretWallets.Menu.Regular.WithoutEmodji" = "Regular";
+"SecretWallets.Menu.Regular.WithoutEmoji" = "Regular";
 "SecretWallets.Menu.Secret1" = "🔐1️⃣ Secret 1";
 "SecretWallets.Menu.Secret2" = "🔐2️⃣ Secret 2";
 "SecretWallets.Menu.Secret3" = "🔐3️⃣ Secret 3";
 "SecretWallets.Menu.Secret4" = "🔐4️⃣ Secret 4";
 "SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
-"SecretWallets.Menu.Secret1.Emodji" = "🔐1️⃣";
-"SecretWallets.Menu.Secret2.Emodji" = "🔐2️⃣";
-"SecretWallets.Menu.Secret3.Emodji" = "🔐3️⃣";
-"SecretWallets.Menu.Secret4.Emodji" = "🔐4️⃣";
-"SecretWallets.Menu.Secret5.Emodji" = "🔐5️⃣";
+"SecretWallets.Menu.Secret1.Emoji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emoji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emoji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emoji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emoji" = "🔐5️⃣";
 "SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
 "SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
 "SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
