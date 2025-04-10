@@ -12,10 +12,6 @@ import SafariServices
 import UIKit
 
 extension String.adamant.wallets {
-    static var adamant: String {
-        String.localized("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
-    }
-
     static var sendAdm: String {
         String.localized("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
     }
@@ -56,6 +52,10 @@ extension String.adamant.wallets {
 }
 
 final class AdmWalletViewController: WalletViewControllerBase {
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.adamant", comment: "Account tab: Adamant wallet")
+    }
+    
     // MARK: - Rows & Sections
     enum Rows {
         case stakeAdm, buyTokens, freeTokens
@@ -279,13 +279,15 @@ final class AdmWalletViewController: WalletViewControllerBase {
         }
         return addressRow
     }
-
-    override func setTitle() {
-        walletTitleLabel.text = makeTitle()
-    }
     
     override func makeTitle() -> String {
-        String.adamant.wallets.adamant
+        String.localizedStringWithFormat(
+            String.localized(
+                "SecretWallets.Coin.Regular",
+                comment: "Regular Wallet"
+            ),
+            walletName
+        )
     }
 
     func updateRows() {

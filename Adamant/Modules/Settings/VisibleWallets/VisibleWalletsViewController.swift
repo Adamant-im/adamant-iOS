@@ -54,6 +54,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     var visibleWalletsService: VisibleWalletsService
     var walletsStoreService: WalletStoreServiceProviderProtocol
     var accountService: AccountService
+    var secretWalletsViewModel: SecretWalletsViewModel
 
     // MARK: - Properties
 
@@ -75,11 +76,13 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
-        walletsStoreService: WalletStoreServiceProviderProtocol
+        walletsStoreService: WalletStoreServiceProviderProtocol,
+        secretWalletsViewModel: SecretWalletsViewModel
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
         self.walletsStoreService = walletsStoreService
+        self.secretWalletsViewModel = secretWalletsViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -152,7 +155,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     private func setupView() {
-        navigationItem.title = String.adamant.visibleWallets.title
+        navigationItem.title = String.adamant.visibleWallets.title + " \(secretWalletsViewModel.getCurrentWalletEmoji())"
         navigationItem.searchController = searchController
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
 

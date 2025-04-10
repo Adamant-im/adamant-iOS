@@ -10,38 +10,20 @@ import CommonKit
 import UIKit
 
 extension String.adamant.wallets {
-    static var ethereum: String {
-        String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
-    }
-    
-    static var secretEthereum: String {
-        String.localized("SecretWallets.Ethereum.Secret", comment: "Account tab: Ethereum wallet")
-    }
-    
     static var sendEth: String {
         String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
     }
 }
 
 final class EthWalletViewController: WalletViewControllerBase {
+    override var walletName: String {
+        String.localized("AccountTab.Wallets.ethereum", comment: "Account tab: Ethereum wallet")
+    }
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.wallets.sendEth)
     }
 
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
-    }
-
-    override func setTitle() {
-        walletTitleLabel.text = makeTitle()
-    }
-    
-    override func makeTitle() -> String {
-        let index = secretWalletsViewModel.state.currentActiveIndex
-        if index <= 0 {
-           return String.adamant.wallets.ethereum
-        } else {
-            return String.adamant.wallets.secretEthereum + " \(index)"
-        }
     }
 }

@@ -44,7 +44,7 @@ struct SettingsFactory {
         VisibleWalletsViewController(
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
-            walletsStoreService: assembler.resolve(WalletStoreServiceProviderProtocol.self)!
+            walletsStoreService: assembler.resolve(WalletStoreServiceProviderProtocol.self)!, secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 }

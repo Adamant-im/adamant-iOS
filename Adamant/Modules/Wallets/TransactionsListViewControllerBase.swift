@@ -117,7 +117,7 @@ class TransactionsListViewControllerBase: UIViewController {
         super.viewDidLoad()
 
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = String.adamant.transactionList.title + (secretWalletsViewModel.state.currentWallet?.name ?? "")
+        navigationItem.title = String.adamant.transactionList.title + " "  + secretWalletsViewModel.getCurrentWalletEmoji()
         emptyLabel.text = String.adamant.transactionList.noTransactionYet
 
         update(walletService.core.getLocalTransactionHistory())

@@ -29,7 +29,7 @@ final class SecretWalletsViewModel: ObservableObject {
         } else {
             secretWalletsManager.activateSecretWallet(at: index - 1)
         }
-        state.currentActiveIndex = index // We must change state after to avoid bugs
+        state.currentActiveIndex = index
     }
     
     func createSecretWallet(password: String) {
@@ -56,4 +56,75 @@ private extension SecretWalletsViewModel {
         state.currentActiveIndex = 0
         state.wallets.removeLast(state.wallets.count - 1)
     }
+}
+
+// MARK: Naming generation
+extension SecretWalletsViewModel {
+    func getCurrentWalletName(regularWithEmoji: Bool = true) -> String {
+        guard !regularWithEmoji else {
+            return state.wallets[state.currentActiveIndex].name
+        }
+        
+        if state.currentActiveIndex == 0 {
+            return String.localized("SecretWallets.Menu.Regular.WithoutEmoji", comment: "Regular Wallet")
+        } else {
+            return state.wallets[state.currentActiveIndex].name
+        }
+    }
+    
+    // Used in transferViewControllerBase
+    func getNameFor(walletCore: WalletCoreProtocol, regularWithEmoji: Bool = true) -> String {
+        let regular = regularWithEmoji ? String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet") : String.localized("SecretWallets.Menu.Regular.WithoutEmoji", comment: "Regular Wallet")
+        var name = state.currentWallet?.name ?? regular
+        
+        for wallet in secretWalletsManager.getRegularWallet().sorted(includeInvisible: false) where wallet.core.wallet?.address == walletCore.wallet?.address {
+            name = regular
+            break
+        }
+        
+        return name
+    }
+    
+    // Used in wallet list, transactions list
+    func getCurrentWalletEmoji() -> String {
+        guard state.currentActiveIndex != 0 else {
+            return ""
+        }
+        return String.localized("SecretWallets.Menu.Secret\(state.currentActiveIndex).Emoji")
+    }
+    
+    // Used in walletViewControllerBase
+    func getCurrentWalletCoinName(withCoinName name: String) -> String {
+        if state.wallets.count == 1 {
+            return String.localizedStringWithFormat(
+                String.localized(
+                    "SecretWallets.Coin.Regular",
+                    comment: "Regular Wallet"
+                ),
+                name
+            )
+        }
+        
+        if state.currentActiveIndex != 0 {
+            return String.localizedStringWithFormat(
+                String.localized(
+                    "SecretWallets.Coin.Secret\(state.currentActiveIndex)",
+                    comment: "Secret Wallet"
+                ),
+                name
+            )
+        }
+        
+        return String.localizedStringWithFormat(
+            String.localized(
+                "SecretWallets.Coin.SecretRegular",
+                comment: "Regular Wallet"
+            ),
+            name
+        )
+    }
+}
+
+private extension SecretWalletsViewModel {
+    
 }

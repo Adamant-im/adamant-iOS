@@ -1078,12 +1078,7 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.type.tag
                 $0.disabled = true
                 
-                $0.value = secretWalletViewModel.state.currentWallet?.name ?? String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet")
-                
-                for wallet in secretWalletManager.getRegularWallet().sorted(includeInvisible: false) where wallet.core.wallet?.address == walletCore.wallet?.address {
-                        $0.value = String.localized("SecretWallets.Menu.Regular", comment: "Regular Wallet")
-                        break
-                    }
+                $0.value = secretWalletViewModel.getNameFor(walletCore: walletCore, regularWithEmoji: false)
             }
             
         case .balance:
