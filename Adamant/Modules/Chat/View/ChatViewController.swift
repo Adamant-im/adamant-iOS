@@ -46,6 +46,7 @@ final class ChatViewController: MessagesViewController {
     private var isScrollDownButtonHidden = true
     private var previousUnreadCount: Int = 0
     private var scrollToPositionType: UICollectionView.ScrollPosition = .top
+    private var isAppActive = true
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -325,8 +326,16 @@ extension ChatViewController {
             .notifications(named: UIApplication.didBecomeActiveNotification)
             .sink { @MainActor [weak self] _ in
                 guard let self = self else { return }
+                self.isAppActive = true
+                self.updateUnreadMessages()
                 let indexes = self.messagesCollectionView.indexPathsForVisibleItems
                 self.viewModel.updatePreviewFor(indexes: indexes)
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                self?.isAppActive = false
             }
             .store(in: &subscriptions)
 
@@ -587,6 +596,9 @@ extension ChatViewController {
     }
 
     fileprivate func updateUnreadMessages() {
+        if isMacOS && !isAppActive {
+            return
+        }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
 
