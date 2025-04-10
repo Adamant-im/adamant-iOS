@@ -999,157 +999,135 @@ extension ChatListViewController {
         let buyAndSellVC = screensFactory.makeBuyAndSell()
         navigationController?.pushViewController(buyAndSellVC, animated: true)
     }
+    
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
-        case let message as MessageTransaction:
-            guard var text = message.message else {
+            case let message as MessageTransaction:
+                guard var text = message.message else {
+                    return nil
+                }
+                text = MessageProcessHelper.process(text)
+                
+                var attributedText = markdownParser.parse(text).resolveLinkColor()
+                attributedText = MessageProcessHelper.process(attributedText: attributedText)
+                
+                if message.isOutgoing {
+                    let prefix = markdownParser.parse("\(String.adamant.chatList.sentMessagePrefix)")
+                    attributedText.insert(prefix, at: 0)
+                }
+                
+                return attributedText
+                
+            case let transfer as TransferTransaction:
+                if let admService = walletServiceCompose.getWallet(
+                    by: AdmWalletService.richMessageType
+                )?.core as? AdmWalletService {
+                    return markdownParser.parse(admService.shortDescription(for: transfer))
+                }
+                
                 return nil
-            }
-            text = MessageProcessHelper.process(text)
-
-            var raw: String
-            if message.isOutgoing {
-                raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
-            } else {
-                raw = text
-            }
-
-            var attributedText = markdownParser.parse(raw).resolveLinkColor()
-            attributedText = MessageProcessHelper.process(attributedText: attributedText)
-
-            return attributedText
-
-        case let transfer as TransferTransaction:
-            if let admService = walletServiceCompose.getWallet(
-                by: AdmWalletService.richMessageType
-            )?.core as? AdmWalletService {
-                return markdownParser.parse(admService.shortDescription(for: transfer))
-            }
-
-            return nil
-        case let richMessage as RichMessageTransaction:
-            if let type = richMessage.richType,
-                let provider = walletServiceCompose.getWallet(by: type)
-            {
-                return provider.core.shortDescription(for: richMessage)
-            }
-
-            if richMessage.additionalType == .reply,
-                let content = richMessage.richContent,
-                let text = content[RichContentKeys.reply.replyMessage] as? String
-            {
-                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
-            }
-
-            if richMessage.additionalType == .reaction,
-                let content = richMessage.richContent,
-                let reaction = content[RichContentKeys.react.react_message] as? String
-            {
-                let prefix =
-                    richMessage.isOutgoing
+            case let richMessage as RichMessageTransaction:
+                if let type = richMessage.richType,
+                   let provider = walletServiceCompose.getWallet(by: type) {
+                    return provider.core.shortDescription(for: richMessage)
+                }
+                
+                if richMessage.additionalType == .reaction,
+                   let content = richMessage.richContent,
+                   let reaction = content[RichContentKeys.react.react_message] as? String {
+                    let prefix = richMessage.isOutgoing
                     ? "\(String.adamant.chatList.sentMessagePrefix)"
                     : ""
-
-                let text =
-                    reaction.isEmpty
+                    
+                    let text = reaction.isEmpty
                     ? NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.removedReaction) \(reaction)")
                     : NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.reacted) \(reaction)")
-
-                return text
-            }
-
-            if richMessage.additionalType == .reply,
-                let content = richMessage.richContent,
-                richMessage.isFileReply()
-            {
-                let text = FilePresentationHelper.getFilePresentationText(content)
-                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
-            }
-
-            if richMessage.additionalType == .file,
-                let content = richMessage.richContent
-            {
-                let prefix =
-                    richMessage.isOutgoing
-                    ? "\(String.adamant.chatList.sentMessagePrefix)"
-                    : ""
-
-                let fileText = FilePresentationHelper.getFilePresentationText(content)
-
-                let attributesText = markdownParser.parse(prefix + fileText).resolveLinkColor()
-
-                return attributesText
-            }
-
-            if let serialized = richMessage.serializedMessage() {
-                return NSAttributedString(string: serialized)
-            }
-
-            return nil
-
-        /*
-            if richMessage.isOutgoing {
-                let mutable = NSMutableAttributedString(attributedString: description)
-                let prefix = NSAttributedString(string: String.adamant.chatList.sentMessagePrefix)
-                mutable.insert(prefix, at: 0)
-                return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
-            } else {
-                return description
-            }
-             */
-
-        default:
-            return nil
+                    
+                    return text
+                }
+                
+                if [.file, .reply].contains(richMessage.additionalType),
+                   let rawContent = richMessage.richContent {
+                    
+                    let youPrefixText = richMessage.isOutgoing ? String.adamant.chatList.sentMessagePrefix : ""
+                    
+                    if richMessage.additionalType == .reply,
+                       let replyText = rawContent[RichContentKeys.reply.replyMessage] as? String {
+                        return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: replyText)
+                    }
+                    
+                    let result = NSMutableAttributedString(attributedString: markdownParser.parse(youPrefixText))
+                    
+                    let replyAttributedText = richMessage.additionalType == .reply
+                    ? makeReplayNSAttributedString()
+                    : NSAttributedString()
+                    
+                    result.append(replyAttributedText)
+                    
+                    let content = (rawContent[RichContentKeys.reply.replyMessage] as? [String: Any]) ?? rawContent
+                                        
+                    let text = FilePresentationHelper.getFilePresentationText(content, parsedWith: markdownParser, resolveLinkColor: true)
+                    
+                    result.append(text)
+                    
+                    let formattedResult = MessageProcessHelper.process(attributedText: result)
+                    
+                    return formattedResult
+                }
+                
+                if let serialized = richMessage.serializedMessage() {
+                    return NSAttributedString(string: serialized)
+                }
+                
+                return nil
+                
+            default:
+                return nil
         }
     }
+    
     private func shortDescription(for address: String) -> NSAttributedString? {
         var descriptionParts: [NSAttributedString] = []
-
+        
+        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address) {
+            var attributedText = markdownParser.parse(preservedMessage).resolveLinkColor()
+            attributedText = MessageProcessHelper.process(attributedText: attributedText)
+            descriptionParts.append(attributedText)
+        }
+        
+        if let files = chatPreservation.getPreservedFiles(for: address), !files.isEmpty {
+            let mediaCount = files.count(where: { $0.type.isMedia })
+            let otherCount = files.count(where: { !$0.type.isMedia })
+            
+            let text = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaCount, otherFilesCount: otherCount, comment: "", parsedWith: markdownParser, resolveLinkColor: true)
+            
+            descriptionParts.insert(text, at: 0)
+        }
+        
+        guard descriptionParts.contains(where: { !$0.string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty }) else {
+            return nil
+        }
+        
         if chatPreservation.getReplyMessage(address: address) != nil {
             let replyImageAttachment = NSTextAttachment()
             replyImageAttachment.image = UIImage(systemName: "arrowshape.turn.up.left")?.withTintColor(.adamant.primary)
             replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 23, height: 20)
-
-            descriptionParts.append(NSAttributedString(attachment: replyImageAttachment))
+            
+            descriptionParts.insert(NSAttributedString(attachment: replyImageAttachment), at: 0)
         }
-        if let files = chatPreservation.getPreservedFiles(for: address), !files.isEmpty {
-            let mediaCount = files.count(where: { $0.type.isMedia })
-            let otherCount = files.count(where: { !$0.type.isMedia })
-
-            let fileParts = [
-                mediaCount > 0 ? "📸" + (mediaCount >= 2 ? "\(mediaCount)" : "") : nil,
-                otherCount > 0 ? "📄" + (otherCount >= 2 ? "\(otherCount)" : "") : nil
-            ].compactMap { $0 }
-
-            if !fileParts.isEmpty {
-                let parsedFileParts =
-                    fileParts
-                    .map { markdownParser.parse($0).resolveLinkColor() }
-                    .reduce(NSMutableAttributedString()) { result, part in
-                        if !result.string.isEmpty { result.append(NSAttributedString(string: " ")) }
-                        result.append(part)
-                        return result
-                    }
-                descriptionParts.append(parsedFileParts)
-            }
-        }
-
-        if let preservedMessage = chatPreservation.getPreservedMessageFor(address: address) {
-            let processedMessage = MessageProcessHelper.process(preservedMessage)
-            descriptionParts.append(NSAttributedString(string: processedMessage))
-        }
-        guard descriptionParts.contains(where: { !$0.string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty }) else {
-            return nil
-        }
-
-        let result = NSMutableAttributedString(string: "✏️: ")
+        
+        let draftPrefix = NSMutableAttributedString(string: "✏️: ")
+        descriptionParts.insert(draftPrefix, at: 0)
+        
+        let result: NSMutableAttributedString = .init(string: "")
         for (index, part) in descriptionParts.enumerated() {
             if index > 0 { result.append(NSAttributedString(string: " ")) }
             result.append(part)
         }
-
+        
         return result
     }
+    
     private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {
         let prefix =
             isOutgoing
@@ -1171,9 +1149,10 @@ extension ChatListViewController {
 
         let extraSpace = isOutgoing ? "  " : ""
         let imageString = NSAttributedString(attachment: replyImageAttachment)
-
-        let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
-
+        
+        let markDownText = markdownParser.parse("\(text)").resolveLinkColor()
+        markDownText.insert(NSAttributedString(string: extraSpace), at: 0)
+        
         let fullString = NSMutableAttributedString(string: prefix)
         if isOutgoing {
             fullString.append(imageString)
@@ -1181,6 +1160,25 @@ extension ChatListViewController {
         fullString.append(markDownText)
 
         return MessageProcessHelper.process(attributedText: fullString)
+    }
+    
+    private func makeReplayNSAttributedString() -> NSMutableAttributedString {
+        let replyImageAttachment = NSTextAttachment()
+        
+        replyImageAttachment.image = UIImage(
+            systemName: "arrowshape.turn.up.left"
+        )?.withTintColor(.adamant.primary)
+        
+        replyImageAttachment.bounds = CGRect(
+            x: .zero,
+            y: -3,
+            width: 23,
+            height: 20
+        )
+        
+        let fullString = NSMutableAttributedString(attachment: replyImageAttachment)
+        
+        return fullString
     }
 }
 
