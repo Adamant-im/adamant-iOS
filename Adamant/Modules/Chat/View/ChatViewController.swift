@@ -952,6 +952,8 @@ extension ChatViewController {
         switch position {
         case let .offset(offset):
             chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
+            guard !viewAppeared else { return }
+            chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
         case let .messageId(id, scrollToBottomIfNotFound):
             var index = viewModel.messages.firstIndex(where: { $0.messageId == id })
             var needToAnimateCell = true
