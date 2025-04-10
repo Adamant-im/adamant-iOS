@@ -1,14 +1,14 @@
 //
-//  NSAttributedText+Adamant.swift
-//  Adamant
+//  NSAttributedString+Extension.swift
+//  CommonKit
 //
-//  Created by Stanislav Jelezoglo on 28.04.2023.
-//  Copyright © 2023 Adamant. All rights reserved.
+//  Created by Dmitrij Meidus on 03.04.25.
 //
 
+import Foundation
 import UIKit
 
-extension NSAttributedString {
+public extension NSAttributedString {
     func resolveLinkColor(_ color: UIColor = UIColor.adamant.active) -> NSMutableAttributedString {
         let mutableText = NSMutableAttributedString(attributedString: self)
 
@@ -28,5 +28,11 @@ extension NSAttributedString {
         }
 
         return mutableText
+    }
+}
+
+extension Array where Element == NSAttributedString {
+    func joined() -> NSMutableAttributedString {
+        self.reduce(into: NSMutableAttributedString()) { $0.append($1) }
     }
 }

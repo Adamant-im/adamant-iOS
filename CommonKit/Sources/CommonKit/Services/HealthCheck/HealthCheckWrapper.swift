@@ -113,6 +113,12 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         updateSortedNodes()
     }
 
+    func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
+        await $sortedAllowedNodes.values.first {
+            !waitsForConnectivity || !$0.isEmpty
+        } ?? .init()
+    }
+
     nonisolated public func healthCheck() {
         Task { @HealthCheckActor in
             guard canPerformHealthCheck else { return }
@@ -176,12 +182,6 @@ extension HealthCheckWrapper {
             .notifications(named: UIApplication.willResignActiveNotification, object: nil)
             .sink { @HealthCheckActor [weak self] _ in self?.willResignActiveAction() }
             .store(in: &subscriptions)
-    }
-
-    fileprivate func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.values.first {
-            !waitsForConnectivity || !$0.isEmpty
-        } ?? .init()
     }
 
     fileprivate func updateHealthCheckTimerSubscription() {

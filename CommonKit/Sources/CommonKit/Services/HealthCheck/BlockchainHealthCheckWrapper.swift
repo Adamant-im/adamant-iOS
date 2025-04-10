@@ -15,7 +15,7 @@ public protocol BlockchainHealthCheckableService {
 }
 
 @HealthCheckActor
-public final class BlockchainHealthCheckWrapper<
+open class BlockchainHealthCheckWrapper<
     Service: BlockchainHealthCheckableService
 >: HealthCheckWrapper<Service, Service.Error>, Sendable {
     private let nodesStorage: NodesStorageProtocol

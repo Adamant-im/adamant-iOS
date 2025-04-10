@@ -9,30 +9,33 @@ import Foundation
 
 final class AdamantApiTask<Output>: CancellableTask {
     private let task: Task<Result<Output, ApiServiceError>, Never>
-    private let id = UUID()
+    private let id: UUID
+    
+    var isCancelled: Bool {
+        task.isCancelled
+    }
+    
     var value: Result<Output, ApiServiceError> {
         get async {
-            await task.value
+            let value = await task.value
+            if task.isCancelled {
+                return .failure(ApiServiceError.requestCancelled)
+            }
+            return value
         }
     }
 
-    init(task: Task<Result<Output, ApiServiceError>, Never>) {
+    init(task: Task<Result<Output, ApiServiceError>, Never>, id: UUID) {
         self.task = task
+        self.id = id
     }
 
     func cancel() {
         task.cancel()
     }
-
-    func storeIn(taskStorage: inout [UUID: CancellableTask]) {
-        taskStorage[id] = self
-    }
-
-    func removeFrom(taskStorage: inout [UUID: CancellableTask]) {
-        taskStorage[id] = nil
-    }
 }
 
 protocol CancellableTask {
+    var isCancelled: Bool { get }
     func cancel()
 }

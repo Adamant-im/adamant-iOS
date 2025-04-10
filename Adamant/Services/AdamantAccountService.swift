@@ -477,11 +477,11 @@ extension AdamantAccountService {
         keypair = nil
         passphrase = nil
         state = .notLogged
-        apiService.cancelCurrentTasks()
         coreDataStack.clearCoreData()
 
         guard wasLogged else { return }
         NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
+        apiService.cancelCurrentTasks()
     }
 }
 

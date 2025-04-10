@@ -184,7 +184,7 @@ struct AppAssembly: MainThreadAssembly {
         // MARK: ApiService
         container.register(AdamantApiServiceProtocol.self) { r in
             AdamantApiService(
-                healthCheckWrapper: .init(
+                healthCheckWrapper: AdamantHealthCheck(
                     service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                     nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                     nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,

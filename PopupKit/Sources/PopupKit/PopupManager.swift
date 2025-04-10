@@ -23,13 +23,16 @@ public final class PopupManager {
 
 // MARK: - Toast
 
-extension PopupManager {
-    public func showToastMessage(_ message: String) {
-        coordinatorModel.toastMessage = message
-        autoDismissManager.dismissToast()
+public extension PopupManager {
+    func showToastMessage(_ message: String) {
+        autoDismissManager.dismissPreviousToast()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.coordinatorModel.toastMessage = message
+            self?.autoDismissManager.dismissToast()
+        }
     }
-
-    public func dismissToast() {
+    
+    func dismissToast() {
         coordinatorModel.toastMessage = nil
     }
 }
