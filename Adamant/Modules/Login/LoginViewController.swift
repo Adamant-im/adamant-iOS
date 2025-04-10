@@ -203,224 +203,7 @@ final class LoginViewController: FormViewController {
             }
         }
 
-        // MARK: Login section
-        form
-            +++ Section(Sections.login.localized) {
-                $0.tag = Sections.login.tag
-
-                $0.footer = { [weak self] in
-                    var footer = HeaderFooterView<UIView>(
-                        .callback {
-                            let view = ButtonsStripeView.adamantConfigured()
-
-                            var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
-
-                            if let accountService = self?.accountService,
-                                accountService.hasStayInAccount
-                            {
-                                stripe.append(.pinpad)
-                                if accountService.useBiometry,
-                                    let button = self?.localAuth.biometryType.stripeButtonType
-                                {
-                                    stripe.append(button)
-                                }
-                            }
-
-                            view.stripe = stripe
-                            view.delegate = self
-
-                            return view
-                        }
-                    )
-
-                    footer.height = { ButtonsStripeView.adamantDefaultHeight }
-
-                    return footer
-                }()
-            }
-
-            // Passphrase row
-            <<< PasteInterceptingPasswordRow {
-                $0.tag = Rows.passphrase.tag
-                $0.placeholder = Rows.passphrase.localized
-                $0.placeholderColor = UIColor.adamant.secondary
-                $0.cell._textField.pasteInterceptor = { [weak self] text in
-                    if let text {
-                        self?.loginWith(passphrase: text)
-                    }
-                }
-                $0.cell.textField.enablePasteButtonAndPasswordToggle { [weak self] in
-                    // assing text to textfield like this to make loginButton update its enabled/disabled state
-                    let row = self?.form.rowBy(tag: Rows.passphrase.tag) as? PasteInterceptingPasswordRow
-                    row?.value = $0
-                    row?.cell.textField.text = $0
-                    self?.loginWith(passphrase: $0)
-                }
-                $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
-            }
-
-            // Login with passphrase row
-            <<< ButtonRow {
-                $0.tag = Rows.loginButton.tag
-                $0.title = Rows.loginButton.localized
-                $0.disabled = Condition.function(
-                    [Rows.passphrase.tag],
-                    { form -> Bool in
-                        guard let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag), row.value != nil else {
-                            return true
-                        }
-                        return false
-                    }
-                )
-            }.onCellSelection { [weak self] (_, _) in
-                guard let row: PasteInterceptingPasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
-                    let passphrase = row.value
-                else {
-                    return
-                }
-
-                self?.loginWith(passphrase: passphrase)
-            }
-
-        // MARK: New account section
-        form
-            +++ Section(Sections.newAccount.localized) {
-                $0.tag = Sections.newAccount.tag
-            }
-
-            // Alert
-            <<< TextAreaRow {
-                $0.tag = Rows.saveYourPassphraseAlert.tag
-                $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
-                $0.hidden = Condition.function(
-                    [],
-                    { [weak self] _ -> Bool in
-                        return self?.hideNewPassphrase ?? false
-                    }
-                )
-            }.cellUpdate { (cell, _) in
-                cell.textView.textAlignment = .center
-                cell.textView.isSelectable = false
-                cell.textView.isEditable = false
-
-                let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.primary)
-
-                let style = NSMutableParagraphStyle()
-                style.alignment = NSTextAlignment.center
-
-                let mutableText = NSMutableAttributedString(attributedString: parser.parse(Rows.saveYourPassphraseAlert.localized))
-                mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
-
-                cell.textView.attributedText = mutableText
-            }
-
-            // New genegated passphrase
-            <<< PassphraseRow {
-                $0.tag = Rows.newPassphrase.tag
-                $0.cell.tip = Rows.tapToSaveHint.localized
-                $0.cell.height = { 96.0 }
-                $0.hidden = Condition.function(
-                    [],
-                    { [weak self] _ -> Bool in
-                        return self?.hideNewPassphrase ?? true
-                    }
-                )
-            }.cellUpdate({ (cell, _) in
-                cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
-                cell.passphraseLabel.textColor = UIColor.adamant.primary
-                cell.passphraseLabel.textAlignment = .center
-
-                cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
-                cell.tipLabel.textColor = UIColor.adamant.secondary
-                cell.tipLabel.textAlignment = .center
-            }).onCellSelection({ [weak self] (cell, row) in
-                guard let passphrase = row.value, let dialogService = self?.dialogService else {
-                    return
-                }
-
-                if let indexPath = row.indexPath, let tableView = self?.tableView {
-                    tableView.deselectRow(at: indexPath, animated: true)
-                }
-
-                let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-
-                let didSelectAction: ((ShareType) -> Void)? = { [weak self] type in
-                    guard case .copyToPasteboard = type else {
-                        return
-                    }
-
-                    Task { @MainActor in
-                        self?.tableView.scrollToBottom(animated: true)
-                    }
-                }
-
-                dialogService.presentShareAlertFor(
-                    string: passphrase,
-                    types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
-                    excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-                    animated: true,
-                    from: nil,
-                    completion: nil,
-                    didSelect: didSelectAction
-                )
-            })
-
-            <<< ButtonRow {
-                $0.tag = Rows.generateNewPassphraseButton.tag
-                $0.title = Rows.generateNewPassphraseButton.localized
-            }.onCellSelection { [weak self] (_, _) in
-                self?.generateNewPassphrase()
-            }
-
-        // MARK: Nodes list settings
-        form +++ Section()
-            <<< ButtonRow {
-                $0.title = Rows.nodes.localized
-                $0.tag = Rows.nodes.tag
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.cellUpdate { (cell, _) in
-                cell.textLabel?.textColor = UIColor.adamant.primary
-            }.onCellSelection { [weak self] (_, _) in
-                guard let self = self else { return }
-                let vc = screensFactory.makeNodesList()
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .overFullScreen
-                present(nav, animated: true, completion: nil)
-            }
-
-            // MARK: Coins nodes list settings
-            <<< ButtonRow {
-                $0.title = Rows.coinsNodes.localized
-                $0.tag = Rows.coinsNodes.tag
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.cellUpdate { (cell, _) in
-                cell.textLabel?.textColor = UIColor.adamant.primary
-            }.onCellSelection { [weak self] (_, _) in
-                guard let self = self else { return }
-                let vc = screensFactory.makeCoinsNodesList(context: .login)
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .overFullScreen
-                present(nav, animated: true, completion: nil)
-            }
-
-        // MARK: tableView position tuning
-        if let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-            NotificationCenter.default.addObserver(
-                forName: UITextField.textDidBeginEditingNotification,
-                object: row.cell.textField,
-                queue: OperationQueue.main
-            ) { [weak self] _ in
-                MainActor.assumeIsolatedSafe {
-                    guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
-                        return
-                    }
-
-                    tableView.scrollToRow(at: indexPath, at: .none, animated: true)
-                }
-            }
-        }
+        setupSections()
 
         // MARK: Requesting biometry onActive
         NotificationCenter.default.addObserver(
@@ -432,13 +215,16 @@ final class LoginViewController: FormViewController {
                 guard let vc = self,
                     vc.firstTimeActive,
                     vc.requestBiometryOnFirstTimeActive,
-                    vc.accountService.hasStayInAccount,
-                    vc.accountService.useBiometry
+                    vc.accountService.hasStayInAccount
                 else {
                     return
                 }
 
-                vc.loginWithBiometry()
+                if vc.accountService.useBiometry {
+                    vc.loginWithBiometry()
+                } else {
+                    vc.loginWithPinpad()
+                }
                 vc.firstTimeActive = false
             }
         }
@@ -460,6 +246,227 @@ final class LoginViewController: FormViewController {
         }
 
         return result
+    }
+    
+    private func setupSections(){
+        // MARK: Login section
+        form
+        +++ Section(Sections.login.localized) {
+            $0.tag = Sections.login.tag
+            
+            $0.footer = { [weak self] in
+                var footer = HeaderFooterView<UIView>(
+                    .callback {
+                        let view = ButtonsStripeView.adamantConfigured()
+                        
+                        var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
+                        
+                        if let accountService = self?.accountService,
+                           accountService.hasStayInAccount
+                        {
+                            stripe.append(.pinpad)
+                            if accountService.useBiometry,
+                               let button = self?.localAuth.biometryType.stripeButtonType
+                            {
+                                stripe.append(button)
+                            }
+                        }
+                        
+                        view.stripe = stripe
+                        view.delegate = self
+                        
+                        return view
+                    }
+                )
+                
+                footer.height = { ButtonsStripeView.adamantDefaultHeight }
+                
+                return footer
+            }()
+        }
+        
+        // Passphrase row
+        <<< PasteInterceptingPasswordRow {
+            $0.tag = Rows.passphrase.tag
+            $0.placeholder = Rows.passphrase.localized
+            $0.placeholderColor = UIColor.adamant.secondary
+            $0.cell._textField.pasteInterceptor = { [weak self] text in
+                if let text {
+                    self?.loginWith(passphrase: text)
+                }
+            }
+            $0.cell.textField.enablePasteButtonAndPasswordToggle { [weak self] in
+                // assing text to textfield like this to make loginButton update its enabled/disabled state
+                let row = self?.form.rowBy(tag: Rows.passphrase.tag) as? PasteInterceptingPasswordRow
+                row?.value = $0
+                row?.cell.textField.text = $0
+                self?.loginWith(passphrase: $0)
+            }
+            $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
+        }
+        
+        // Login with passphrase row
+        <<< ButtonRow {
+            $0.tag = Rows.loginButton.tag
+            $0.title = Rows.loginButton.localized
+            $0.disabled = Condition.function(
+                [Rows.passphrase.tag],
+                { form -> Bool in
+                    guard let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag), row.value != nil else {
+                        return true
+                    }
+                    return false
+                }
+            )
+        }.onCellSelection { [weak self] (_, _) in
+            guard let row: PasteInterceptingPasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
+                  let passphrase = row.value
+            else {
+                return
+            }
+            
+            self?.loginWith(passphrase: passphrase)
+        }
+        
+        // MARK: New account section
+        form
+        +++ Section(Sections.newAccount.localized) {
+            $0.tag = Sections.newAccount.tag
+        }
+        
+        // Alert
+        <<< TextAreaRow {
+            $0.tag = Rows.saveYourPassphraseAlert.tag
+            $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            $0.hidden = Condition.function(
+                [],
+                { [weak self] _ -> Bool in
+                    return self?.hideNewPassphrase ?? false
+                }
+            )
+        }.cellUpdate { (cell, _) in
+            cell.textView.textAlignment = .center
+            cell.textView.isSelectable = false
+            cell.textView.isEditable = false
+            
+            let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.primary)
+            
+            let style = NSMutableParagraphStyle()
+            style.alignment = NSTextAlignment.center
+            
+            let mutableText = NSMutableAttributedString(attributedString: parser.parse(Rows.saveYourPassphraseAlert.localized))
+            mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
+            
+            cell.textView.attributedText = mutableText
+        }
+        
+        // New genegated passphrase
+        <<< PassphraseRow {
+            $0.tag = Rows.newPassphrase.tag
+            $0.cell.tip = Rows.tapToSaveHint.localized
+            $0.cell.height = { 96.0 }
+            $0.hidden = Condition.function(
+                [],
+                { [weak self] _ -> Bool in
+                    return self?.hideNewPassphrase ?? true
+                }
+            )
+        }.cellUpdate({ (cell, _) in
+            cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
+            cell.passphraseLabel.textColor = UIColor.adamant.primary
+            cell.passphraseLabel.textAlignment = .center
+            
+            cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
+            cell.tipLabel.textColor = UIColor.adamant.secondary
+            cell.tipLabel.textAlignment = .center
+        }).onCellSelection({ [weak self] (cell, row) in
+            guard let passphrase = row.value, let dialogService = self?.dialogService else {
+                return
+            }
+            
+            if let indexPath = row.indexPath, let tableView = self?.tableView {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
+            
+            let didSelectAction: ((ShareType) -> Void)? = { [weak self] type in
+                guard case .copyToPasteboard = type else {
+                    return
+                }
+                
+                Task { @MainActor in
+                    self?.tableView.scrollToBottom(animated: true)
+                }
+            }
+            
+            dialogService.presentShareAlertFor(
+                string: passphrase,
+                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
+                excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+                animated: true,
+                from: nil,
+                completion: nil,
+                didSelect: didSelectAction
+            )
+        })
+        
+        <<< ButtonRow {
+            $0.tag = Rows.generateNewPassphraseButton.tag
+            $0.title = Rows.generateNewPassphraseButton.localized
+        }.onCellSelection { [weak self] (_, _) in
+            self?.generateNewPassphrase()
+        }
+        
+        // MARK: Nodes list settings
+        form +++ Section()
+        <<< ButtonRow {
+            $0.title = Rows.nodes.localized
+            $0.tag = Rows.nodes.tag
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.primary
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeNodesList()
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .overFullScreen
+            present(nav, animated: true, completion: nil)
+        }
+        
+        // MARK: Coins nodes list settings
+        <<< ButtonRow {
+            $0.title = Rows.coinsNodes.localized
+            $0.tag = Rows.coinsNodes.tag
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.primary
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeCoinsNodesList(context: .login)
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .overFullScreen
+            present(nav, animated: true, completion: nil)
+        }
+        
+        // MARK: tableView position tuning
+        if let row: PasteInterceptingPasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
+            NotificationCenter.default.addObserver(
+                forName: UITextField.textDidBeginEditingNotification,
+                object: row.cell.textField,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolatedSafe {
+                    guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
+                        return
+                    }
+                    
+                    tableView.scrollToRow(at: indexPath, at: .none, animated: true)
+                }
+            }
+        }
     }
 
     // MARK: - Other
@@ -635,6 +642,8 @@ extension UITextField {
         if let pasteboardText = UIPasteboard.general.string {
             let newText = String(pasteboardText.prefix(150))
             handler(newText)
+        } else {
+            handler("")
         }
     }
 }

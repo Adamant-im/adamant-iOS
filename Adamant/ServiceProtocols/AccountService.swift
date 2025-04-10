@@ -162,6 +162,7 @@ protocol AccountService: AnyObject, Sendable {
 
     /// Update logged account info
     func update()
+    func updateWithRefreshUI()
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?)
 
     /// Login into Adamant using passphrase.

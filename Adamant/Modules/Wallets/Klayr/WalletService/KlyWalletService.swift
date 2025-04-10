@@ -44,7 +44,7 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         coinInfo?.services?.klyService?.list.map { serviceNode in
             Node.makeDefaultNode(
                 url: URL(string: serviceNode.url)!,
-                altUrl: serviceNode.altIP.flatMap { URL(string: $0) }
+                altUrl: serviceNode.altIp.flatMap { URL(string: $0) }
             )
         } ?? []
     }
@@ -249,8 +249,14 @@ extension KlyWalletService {
             .store(in: &subscriptions)
     }
 
+    func updateWithRefreshUIBalance(){
+        Task {
+            await update(updateWithRefreshUIBalance: true)
+        }
+    }
+    
     @MainActor
-    fileprivate func update() async {
+    fileprivate func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = klyWallet else {
             return
         }
@@ -262,7 +268,12 @@ extension KlyWalletService {
         case .upToDate:
             break
         }
-
+        
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
+        
         setState(.updating)
 
         if let balance = try? await getBalance() {
@@ -272,12 +283,10 @@ extension KlyWalletService {
 
             wallet.balance = balance
             markBalanceAsFresh(wallet)
-
-            walletUpdateSender.send()
-        } else {
-            wallet.isBalanceInitialized = false
         }
-
+        
+        walletUpdateSender.send()
+        
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,

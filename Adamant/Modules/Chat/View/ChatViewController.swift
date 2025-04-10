@@ -47,6 +47,7 @@ final class ChatViewController: MessagesViewController {
     private var previousUnreadCount: Int = 0
     private var isAnimatingCellHighlight = false
     private var isAutoScrolling: Bool = false
+    private var isAppActive = true
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -197,7 +198,23 @@ final class ChatViewController: MessagesViewController {
                 : chatMessagesCollectionView.bottomOffset
         )
     }
-
+    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        canPerformAction action: Selector,
+        forItemAt indexPath: IndexPath,
+        withSender sender: Any?
+    ) -> Bool {
+        return false
+    }
+    
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        shouldShowMenuForItemAt indexPath: IndexPath
+    ) -> Bool {
+        return false
+    }
+    
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
         scrollDidStop()
     }
@@ -294,8 +311,16 @@ extension ChatViewController {
             .notifications(named: UIApplication.didBecomeActiveNotification)
             .sink { @MainActor [weak self] _ in
                 guard let self = self else { return }
+                self.isAppActive = true
+                self.updateUnreadMessages()
                 let indexes = self.messagesCollectionView.indexPathsForVisibleItems
                 self.viewModel.updatePreviewFor(indexes: indexes)
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                self?.isAppActive = false
             }
             .store(in: &subscriptions)
 
@@ -555,6 +580,9 @@ extension ChatViewController {
 
     fileprivate func updateUnreadMessages() {
         guard !isAutoScrolling else { return }
+        if isMacOS && !isAppActive {
+            return
+        }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
 
@@ -760,7 +788,7 @@ extension ChatViewController {
         if viewModel.messageIdToShow == nil {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: true, scrollAt: .top)
-           }
+            }
         }
     }
 

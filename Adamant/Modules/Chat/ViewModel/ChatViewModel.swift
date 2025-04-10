@@ -1318,7 +1318,6 @@ extension ChatViewModel {
             unreadMessagesIds = messageId
             updateSeparatorId()
             postProcess(messages: &messages)
-            
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,

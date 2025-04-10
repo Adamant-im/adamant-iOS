@@ -301,6 +301,7 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var walletUpdatePublisher: AnyObservable<Void> { get }
 
     func update()
+    func updateWithRefreshUIBalance()
 
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult

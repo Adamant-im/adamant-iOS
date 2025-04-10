@@ -1,7 +1,9 @@
 {
-  "name": "PAX Dollar",
+  "name": "Pax Dollar",
   "symbol": "USDP",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 100,
   "contractId": "0x8e870d67f660d95d5be530380d0ec0bd388289e1",
   "decimals": 18
 }

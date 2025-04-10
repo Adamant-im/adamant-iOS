@@ -2,6 +2,8 @@
   "name": "Status",
   "symbol": "SNT",
   "status": "active",
+  "defaultVisibility": false,
+  "defaultOrdinalLevel": 1000,
   "contractId": "0x744d70fdbe2ba4cf95131626614a1763df805b9e",
   "decimals": 18
 }

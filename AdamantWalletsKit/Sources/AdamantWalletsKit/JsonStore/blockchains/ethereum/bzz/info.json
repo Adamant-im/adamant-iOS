@@ -5,5 +5,6 @@
   "defaultVisibility": false,
   "defaultOrdinalLevel": 95,
   "contractId": "0x19062190B1925b5b6689D7073fDfC8c2976EF8Cb",
-  "decimals": 16
+  "decimals": 16,
+  "cryptoTransferDecimals": 6
 }
