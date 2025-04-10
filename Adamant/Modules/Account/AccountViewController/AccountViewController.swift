@@ -1068,6 +1068,12 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         destinationViewController: UIViewController,
         transitionSuccessful: Bool
     ) {
+        Task { @MainActor in
+            currentSelectedWallet = viewModel.state.wallets.first(where: { wallet in
+                wallet.model.index == pagingItem.identifier
+            })
+        }
+        
         DispatchQueue.onMainThreadSyncSafe {
             guard transitionSuccessful,
                 let first = startingViewController as? WalletViewController,
@@ -1091,6 +1097,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             })
         }
     }
+
 
     private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
         guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
