@@ -1284,30 +1284,24 @@ extension ChatViewController {
               let index = viewModel.messages.firstIndex(where: { $0.messageId == messageId }) else {
             return
         }
-
-        let indexPath = IndexPath(item: 0, section: index)
         
-        tryAnimateCell(at: indexPath)
+        let indexPath = IndexPath(item: 0, section: index)
+        animateCell(at: indexPath)
     }
-
-    //scrolling to item can work very differently, especially when going to a message at a large distance, so I had to implement it in such a way that the animation would be displayed for sure
-    private func tryAnimateCell(at indexPath: IndexPath, retryCount: Int = 20) {
+    
+    private func animateCell(at indexPath: IndexPath) {
         isAnimatingCellHighlight = true
-
-        guard retryCount > 0 else {
-            isAnimatingCellHighlight = false
-            return
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+        
+        //0.2 sec delay that all methods that can interrupt the animation have time to execute
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             guard let self = self else { return }
-
+            
             guard self.messagesCollectionView.indexPathsForVisibleItems.contains(indexPath),
                   let cell = self.messagesCollectionView.cellForItem(at: indexPath) as? ChatCellProtocol else {
-                self.tryAnimateCell(at: indexPath, retryCount: retryCount - 1)
+                self.isAnimatingCellHighlight = false
                 return
             }
-
+            
             cell.animateMessageHighlight()
             self.viewModel.shortVibro()
             self.viewModel.needToAnimateCellIndex = nil
