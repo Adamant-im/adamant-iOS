@@ -783,7 +783,7 @@ extension ChatViewController {
             self.scrollDownButton.alpha = self.isScrollPositionNearlyTheBottom ? 0 : 1
             self.updateScrollToUnreadButtonPosition()
         }
-        if messagesLoaded {
+        if messagesLoaded && !isAutoScrolling {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
                 buttonUpdate()
             }
@@ -802,7 +802,7 @@ extension ChatViewController {
         }
         previousUnreadCount = count
         let updateAlpha = { self.scrollToUnreadReactButton.alpha = (count == 0) ? 0 : 1 }
-        if messagesLoaded {
+        if messagesLoaded && !isAutoScrolling {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: updateAlpha)
         } else {
             updateAlpha()
