@@ -48,7 +48,7 @@ final class ChatViewController: MessagesViewController {
     private var isAnimatingCellHighlight = false
     private var isAutoScrolling = false
     private var isAppActive = true
-    //need separate var to read messages but dont animate button
+    //separate var to read messages but dont animate button
     private var isScrollingToBottom = false
 
     private lazy var inputBar = ChatInputBar()
