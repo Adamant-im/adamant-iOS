@@ -7,10 +7,10 @@
 //
 import SnapKit
 
-struct ChatScrollState {
-    var messagesLoaded = false
+struct ChatViewControllerState {
+    var isMessagesLoaded = false
     var isScrollPositionNearlyTheBottom = true
-    var viewAppeared = false
+    var isViewAppeared = false
     var scrollToUnreadBottomConstraint: Constraint?
     var isScrollDownButtonHidden = true
     var previousUnreadCount: Int = 0
@@ -19,8 +19,8 @@ struct ChatScrollState {
     var isAppActive = true
     var isScrollingToBottom = false
     
-    //calculation for animate, might use for something else in the futer
-    var isAllowed: Bool {
-        messagesLoaded && !isAutoScrolling && !isScrollingToBottom
+    //calculation for animation, might use for something else in the future
+    var isAnimationAllowed: Bool {
+        isMessagesLoaded && !isAutoScrolling && !isScrollingToBottom
     }
 }

@@ -42,6 +42,7 @@ final class ChatViewModel: NSObject {
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     private let visibleWalletsService: VisibleWalletsService
+    private let vibroService: VibroService
 
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -89,7 +90,7 @@ final class ChatViewModel: NSObject {
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
-    var needToAnimateCellIndex: String?
+    var cellIdForAnimation: String?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -191,7 +192,8 @@ final class ChatViewModel: NSObject {
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol,
-        visibleWalletsService: VisibleWalletsService
+        visibleWalletsService: VisibleWalletsService,
+        vibroService: VibroService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -215,6 +217,7 @@ final class ChatViewModel: NSObject {
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         self.visibleWalletsService = visibleWalletsService
+        self.vibroService = vibroService
 
         super.init()
         setupObservers()
@@ -257,18 +260,6 @@ final class ChatViewModel: NSObject {
         if isNewChat && !(accountService.account?.isEnoughMoneyForTransaction ?? false) {
             dialog.send(.freeTokenAlert)
         }
-    }
-
-    func makeStartPosition() {
-        guard messageIdToShow == nil,
-              let address = chatroom?.partner?.address else {
-            startPosition = nil
-            return
-        }
-
-        startPosition = chatsProvider
-            .getChatPositon(for: address)
-            .map { .offset(.init($0)) }
     }
     
     func presentKeyboardOnStartIfNeeded() {
@@ -1096,7 +1087,7 @@ extension ChatViewModel {
     }
     
     func shortVibro() {
-        dialog.send(.shortVibro)
+        vibroService.applyVibration(.rigid)
     }
 }
 
@@ -1267,6 +1258,18 @@ extension ChatViewModel {
             .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
+    }
+    
+    fileprivate func makeStartPosition() {
+        guard messageIdToShow == nil,
+              let address = chatroom?.partner?.address else {
+            startPosition = nil
+            return
+        }
+
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(.init($0)) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {

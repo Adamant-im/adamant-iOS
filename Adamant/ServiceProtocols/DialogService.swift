@@ -198,7 +198,6 @@ protocol DialogService: AnyObject {
     // MARK: - Notifications
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)
     func dismissNotification()
-    func shortVibro()
 
     // MARK: - ActivityControllers
     func presentShareAlertFor(
