@@ -15,6 +15,8 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
     private let containerMediaView = ChatMediaContainerView()
     private let cellContainerView = UIView()
     private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
+    private var taskManager = TaskManager()
+    private var didCopy = false
 
     var subscription: AnyCancellable?
     var copyNotification: (() -> Void)?
@@ -108,20 +110,39 @@ extension ChatMediaCell {
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            didCopy = false
             cellContainerView.animatePressDown()
             
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
+                
+                guard gesture.state == .began || gesture.state == .changed else { return }
+                
+                await MainActor.run {
+                    self.longPressCopyAction()
+                    self.didCopy = true
+                }
+            }.stored(in: taskManager)
+            
         case .ended:
-            cellContainerView.animatePressUp()
-            if model.content.comment.string != "" {
-                UIPasteboard.general.string = model.content.comment.string
-                copyNotification?()
+            if !didCopy {
+                taskManager.clean()
+                longPressCopyAction()
             }
             
         case .cancelled, .failed:
             cellContainerView.animatePressUp()
-
+            
         default:
             break
+        }
+    }
+    
+    private func longPressCopyAction() {
+        cellContainerView.animatePressUp()
+        if model.content.comment.string != "" {
+            UIPasteboard.general.string = model.content.comment.string
+            copyNotification?()
         }
     }
 }

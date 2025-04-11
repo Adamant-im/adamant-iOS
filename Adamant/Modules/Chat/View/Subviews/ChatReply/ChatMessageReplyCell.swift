@@ -190,6 +190,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
+    private var taskManager = TaskManager()
+    private var didCopy = false
 
     // MARK: - Methods
 
@@ -587,13 +589,24 @@ private extension ChatMessageReplyCell {
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            didCopy = false
             messageContainerView.animatePressDown()
             
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
+                
+                guard gesture.state == .began || gesture.state == .changed else { return }
+                
+                await MainActor.run {
+                    self.longPressCopyAction()
+                    self.didCopy = true
+                }
+            }.stored(in: taskManager)
+            
         case .ended:
-            messageContainerView.animatePressUp()
-            if model.message.string != "" {
-                UIPasteboard.general.string = model.message.string
-                copyNotification?()
+            if !didCopy {
+                taskManager.clean()
+                longPressCopyAction()
             }
             
         case .cancelled, .failed:
@@ -601,6 +614,14 @@ private extension ChatMessageReplyCell {
             
         default:
             break
+        }
+    }
+    
+    private func longPressCopyAction() {
+        messageContainerView.animatePressUp()
+        if model.message.string != "" {
+            UIPasteboard.general.string = model.message.string
+            copyNotification?()
         }
     }
 }
