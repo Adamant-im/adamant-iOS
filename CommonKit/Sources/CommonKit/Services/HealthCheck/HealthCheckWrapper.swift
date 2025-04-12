@@ -140,7 +140,6 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
     open func healthCheckInternal() async {}
 }
 
-//<<<<<<< HEAD
 extension HealthCheckWrapper where Error: HealthCheckableTimeoutableError {
     public func request<Output>(
         waitsForConnectivity: Bool,
@@ -165,9 +164,6 @@ extension HealthCheckWrapper where Error: HealthCheckableTimeoutableError {
 }
 
 extension HealthCheckWrapper {
-    //=======
-    //extension HealthCheckWrapper {
-    //>>>>>>> develop
     private enum AppState {
         case active
         case background
