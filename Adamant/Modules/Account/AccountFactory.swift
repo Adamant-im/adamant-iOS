@@ -12,10 +12,10 @@ import UIKit
 @MainActor
 struct AccountFactory {
     let assembler: Assembler
-    
+
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
         AccountViewController(
-            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
+            walletStoreServiceProvider: assembler.resolve(WalletStoreServiceProviderProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,
@@ -26,7 +26,8 @@ struct AccountFactory {
             currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!
         )
     }
 }

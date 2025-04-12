@@ -6,14 +6,15 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import UIKit
-import Swinject
-import CommonKit
 import Combine
+import CommonKit
+import Foundation
+import Swinject
+import UIKit
 
 enum WalletServiceState: Equatable {
-    case notInitiated, updating, upToDate, initiationFailed(reason: String)
+    case notInitiated, updating, upToDate
+    case initiationFailed(reason: String)
 }
 
 enum WalletServiceSimpleResult {
@@ -45,68 +46,74 @@ extension WalletServiceError: RichError {
         switch self {
         case .notLogged:
             return String.adamant.sharedErrors.userNotLogged
-            
+
         case .notEnoughMoney:
             return String.adamant.sharedErrors.notEnoughMoney
-            
+
         case .networkError:
             return String.adamant.sharedErrors.networkError
-            
+
         case .accountNotFound:
             return String.adamant.transfer.accountNotFound
-            
+
         case .walletNotInitiated:
-            return .localized("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
-            
+            return .localized(
+                "WalletServices.SharedErrors.WalletNotInitiated",
+                comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet."
+            )
+
         case .remoteServiceError(let message, let error):
             return String.adamant.sharedErrors.remoteServerError(message: message)
-            
+
         case .apiError(let error):
             return error.localizedDescription
-            
+
         case .internalError(let message, _):
             return String.adamant.sharedErrors.internalError(message: message)
-            
+
         case .invalidAmount(let amount):
-            return String.localizedStringWithFormat(.localized("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"), AdamantBalanceFormat.full.format(amount))
-            
+            return String.localizedStringWithFormat(
+                .localized("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"),
+                AdamantBalanceFormat.full.format(amount)
+            )
+
         case .transactionNotFound:
             return .localized("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
-            
+
         case .requestCancelled:
             return String.adamant.sharedErrors.requestCancelled
         case .dustAmountError:
             return String.adamant.sharedErrors.dustError
         }
     }
-    
+
     var internalError: Error? {
         switch self {
         case .internalError(_, let error): return error
         default: return nil
         }
     }
-    
+
     var level: ErrorLevel {
         switch self {
         case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
-        
+
         case .dustAmountError, .remoteServiceError:
             return .error
-            
+
         case .internalError:
             return .internalError
-            
+
         case .apiError(let error):
             return error.level
         }
     }
-    
+
     static func internalError(_ error: InternalAPIError) -> Self {
         .internalError(message: error.localizedDescription, error: error)
     }
-    
+
     static func remoteServiceError(message: String? = nil, error: Error? = nil) -> Self {
         .remoteServiceError(
             message: message ?? error?.localizedDescription ?? .empty,
@@ -124,11 +131,11 @@ extension WalletServiceError: HealthCheckableError {
             return false
         }
     }
-    
+
     public static var noNetworkError: WalletServiceError {
         .apiError(.noNetworkError)
     }
-    
+
     static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
         .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
@@ -139,16 +146,16 @@ extension ApiServiceError {
         switch self {
         case .accountNotFound:
             return .accountNotFound
-            
+
         case .networkError:
             return .networkError
-            
+
         case .notLogged:
             return .notLogged
-            
+
         case .requestCancelled:
             return .requestCancelled
-            
+
         case .serverError, .internalError, .commonError, .noEndpointsAvailable:
             return .apiError(self)
         }
@@ -160,40 +167,40 @@ extension ChatsProviderError {
         switch self {
         case .notLogged:
             return .notLogged
-            
+
         case .messageNotValid:
             return .notLogged
-            
+
         case .notEnoughMoneyToSend:
             return .notEnoughMoney
-            
+
         case .networkError:
             return .networkError
-            
+
         case .serverError(let e as ApiServiceError):
             return .apiError(e)
-            
+
         case .serverError(let e):
             return .internalError(message: self.message, error: e.wrappedError)
-            
+
         case .accountNotFound:
             return .accountNotFound
-            
+
         case .dependencyError(let message):
             return .internalError(message: message, error: nil)
-            
+
         case .transactionNotFound(let id):
             return .transactionNotFound(reason: "\(id)")
-            
+
         case .internalError(let error):
             return .internalError(message: self.message, error: error)
-            
+
         case .accountNotInitiated:
             return .walletNotInitiated
-            
+
         case .requestCancelled:
             return .requestCancelled
-            
+
         case .invalidTransactionStatus:
             return .internalError(message: "Invalid Transaction Status", error: nil)
         }
@@ -205,7 +212,7 @@ extension AdamantUserInfoKey {
     struct WalletService {
         static let wallet = "Adamant.WalletService.wallet"
         static let walletState = "Adamant.WalletService.walletState"
-        
+
         private init() {}
     }
 }
@@ -214,7 +221,7 @@ extension AdamantUserInfoKey {
 extension Notification.Name {
     struct WalletViewController {
         static let heightUpdated = Notification.Name("adamant.walletViewController")
-        
+
         private init() {}
     }
 }
@@ -229,10 +236,6 @@ protocol WalletViewController {
 // MARK: - Wallet Service
 protocol WalletCoreProtocol: AnyObject, Sendable {
     // MARK: Currency
-    static var currencySymbol: String { get }
-    static var currencyLogo: UIImage { get }
-    static var qqPrefix: String { get }
-    
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
@@ -250,55 +253,56 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var nodeGroups: [NodeGroup] { get }
     var transferDecimals: Int { get }
     var explorerAddress: String { get }
-    
+
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
     }
-    
+
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         get
     }
-    
+
     /// Lowercased!!
     static var richMessageType: String { get }
-    
+
     // MARK: Transactions fetch info
-    
+
     var newPendingInterval: TimeInterval { get }
     var oldPendingInterval: TimeInterval { get }
     var registeredInterval: TimeInterval { get }
     var newPendingAttempts: Int { get }
     var oldPendingAttempts: Int { get }
-    
+
     // MARK: Notifications
-    
+
     /// Wallet updated.
     /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
     var walletUpdatedNotification: Notification.Name { get }
-    
+
     /// Enabled state changed
     var serviceEnabledChanged: Notification.Name { get }
-    
+
     /// State changed
     var serviceStateChanged: Notification.Name { get }
-    
+
     // MARK: State
     var wallet: WalletAccount? { get }
     var state: WalletServiceState { get }
     var enabled: Bool { get }
-    
+
     // MARK: Logic
     @MainActor
     var hasEnabledNode: Bool { get }
-    
+
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
-    
+
     @MainActor
     var walletUpdatePublisher: AnyObservable<Void> { get }
-    
+
     func update()
-    
+    func updateWithRefreshUIBalance()
+
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
@@ -313,23 +317,23 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     func getFee(comment: String) -> Decimal
-    
+
     // MARK: Send
-    
+
     var transactionFeeUpdated: Notification.Name { get }
-    
+
     var qqPrefix: String { get }
     var blockchainSymbol: String { get }
-    var isDynamicFee : Bool { get }
-    var diplayTransactionFee : Decimal { get }
-    var transactionFee : Decimal { get }
-    var isWarningGasPrice : Bool { get }
-    var isTransactionFeeValid : Bool { get }
+    var isDynamicFee: Bool { get }
+    var diplayTransactionFee: Decimal { get }
+    var transactionFee: Decimal { get }
+    var isWarningGasPrice: Bool { get }
+    var isTransactionFeeValid: Bool { get }
     var commentsEnabledForRichMessages: Bool { get }
     var isSupportIncreaseFee: Bool { get }
     var isIncreaseFeeEnabled: Bool { get }
     var defaultIncreaseFee: Decimal { get }
-    var additionalFee : Decimal { get }
+    var additionalFee: Decimal { get }
 }
 
 extension WalletCoreProtocol {
@@ -385,14 +389,14 @@ protocol WalletServiceSimpleSend: WalletCoreProtocol {
 
 protocol WalletServiceTwoStepSend: WalletCoreProtocol {
     associatedtype T: RawTransaction
-    
+
     func createTransaction(
         recipient: String,
         amount: Decimal,
         fee: Decimal,
         comment: String?
     ) async throws -> T
-    
+
     func sendTransaction(_ transaction: T) async throws
 }
 

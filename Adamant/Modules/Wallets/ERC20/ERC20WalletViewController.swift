@@ -6,16 +6,16 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import UIKit
-import CommonKit
 
 extension String.adamant.wallets {
     enum erc20 {
         static func tokenWallet(_ token: String) -> String {
             return String(format: .localized("AccountTab.Wallets.erc20_wallet", comment: "Account tab: Ethereum wallet"), token)
         }
-        
+
         static func sendToken(_ token: String) -> String {
             return String(format: .localized("AccountTab.Row.SendToken", comment: "Account tab: 'Send ERC20 tokens' button"), token)
         }
@@ -30,7 +30,7 @@ final class ERC20WalletViewController: WalletViewControllerBase {
         let networkFont = currencyFont.withSize(8)
         let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
         let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
-      
+
         let defaultString = NSMutableAttributedString(
             string: tokenSymbol,
             attributes: currencyAttributes
@@ -39,16 +39,16 @@ final class ERC20WalletViewController: WalletViewControllerBase {
             string: " \(networkSymbol)",
             attributes: networkAttributes
         )
-        
+
         defaultString.append(underlineString)
-        
+
         return defaultString
     }
-    
+
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
     }
-    
+
     override func setTitle() {
         walletTitleLabel.text = String.adamant.wallets.erc20.tokenWallet(service?.core.tokenName ?? "")
     }

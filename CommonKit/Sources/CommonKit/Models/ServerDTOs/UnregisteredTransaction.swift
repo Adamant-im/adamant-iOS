@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
 import BigInt
+import Foundation
 
 public struct UnregisteredTransaction: Hashable, Sendable {
     public let type: TransactionType
@@ -19,7 +19,7 @@ public struct UnregisteredTransaction: Hashable, Sendable {
     public let signature: String
     public let asset: TransactionAsset
     public let requesterPublicKey: String?
-    
+
     public init(
         type: TransactionType,
         timestamp: UInt64,
@@ -54,10 +54,10 @@ extension UnregisteredTransaction: Codable {
         case signature
         case asset
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         self.type = try container.decode(TransactionType.self, forKey: .type)
         self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
@@ -65,23 +65,23 @@ extension UnregisteredTransaction: Codable {
         self.recipientId = try? container.decode(String.self, forKey: .recipientId)
         self.signature = (try? container.decode(String.self, forKey: .signature)) ?? ""
         self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
-        
+
         let amount = try container.decode(Decimal.self, forKey: .amount)
         self.amount = amount.shiftedFromAdamant()
         self.requesterPublicKey = ""
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(type, forKey: .type) // TransactionType
-        try container.encode(timestamp, forKey: .timestamp) // UInt64
-        try container.encode(senderPublicKey, forKey: .senderPublicKey) // String
-        try container.encode(senderId, forKey: .senderId) // String
-        try container.encode(recipientId, forKey: .recipientId) // String?
-        try container.encode(signature, forKey: .signature) // String
-        try container.encode(asset, forKey: .asset) // TransactionAsset
-        try container.encode(amount.shiftedToAdamant(), forKey: .amount) // Decimal
+
+        try container.encode(type, forKey: .type)  // TransactionType
+        try container.encode(timestamp, forKey: .timestamp)  // UInt64
+        try container.encode(senderPublicKey, forKey: .senderPublicKey)  // String
+        try container.encode(senderId, forKey: .senderId)  // String
+        try container.encode(recipientId, forKey: .recipientId)  // String?
+        try container.encode(signature, forKey: .signature)  // String
+        try container.encode(asset, forKey: .asset)  // TransactionAsset
+        try container.encode(amount.shiftedToAdamant(), forKey: .amount)  // Decimal
     }
-    
+
 }

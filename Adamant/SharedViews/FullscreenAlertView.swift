@@ -6,58 +6,58 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
 import CommonKit
 import SnapKit
+import UIKit
 
 final class FullscreenAlertView: UIView {
     var message: String = .empty {
         didSet { messageLabel.text = message }
     }
-    
+
     private let containerView: UIView = .init()
     private let imageView = UIImageView(image: warningImage)
-    
+
     private let messageLabel = UILabel(
         font: .systemFont(ofSize: 15),
         textColor: .adamant.textColor,
         numberOfLines: .zero,
         alignment: .center
     )
-    
+
     private lazy var verticalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [imageView, messageLabel])
         stack.axis = .vertical
         stack.spacing = 15
         return stack
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
     }
 }
 
-private extension FullscreenAlertView {
-    func configure() {
+extension FullscreenAlertView {
+    fileprivate func configure() {
         backgroundColor = .black.withAlphaComponent(0.4)
         containerView.backgroundColor = .adamant.cellColor
         containerView.layer.cornerRadius = 15
         imageView.tintColor = .adamant.primary
         imageView.contentMode = .scaleAspectFit
-        
+
         addSubview(containerView)
         containerView.snp.makeConstraints {
             $0.center.equalToSuperview()
             $0.top.leading.greaterThanOrEqualToSuperview().inset(15)
             $0.bottom.trailing.lessThanOrEqualToSuperview().inset(15)
         }
-        
+
         containerView.addSubview(verticalStack)
         verticalStack.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview().inset(15)

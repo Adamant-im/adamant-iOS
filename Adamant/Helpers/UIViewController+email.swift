@@ -6,9 +6,9 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
+import CommonKit
 import MessageUI
 import UIKit
-import CommonKit
 
 extension UIViewController {
     func openEmailScreen(
@@ -25,8 +25,8 @@ extension UIViewController {
     }
 }
 
-private extension UIViewController {
-    func showEmailVC(
+extension UIViewController {
+    fileprivate func showEmailVC(
         recipient: String,
         subject: String?,
         body: String?,
@@ -34,12 +34,12 @@ private extension UIViewController {
     ) {
         let mailVC = MFMailComposeViewController()
         subject.map { mailVC.setSubject($0) }
-        
+
         if let body = body {
             let html = body.replacingOccurrences(of: "\n", with: "<br>")
             mailVC.setMessageBody(html, isHTML: true)
         }
-        
+
         mailVC.mailComposeDelegate = delegate
         mailVC.setToRecipients([recipient])
         mailVC.modalPresentationStyle = .overFullScreen

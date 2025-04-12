@@ -51,7 +51,7 @@ extension Array where Element == APINode {
             .init(origin: "https://testnet-service.lisk.io")
         ]
     }
-    
+
 }
 
 extension Array where Element == APINode {

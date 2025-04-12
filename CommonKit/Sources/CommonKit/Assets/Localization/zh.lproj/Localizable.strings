@@ -712,6 +712,8 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+"chat.NewMessages" = "新消息";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "保持文件加密";
 
@@ -1349,7 +1351,13 @@
 "Chat.unknown.title" = "未知";
 
 /* No active nodes */
+"Chat.Alert.Title.NoActiveNodes" = "無活動 ADM 節點";
 "Chat.Alert.NoActiveNodes" = "无法请求新消息 - 没有活动的 ADM 区块链节点。由于您已停用部分节点，请考虑查看节点列表。";
+
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "檢查裝置時間";
+"Chat.Alert.TimestampIsInTheFuture" = "無法請求新訊息-沒有活動的 ADM 區塊鏈節點。由於您已停用部分節點，請考慮檢視節點清單。";
+"Chat.Alert.TimeSettings" = "時間設定";
 
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";

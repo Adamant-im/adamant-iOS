@@ -45,7 +45,7 @@ public class ScriptExecutionContext {
     public private(set) var transaction: Transaction?
     public private(set) var utxoToVerify: TransactionOutput?
     public private(set) var txinToVerify: TransactionInput?
-    public private(set) var inputIndex: UInt32 = 0xffffffff
+    public private(set) var inputIndex: UInt32 = 0xffff_ffff
 
     // A timestamp of the current block. Default is current timestamp.
     // This is used to test for P2SH scripts or other changes in the protocol that may happen in the future.

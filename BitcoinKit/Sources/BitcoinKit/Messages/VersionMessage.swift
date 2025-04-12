@@ -71,17 +71,47 @@ public struct VersionMessage {
         let timestamp = byteStream.read(Int64.self)
         let yourAddress = NetworkAddress.deserialize(byteStream)
         guard byteStream.availableBytes > 0 else {
-            return VersionMessage(version: version, services: services, timestamp: timestamp, yourAddress: yourAddress, myAddress: nil, nonce: nil, userAgent: nil, startHeight: nil, relay: nil)
+            return VersionMessage(
+                version: version,
+                services: services,
+                timestamp: timestamp,
+                yourAddress: yourAddress,
+                myAddress: nil,
+                nonce: nil,
+                userAgent: nil,
+                startHeight: nil,
+                relay: nil
+            )
         }
         let myAddress = NetworkAddress.deserialize(byteStream)
         let nonce = byteStream.read(UInt64.self)
         let userAgent = byteStream.read(VarString.self)
         let startHeight = byteStream.read(Int32.self)
         guard byteStream.availableBytes > 0 else {
-            return VersionMessage(version: version, services: services, timestamp: timestamp, yourAddress: yourAddress, myAddress: myAddress, nonce: nonce, userAgent: userAgent, startHeight: startHeight, relay: nil)
+            return VersionMessage(
+                version: version,
+                services: services,
+                timestamp: timestamp,
+                yourAddress: yourAddress,
+                myAddress: myAddress,
+                nonce: nonce,
+                userAgent: userAgent,
+                startHeight: startHeight,
+                relay: nil
+            )
         }
         let relay = byteStream.read(Bool.self)
 
-        return VersionMessage(version: version, services: services, timestamp: timestamp, yourAddress: yourAddress, myAddress: myAddress, nonce: nonce, userAgent: userAgent, startHeight: startHeight, relay: relay)
+        return VersionMessage(
+            version: version,
+            services: services,
+            timestamp: timestamp,
+            yourAddress: yourAddress,
+            myAddress: myAddress,
+            nonce: nonce,
+            userAgent: userAgent,
+            startHeight: startHeight,
+            relay: relay
+        )
     }
 }

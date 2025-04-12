@@ -6,30 +6,30 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import Foundation
-import CommonKit
 import Combine
+import CommonKit
+import Foundation
 
 @MainActor
 final class AccountWalletsViewModel {
-    @ObservableValue var state: AccountWalletsState = .default
-    
-    private let walletsService: VisibleWalletsService
+    var state: AccountWalletsState = .default
+
+    private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
-    
-    init(walletsService: VisibleWalletsService) {
-        self.walletsService = walletsService
+
+    init(walletsStoreService: WalletStoreServiceProviderProtocol) {
+        self.walletsStoreService = walletsStoreService
         setup()
     }
 }
 
-private extension AccountWalletsViewModel {
-    func setup() {
+extension AccountWalletsViewModel {
+    fileprivate func setup() {
         addObservers()
     }
-    
-    func addObservers() {
-        for wallet in walletsService.sorted(includeInvisible: false) {
+
+    fileprivate func addObservers() {
+        for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
                 .sink(
@@ -41,19 +41,22 @@ private extension AccountWalletsViewModel {
         }
     }
 
-    func updateInfo(for wallet: WalletService) {
+    fileprivate func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
-        if let index = state.wallets.firstIndex(where: { $0.coinID == coreService.tokenUniqueID }) {
-            state.wallets[index].balance = coreService.wallet?.balance ?? 0
-            state.wallets[index].isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
-            state.wallets[index].notificationBadgeCount = coreService.wallet?.notifications ?? 0
+        let tokenID = coreService.tokenUniqueID
+        if let index = state.wallets.firstIndex(where: { $0.model.coinID == tokenID }) {
+            let cellState = state.wallets[index]
+            var currentModel = cellState.model
+            currentModel.balance = coreService.wallet?.balance ?? 0
+            currentModel.isBalanceInitialized = coreService.wallet?.isBalanceInitialized ?? false
+            currentModel.notificationBadgeCount = coreService.wallet?.notifications ?? 0
+            cellState.model = currentModel
+            state.wallets[index] = cellState
         } else {
-            let network = ERC20Token.supportedTokens.contains(where: { $0.symbol == coreService.tokenSymbol })
-                ? type(of: coreService).tokenNetworkSymbol
-                : ""
-            let model = WalletCollectionViewCell.Model(
+            let network = type(of: coreService).tokenNetworkSymbol
+            let newModel = WalletCollectionViewCellModel(
                 index: state.wallets.count,
-                coinID: coreService.tokenUniqueID,
+                coinID: tokenID,
                 currencySymbol: coreService.tokenSymbol,
                 currencyImage: coreService.tokenLogo,
                 currencyNetwork: network,
@@ -61,8 +64,8 @@ private extension AccountWalletsViewModel {
                 balance: coreService.wallet?.balance ?? 0,
                 notificationBadgeCount: coreService.wallet?.notifications ?? 0
             )
-            
-            state.wallets.append(model)
+            let cellState = AccountWalletCellState(model: newModel)
+            state.wallets.append(cellState)
         }
     }
 }

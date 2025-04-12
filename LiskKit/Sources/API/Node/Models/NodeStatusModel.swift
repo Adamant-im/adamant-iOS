@@ -38,14 +38,14 @@ extension Node {
 
         public let total: Int
     }
-    
+
     public struct NodeInfoModel: APIModel {
 
         public let version: String
 
         public let networkVersion: String
-        
+
         public let height: Int?
     }
-    
+
 }

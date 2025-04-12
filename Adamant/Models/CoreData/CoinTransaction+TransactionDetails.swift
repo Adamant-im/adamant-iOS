@@ -14,28 +14,32 @@ extension CoinTransaction: TransactionDetails {
     var senderAddress: String {
         senderId ?? ""
     }
-    
+
     var recipientAddress: String {
         recipientId ?? ""
     }
-    
+
     var dateValue: Date? {
         date as? Date
     }
-    
+
     var amountValue: Decimal? {
         amount?.decimalValue
     }
-    
+
     var feeValue: Decimal? { fee?.decimalValue }
-    
+
     var confirmationsValue: String? { return isConfirmed ? String(confirmations) : nil }
-    
+
     var blockValue: String? { return isConfirmed ? blockId : nil }
-    
+
     var txId: String { return transactionId }
-    
+
     var blockHeight: UInt64? {
         return nil
+    }
+
+    var timeIntervalMillisecondsSince1970: Int64 {
+        date?.timeIntervalMillisecondsSince1970 ?? .zero
     }
 }

@@ -6,25 +6,25 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import LiskKit
-import Foundation
 import CommonKit
+import Foundation
+import LiskKit
 
 final class KlyNodeApiService: KlyNodeApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
-    
+
     @MainActor
     var nodesInfoPublisher: AnyObservable<NodesListInfo> { api.nodesInfoPublisher }
-    
+
     @MainActor
     var nodesInfo: NodesListInfo { api.nodesInfo }
-    
+
     func healthCheck() { api.healthCheck() }
-    
+
     init(api: BlockchainHealthCheckWrapper<KlyApiCore>) {
         self.api = api
     }
-    
+
     func requestNodeApi<Output>(
         body: @escaping @Sendable (
             _ api: LiskKit.Node,
@@ -35,7 +35,7 @@ final class KlyNodeApiService: KlyNodeApiServiceProtocol {
             body(.init(client: client), completion)
         }
     }
-    
+
     func requestTransactionsApi<Output>(
         _ request: @Sendable @escaping (Transactions) async throws -> Output
     ) async -> WalletServiceResult<Output> {
@@ -43,7 +43,7 @@ final class KlyNodeApiService: KlyNodeApiServiceProtocol {
             try await request(Transactions(client: client))
         }
     }
-    
+
     func requestAccountsApi<Output>(
         _ request: @Sendable @escaping (Accounts) async throws -> Output
     ) async -> WalletServiceResult<Output> {
@@ -51,7 +51,7 @@ final class KlyNodeApiService: KlyNodeApiServiceProtocol {
             try await request(Accounts(client: client))
         }
     }
-    
+
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
         await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
@@ -59,8 +59,8 @@ final class KlyNodeApiService: KlyNodeApiServiceProtocol {
     }
 }
 
-private extension KlyNodeApiService {
-    func requestClient<Output>(
+extension KlyNodeApiService {
+    fileprivate func requestClient<Output>(
         waitsForConnectivity: Bool,
         body: @escaping @Sendable (
             _ client: APIClient,
@@ -71,8 +71,8 @@ private extension KlyNodeApiService {
             await core.request(origin: origin, body: body)
         }
     }
-    
-    func requestClient<Output>(
+
+    fileprivate func requestClient<Output>(
         waitsForConnectivity: Bool,
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {

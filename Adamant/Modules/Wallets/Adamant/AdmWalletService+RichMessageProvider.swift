@@ -6,64 +6,64 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
+import CommonKit
 import Foundation
 import MessageKit
 import UIKit
-import CommonKit
 
 extension AdmWalletService {
     var newPendingInterval: TimeInterval {
         .zero
     }
-    
+
     var oldPendingInterval: TimeInterval {
         .zero
     }
-    
+
     var registeredInterval: TimeInterval {
         .zero
     }
-    
+
     var newPendingAttempts: Int {
         .zero
     }
-    
+
     var oldPendingAttempts: Int {
         .zero
     }
-    
+
     var dynamicRichMessageType: String {
         return type(of: self).richMessageType
     }
-    
+
     // MARK: Events
-    
+
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         return
     }
-    
+
     // MARK: Short description
     private static let formatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
-    
+
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         guard let balance = transaction.amount as Decimal? else {
             return NSAttributedString(string: "")
         }
-        
+
         return NSAttributedString(string: shortDescription(isOutgoing: transaction.isOutgoing, balance: balance))
     }
-    
+
     /// For ADM transfers
     func shortDescription(for transaction: TransferTransaction) -> String {
         guard let balance = transaction.amount as Decimal? else {
             return ""
         }
-        
+
         return shortDescription(isOutgoing: transaction.isOutgoing, balance: balance)
     }
-    
+
     private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
         if isOutgoing {
             return "⬅️  \(AdmWalletService.formatter.string(from: balance)!)"

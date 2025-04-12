@@ -5,11 +5,11 @@
 //  Created by Andrew G on 09.10.2024.
 //
 
-import Combine
 import AsyncAlgorithms
+import Combine
 
-public extension AsyncSequence where Self: Sendable {
-    func sink(
+extension AsyncSequence where Self: Sendable {
+    public func sink(
         receiveValue: @escaping @Sendable (Element) async -> Void,
         receiveCompletion: @escaping @Sendable (Error?) async -> Void = { _ in }
     ) -> AnyCancellable {
@@ -18,25 +18,25 @@ public extension AsyncSequence where Self: Sendable {
                 for try await newValue in self {
                     await receiveValue(newValue)
                 }
-                
+
                 await receiveCompletion(nil)
             } catch {
                 await receiveCompletion(error)
             }
         }.eraseToAnyCancellable()
     }
-    
-    func combineLatest<T: AsyncSequence & Sendable>(_ other: T) -> AsyncCombineLatest2Sequence<Self, T> {
+
+    public func combineLatest<T: AsyncSequence & Sendable>(_ other: T) -> AsyncCombineLatest2Sequence<Self, T> {
         AsyncAlgorithms.combineLatest(self, other)
     }
 }
 
-public extension AsyncSequence {
-    var first: Element? {
+extension AsyncSequence {
+    public var first: Element? {
         get async throws { try await first { _ in true } }
     }
-    
-    func handleEvents(receiveOutput: @escaping (Element) async throws -> Void) -> AsyncMapSequence<Self, Element> {
+
+    public func handleEvents(receiveOutput: @escaping (Element) async throws -> Void) -> AsyncMapSequence<Self, Element> {
         map { [receiveOutput] in
             try? await receiveOutput($0)
             return $0

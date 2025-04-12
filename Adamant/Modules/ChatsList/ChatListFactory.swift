@@ -6,14 +6,14 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
-import Swinject
 import CommonKit
+import Swinject
+import UIKit
 
 @MainActor
 struct ChatListFactory {
     let assembler: Assembler
-    
+
     func makeChatListVC(screensFactory: ScreensFactory) -> UIViewController {
         ChatListViewController(
             accountService: assembler.resolve(AccountService.self)!,
@@ -24,10 +24,11 @@ struct ChatListFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             addressBook: assembler.resolve(AddressBookService.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            chatPreservation: assembler.resolve(ChatPreservationProtocol.self)!
         )
     }
-    
+
     func makeNewChatVC(screensFactory: ScreensFactory) -> NewChatViewController {
         let c = NewChatViewController()
         c.dialogService = assembler.resolve(DialogService.self)
@@ -36,17 +37,17 @@ struct ChatListFactory {
         c.screensFactory = screensFactory
         return c
     }
-    
+
     func makeComplexTransferVC(screensFactory: ScreensFactory) -> UIViewController {
         ComplexTransferViewController(
-            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
+            walletsStoreService: assembler.resolve(WalletStoreServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
     }
-    
+
     func makeSearchResultsViewController(screensFactory: ScreensFactory) -> SearchResultsViewController {
         SearchResultsViewController(
             screensFactory: screensFactory,

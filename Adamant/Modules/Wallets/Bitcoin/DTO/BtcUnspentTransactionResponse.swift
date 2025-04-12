@@ -15,7 +15,7 @@ struct BtcUnspentTransactionResponse: Decodable {
         case value
         case status
     }
-    
+
     let txId: String
     let vout: UInt32
     let value: Decimal

@@ -7,9 +7,9 @@
 
 import Foundation
 
-public extension MainActor {
+extension MainActor {
     @discardableResult
-    static func assumeIsolatedSafe<T: Sendable>(_ action: @MainActor () -> T) -> T {
+    public static func assumeIsolatedSafe<T: Sendable>(_ action: @MainActor () -> T) -> T {
         assertIsolated()
         return DispatchQueue.onMainThreadSyncSafe(action)
     }

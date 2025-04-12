@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-public extension ApiCommands {
-    static let Chats = (
+extension ApiCommands {
+    public static let Chats = (
         root: "/api/chats",
         get: "/api/chats/get",
         normalizeTransaction: "/api/chats/normalize",
@@ -30,15 +30,15 @@ extension AdamantApiService {
             "isIn": address,
             "orderBy": "timestamp:desc"
         ]
-        
+
         if let height = height, height > .zero {
             parameters["fromHeight"] = String(height)
         }
-        
+
         if let offset = offset {
             parameters["offset"] = String(offset)
         }
-        
+
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
         response = await request(waitsForConnectivity: waitsForConnectivity) {
             [parameters] service, origin in
@@ -50,10 +50,10 @@ extension AdamantApiService {
                 encoding: .url
             )
         }
-        
+
         return response.flatMap { $0.resolved() }
     }
-    
+
     public func sendMessageTransaction(
         transaction: UnregisteredTransaction,
         timeout: TimeInterval? = nil
@@ -64,18 +64,18 @@ extension AdamantApiService {
             timeout: timeout
         )
     }
-    
+
     public func getChatRooms(
         address: String,
         offset: Int?,
         waitsForConnectivity: Bool
     ) async -> ApiServiceResult<ChatRooms> {
         var parameters = ["limit": "20"]
-        
+
         if let offset = offset {
             parameters["offset"] = String(offset)
         }
-        
+
         return await request(waitsForConnectivity: waitsForConnectivity) {
             [parameters] service, origin in
             await service.sendRequestJsonResponse(
@@ -87,7 +87,7 @@ extension AdamantApiService {
             )
         }
     }
-    
+
     public func getChatMessages(
         address: String,
         addressRecipient: String,
@@ -95,15 +95,15 @@ extension AdamantApiService {
         limit: Int?
     ) async -> ApiServiceResult<ChatRooms> {
         var parameters: [String: String] = [:]
-        
+
         if let offset = offset {
             parameters["offset"] = String(offset)
         }
-        
+
         if let limit = limit {
             parameters["limit"] = String(limit)
         }
-        
+
         return await request { [parameters] service, origin in
             await service.sendRequestJsonResponse(
                 origin: origin,

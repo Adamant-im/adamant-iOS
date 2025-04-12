@@ -1,6 +1,6 @@
 //
 //  SecureStorageProtocol.swift
-//  
+//
 //
 //  Created by Stanislav Jelezoglo on 05.08.2024.
 //

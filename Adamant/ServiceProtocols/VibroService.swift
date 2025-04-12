@@ -12,7 +12,7 @@ import Foundation
 extension Notification.Name {
     struct AdamantVibroService {
         static let presentVibrationRow = Notification.Name("adamant.vibroService.presentVibrationRow")
-        
+
     }
 }
 

@@ -31,7 +31,7 @@ public struct OpCheckSigVerify: OpCodeProtocol {
 
     // input : sig pubkey
     // output : Nothing / fail
-     public func mainProcess(_ context: ScriptExecutionContext) throws {
+    public func mainProcess(_ context: ScriptExecutionContext) throws {
         try OpCode.OP_CHECKSIG.mainProcess(context)
         do {
             try OpCode.OP_VERIFY.mainProcess(context)

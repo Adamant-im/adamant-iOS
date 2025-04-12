@@ -6,8 +6,8 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 // MARK: - Localization
 extension String.adamant {
@@ -94,7 +94,10 @@ extension String.adamant {
             String.localized("ChatScene.Received", comment: "Chat: 'Received funds' bubble title")
         }
         static var messageWasDeleted: String {
-            String.localized("ChatScene.Error.messageWasDeleted", comment: "Chat: Error scrolling to message, this message has been deleted and is no longer accessible")
+            String.localized(
+                "ChatScene.Error.messageWasDeleted",
+                comment: "Chat: Error scrolling to message, this message has been deleted and is no longer accessible"
+            )
         }
         static var messageIsTooBig: String {
             String.localized("ChatScene.Error.messageIsTooBig", comment: "Chat: Error message is too big")
@@ -102,8 +105,20 @@ extension String.adamant {
         static var unknownTitle: String {
             String.localized("Chat.unknown.title", comment: "Chat unknown")
         }
+        static var noActiveNodesTitle: String {
+            String.localized("Chat.Alert.Title.NoActiveNodes", comment: "No active nodes title")
+        }
         static var noActiveNodes: String {
             String.localized("Chat.Alert.NoActiveNodes", comment: "No active nodes")
+        }
+        static var timestampIsInTheFutureTitle: String {
+            String.localized("Chat.Alert.Title.TimestampIsInTheFuture", comment: "Timestamp is in the future title")
+        }
+        static var timestampIsInTheFuture: String {
+            String.localized("Chat.Alert.TimestampIsInTheFuture", comment: "Timestamp is in the future text")
+        }
+        static var timeSettings: String {
+            String.localized("Chat.Alert.TimeSettings", comment: "Timestamp is in the future text")
         }
         static var reviewNodesList: String {
             String.localized("Chat.Alert.ReviewNodesList", comment: "Review Nodes List")

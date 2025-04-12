@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 struct InfoServiceApiCore {
     let apiCore: APICoreProtocol
@@ -30,7 +30,7 @@ extension InfoServiceApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
-        
+
         return statusResponse.map { statusDto in
             mapper.mapToNodeStatusInfo(
                 ping: ping,

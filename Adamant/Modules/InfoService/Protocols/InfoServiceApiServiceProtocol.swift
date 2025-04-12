@@ -6,14 +6,14 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 protocol InfoServiceApiServiceProtocol: ApiServiceProtocol {
     func loadRates(
         coins: [String]
     ) async -> InfoServiceApiResult<[InfoServiceTicker: Decimal]>
-    
+
     func getHistory(
         coin: String,
         date: Date

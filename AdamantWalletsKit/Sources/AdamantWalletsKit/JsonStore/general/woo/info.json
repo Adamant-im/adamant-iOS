@@ -1,0 +1,25 @@
+{
+  "name": "WOO Network",
+  "website": "https://woo.network",
+  "description": "WOO Network is a system of centralized finance and decentralized finance services designed to enable deeper liquidity for various cryptocurrency market participants",
+  "symbol": "WOO",
+  "type": "token",
+  "decimals": 18,
+  "cryptoTransferDecimals": 6,
+  "status": "active",
+  "createCoin": false,
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/WOOnetwork"
+    },
+    {
+      "name": "reddit",
+      "url": "https://www.reddit.com/r/WOO_X"
+    },
+    {
+      "name": "whitepaper",
+      "url": "https://woo.org/Litepaper.pdf"
+    }
+  ]
+}

@@ -14,7 +14,7 @@ protocol FilesNetworkManagerProtocol {
         type: NetworkFileProtocolType,
         uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<String>
-    
+
     func downloadFile(
         _ id: String,
         type: String,

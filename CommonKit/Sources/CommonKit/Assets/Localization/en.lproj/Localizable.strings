@@ -761,6 +761,8 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+"chat.NewMessages" = "New Messages";
+
 /* Storage: Save Encrypted */
 "Storage.SaveEncrypted.Title" = "Store files encrypted";
 
@@ -1358,7 +1360,13 @@
 "Chat.unknown.title" = "Unknown";
 
 /* No active nodes */
-"Chat.Alert.NoActiveNodes" = "Unable to request new messages — No active ADM blockchain nodes. As you’ve deactivated some of them, consider reviewing the node list.";
+"Chat.Alert.Title.NoActiveNodes" = "No active ADM nodes";
+"Chat.Alert.NoActiveNodes" = "Unable to request new messages—No active ADM blockchain nodes. As you’ve deactivated some of them, consider reviewing the node list.";
+
+/* Timestamp in the future */
+"Chat.Alert.Title.TimestampIsInTheFuture" = "Check device time";
+"Chat.Alert.TimestampIsInTheFuture" = "A network node rejected the message because the time on your device is ahead. Check the device's time or try sending a message again.";
+"Chat.Alert.TimeSettings" = "Time setting";
 
 /* Review Nodes List */
 "Chat.Alert.ReviewNodesList" = "Review ADM node list";

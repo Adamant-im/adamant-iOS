@@ -6,33 +6,33 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension AdamantChatsProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
-        guard let address: String = securedStore.get(StoreKey.chatProvider.address) else {
+        guard let address: String = secureStore.get(StoreKey.chatProvider.address) else {
             return .failed
         }
-        
+
         var lastHeight: Int64?
-        if let raw: String = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
+        if let raw: String = secureStore.get(StoreKey.chatProvider.receivedLastHeight) {
             lastHeight = Int64(raw)
         } else {
             lastHeight = nil
         }
-        
+
         var notifiedCount = 0
-        if let raw: String = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+        if let raw: String = secureStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
             if h < notifiedHeight {
                 lastHeight = notifiedHeight
-                
-                if let raw: String = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
+
+                if let raw: String = secureStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
                     notifiedCount = count
                 }
             }
         }
-        
+
         do {
             let transactions = try await apiService.getMessageTransactions(
                 address: address,
@@ -40,28 +40,28 @@ extension AdamantChatsProvider: BackgroundFetchService {
                 offset: nil,
                 waitsForConnectivity: false
             ).get()
-            
+
             guard transactions.count > 0 else { return .noData }
-            
+
             let total = transactions.count
-            securedStore.set(
+            secureStore.set(
                 String(total + notifiedCount),
                 for: StoreKey.chatProvider.notifiedMessagesCount
             )
-            
-            if let newLastHeight = transactions.map({$0.height}).sorted().last {
-                securedStore.set(
+
+            if let newLastHeight = transactions.map({ $0.height }).sorted().last {
+                secureStore.set(
                     String(newLastHeight),
                     for: StoreKey.chatProvider.notifiedLastHeight
                 )
             }
-            
+
             await notificationsService.showNotification(
                 title: NotificationStrings.newMessageTitle,
                 body: NotificationStrings.newMessageBody(total + notifiedCount),
                 type: .newMessages(count: total)
             )
-            
+
             return .newData
         } catch {
             return .failed

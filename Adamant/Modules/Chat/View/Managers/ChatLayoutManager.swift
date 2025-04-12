@@ -6,24 +6,24 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
+import Combine
 @preconcurrency import MessageKit
 import UIKit
-import Combine
 
 @MainActor
 final class ChatLayoutManager: MessagesLayoutDelegate {
     private let viewModel: ChatViewModel
-    
+
     init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
     }
-    
+
     nonisolated func avatarSize(
         for _: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> CGSize? { .zero }
-    
+
     nonisolated func cellTopLabelHeight(
         for message: MessageType,
         at indexPath: IndexPath,
@@ -33,7 +33,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             ? .zero
             : labelHeight
     }
-    
+
     nonisolated func messageTopLabelHeight(
         for message: MessageType,
         at _: IndexPath,
@@ -43,7 +43,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             ? labelHeight
             : .zero
     }
-    
+
     nonisolated func messageBottomLabelHeight(
         for message: MessageType,
         at _: IndexPath,
@@ -53,7 +53,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             ? .zero
             : labelHeight
     }
-    
+
     nonisolated func messageTopLabelAlignment(
         for message: MessageType,
         at _: IndexPath,
@@ -66,7 +66,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             )
         }
     }
-    
+
     nonisolated func messageBottomLabelAlignment(
         for message: MessageType,
         at _: IndexPath,
@@ -79,7 +79,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             )
         }
     }
-    
+
     nonisolated func textCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
@@ -93,7 +93,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             )
         }
     }
-    
+
     nonisolated func customCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
@@ -107,7 +107,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             )
         }
     }
-    
+
     nonisolated func headerViewSize(
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
@@ -118,7 +118,19 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
                 : .zero
         }
     }
-    
+
+    nonisolated func footerViewSize(
+        for section: Int,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CGSize {
+        MainActor.assumeIsolatedSafe {
+            guard let separatorIndex = viewModel.separatorIndex, section == separatorIndex else {
+                return .zero
+            }
+            return CGSize(width: messagesCollectionView.bounds.width, height: 25)
+        }
+    }
+
     nonisolated func attributedTextCellSizeCalculator(
         for message: MessageType,
         at indexPath: IndexPath,
@@ -134,8 +146,8 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
     }
 }
 
-private extension ChatLayoutManager {
-    func textAlignment(for message: MessageType) -> NSTextAlignment {
+extension ChatLayoutManager {
+    fileprivate func textAlignment(for message: MessageType) -> NSTextAlignment {
         message.sender.senderId == viewModel.sender.senderId
             ? .right
             : .left

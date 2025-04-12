@@ -6,16 +6,16 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Swinject
-import SwiftUI
 import CommonKit
+import SwiftUI
+import Swinject
 
 struct AdmWalletFactory: WalletFactory {
     typealias Service = WalletService
-    
+
     let typeSymbol: String = AdmWalletService.richMessageType
     let assembler: Assembler
-    
+
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         AdmWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
@@ -26,7 +26,7 @@ struct AdmWalletFactory: WalletFactory {
             service: service
         )
     }
-    
+
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         AdmTransactionsViewController(
             accountService: assembler.resolve(AccountService.self)!,
@@ -40,7 +40,7 @@ struct AdmWalletFactory: WalletFactory {
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!
         )
     }
-    
+
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
         AdmTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
@@ -56,17 +56,17 @@ struct AdmWalletFactory: WalletFactory {
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
-    
+
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? { nil }
-    
+
     func makeDetailsVC(service: Service) -> TransactionDetailsViewControllerBase {
         fatalError("ScreensFactory in necessary for AdmTransactionDetailsViewController")
     }
-    
+
     func makeDetailsVC(screensFactory: ScreensFactory) -> AdmTransactionDetailsViewController {
         makeTransactionDetailsVC(screensFactory: screensFactory)
     }
-    
+
     func makeDetailsVC(transaction: TransferTransaction, screensFactory: ScreensFactory) -> UIViewController {
         let controller = makeTransactionDetailsVC(screensFactory: screensFactory)
         controller.adamantTransaction = transaction
@@ -75,7 +75,7 @@ struct AdmWalletFactory: WalletFactory {
         controller.recipientId = transaction.recipientId
         return controller
     }
-    
+
     func makeBuyAndSellVC(screenFactory: ScreensFactory) -> UIViewController {
         let c = BuyAndSellViewController()
         c.accountService = assembler.resolve(AccountService.self)
@@ -91,12 +91,15 @@ struct AdmWalletFactory: WalletFactory {
                     .navigationBarTitle(AdmWalletViewController.Rows.buyTokens.localized, displayMode: .inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
-                            Button(action: {
-                                action()
-                            }, label: {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 18, weight: .medium))
-                            })
+                            Button(
+                                action: {
+                                    action()
+                                },
+                                label: {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 18, weight: .medium))
+                                }
+                            )
                         }
                     }
             }
@@ -104,8 +107,8 @@ struct AdmWalletFactory: WalletFactory {
     }
 }
 
-private extension AdmWalletFactory {
-    func makeTransactionDetailsVC(screensFactory: ScreensFactory) -> AdmTransactionDetailsViewController {
+extension AdmWalletFactory {
+    fileprivate func makeTransactionDetailsVC(screensFactory: ScreensFactory) -> AdmTransactionDetailsViewController {
         AdmTransactionDetailsViewController(
             accountService: assembler.resolve(AccountService.self)!,
             transfersProvider: assembler.resolve(TransfersProvider.self)!,

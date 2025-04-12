@@ -6,8 +6,8 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
+import Foundation
 
 extension ChatMediaContentView {
     struct Model: Equatable {
@@ -20,7 +20,7 @@ extension ChatMediaContentView {
         let replyId: String
         let comment: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
-        
+
         static var `default`: Self {
             Self(
                 id: "",
@@ -35,7 +35,7 @@ extension ChatMediaContentView {
             )
         }
     }
-    
+
     struct FileModel: Equatable {
         let messageId: String
         var files: [ChatFile]
@@ -43,7 +43,7 @@ extension ChatMediaContentView {
         let isFromCurrentSender: Bool
         let txStatus: MessageStatus
         var showAutoDownloadWarningLabel: Bool
-        
+
         static var `default`: Self {
             Self(
                 messageId: .empty,
@@ -55,11 +55,11 @@ extension ChatMediaContentView {
             )
         }
     }
-    
+
     struct FileContentModel {
         let chatFile: ChatFile
         let txStatus: MessageStatus
-        
+
         static var `default`: Self {
             Self(
                 chatFile: .default,

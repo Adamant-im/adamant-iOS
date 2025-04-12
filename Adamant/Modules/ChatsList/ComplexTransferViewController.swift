@@ -6,28 +6,32 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import UIKit
+import CommonKit
 @preconcurrency import Parchment
 import SnapKit
-import CommonKit
+import UIKit
 
 @MainActor
 protocol ComplexTransferViewControllerDelegate: AnyObject {
-    func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
+    func complexTransferViewController(
+        _ viewController: ComplexTransferViewController,
+        didFinishWithTransfer: TransactionDetails?,
+        detailsViewController: UIViewController?
+    )
 }
 
 final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
-    
-    private let visibleWalletsService: VisibleWalletsService
+
+    private let walletsStoreService: WalletStoreServiceProtocol
     private let addressBookService: AddressBookService
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
     private let nodesStorage: NodesStorageProtocol
-    
+
     // MARK: - Properties
     var pagingViewController: PagingViewController!
-    
+
     weak var transferDelegate: ComplexTransferViewControllerDelegate?
     var services: [WalletService] = []
     var partner: CoreDataAccount? {
@@ -36,76 +40,76 @@ final class ComplexTransferViewController: UIViewController {
         }
     }
     var replyToMessageId: String?
-    
+
     // MARK: Init
-    
+
     init(
-        visibleWalletsService: VisibleWalletsService,
+        walletsStoreService: WalletStoreServiceProtocol,
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
         nodesStorage: NodesStorageProtocol
     ) {
-        self.visibleWalletsService = visibleWalletsService
+        self.walletsStoreService = walletsStoreService
         self.addressBookService = addressBookService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
         self.nodesStorage = nodesStorage
-        
+
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        
+
         // MARK: Services
         setupServices()
-        
+
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletCollectionViewCell.Model.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: AccountWalletCellState.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
-        
+
         pagingViewController.dataSource = self
         pagingViewController.select(index: 0)
-        
+
         pagingViewController.borderColor = UIColor.clear
-        
+
         view.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
             $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
         }
-        
+
         addChild(pagingViewController)
-        
+
         setColors()
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     // MARK: - Other
-    
+
     private func setupServices() {
         services.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices: [WalletService] = walletsStoreService.sorted(includeInvisible: false)
         services = availableServices
     }
-    
+
     func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
     }
-    
+
     @objc func cancel() {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
     }
@@ -114,35 +118,35 @@ final class ComplexTransferViewController: UIViewController {
 extension ComplexTransferViewController: PagingViewControllerDataSource {
     nonisolated func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
         MainActor.assertIsolated()
-        
+
         return DispatchQueue.onMainThreadSyncSafe {
             services.count
         }
     }
-    
+
     nonisolated func pagingViewController(
         _ pagingViewController: PagingViewController,
         viewControllerAt index: Int
     ) -> UIViewController {
         MainActor.assertIsolated()
-        
+
         return DispatchQueue.onMainThreadSyncSafe {
             let service = services[index]
             let admService = services.first { $0.core.nodeGroups.contains(.adm) }
             let vc = screensFactory.makeTransferVC(service: service)
-            
+
             vc.delegate = self
-            
+
             guard let address = partner?.address else { return vc }
-            
+
             let name = partner?.chatroom?.getName(addressBookService: addressBookService)
-            
+
             vc.replyToMessageId = replyToMessageId
             vc.admReportRecipient = address
             vc.recipientIsReadonly = true
             vc.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
             vc.showProgressView(animated: false)
-            
+
             Task {
                 guard service.core.hasEnabledNode else {
                     vc.showAlertView(
@@ -153,7 +157,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     )
                     return
                 }
-                
+
                 guard admService?.core.hasEnabledNode ?? false else {
                     vc.showAlertView(
                         message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
@@ -161,7 +165,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     )
                     return
                 }
-                
+
                 do {
                     let walletAddress = try await service.core
                         .getWalletAddress(
@@ -171,7 +175,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     vc.recipientAddress = walletAddress
                     vc.recipientName = name
                     vc.hideProgress(animated: true)
-                    
+
                     if ERC20Token.supportedTokens.contains(
                         where: { token in
                             return token.symbol == service.core.tokenSymbol
@@ -180,7 +184,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         let ethWallet = walletServiceCompose.getWallet(
                             by: EthWalletService.richMessageType
                         )?.core
-                        
+
                         vc.rootCoinBalance = ethWallet?.wallet?.balance
                     }
                 } catch let error as WalletServiceError {
@@ -195,29 +199,29 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     )
                 }
             }
-            
+
             return vc
         }
-	}
-	
+    }
+
     nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         MainActor.assertIsolated()
-        
+
         return DispatchQueue.onMainThreadSyncSafe {
             let service = services[index].core
-            
+
             guard let wallet = service.wallet else {
-                return WalletCollectionViewCell.Model.default
+                return AccountWalletCellState.default
             }
-            
+
             var network: String?
             if ERC20Token.supportedTokens.contains(where: { token in
                 return token.symbol == service.tokenSymbol
             }) {
                 network = type(of: service).tokenNetworkSymbol
             }
-            
-            let item = WalletCollectionViewCell.Model(
+
+            let item = WalletCollectionViewCellModel(
                 index: index,
                 coinID: service.tokenUniqueID,
                 currencySymbol: service.tokenSymbol,
@@ -227,14 +231,38 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 balance: wallet.balance,
                 notificationBadgeCount: 0
             )
-            
-            return item
+
+            let model = AccountWalletCellState(model: item)
+            return model
         }
-	}
+    }
 }
 
 extension ComplexTransferViewController: TransferViewControllerDelegate {
-    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
+    func transferViewController(
+        _ viewController: TransferViewControllerBase,
+        didFinishWithTransfer transfer: TransactionDetails?,
+        detailsViewController: UIViewController?
+    ) {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: transfer, detailsViewController: detailsViewController)
+    }
+}
+
+// MARK: - Hardware keyboard handling
+
+extension ComplexTransferViewController {
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        for press in presses {
+            guard let key = press.key else { continue }
+            if key.keyCode == UIKeyboardHIDUsage.keyboardEscape {
+                return cancel()
+            }
+        }
+
+        super.pressesBegan(presses, with: event)
     }
 }

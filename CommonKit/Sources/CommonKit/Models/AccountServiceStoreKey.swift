@@ -1,13 +1,13 @@
 //
-//  SecuredStore+Account.swift
+//  SecureStore+Account.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 21.11.2022.
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-public extension StoreKey {
-    enum accountService {
+extension StoreKey {
+    public enum accountService {
         public static let publicKey = "accountService.publicKey"
         public static let privateKey = "accountService.privateKey"
         public static let pin = "accountService.pin"

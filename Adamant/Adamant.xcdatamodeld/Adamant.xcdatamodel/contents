@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23B81" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24D81" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="avatar" optional="YES" attributeType="String"/>
@@ -34,6 +34,7 @@
         <attribute name="status" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom"/>
         <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom"/>
+        <relationship name="richMessageTransactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="RichMessageTransaction" inverseName="chatTransaction" inverseEntity="RichMessageTransaction"/>
     </entity>
     <entity name="CoinTransaction" representedClassName="CoinTransaction" isAbstract="YES" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
@@ -49,6 +50,7 @@
         <attribute name="nonceRaw" optional="YES" attributeType="String"/>
         <attribute name="recipientId" attributeType="String" defaultValueString=""/>
         <attribute name="senderId" attributeType="String" defaultValueString=""/>
+        <attribute name="timestampMs" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="transactionId" attributeType="String" defaultValueString=""/>
         <attribute name="transactionStatusRaw" attributeType="String" defaultValueString=""/>
         <uniquenessConstraints>
@@ -76,6 +78,7 @@
         <attribute name="richTransferHash" optional="YES" attributeType="String"/>
         <attribute name="richType" attributeType="String"/>
         <attribute name="transferStatusRaw" optional="YES" attributeType="Integer 16" usesScalarValueType="NO" customClassName="RichTransferStatus"/>
+        <relationship name="chatTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="richMessageTransactions" inverseEntity="ChatTransaction"/>
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>

@@ -12,7 +12,8 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "FilesStorageKit",
-            targets: ["FilesStorageKit"]),
+            targets: ["FilesStorageKit"]
+        )
     ],
     dependencies: [
         .package(path: "../CommonKit")
@@ -22,9 +23,11 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "FilesStorageKit",
-            dependencies: ["CommonKit"]),
+            dependencies: ["CommonKit"]
+        ),
         .testTarget(
             name: "FilesStorageKitTests",
-            dependencies: ["FilesStorageKit"]),
+            dependencies: ["FilesStorageKit"]
+        )
     ]
 )

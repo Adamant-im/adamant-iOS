@@ -31,7 +31,7 @@ let BTC_BIP16_TIMESTAMP: UInt32 = 1_333_238_400
 let BTC_MAX_SCRIPT_SIZE: Int = 10_000
 
 // Maximum number of bytes per "pushdata" operation
-let BTC_MAX_SCRIPT_ELEMENT_SIZE: Int = 520; // bytes
+let BTC_MAX_SCRIPT_ELEMENT_SIZE: Int = 520  // bytes
 
 // Number of public keys allowed for OP_CHECKMULTISIG
 let BTC_MAX_KEYS_FOR_CHECKMULTISIG: Int = 20
