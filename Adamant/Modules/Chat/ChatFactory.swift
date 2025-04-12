@@ -38,6 +38,7 @@ struct ChatFactory {
     let filesPickerKit: FilesPickerProtocol
     let coreDataRealationMapper: CoreDataRealationMapperProtocol
     let visibleWalletsService: VisibleWalletsService
+    let vibroService: VibroService
 
     init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -60,6 +61,7 @@ struct ChatFactory {
         filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
         coreDataRealationMapper = assembler.resolve(CoreDataRealationMapperProtocol.self)!
         visibleWalletsService = assembler.resolve(VisibleWalletsService.self)!
+        vibroService = assembler.resolve(VibroService.self)!
     }
 
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -144,7 +146,8 @@ extension ChatFactory {
             apiServiceCompose: apiServiceCompose,
             reachabilityMonitor: reachabilityMonitor,
             filesPicker: filesPickerKit,
-            visibleWalletsService: visibleWalletsService
+            visibleWalletsService: visibleWalletsService,
+            vibroService: vibroService
         )
     }
 

@@ -35,6 +35,41 @@ extension UIView {
         layer.cornerRadius = cornerRadius
     }
     
+    func animateHighlight(
+        highlightColor: UIColor = UIColor.adamant.active.withAlphaComponent(0.5),
+        duration: TimeInterval = 2.5
+    ) {
+        let originalColor = self.backgroundColor
+        
+        UIView.animate(withDuration: 0.35, animations: {
+            self.backgroundColor = highlightColor
+        }, completion: { _ in
+            UIView.animate(withDuration: duration - 0.35) {
+                self.backgroundColor = originalColor
+            }
+        })
+    }
+    
+    func animateHighlightOverlay(
+        overlayColor: UIColor = UIColor.adamant.active.withAlphaComponent(0.5)
+    ) {
+        let overlay = UIView(frame: bounds)
+        overlay.backgroundColor = overlayColor
+        overlay.alpha = 1
+        overlay.isUserInteractionEnabled = false
+        overlay.layer.cornerRadius = layer.cornerRadius
+        overlay.layer.masksToBounds = true
+        
+        addSubview(overlay)
+        bringSubviewToFront(overlay)
+        
+        UIView.animate(withDuration: 1.5, delay: 0.5, options: [.curveEaseOut], animations: {
+            overlay.alpha = 0
+        }, completion: { _ in
+            overlay.removeFromSuperview()
+        })
+    }
+    
     func animatePressDown(duration: TimeInterval = 0.1) {
         UIView.animate(withDuration: duration) {
             self.transform = CGAffineTransform(scaleX: 0.96, y: 0.96)
