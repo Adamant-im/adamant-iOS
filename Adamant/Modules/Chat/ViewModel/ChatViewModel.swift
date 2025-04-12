@@ -493,9 +493,9 @@ final class ChatViewModel: NSObject {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-
+            
             let message = messages.first(where: { $0.messageId == id })
-
+            
             if case let .file(model) = message?.content {
                 try? await chatFileService.resendMessage(
                     with: id,
@@ -506,21 +506,21 @@ final class ChatViewModel: NSObject {
                 )
                 return
             }
-
+            
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {
                 switch error as? ChatsProviderError {
-                case .invalidTransactionStatus:
-                    break
-                case let .serverError(serverError):
-                    switch serverError {
-                    case .timestampIsInTheFuture:
-                        dialog.send(.timestampIsInTheFuture)
-                    default: dialog.send(.richError(error))
-                    }
-                default:
-                    dialog.send(.richError(error))
+                    case .invalidTransactionStatus:
+                        break
+                    case let .serverError(serverError):
+                        switch serverError {
+                            case .timestampIsInTheFuture:
+                                dialog.send(.timestampIsInTheFuture)
+                            default: dialog.send(.warning(error.localizedDescription))
+                        }
+                    default:
+                        dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -1105,7 +1105,7 @@ extension ChatViewModel {
     fileprivate func sendFiles(with text: String) async throws {
         guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
             dialog.send(
-                .alert(
+                .warning(
                     ApiServiceError.noEndpointsAvailable(
                         nodeGroupName: NodeGroup.ipfs.name
                     ).localizedDescription
@@ -1481,22 +1481,24 @@ extension ChatViewModel {
         filesPicked: [FileResult]? = nil
     ) async {
         switch error as? ChatsProviderError {
-        case .messageNotValid:
-            inputText = sentText
-        case .notEnoughMoneyToSend:
-            inputText = sentText
-            self.filesPicked = filesPicked
-            guard await transfersProvider.hasTransactions else {
-                dialog.send(.freeTokenAlert)
-                return
-            }
-        case let .serverError(error):
-            if case .timestampIsInTheFuture = error {
-                dialog.send(.timestampIsInTheFuture)
-            }
-        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
-            .invalidTransactionStatus, .none:
-            break
+            case .messageNotValid:
+                inputText = sentText
+            case .notEnoughMoneyToSend:
+                inputText = sentText
+                self.filesPicked = filesPicked
+                guard await transfersProvider.hasTransactions else {
+                    dialog.send(.freeTokenAlert)
+                    return
+                }
+            case let .serverError(error):
+                switch error {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.warning(error.localizedDescription))
+                }
+            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
+                    .invalidTransactionStatus, .none:
+                break
         }
     }
 
