@@ -184,6 +184,9 @@ final class AccountViewController: FormViewController {
                 guard let self = self else { return }
                 self.setupWalletsVC()
                 self.pagingViewController.reloadData()
+                if let pagingItemIndex = currentSelectedWallet?.identifier {
+                    self.pagingViewController.select(index: pagingItemIndex, animated: false)
+                }
                 guard index >= 0 else { return }
                 self.accountHeaderView.setWalletIcon(index == 0 ? .regular : .secret, badgeCount: index)
             }
