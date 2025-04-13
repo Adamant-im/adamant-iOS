@@ -36,6 +36,10 @@ extension AdmWalletService {
         return type(of: self).richMessageType
     }
 
+    static var timeouts: MessageTimeouts {
+        MessageTimeouts(message: 300, attachment: 300)
+    }
+
     // MARK: Events
 
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
