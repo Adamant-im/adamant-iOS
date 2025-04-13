@@ -18,26 +18,23 @@ import Foundation
 /// We are creating a `AdamantApiTask` without any `Task` in it to defer a `Task` execution to store it in the storage before the execution
 ///
 
-public final class AdamantApiService: @unchecked Sendable {
-    @Atomic private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
-    private var cancelled: Bool = false
 private final actor TasksStorage {
     private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
-    
+
     init() {}
-    
+
     func getTask(id: UUID) -> CancellableTask? {
         return adamantApiTaskStorage[id]
     }
-    
+
     func addTask(_ task: CancellableTask, id: UUID) {
         adamantApiTaskStorage[id] = task
     }
-    
+
     func removeTask(id: UUID) {
         adamantApiTaskStorage[id] = nil
     }
-    
+
     func cancelAll() {
         adamantApiTaskStorage.forEach { _, task in
             task.cancel()
@@ -65,21 +62,36 @@ public final class AdamantApiService: @unchecked Sendable {
     ) async -> ApiServiceResult<Output> {
         let taskId: UUID = .init()
         let task = AdamantApiTask<Output>(id: taskId)
-        
+
         await tasksStorage.addTask(task, id: taskId)
         defer {
             Task {
                 await tasksStorage.removeTask(id: taskId)
             }
         }
-        
+
         task.startTask(
             Task {
-                await service.request(
-                    waitsForConnectivity: waitsForConnectivity,
-                    taskId: taskId,
-                    isCancelled: {
-                        return await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                if let timeout {
+                    await service.request(
+                        waitsForConnectivity: waitsForConnectivity,
+                        timeout: timeout,
+                        taskId: taskId,
+                        isCancelled: {
+                            await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                        }
+                    ) { admApiCore, origin in
+                        await request(admApiCore.apiCore, origin)
+                    }
+                } else {
+                    await service.request(
+                        waitsForConnectivity: waitsForConnectivity,
+                        taskId: taskId,
+                        isCancelled: {
+                            await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                        }
+                    ) { admApiCore, origin in
+                        await request(admApiCore.apiCore, origin)
                     }
                 }
             }
@@ -120,7 +132,7 @@ public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCo
         _ requestAction: (AdamantApiCore, NodeOrigin) async -> Result<Output, AdamantApiCore.Error>
     ) async -> Result<Output, AdamantApiCore.Error> {
         var usedNodesIds: Set<UUID> = .init()
-        var lastConnectionError: Error?
+        var lastConnectionError: AdamantApiCore.Error?
 
         /// Check the cancellation of the task from the outside
         guard await !isCancelled() else {
@@ -146,14 +158,24 @@ public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCo
 
         healthCheck()
 
-        lastConnectionError =
-            lastConnectionError
-            ?? (nodes.contains { $0.isEnabled }
-                ? ApiServiceError.noNetworkError
-                : ApiServiceError.noEndpointsError(nodeGroupName: name))
+        if waitsForConnectivity {
+            return await request(
+                waitsForConnectivity: waitsForConnectivity,
+                taskId: taskId,
+                isCancelled: isCancelled,
+                requestAction
+            )
+        }
 
-        return await waitsForConnectivity
-            ? request(waitsForConnectivity: waitsForConnectivity, taskId: taskId, isCancelled: isCancelled, requestAction)
-            : .failure(lastConnectionError as? AdamantApiCore.Error ?? .noEndpointsAvailable(nodeGroupName: name))
+        let finalError: AdamantApiCore.Error
+        if let error = lastConnectionError {
+            finalError = error
+        } else if nodes.contains(where: { $0.isEnabled }) {
+            finalError = .networkError(error: ApiServiceError.noNetworkError)
+        } else {
+            finalError = .noEndpointsAvailable(nodeGroupName: name)
+        }
+
+        return .failure(finalError)
     }
 }
