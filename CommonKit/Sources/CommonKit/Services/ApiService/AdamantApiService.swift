@@ -15,11 +15,38 @@ import Foundation
 /// and checking it for a cancellation before doing something in the recursive function
 /// `request(waitsForConnectivity:taskId:isCancelled:_ request:)`
 ///
+/// We are creating a `AdamantApiTask` without any `Task` in it to defer a `Task` execution to store it in the storage before the execution
+///
 
 public final class AdamantApiService: @unchecked Sendable {
     @Atomic private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
     private var cancelled: Bool = false
+private final actor TasksStorage {
+    private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
+    
+    init() {}
+    
+    func getTask(id: UUID) -> CancellableTask? {
+        return adamantApiTaskStorage[id]
+    }
+    
+    func addTask(_ task: CancellableTask, id: UUID) {
+        adamantApiTaskStorage[id] = task
+    }
+    
+    func removeTask(id: UUID) {
+        adamantApiTaskStorage[id] = nil
+    }
+    
+    func cancelAll() {
+        adamantApiTaskStorage.forEach { _, task in
+            task.cancel()
+        }
+    }
+}
 
+public final class AdamantApiService: @unchecked Sendable {
+    private let tasksStorage = TasksStorage()
     public let adamantCore: AdamantCore
     public let service: AdamantHealthCheck
 
@@ -37,50 +64,31 @@ public final class AdamantApiService: @unchecked Sendable {
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
         let taskId: UUID = .init()
-        let task = AdamantApiTask<Output>(
-            task: Task {
-                if let timeout {
-                    await service.request(
-                        waitsForConnectivity: waitsForConnectivity,
-                        timeout: timeout,
-                        taskId: taskId,
-                        isCancelled: {
-                            adamantApiTaskStorage[taskId]?.isCancelled
-                                ?? true
-                        }
-                    ) { admApiCore, origin in
-                        await request(admApiCore.apiCore, origin)
-                    }
-                } else {
-                    await service.request(
-                        waitsForConnectivity: waitsForConnectivity,
-                        taskId: taskId,
-                        isCancelled: {
-                            adamantApiTaskStorage[taskId]?.isCancelled
-                                ?? true
-                        }
-                    ) { admApiCore, origin in
-                        await request(admApiCore.apiCore, origin)
-                    }
-                }
-            },
-            id: taskId
-        )
-        _adamantApiTaskStorage.mutate { storage in
-            storage[taskId] = task
-        }
+        let task = AdamantApiTask<Output>(id: taskId)
+        
+        await tasksStorage.addTask(task, id: taskId)
         defer {
-            _adamantApiTaskStorage.mutate { storage in
-                storage[taskId] = nil
+            Task {
+                await tasksStorage.removeTask(id: taskId)
             }
         }
+        
+        task.startTask(
+            Task {
+                await service.request(
+                    waitsForConnectivity: waitsForConnectivity,
+                    taskId: taskId,
+                    isCancelled: {
+                        return await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                    }
+                }
+            }
+        )
         return await task.value
     }
 
-    public func cancelCurrentTasks() {
-        adamantApiTaskStorage.forEach { _, task in
-            task.cancel()
-        }
+    public func cancelCurrentTasks() async {
+        await tasksStorage.cancelAll()
     }
 }
 
@@ -108,14 +116,14 @@ public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCo
         waitsForConnectivity: Bool,
         timeout: TimeInterval? = nil,
         taskId: UUID,
-        isCancelled: () -> Bool,
+        isCancelled: () async -> Bool,
         _ requestAction: (AdamantApiCore, NodeOrigin) async -> Result<Output, AdamantApiCore.Error>
     ) async -> Result<Output, AdamantApiCore.Error> {
         var usedNodesIds: Set<UUID> = .init()
         var lastConnectionError: Error?
 
         /// Check the cancellation of the task from the outside
-        guard !isCancelled() else {
+        guard await !isCancelled() else {
             return .failure(.requestCancelled)
         }
 
