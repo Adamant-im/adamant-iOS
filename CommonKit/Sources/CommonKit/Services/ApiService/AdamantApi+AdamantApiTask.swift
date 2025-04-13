@@ -10,6 +10,7 @@ import Foundation
 final class AdamantApiTask<Output>: CancellableTask {
     private var task: Task<Result<Output, ApiServiceError>, Never>!
     private let id: UUID
+    private var cancelled: Bool = false
 
     var isCancelled: Bool {
         cancelled
