@@ -8,7 +8,7 @@ jobs:
     trello:
         runs-on: ubuntu-latest
         steps:
-            - uses: rematocorp/trello-integration-action@v9
+            - uses: rematocorp/trello-integration-action@v9.9.0
               with:
                   github-token: ${{ secrets.github_token }}
                   trello-api-key: ${{ secrets.TRELLO_API_KEY }}
