@@ -461,7 +461,7 @@ extension AdamantAccountService {
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
-        Task {
+        Task { @MainActor in
             if account != nil {
                 NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
             }
