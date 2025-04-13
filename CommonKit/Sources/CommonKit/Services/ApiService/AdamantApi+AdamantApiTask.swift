@@ -18,11 +18,7 @@ final class AdamantApiTask<Output>: CancellableTask {
     
     var value: Result<Output, ApiServiceError> {
         get async {
-            let value = await task.value
-            if cancelled {
-                return .failure(ApiServiceError.requestCancelled)
-            }
-            return value
+            await task.value
         }
     }
 

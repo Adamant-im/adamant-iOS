@@ -129,5 +129,5 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
         date: Date
     ) async -> ApiServiceResult<Bool>
 
-    func cancelCurrentTasks()
+    func cancelCurrentTasks() async
 }

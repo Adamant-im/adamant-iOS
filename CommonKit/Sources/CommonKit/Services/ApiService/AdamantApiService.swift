@@ -86,10 +86,8 @@ public final class AdamantApiService: @unchecked Sendable {
         return await task.value
     }
 
-    public func cancelCurrentTasks() {
-        Task {
-            await tasksStorage.cancelAll()
-        }
+    public func cancelCurrentTasks() async {
+        await tasksStorage.cancelAll()
     }
 }
 
