@@ -707,13 +707,8 @@ extension ChatListViewController {
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
                 if let address = partner.publicKey {
-                    DispatchQueue.global().async {
-                        let image = self.avatarService.avatar(for: address, size: 200)
-                        DispatchQueue.main.async {
-                            cell.avatarImage = image
-                        }
-                    }
-
+                    let image = self.avatarService.avatar(for: address, size: 200)
+                    cell.avatarImage = image
                     cell.avatarImageView.roundingMode = .round
                     cell.avatarImageView.clipsToBounds = true
                 } else {
