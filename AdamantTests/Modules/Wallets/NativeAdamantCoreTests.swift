@@ -40,6 +40,7 @@ final class NativeAdamantCoreTests: XCTestCase {
     }
 }
 
+// testing trello 1234
 private enum Constants {
     static let privateKey = "c2b4df1562b93e5e37bef8551d430a21736da9b021cad8e3eec54cfca05b8db2fdfa0ad06afc6445c8d2c63078cba7f6d079ee0367e764cf286f42ab955a4d67"
     static let publicKey = "1ed651ec1c686c23249dadb2cb656edd5f8e7d35076815d8a81c395c3eed1a85"
