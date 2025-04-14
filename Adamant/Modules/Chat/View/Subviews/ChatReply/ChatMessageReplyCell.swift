@@ -177,6 +177,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
                 isSelected,
                 originalColor: model.backgroundColor.uiColor
             )
+            if model.message.string != "" {
+                UIPasteboard.general.string = model.message.string
+                copyNotification?()
+            }
         }
     }
 

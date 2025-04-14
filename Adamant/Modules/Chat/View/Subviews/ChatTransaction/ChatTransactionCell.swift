@@ -57,6 +57,10 @@ final class ChatTransactionCell: MessageContentCell, ChatModelView {
     override var isSelected: Bool {
         didSet {
             transactionView.isSelected = isSelected
+            if let comment = model.content.comment, !comment.isEmpty {
+                UIPasteboard.general.string = comment
+                copyNotification?()
+            }
         }
     }
 
