@@ -969,6 +969,7 @@ extension ChatViewController {
                 if checkIfNeedExtraOffsetForUnreadMessages() {
                     setExtraOffsetForNewMessages()
                 }
+                state.isAutoScrolling = false
             }
 
             viewModel.cellIdForAnimation =
