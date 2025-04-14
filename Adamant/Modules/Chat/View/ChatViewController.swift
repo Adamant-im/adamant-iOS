@@ -162,10 +162,11 @@ final class ChatViewController: MessagesViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        defer { state.isViewAppeared = true }
+        defer { state.isViewAppeared = true
+            updateUnreadMessages()
+        }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
-        updateUnreadMessages()
         if !state.isViewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
         }
@@ -571,10 +572,8 @@ extension ChatViewController {
     }
 
     fileprivate func updateUnreadMessages() {
-        guard !state.isAutoScrolling else { return }
-        if isMacOS && !state.isAppActive {
-            return
-        }
+        guard state.canReadChat else { return }
+        
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
 
@@ -941,7 +940,9 @@ extension ChatViewController {
 
         switch position {
         case let .offset(offset):
+            state.isAutoScrolling = true
             chatMessagesCollectionView.setBottomOffset(offset, safely: state.isViewAppeared)
+            state.isAutoScrolling = false
             guard !state.isViewAppeared else { return }
             chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
         case let .messageId(id, scrollToBottomIfNotFound):

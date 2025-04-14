@@ -6,6 +6,7 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 import SnapKit
+import CommonKit
 
 struct ChatViewControllerState {
     var isMessagesLoaded = false
@@ -22,5 +23,8 @@ struct ChatViewControllerState {
     //calculation for animation, might use for something else in the future
     var isAnimationAllowed: Bool {
         isMessagesLoaded && !isAutoScrolling && !isScrollingToBottom
+    }
+    var canReadChat: Bool {
+        !isAutoScrolling && isViewAppeared && (!isMacOS || isAppActive)
     }
 }
