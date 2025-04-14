@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import QuartzCore.CABase
 
 ///
 /// I need to override HealthCheckWrapped because of now we have an option to cancel the tasks
@@ -159,12 +160,29 @@ public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCo
         healthCheck()
 
         if waitsForConnectivity {
-            return await request(
-                waitsForConnectivity: waitsForConnectivity,
-                taskId: taskId,
-                isCancelled: isCancelled,
-                requestAction
-            )
+            
+            
+            if let timeout {
+                let startTime = CACurrentMediaTime()
+
+                do {
+                    let result = try await deadline(until: startTime + timeout) {
+                        await self.request(waitsForConnectivity: waitsForConnectivity, requestAction)
+                    }
+                    return result
+                } catch _ as DeadlineExceededError {
+                    return .failure(.timeoutError)
+                } catch {
+                    return .failure(.noNetworkError)
+                }
+            } else {
+                return await request(
+                    waitsForConnectivity: waitsForConnectivity,
+                    taskId: taskId,
+                    isCancelled: isCancelled,
+                    requestAction
+                )
+            }
         }
 
         let finalError: AdamantApiCore.Error
