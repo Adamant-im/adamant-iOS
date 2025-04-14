@@ -7,4 +7,5 @@
 
 public enum UserDefaultsKey: String {
     case needsToShowNoActiveNodesAlert
+    case preferredPrimaryColumnWidthFraction
 }
