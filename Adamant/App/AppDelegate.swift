@@ -777,7 +777,7 @@ private func makeSplitController() -> UISplitViewController {
     
     let minimumPrimaryColumnWidth: CGFloat = UIScreen.main.bounds.width * 0.2
     // Set the minimum ratio to 1:5, or to 300px if 1:5 results in a smaller value
-    controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 300 ? minimumPrimaryColumnWidth : 300
+    controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 400 ? minimumPrimaryColumnWidth : 400
     
     // Set the maximum ratio to 3:1
     controller.maximumPrimaryColumnWidth = UIScreen.main.bounds.width * 0.75
