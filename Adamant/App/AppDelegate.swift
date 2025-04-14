@@ -762,39 +762,61 @@ private enum TabScreens {
     }
 }
 
-@MainActor
-private func makeSplitController() -> UISplitViewController {
-    let controller = UISplitViewController()
-    controller.preferredDisplayMode = .oneBesideSecondary
-    
-    @UserDefaultsStorage(.preferredPrimaryColumnWidthFraction) var preferredPrimaryColumnWidthFraction: Double?
-    
+private extension AppDelegate{
+    @MainActor
+    func makeSplitController() -> AdamantSplitViewController {
+        let controller = AdamantSplitViewController()
+        controller.preferredDisplayMode = .oneBesideSecondary
+        
+        let minimumPrimaryColumnWidth: CGFloat = UIScreen.main.bounds.width * 0.2
+        // Set the minimum ratio to 1:5, or to 300px if 1:5 results in a smaller value
+        controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 300 ? minimumPrimaryColumnWidth : 300
+        
+        // Set the maximum ratio to 3:1
+        controller.maximumPrimaryColumnWidth = UIScreen.main.bounds.width * 0.75
+        
+        return controller
+    }
+}
+
+
+private extension AppDelegate{
     // We created our own AdamantSplitViewController (a custom subclass of UISplitViewController)
     // so we can observe changes in the primary column's width and store that ratio in UserDefaults.
     // Here, we retrieve the saved ratio for the primary column's width from UserDefaults.
     // If no value has been stored yet, we default to 0.3337, which is roughly a 1:2 ratio.
-    controller.preferredPrimaryColumnWidthFraction = preferredPrimaryColumnWidthFraction ?? 0.3337
-    
-    let minimumPrimaryColumnWidth: CGFloat = UIScreen.main.bounds.width * 0.2
-    // Set the minimum ratio to 1:5, or to 300px if 1:5 results in a smaller value
-    controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 300 ? minimumPrimaryColumnWidth : 300
-    
-    // Set the maximum ratio to 3:1
-    controller.maximumPrimaryColumnWidth = UIScreen.main.bounds.width * 0.75
-    
-    return controller
-}
-
-final class AdamantSplitViewController: UISplitViewController {
-    private var fractionStorage = UserDefaultsStorage<Double>(.preferredPrimaryColumnWidthFraction)
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    final class AdamantSplitViewController: UISplitViewController {
+        private var storage = UserDefaultsStorage<Double>(.preferredPrimaryColumnWidthFraction)
         
-        guard view.bounds.width > 0 else { return }
+        // Этот дергается когда мы переключаемся на таб
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            let storedFraction = storage.wrappedValue ?? 0.3337
+            self.preferredPrimaryColumnWidthFraction = storedFraction
+            print("(viewWillAppear) preferredPrimaryColumnWidthFraction: \(preferredPrimaryColumnWidthFraction)")
+            view.setNeedsLayout()
+//            view.layoutIfNeeded()
+        }
         
-        let fraction = primaryColumnWidth / view.bounds.width
+        // Для теста
+        override func viewWillLayoutSubviews() {
+            super.viewWillLayoutSubviews()
+            print("(viewWillLayoutSubviews) preferredPrimaryColumnWidthFraction: \(preferredPrimaryColumnWidthFraction)")
+        }
         
-        fractionStorage.wrappedValue = fraction
+        // Дергается когда меняем ширину и запоминаем ее
+        override func viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews()
+            guard view.bounds.width > 0 else { return }
+            
+            let actualFraction = primaryColumnWidth / view.bounds.width
+            
+            print("(viewDidLayoutSubviews) actualFraction: \(actualFraction)")
+            
+            storage.wrappedValue = actualFraction
+            
+            print("(viewDidLayoutSubviews) preferredPrimaryColumnWidthFraction: \(preferredPrimaryColumnWidthFraction)")
+        }
     }
 }
