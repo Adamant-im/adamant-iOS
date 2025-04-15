@@ -160,9 +160,11 @@ actor AdamantChatsProvider: ChatsProvider {
 
         if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
             if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
-                let h = Int64(raw)
+               let h = Int64(raw),
+               let chatsMarkAsUnread: Set<String> = store.get(StoreKey.chatProvider.markedChatsAsUnread)
             {
                 self.readedLastHeight = h
+                self.chatsMarkAsUnread = chatsMarkAsUnread
             }
         } else {
             store.remove(StoreKey.chatProvider.receivedLastHeight)

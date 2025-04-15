@@ -461,22 +461,24 @@ extension AdamantAccountService {
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
-        if account != nil {
-            NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
+        Task { @MainActor in
+            if account != nil {
+                NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
+            }
+            
+            dropSavedAccount()
+            
+            let wasLogged = account != nil
+            account = nil
+            keypair = nil
+            passphrase = nil
+            state = .notLogged
+            await apiService.cancelCurrentTasks()
+            coreDataStack.clearCoreData()
+            
+            guard wasLogged else { return }
+            NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
         }
-
-        dropSavedAccount()
-
-        let wasLogged = account != nil
-        account = nil
-        keypair = nil
-        passphrase = nil
-        state = .notLogged
-        coreDataStack.clearCoreData()
-
-        guard wasLogged else { return }
-        NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
-        apiService.cancelCurrentTasks()
     }
 }
 

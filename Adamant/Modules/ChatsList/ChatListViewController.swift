@@ -707,13 +707,8 @@ extension ChatListViewController {
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
                 if let address = partner.publicKey {
-                    DispatchQueue.global().async {
-                        let image = self.avatarService.avatar(for: address, size: 200)
-                        DispatchQueue.main.async {
-                            cell.avatarImage = image
-                        }
-                    }
-
+                    let image = self.avatarService.avatar(for: address, size: 200)
+                    cell.avatarImage = image
                     cell.avatarImageView.roundingMode = .round
                     cell.avatarImageView.clipsToBounds = true
                 } else {
@@ -1295,6 +1290,9 @@ extension ChatListViewController {
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
                 self.removeManualAdress(adress: adress)
+                Task {
+                    await self.chatsProvider.update(notifyState: true)
+                }
             } else {
                 chatroom.markAsUnread()
                 self.chatsManuallyMarkedAsUnread.insert(adress)

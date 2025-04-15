@@ -105,3 +105,9 @@ extension ChatTransactionCell {
         }
     }
 }
+
+extension ChatTransactionCell: ChatCellProtocol {
+    func animateMessageHighlight() {
+        transactionView.animateTransactionHighlight()
+    }
+}

@@ -397,3 +397,9 @@ extension ChatTransactionContainerView {
         return view
     }
 }
+
+extension ChatTransactionContainerView {
+    func animateTransactionHighlight() {
+        contentView.animateHighlight()
+    }
+}

@@ -42,6 +42,7 @@ final class ChatViewModel: NSObject {
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     private let visibleWalletsService: VisibleWalletsService
+    private let vibroService: VibroService
 
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -89,7 +90,7 @@ final class ChatViewModel: NSObject {
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
-    var needToAnimateCellIndex: Int?
+    var cellIdForAnimation: String?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -134,21 +135,14 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToIdAndPosition: (id: String, position: UICollectionView.ScrollPosition)?
+    @ObservableValue var scrollToIdAndPosition: String?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
         }
     }
 
-    var startPosition: ChatStartPosition? {
-        if messageIdToShow != nil {
-            return nil
-        }
-
-        guard let address = chatroom?.partner?.address else { return nil }
-        return chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
-    }
+    var startPosition: ChatStartPosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -198,7 +192,8 @@ final class ChatViewModel: NSObject {
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol,
-        visibleWalletsService: VisibleWalletsService
+        visibleWalletsService: VisibleWalletsService,
+        vibroService: VibroService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -222,6 +217,7 @@ final class ChatViewModel: NSObject {
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         self.visibleWalletsService = visibleWalletsService
+        self.vibroService = vibroService
 
         super.init()
         setupObservers()
@@ -237,6 +233,7 @@ final class ChatViewModel: NSObject {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
+        makeStartPosition()
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -264,7 +261,7 @@ final class ChatViewModel: NSObject {
             dialog.send(.freeTokenAlert)
         }
     }
-
+    
     func presentKeyboardOnStartIfNeeded() {
         guard
             !inputText.isEmpty
@@ -431,6 +428,7 @@ final class ChatViewModel: NSObject {
         let message = _messages.wrappedValue[index]
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
+            await _ = chatsProvider.update(notifyState: true)
         }
     }
 
@@ -493,9 +491,9 @@ final class ChatViewModel: NSObject {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-
+            
             let message = messages.first(where: { $0.messageId == id })
-
+            
             if case let .file(model) = message?.content {
                 try? await chatFileService.resendMessage(
                     with: id,
@@ -506,21 +504,21 @@ final class ChatViewModel: NSObject {
                 )
                 return
             }
-
+            
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {
                 switch error as? ChatsProviderError {
-                case .invalidTransactionStatus:
-                    break
-                case let .serverError(serverError):
-                    switch serverError {
-                    case .timestampIsInTheFuture:
-                        dialog.send(.timestampIsInTheFuture)
-                    default: dialog.send(.richError(error))
-                    }
-                default:
-                    dialog.send(.richError(error))
+                    case .invalidTransactionStatus:
+                        break
+                    case let .serverError(serverError):
+                        switch serverError {
+                            case .timestampIsInTheFuture:
+                                dialog.send(.timestampIsInTheFuture)
+                            default: dialog.send(.warning(error.localizedDescription))
+                        }
+                    default:
+                        dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -547,12 +545,8 @@ final class ChatViewModel: NSObject {
                 }
 
                 await waitForMessage(withId: messageId)
-
-                if let lastMessageId = messages.last?.id {
-                    let position: UICollectionView.ScrollPosition = (messageId == lastMessageId) ? .top : .bottom
-                    scrollToIdAndPosition = (id: messageId, position: position)
-                }
-
+                scrollToIdAndPosition = messageId
+                
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
                     markMessageAsRead(index: index)
@@ -1092,6 +1086,10 @@ extension ChatViewModel {
     func unredMessageCount() -> Int? {
         unreadMessagesIds?.count
     }
+    
+    func shortVibro() {
+        vibroService.applyVibration(.rigid)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1105,7 +1103,7 @@ extension ChatViewModel {
     fileprivate func sendFiles(with text: String) async throws {
         guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
             dialog.send(
-                .alert(
+                .warning(
                     ApiServiceError.noEndpointsAvailable(
                         nodeGroupName: NodeGroup.ipfs.name
                     ).localizedDescription
@@ -1262,6 +1260,18 @@ extension ChatViewModel {
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
     }
+    
+    fileprivate func makeStartPosition() {
+        guard messageIdToShow == nil,
+              let address = chatroom?.partner?.address else {
+            startPosition = nil
+            return
+        }
+
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(.init($0)) }
+    }
 
     fileprivate func loadMessages(address: String, offset: Int) async {
         guard !isLoading else { return }
@@ -1310,9 +1320,8 @@ extension ChatViewModel {
 
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
-            postProcess(messages: &messages)
             updateSeparatorId()
-
+            postProcess(messages: &messages)
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
@@ -1481,22 +1490,24 @@ extension ChatViewModel {
         filesPicked: [FileResult]? = nil
     ) async {
         switch error as? ChatsProviderError {
-        case .messageNotValid:
-            inputText = sentText
-        case .notEnoughMoneyToSend:
-            inputText = sentText
-            self.filesPicked = filesPicked
-            guard await transfersProvider.hasTransactions else {
-                dialog.send(.freeTokenAlert)
-                return
-            }
-        case let .serverError(error):
-            if case .timestampIsInTheFuture = error {
-                dialog.send(.timestampIsInTheFuture)
-            }
-        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
-            .invalidTransactionStatus, .none:
-            break
+            case .messageNotValid:
+                inputText = sentText
+            case .notEnoughMoneyToSend:
+                inputText = sentText
+                self.filesPicked = filesPicked
+                guard await transfersProvider.hasTransactions else {
+                    dialog.send(.freeTokenAlert)
+                    return
+                }
+            case let .serverError(error):
+                switch error {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.warning(error.localizedDescription))
+                }
+            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
+                    .invalidTransactionStatus, .none:
+                break
         }
     }
 
