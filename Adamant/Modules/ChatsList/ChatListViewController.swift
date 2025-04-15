@@ -333,15 +333,13 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
 
         Task {
-            let chatsProviderState = await chatsProvider.stateObserver
-            let transfersProviderState = await transfersProvider.stateObserver
+            let chatsProviderState = await chatsProvider.isUpdatingOvertiming
 
             chatsProviderState
-                .combineLatest(transfersProviderState)
-                .map { $0.0.isUpdating || $0.1.isUpdating }
-                .removeDuplicates()
-                .values
-                .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    self?.setIsStateUpdating($0)
+                }
                 .store(in: &subscriptions)
         }
         chatPreservation.updateNotifier

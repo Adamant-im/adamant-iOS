@@ -54,6 +54,9 @@ actor AdamantChatsProvider: ChatsProvider {
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
+    
+    private let chatUpdatingNotificator: AnyChatUpdatingNotificator
+    var isUpdatingOvertiming: AnyObservable<Bool> { chatUpdatingNotificator.needToShowChatUpdateSpinnerObeserver }
 
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -85,7 +88,8 @@ actor AdamantChatsProvider: ChatsProvider {
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
         SecureStore: SecureStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        chatUpdatingNotificator: AnyChatUpdatingNotificator
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -96,6 +100,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.transactionService = transactionService
         self.SecureStore = SecureStore
         self.walletServiceCompose = walletServiceCompose
+        self.chatUpdatingNotificator = chatUpdatingNotificator
 
         Task {
             await setupSecureStore()
@@ -551,6 +556,7 @@ extension AdamantChatsProvider {
             }
         }
         setupAsReadyToSyncChats()
+        chatUpdatingNotificator.startMonitoring()
     }
 
     func setupAsReadyToSyncChats() {
@@ -561,6 +567,7 @@ extension AdamantChatsProvider {
 
     func disconnectFromSocket() {
         self.socketService.disconnect()
+        chatUpdatingNotificator.stopMonitoring()
     }
 
     func update(notifyState: Bool) async -> ChatsProviderResult? {
@@ -600,6 +607,7 @@ extension AdamantChatsProvider {
 
         switch state {
         case .upToDate, .empty, .updating:
+            chatUpdatingNotificator.updateLastUpdateTime()
             setState(.upToDate, previous: state, notify: notifyState)
 
             if prevHeight != receivedLastHeight,
