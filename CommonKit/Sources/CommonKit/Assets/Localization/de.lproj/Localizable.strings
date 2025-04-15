@@ -571,6 +571,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "Keine Verbindung";
 
+/* Shared error: Timeout Problem. In most cases - no connection */
+"Error.TimeOut" = "Das Zeitlimit für die Antwort wurde überschritten";
+
 /* Shared error: Request cancelled */
 "Error.RequestCancelled" = "Request cancelled";
 

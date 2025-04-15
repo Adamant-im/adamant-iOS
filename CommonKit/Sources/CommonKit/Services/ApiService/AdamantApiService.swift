@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import QuartzCore.CABase
 
 ///
 /// I need to override HealthCheckWrapped because of now we have an option to cancel the tasks
@@ -21,21 +21,21 @@ import Foundation
 
 private final actor TasksStorage {
     private var adamantApiTaskStorage: [UUID: CancellableTask] = [:]
-    
+
     init() {}
-    
+
     func getTask(id: UUID) -> CancellableTask? {
         return adamantApiTaskStorage[id]
     }
-    
+
     func addTask(_ task: CancellableTask, id: UUID) {
         adamantApiTaskStorage[id] = task
     }
-    
+
     func removeTask(id: UUID) {
         adamantApiTaskStorage[id] = nil
     }
-    
+
     func cancelAll() {
         adamantApiTaskStorage.forEach { _, task in
             task.cancel()
@@ -58,28 +58,42 @@ public final class AdamantApiService: @unchecked Sendable {
 
     public func request<Output>(
         waitsForConnectivity: Bool = false,
+        timeout: TimeInterval? = nil,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
         let taskId: UUID = .init()
         let task = AdamantApiTask<Output>(id: taskId)
-        
+
         await tasksStorage.addTask(task, id: taskId)
         defer {
             Task {
                 await tasksStorage.removeTask(id: taskId)
             }
         }
-        
+
         task.startTask(
             Task {
-                await service.request(
-                    waitsForConnectivity: waitsForConnectivity,
-                    taskId: taskId,
-                    isCancelled: {
-                        return await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                if let timeout {
+                    await service.request(
+                        waitsForConnectivity: waitsForConnectivity,
+                        timeout: timeout,
+                        taskId: taskId,
+                        isCancelled: {
+                            await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                        }
+                    ) { admApiCore, origin in
+                        await request(admApiCore.apiCore, origin)
                     }
-                ) { admApiCore, origin in
-                    return await request(admApiCore.apiCore, origin)
+                } else {
+                    await service.request(
+                        waitsForConnectivity: waitsForConnectivity,
+                        taskId: taskId,
+                        isCancelled: {
+                            await tasksStorage.getTask(id: taskId)?.isCancelled ?? true
+                        }
+                    ) { admApiCore, origin in
+                        await request(admApiCore.apiCore, origin)
+                    }
                 }
             }
         )
@@ -88,6 +102,15 @@ public final class AdamantApiService: @unchecked Sendable {
 
     public func cancelCurrentTasks() async {
         await tasksStorage.cancelAll()
+    }
+}
+
+extension AdamantApiServiceProtocol {
+    public func sendTransaction(
+        path: String,
+        transaction: UnregisteredTransaction
+    ) async -> ApiServiceResult<UInt64> {
+        await sendTransaction(path: path, transaction: transaction, timeout: nil)
     }
 }
 
@@ -104,13 +127,14 @@ extension AdamantApiService: AdamantApiServiceProtocol {
 public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCore> {
     func request<Output>(
         waitsForConnectivity: Bool,
+        timeout: TimeInterval? = nil,
         taskId: UUID,
         isCancelled: () async -> Bool,
         _ requestAction: (AdamantApiCore, NodeOrigin) async -> Result<Output, AdamantApiCore.Error>
     ) async -> Result<Output, AdamantApiCore.Error> {
         var usedNodesIds: Set<UUID> = .init()
-        var lastConnectionError: Error?
-        
+        var lastConnectionError: AdamantApiCore.Error?
+
         /// Check the cancellation of the task from the outside
         guard await !isCancelled() else {
             return .failure(.requestCancelled)
@@ -132,17 +156,44 @@ public final class AdamantHealthCheck: BlockchainHealthCheckWrapper<AdamantApiCo
                 lastConnectionError = error
             }
         }
-        
+
         healthCheck()
 
-        lastConnectionError =
-            lastConnectionError
-            ?? (nodes.contains { $0.isEnabled }
-                ? ApiServiceError.noNetworkError
-                : ApiServiceError.noEndpointsError(nodeGroupName: name))
-        
-        return await waitsForConnectivity
-        ? request(waitsForConnectivity: waitsForConnectivity, taskId: taskId, isCancelled: isCancelled, requestAction)
-        : .failure(lastConnectionError as? AdamantApiCore.Error ?? .noEndpointsAvailable(nodeGroupName: name))
+        if waitsForConnectivity {
+            
+            
+            if let timeout {
+                let startTime = CACurrentMediaTime()
+
+                do {
+                    let result = try await deadline(until: startTime + timeout) {
+                        await self.request(waitsForConnectivity: waitsForConnectivity, requestAction)
+                    }
+                    return result
+                } catch _ as DeadlineExceededError {
+                    return .failure(.timeoutError)
+                } catch {
+                    return .failure(.noNetworkError)
+                }
+            } else {
+                return await request(
+                    waitsForConnectivity: waitsForConnectivity,
+                    taskId: taskId,
+                    isCancelled: isCancelled,
+                    requestAction
+                )
+            }
+        }
+
+        let finalError: AdamantApiCore.Error
+        if let error = lastConnectionError {
+            finalError = error
+        } else if nodes.contains(where: { $0.isEnabled }) {
+            finalError = .networkError(error: ApiServiceError.noNetworkError)
+        } else {
+            finalError = .noEndpointsAvailable(nodeGroupName: name)
+        }
+
+        return .failure(finalError)
     }
 }

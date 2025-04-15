@@ -90,7 +90,7 @@ final class AccountViewController: FormViewController {
     }()
 
     private var walletViewControllers: [WalletViewController] = []
-    
+
     private lazy var currentSelectedWallet: AccountWalletCellState? = {
         viewModel.state.wallets.first(where: { $0.model.index == 0 })
     }()
@@ -189,7 +189,7 @@ final class AccountViewController: FormViewController {
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        
+
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
@@ -200,7 +200,7 @@ final class AccountViewController: FormViewController {
         updatePagingItemHeight()
 
         pagingViewController.borderColor = UIColor.clear
-        
+
         // MARK: Rows&Sections
 
         // MARK: Application
@@ -963,11 +963,13 @@ final class AccountViewController: FormViewController {
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         guard let currencyNetwork = currentSelectedWallet?.model.currencyNetwork else { return }
-        
-        let unavailableNodes: Set<NodeGroup> = Set(NodeGroup.allCases.filter {
-            !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
-        })
-        
+
+        let unavailableNodes: Set<NodeGroup> = Set(
+            NodeGroup.allCases.filter {
+                !(apiServiceCompose.get($0)?.hasSupportedNode ?? true)
+            }
+        )
+
         if unavailableNodes.contains(where: {
             $0.name == currencyNetwork
         }) {
@@ -977,7 +979,7 @@ final class AccountViewController: FormViewController {
                 ).localizedDescription
             )
         }
-        
+
         Task { @MainActor in
             accountService.updateWithRefreshUI()
         }
@@ -1073,7 +1075,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
                 wallet.model.index == pagingItem.identifier
             })
         }
-        
+
         DispatchQueue.onMainThreadSyncSafe {
             guard transitionSuccessful,
                 let first = startingViewController as? WalletViewController,
@@ -1097,7 +1099,6 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             })
         }
     }
-
 
     private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
         guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {

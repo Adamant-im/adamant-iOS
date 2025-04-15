@@ -44,7 +44,7 @@ public struct CoinInfoDTO: Codable {
             case url
             case altIp = "alt_ip"
         }
-        
+
         public let url: String
         public let altIp: String?
     }

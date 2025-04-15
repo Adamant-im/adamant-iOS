@@ -41,9 +41,14 @@ extension ChatMediaContainerView {
             }.count
 
             let otherFilesCount = content.fileModel.files.count - mediaFilesCount
-                        
-            let result = FilePresentationHelper.getFilePresentationText(mediaFilesCount: mediaFilesCount, otherFilesCount: otherFilesCount, comment: content.comment.string, parsedWith: ChatMessageFactory.markdownParser)
-           
+
+            let result = FilePresentationHelper.getFilePresentationText(
+                mediaFilesCount: mediaFilesCount,
+                otherFilesCount: otherFilesCount,
+                comment: content.comment.string,
+                parsedWith: ChatMessageFactory.markdownParser
+            )
+
             return result
         }
     }

@@ -27,7 +27,7 @@ final class ChatTransactionContainerView: UIView {
     var actionHandler: (ChatAction) -> Void = { _ in } {
         didSet { contentView.actionHandler = actionHandler }
     }
-    
+
     var copyNotification: (() -> Void)?
 
     private let contentView = ChatTransactionContentView()
@@ -157,7 +157,7 @@ extension ChatTransactionContainerView {
         chatMenuManager.setup(for: contentView)
         configureLongPressGesture()
     }
-    
+
     fileprivate func configureLongPressGesture() {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
         longPress.minimumPressDuration = 0.2
@@ -197,22 +197,22 @@ extension ChatTransactionContainerView {
     @objc fileprivate func onStatusButtonTap() {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
     }
-    
+
     @objc fileprivate func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             contentView.animatePressDown()
-            
+
         case .ended:
             contentView.animatePressUp()
             if let comment = model.content.comment, !comment.isEmpty {
                 UIPasteboard.general.string = comment
                 copyNotification?()
             }
-            
+
         case .cancelled, .failed:
             contentView.animatePressUp()
-            
+
         default:
             break
         }
@@ -322,19 +322,19 @@ extension ChatTransactionContainerView {
         ) { [actionHandler, model] in
             actionHandler(.reply(id: model.id))
         }
-        
+
         let copy = AMenuItem.action(
             title: .adamant.chat.copy,
             systemImageName: "doc.on.doc"
         ) { [actionHandler, model] in
             actionHandler(.copy(text: model.content.comment ?? ""))
         }
-        
+
         let actions: [AMenuItem] =
-        model.content.comment == nil || model.content.comment == ""
+            model.content.comment == nil || model.content.comment == ""
             ? [reply, report, remove]
             : [reply, copy, report, remove]
-        
+
         return AMenuSection(actions)
     }
 }

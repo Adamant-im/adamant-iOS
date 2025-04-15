@@ -192,7 +192,7 @@ final class ChatViewController: MessagesViewController {
                 : chatMessagesCollectionView.bottomOffset
         )
     }
-    
+
     override func collectionView(
         _ collectionView: UICollectionView,
         canPerformAction action: Selector,
@@ -201,14 +201,14 @@ final class ChatViewController: MessagesViewController {
     ) -> Bool {
         return false
     }
-    
+
     override func collectionView(
         _ collectionView: UICollectionView,
         shouldShowMenuForItemAt indexPath: IndexPath
     ) -> Bool {
         return false
     }
-    
+
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
         scrollDidStop()
     }
@@ -311,7 +311,7 @@ extension ChatViewController {
                 self.viewModel.updatePreviewFor(indexes: indexes)
             }
             .store(in: &subscriptions)
-        
+
         NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
             .sink { [weak self] _ in
                 self?.state.isAppActive = false
@@ -936,7 +936,12 @@ extension ChatViewController {
     }
 
     @MainActor
-    fileprivate func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false, scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
+    fileprivate func scrollToPosition(
+        _ position: ChatStartPosition,
+        animated: Bool = false,
+        setExtraOffset: Bool = false,
+        scrollAt: UICollectionView.ScrollPosition = .centeredVertically
+    ) {
         chatMessagesCollectionView.fixedBottomOffset = nil
 
         switch position {
@@ -1271,30 +1276,32 @@ extension ChatViewController {
         state.isAutoScrolling = false
         state.isScrollingToBottom = false
         updateUnreadMessages()
-        
+
         guard !state.isAnimatingCellHighlight else { return }
         guard let messageId = viewModel.cellIdForAnimation,
-              let index = viewModel.messages.firstIndex(where: { $0.messageId == messageId }) else {
+            let index = viewModel.messages.firstIndex(where: { $0.messageId == messageId })
+        else {
             return
         }
-        
+
         let indexPath = IndexPath(item: 0, section: index)
         animateCell(at: indexPath)
     }
-    
+
     private func animateCell(at indexPath: IndexPath) {
         state.isAnimatingCellHighlight = true
-        
+
         //0.2 sec delay that all methods that can interrupt the animation have time to execute
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             guard let self = self else { return }
-            
+
             guard self.messagesCollectionView.indexPathsForVisibleItems.contains(indexPath),
-                  let cell = self.messagesCollectionView.cellForItem(at: indexPath) as? ChatCellProtocol else {
+                let cell = self.messagesCollectionView.cellForItem(at: indexPath) as? ChatCellProtocol
+            else {
                 self.state.isAnimatingCellHighlight = false
                 return
             }
-            
+
             cell.animateMessageHighlight()
             self.viewModel.shortVibro()
             self.viewModel.cellIdForAnimation = nil

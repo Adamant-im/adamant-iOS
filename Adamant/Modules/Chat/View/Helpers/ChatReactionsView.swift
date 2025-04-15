@@ -23,7 +23,7 @@ struct ChatReactionsView: View {
 
     var didSelectEmoji: ((_ emoji: String, _ messageId: String) -> Void)?
     var didSelectMore: (() -> Void)?
-    
+
     @State private var isPlusHovered = false
 
     init(
@@ -63,8 +63,8 @@ struct ChatReactionsView: View {
             .frame(width: 30, height: 30)
             .background(
                 isPlusHovered
-                ? Color.init(uiColor: .adamant.contextMenuSelectColor)
-                : Color.init(uiColor: .adamant.moreReactionsBackground)
+                    ? Color.init(uiColor: .adamant.contextMenuSelectColor)
+                    : Color.init(uiColor: .adamant.moreReactionsBackground)
             )
             .clipShape(Circle())
             .scaleEffect(isPlusHovered ? 1.15 : 1.0)
@@ -73,7 +73,7 @@ struct ChatReactionsView: View {
             }
             .animation(.easeInOut(duration: 0.2), value: isPlusHovered)
             .padding([.top, .bottom], 5)
-            
+
             Spacer()
         }
         .padding(.leading, 5)
@@ -85,15 +85,17 @@ struct ChatReactionsView: View {
 struct ChatReactionButton: View {
     let emoji: String
     let isSelected: Bool
-    
+
     @State private var isHovered = false
 
     var body: some View {
         Text(emoji)
             .font(.title)
             .frame(width: 40, height: 40)
-            .background( isHovered ? Color.init(uiColor: .adamant.contextMenuSelectColor) :
-                            (isSelected ? Color.init(uiColor: .gray.withAlphaComponent(0.75)) : Color.clear))
+            .background(
+                isHovered
+                    ? Color.init(uiColor: .adamant.contextMenuSelectColor) : (isSelected ? Color.init(uiColor: .gray.withAlphaComponent(0.75)) : Color.clear)
+            )
             .clipShape(Circle())
             .onHover { hovering in
                 isHovered = hovering

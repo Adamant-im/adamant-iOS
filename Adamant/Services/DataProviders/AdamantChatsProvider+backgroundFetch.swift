@@ -11,23 +11,23 @@ import Foundation
 
 extension AdamantChatsProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
-        guard let address: String = SecureStore.get(StoreKey.chatProvider.address) else {
+        guard let address: String = secureStore.get(StoreKey.chatProvider.address) else {
             return .failed
         }
 
         var lastHeight: Int64?
-        if let raw: String = SecureStore.get(StoreKey.chatProvider.receivedLastHeight) {
+        if let raw: String = secureStore.get(StoreKey.chatProvider.receivedLastHeight) {
             lastHeight = Int64(raw)
         } else {
             lastHeight = nil
         }
 
         var notifiedCount = 0
-        if let raw: String = SecureStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+        if let raw: String = secureStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
             if h < notifiedHeight {
                 lastHeight = notifiedHeight
 
-                if let raw: String = SecureStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
+                if let raw: String = secureStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
                     notifiedCount = count
                 }
             }
@@ -44,13 +44,13 @@ extension AdamantChatsProvider: BackgroundFetchService {
             guard transactions.count > 0 else { return .noData }
 
             let total = transactions.count
-            SecureStore.set(
+            secureStore.set(
                 String(total + notifiedCount),
                 for: StoreKey.chatProvider.notifiedMessagesCount
             )
 
             if let newLastHeight = transactions.map({ $0.height }).sorted().last {
-                SecureStore.set(
+                secureStore.set(
                     String(newLastHeight),
                     for: StoreKey.chatProvider.notifiedLastHeight
                 )

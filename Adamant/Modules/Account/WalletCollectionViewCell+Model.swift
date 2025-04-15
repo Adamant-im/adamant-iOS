@@ -6,8 +6,8 @@
 //  Copyright © 2025 Adamant. All rights reserved.
 //
 
-import Parchment
 import CommonKit
+import Parchment
 import UIKit
 
 struct WalletCollectionViewCellModel {
@@ -19,7 +19,7 @@ struct WalletCollectionViewCellModel {
     var isBalanceInitialized: Bool
     var balance: Decimal?
     var notificationBadgeCount: Int
-    
+
     static let `default` = WalletCollectionViewCellModel(
         index: 0,
         coinID: "",

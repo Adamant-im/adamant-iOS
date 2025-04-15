@@ -220,7 +220,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             }) {
                 network = type(of: service).tokenNetworkSymbol
             }
-            
+
             let item = WalletCollectionViewCellModel(
                 index: index,
                 coinID: service.tokenUniqueID,
@@ -231,7 +231,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 balance: wallet.balance,
                 notificationBadgeCount: 0
             )
-            
+
             let model = AccountWalletCellState(model: item)
             return model
         }

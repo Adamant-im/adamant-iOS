@@ -225,8 +225,8 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             await update()
         }
     }
-    
-    func updateWithRefreshUIBalance(){
+
+    func updateWithRefreshUIBalance() {
         Task {
             await update(updateWithRefreshUIBalance: true)
         }
@@ -245,12 +245,12 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         case .upToDate:
             break
         }
-        
-        if updateWithRefreshUIBalance{
+
+        if updateWithRefreshUIBalance {
             wallet.isBalanceInitialized = false
             walletUpdateSender.send()
         }
-        
+
         setState(.updating)
 
         if let balance = try? await getBalance() {
@@ -261,15 +261,15 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             wallet.balance = balance
             markBalanceAsFresh(wallet)
         }
-        
+
         walletUpdateSender.send()
-        
+
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
-        
+
         setState(.upToDate)
     }
 

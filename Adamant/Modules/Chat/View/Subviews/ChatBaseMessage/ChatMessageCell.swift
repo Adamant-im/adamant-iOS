@@ -87,7 +87,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             layoutReactionLabel()
         }
     }
-    
+
     var copyNotification: (() -> Void)?
 
     var reactionsContanerViewWidth: CGFloat {
@@ -156,7 +156,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
 
     func configureMenu() {
         containerView.layer.cornerRadius = 10
-        
+
         configureLongPressGesture()
 
         messageContainerView.removeFromSuperview()
@@ -165,14 +165,14 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
 
         chatMenuManager.setup(for: containerView)
     }
-    
+
     private func configureLongPressGesture() {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
         longPress.minimumPressDuration = 0.2
         messageContainerView.addGestureRecognizer(longPress)
         messageContainerView.isUserInteractionEnabled = true
     }
-    
+
     func updateOwnReaction() {
         ownReactionLabel.text = getReaction(for: model.address)
         ownReactionLabel.backgroundColor = .adamant.pickedReactionBackground
@@ -437,8 +437,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     }
 }
 
-private extension ChatMessageCell {
-    func makeContextMenu() -> AMenuSection {
+extension ChatMessageCell {
+    fileprivate func makeContextMenu() -> AMenuSection {
         let remove = AMenuItem.action(
             title: .adamant.chat.remove,
             systemImageName: "trash",
@@ -482,15 +482,15 @@ private extension ChatMessageCell {
         return AMenuSection([reply, copyInPart, copy, report, remove])
     }
 
-    @objc func tapReactionAction() {
+    @objc fileprivate func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
-    
+
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             messageContainerView.animatePressDown()
-            
+
         case .ended:
             messageContainerView.animatePressUp()
             UIPasteboard.general.string = model.text.string

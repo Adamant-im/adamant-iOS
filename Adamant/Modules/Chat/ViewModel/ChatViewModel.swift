@@ -261,7 +261,7 @@ final class ChatViewModel: NSObject {
             dialog.send(.freeTokenAlert)
         }
     }
-    
+
     func presentKeyboardOnStartIfNeeded() {
         guard
             !inputText.isEmpty
@@ -491,9 +491,9 @@ final class ChatViewModel: NSObject {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-            
+
             let message = messages.first(where: { $0.messageId == id })
-            
+
             if case let .file(model) = message?.content {
                 try? await chatFileService.resendMessage(
                     with: id,
@@ -504,21 +504,21 @@ final class ChatViewModel: NSObject {
                 )
                 return
             }
-            
+
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {
                 switch error as? ChatsProviderError {
-                    case .invalidTransactionStatus:
-                        break
-                    case let .serverError(serverError):
-                        switch serverError {
-                            case .timestampIsInTheFuture:
-                                dialog.send(.timestampIsInTheFuture)
-                            default: dialog.send(.warning(error.localizedDescription))
-                        }
-                    default:
-                        dialog.send(.richError(error))
+                case .invalidTransactionStatus:
+                    break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.warning(error.localizedDescription))
+                    }
+                default:
+                    dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -546,7 +546,7 @@ final class ChatViewModel: NSObject {
 
                 await waitForMessage(withId: messageId)
                 scrollToIdAndPosition = messageId
-                
+
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
                     markMessageAsRead(index: index)
@@ -1086,7 +1086,7 @@ extension ChatViewModel {
     func unredMessageCount() -> Int? {
         unreadMessagesIds?.count
     }
-    
+
     func shortVibro() {
         vibroService.applyVibration(.rigid)
     }
@@ -1260,15 +1260,17 @@ extension ChatViewModel {
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
     }
-    
+
     fileprivate func makeStartPosition() {
         guard messageIdToShow == nil,
-              let address = chatroom?.partner?.address else {
+            let address = chatroom?.partner?.address
+        else {
             startPosition = nil
             return
         }
 
-        startPosition = chatsProvider
+        startPosition =
+            chatsProvider
             .getChatPositon(for: address)
             .map { .offset(.init($0)) }
     }
@@ -1490,24 +1492,24 @@ extension ChatViewModel {
         filesPicked: [FileResult]? = nil
     ) async {
         switch error as? ChatsProviderError {
-            case .messageNotValid:
-                inputText = sentText
-            case .notEnoughMoneyToSend:
-                inputText = sentText
-                self.filesPicked = filesPicked
-                guard await transfersProvider.hasTransactions else {
-                    dialog.send(.freeTokenAlert)
-                    return
-                }
-            case let .serverError(error):
-                switch error {
-                    case .timestampIsInTheFuture:
-                        dialog.send(.timestampIsInTheFuture)
-                    default: dialog.send(.warning(error.localizedDescription))
-                }
-            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
-                    .invalidTransactionStatus, .none:
-                break
+        case .messageNotValid:
+            inputText = sentText
+        case .notEnoughMoneyToSend:
+            inputText = sentText
+            self.filesPicked = filesPicked
+            guard await transfersProvider.hasTransactions else {
+                dialog.send(.freeTokenAlert)
+                return
+            }
+        case let .serverError(error):
+            switch error {
+            case .timestampIsInTheFuture:
+                dialog.send(.timestampIsInTheFuture)
+            default: dialog.send(.warning(error.localizedDescription))
+            }
+        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
+            .invalidTransactionStatus, .none:
+            break
         }
     }
 

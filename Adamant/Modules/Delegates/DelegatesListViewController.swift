@@ -444,7 +444,7 @@ extension DelegatesListViewController {
         let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.attention : UIColor.adamant.primary
 
         DispatchQueue.onMainAsync { [self] in
-            bottomPanel.model = .init(
+            bottomPanel.model = DelegatesBottomPanel.Model(
                 upvotes: upvoted,
                 downvotes: downvoted,
                 new: (changes.count, maxVotes),

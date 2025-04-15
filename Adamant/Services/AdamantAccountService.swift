@@ -233,7 +233,7 @@ extension AdamantAccountService {
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         update(completion, updateOnlyVisible: true)
     }
-    
+
     func updateWithRefreshUI() {
         update(nil, updateOnlyVisible: true, shouldUpdateUIBalance: true)
     }
@@ -465,9 +465,9 @@ extension AdamantAccountService {
             if account != nil {
                 NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
             }
-            
+
             dropSavedAccount()
-            
+
             let wasLogged = account != nil
             account = nil
             keypair = nil
@@ -475,7 +475,7 @@ extension AdamantAccountService {
             state = .notLogged
             await apiService.cancelCurrentTasks()
             coreDataStack.clearCoreData()
-            
+
             guard wasLogged else { return }
             NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
         }

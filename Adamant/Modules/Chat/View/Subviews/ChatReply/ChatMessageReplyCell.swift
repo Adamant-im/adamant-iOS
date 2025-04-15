@@ -150,7 +150,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
     }
     var copyNotification: (() -> Void)?
-    
+
     var reactionsContanerViewWidth: CGFloat {
         if getReaction(for: model.address) == nil && getReaction(for: model.opponentAddress) == nil {
             return .zero
@@ -233,7 +233,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
 
         cellContainerView.addSubview(reactionsContanerView)
     }
-    
+
     func configureReplyMessageGesture() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleReplyTap))
         replyMessageLabel.isUserInteractionEnabled = true
@@ -241,7 +241,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.isUserInteractionEnabled = true
         replyMessageLabel.addGestureRecognizer(tap)
     }
-    
+
     func configureMenu() {
         containerView.layer.cornerRadius = 10
 
@@ -535,8 +535,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     }
 }
 
-private extension ChatMessageReplyCell {
-    func makeContextMenu() -> AMenuSection {
+extension ChatMessageReplyCell {
+    fileprivate func makeContextMenu() -> AMenuSection {
         let remove = AMenuItem.action(
             title: .adamant.chat.remove,
             systemImageName: "trash",
@@ -576,29 +576,29 @@ private extension ChatMessageReplyCell {
         return AMenuSection([reply, copyInPart, copy, report, remove])
     }
 
-    @objc func tapReactionAction() {
+    @objc fileprivate func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
-    
-    @objc func handleReplyTap() {
+
+    @objc fileprivate func handleReplyTap() {
         actionHandler(.scrollTo(message: model))
     }
-    
+
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             messageContainerView.animatePressDown()
-            
+
         case .ended:
             messageContainerView.animatePressUp()
             if model.message.string != "" {
                 UIPasteboard.general.string = model.message.string
                 copyNotification?()
             }
-            
+
         case .cancelled, .failed:
             messageContainerView.animatePressUp()
-            
+
         default:
             break
         }
@@ -671,7 +671,7 @@ extension ChatMessageReplyCell {
         )
         return cell
     }
-    
+
     func configureLongPressGesture() {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
         longPress.minimumPressDuration = 0.2

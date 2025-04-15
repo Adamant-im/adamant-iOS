@@ -405,8 +405,9 @@ struct AppAssembly: MainThreadAssembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                SecureStore: r.resolve(SecureStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                secureStore: r.resolve(SecureStore.self)!,
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                timeouts: AdmWalletService.timeouts
             )
         }.inObjectScope(.container)
 

@@ -278,12 +278,12 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         }
     }
 
-    func updateWithRefreshUIBalance(){
+    func updateWithRefreshUIBalance() {
         Task {
             await update(updateWithRefreshUIBalance: true)
         }
     }
-    
+
     @MainActor
     func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = btcWallet else {
@@ -297,12 +297,12 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         case .upToDate:
             break
         }
-        
+
         if updateWithRefreshUIBalance {
             wallet.isBalanceInitialized = false
             walletUpdateSender.send()
         }
-        
+
         setState(.updating)
 
         if let balance = try? await getBalance() {
@@ -313,15 +313,15 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             wallet.balance = balance
             markBalanceAsFresh(wallet)
         }
-        
+
         walletUpdateSender.send()
-        
+
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
             userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
         )
-        
+
         setState(.upToDate)
 
         if let rate = try? await getFeeRate() {

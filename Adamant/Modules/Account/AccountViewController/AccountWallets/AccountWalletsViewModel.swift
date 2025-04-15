@@ -13,7 +13,7 @@ import Foundation
 @MainActor
 final class AccountWalletsViewModel {
     var state: AccountWalletsState = .default
-    
+
     private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
 

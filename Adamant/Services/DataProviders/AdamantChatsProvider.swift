@@ -20,10 +20,10 @@ actor AdamantChatsProvider: ChatsProvider {
     private let adamantCore: AdamantCore
     private let transactionService: ChatTransactionService
     private let walletServiceCompose: WalletServiceCompose
-
+    private let timeouts: AdmWalletService.MessageTimeouts
     let accountService: AccountService
     let accountsProvider: AccountsProvider
-    let SecureStore: SecureStore
+    let secureStore: SecureStore
     let apiService: AdamantApiServiceProtocol
     let stack: CoreDataStack
 
@@ -84,8 +84,9 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        SecureStore: SecureStore,
-        walletServiceCompose: WalletServiceCompose
+        secureStore: SecureStore,
+        walletServiceCompose: WalletServiceCompose,
+        timeouts: AdmWalletService.MessageTimeouts
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -94,9 +95,9 @@ actor AdamantChatsProvider: ChatsProvider {
         self.adamantCore = adamantCore
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
-        self.SecureStore = SecureStore
+        self.secureStore = secureStore
         self.walletServiceCompose = walletServiceCompose
-
+        self.timeouts = timeouts
         Task {
             await setupSecureStore()
             await addObservers()
@@ -147,8 +148,8 @@ actor AdamantChatsProvider: ChatsProvider {
     // MARK: - Notifications action
 
     private func userLoggedInAction(_ notification: Notification) {
-        let store = self.SecureStore
 
+        let store = self.secureStore
         guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
             store.remove(StoreKey.chatProvider.address)
             store.remove(StoreKey.chatProvider.receivedLastHeight)
@@ -160,8 +161,8 @@ actor AdamantChatsProvider: ChatsProvider {
 
         if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
             if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
-               let h = Int64(raw),
-               let chatsMarkAsUnread: Set<String> = store.get(StoreKey.chatProvider.markedChatsAsUnread)
+                let h = Int64(raw),
+                let chatsMarkAsUnread: Set<String> = store.get(StoreKey.chatProvider.markedChatsAsUnread)
             {
                 self.readedLastHeight = h
                 self.chatsMarkAsUnread = chatsMarkAsUnread
@@ -198,8 +199,8 @@ actor AdamantChatsProvider: ChatsProvider {
         }
 
         if state {
-            SecureStore.set(blockList, for: StoreKey.accountService.blockList)
-            SecureStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
+            secureStore.set(blockList, for: StoreKey.accountService.blockList)
+            secureStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
         }
     }
 
@@ -274,13 +275,13 @@ actor AdamantChatsProvider: ChatsProvider {
     }
 
     private func setupSecureStore() {
-        blockList = SecureStore.get(StoreKey.accountService.blockList) ?? []
-        removedMessages = SecureStore.get(StoreKey.accountService.removedMessages) ?? []
+        blockList = secureStore.get(StoreKey.accountService.blockList) ?? []
+        removedMessages = secureStore.get(StoreKey.accountService.removedMessages) ?? []
     }
 
     func dropStateData() {
-        SecureStore.remove(StoreKey.chatProvider.notifiedLastHeight)
-        SecureStore.remove(StoreKey.chatProvider.notifiedMessagesCount)
+        secureStore.remove(StoreKey.chatProvider.notifiedLastHeight)
+        secureStore.remove(StoreKey.chatProvider.notifiedMessagesCount)
     }
 
     func isMessageDeleted(id: String) -> Bool {
@@ -314,11 +315,11 @@ extension AdamantChatsProvider {
         chatLoadedMessages.removeAll()
 
         // Drop store
-        SecureStore.remove(StoreKey.chatProvider.address)
-        SecureStore.remove(StoreKey.chatProvider.receivedLastHeight)
-        SecureStore.remove(StoreKey.chatProvider.readedLastHeight)
-        SecureStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
 
+        secureStore.remove(StoreKey.chatProvider.address)
+        secureStore.remove(StoreKey.chatProvider.receivedLastHeight)
+        secureStore.remove(StoreKey.chatProvider.readedLastHeight)
+        secureStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
         // Set State
         setState(.empty, previous: prevState, notify: notify)
     }
@@ -619,13 +620,13 @@ extension AdamantChatsProvider {
             }
 
             if let h = receivedLastHeight {
-                SecureStore.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+                secureStore.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
             }
 
             if let h = readedLastHeight,
                 h > 0
             {
-                SecureStore.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+                secureStore.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
             }
 
             if !isInitiallySynced {
@@ -669,16 +670,16 @@ extension AdamantChatsProvider {
 
     func setManualMarkChatAsUnread(chatroomId: String) {
         chatsMarkAsUnread?.insert(chatroomId)
-        SecureStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
     }
 
     func removeManualMarkChatAsUnread(chatroomId: String) {
         chatsMarkAsUnread?.remove(chatroomId)
-        SecureStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
     }
 
     func getMarkAdressesFromChain() -> Set<String> {
-        return SecureStore.get(StoreKey.chatProvider.markedChatsAsUnread) ?? Set()
+        secureStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
+        secureStore.set(chatsMarkAsUnread, for: StoreKey.chatProvider.markedChatsAsUnread)
+        return secureStore.get(StoreKey.chatProvider.markedChatsAsUnread) ?? Set()
     }
 
     func isChatLoading(with addressRecipient: String) -> Bool {
@@ -1334,8 +1335,12 @@ extension AdamantChatsProvider {
             let locallyID = signedTransaction.generateId() ?? UUID().uuidString
             transaction.transactionId = locallyID
             transaction.chatMessageId = locallyID
-
-            let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
+            let id = try await apiService.sendMessageTransaction(
+                transaction: signedTransaction,
+                timeout: transaction.isFileTransfer
+                    ? timeouts.attachment
+                    : timeouts.message
+            ).get()
 
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
@@ -1350,8 +1355,8 @@ extension AdamantChatsProvider {
 
             return transaction
         } catch {
-            guard case let (apiError) = (error as? ApiServiceError),
-                case let (.serverError(text)) = apiError,
+            guard
+                case let (.serverError(text)) = error,
                 text.contains("Transaction is already confirmed")
                     || text.contains("Transaction is already processed")
             else {
@@ -2018,7 +2023,7 @@ extension AdamantChatsProvider {
             self.blockList.append(address)
 
             if self.accountService.hasStayInAccount {
-                self.SecureStore.set(blockList, for: StoreKey.accountService.blockList)
+                self.secureStore.set(blockList, for: StoreKey.accountService.blockList)
             }
         }
     }
@@ -2029,7 +2034,7 @@ extension AdamantChatsProvider {
             markTransactionAsHidden(id: id)
 
             if self.accountService.hasStayInAccount {
-                self.SecureStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
+                self.secureStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
     }
@@ -2069,6 +2074,12 @@ extension AdamantChatsProvider {
     private func onConnectionToTheInternetRestored() {
         onConnectionToTheInternetRestoredTasks.forEach { $0() }
         onConnectionToTheInternetRestoredTasks = []
+    }
+}
+
+extension ChatTransaction {
+    var isFileTransfer: Bool {
+        (self as? RichMessageTransaction)?.additionalType == RichAdditionalType.file
     }
 }
 

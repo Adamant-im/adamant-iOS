@@ -260,7 +260,7 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             await update(updateWithRefreshUIBalance: true)
         }
     }
-    
+
     @MainActor
     func update(updateWithRefreshUIBalance: Bool = false) async {
         guard let wallet = ethWallet else {
@@ -274,12 +274,12 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         case .upToDate:
             break
         }
-        
+
         if updateWithRefreshUIBalance {
             wallet.isBalanceInitialized = false
             walletUpdateSender.send()
         }
-        
+
         setState(.updating)
 
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
@@ -290,9 +290,9 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             wallet.balance = balance
             markBalanceAsFresh(wallet)
         }
-        
+
         walletUpdateSender.send()
-        
+
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
@@ -319,7 +319,7 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             let gasPriceFromChain = try await getGasPrices()
             let gasLimitFromChain = try await getGasLimit(to: address)
             try Task.checkCancellation()
-            
+
             gasPrice = gasPriceFromChain
             gasLimit = gasLimitFromChain
         } catch {

@@ -11,11 +11,11 @@ final class AdamantApiTask<Output>: CancellableTask {
     private var task: Task<Result<Output, ApiServiceError>, Never>!
     private let id: UUID
     private var cancelled: Bool = false
-    
+
     var isCancelled: Bool {
         cancelled
     }
-    
+
     var value: Result<Output, ApiServiceError> {
         get async {
             await task.value
@@ -25,8 +25,8 @@ final class AdamantApiTask<Output>: CancellableTask {
     init(id: UUID) {
         self.id = id
     }
-    
-    /// Must be called before `await` on `value`. 
+
+    /// Must be called before `await` on `value`.
     func startTask(_ task: Task<Result<Output, ApiServiceError>, Never>) {
         self.task = task
     }
