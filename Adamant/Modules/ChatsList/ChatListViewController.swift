@@ -1290,6 +1290,9 @@ extension ChatListViewController {
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
                 self.removeManualAdress(adress: adress)
+                Task {
+                    await self.chatsProvider.update(notifyState: true)
+                }
             } else {
                 chatroom.markAsUnread()
                 self.chatsManuallyMarkedAsUnread.insert(adress)

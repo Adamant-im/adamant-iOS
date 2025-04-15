@@ -428,6 +428,7 @@ final class ChatViewModel: NSObject {
         let message = _messages.wrappedValue[index]
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
+            await _ = chatsProvider.update(notifyState: true)
         }
     }
 
