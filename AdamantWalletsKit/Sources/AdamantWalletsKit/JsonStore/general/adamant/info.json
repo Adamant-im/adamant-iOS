@@ -105,6 +105,7 @@
           "alt_ip": "http://207.180.210.95:33088"
         }
       ],
+      
       "healthCheck": {
         "normalUpdateInterval": 300000,
         "crucialUpdateInterval": 30000,

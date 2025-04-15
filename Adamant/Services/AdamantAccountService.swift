@@ -386,7 +386,7 @@ extension AdamantAccountService {
 
         // Logout first
         case .updating, .loggedIn:
-            logout()
+            await logout()
 
         // Go login
         case .notLogged:
@@ -460,25 +460,24 @@ extension AdamantAccountService {
 
 // MARK: - Log Out
 extension AdamantAccountService {
-    func logout() {
-        Task { @MainActor in
-            if account != nil {
-                NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
-            }
-            
-            dropSavedAccount()
-            
-            let wasLogged = account != nil
-            account = nil
-            keypair = nil
-            passphrase = nil
-            state = .notLogged
-            await apiService.cancelCurrentTasks()
-            coreDataStack.clearCoreData()
-            
-            guard wasLogged else { return }
-            NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
+    @MainActor
+    func logout() async {
+        await apiService.cancelCurrentTasks()
+        
+        if account != nil {
+            NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
         }
+        
+        dropSavedAccount()
+        let wasLogged = account != nil
+        account = nil
+        keypair = nil
+        passphrase = nil
+        state = .notLogged
+        coreDataStack.clearCoreData()
+        
+        guard wasLogged else { return }
+        NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
     }
 }
 
