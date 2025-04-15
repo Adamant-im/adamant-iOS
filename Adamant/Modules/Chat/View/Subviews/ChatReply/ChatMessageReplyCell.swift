@@ -596,10 +596,11 @@ private extension ChatMessageReplyCell {
             didCopy = false
             messageContainerView.animatePressDown()
             
-            Task {
+            Task { [weak self] in
                 try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
                 
-                guard gesture.state == .began || gesture.state == .changed else { return }
+                guard let self = self,
+                      gesture.state == .began || gesture.state == .changed else { return }
                 
                 await MainActor.run {
                     self.longPressCopyAction()
