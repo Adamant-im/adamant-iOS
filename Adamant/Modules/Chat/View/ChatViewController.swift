@@ -162,7 +162,8 @@ final class ChatViewController: MessagesViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        defer { state.isViewAppeared = true
+        defer {
+            state.isViewAppeared = true
             updateUnreadMessages()
         }
         inputBar.isUserInteractionEnabled = true
