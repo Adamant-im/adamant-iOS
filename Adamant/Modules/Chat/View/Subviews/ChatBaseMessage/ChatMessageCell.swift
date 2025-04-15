@@ -116,8 +116,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
                 isSelected,
                 originalColor: model.backgroundColor.uiColor
             )
-            UIPasteboard.general.string = self.model.text.string
-            self.copyNotification?()
+            if isSelected {
+                UIPasteboard.general.string = self.model.text.string
+                self.copyNotification?()
+            }
         }
     }
 

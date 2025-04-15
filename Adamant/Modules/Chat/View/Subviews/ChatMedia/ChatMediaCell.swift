@@ -41,7 +41,7 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
     override var isSelected: Bool {
         didSet {
             containerMediaView.isSelected = isSelected
-            if model.content.comment.string != "" {
+            if isSelected && model.content.comment.string != "" {
                 UIPasteboard.general.string = model.content.comment.string
                 copyNotification?()
             }
