@@ -19,6 +19,7 @@ struct ChatViewControllerState {
     var isAutoScrolling = false
     var isAppActive = true
     var isScrollingToBottom = false
+    var shouldScrollToNewMessages = true
     
     //calculation for animation, might use for something else in the future
     var isAnimationAllowed: Bool {
