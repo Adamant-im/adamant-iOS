@@ -357,6 +357,7 @@ final class ChatViewModel: NSObject {
             guard await validateSendingMessage(message: message) else { return }
 
             replyMessage = nil
+            inputText = ""
 
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -1117,7 +1118,8 @@ extension ChatViewModel {
 
         self.replyMessage = nil
         self.filesPicked = nil
-
+        self.inputText = ""
+        
         try await chatFileService.sendFile(
             text: text,
             chatroom: chatroom,
