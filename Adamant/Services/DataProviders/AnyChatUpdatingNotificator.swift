@@ -10,7 +10,7 @@ import CommonKit
 import Foundation
 
 protocol AnyChatUpdatingNotificator {
-    var needToShowChatUpdateSpinnerObeserver: AnyObservable<Bool> { get }
+    var needToShowChatUpdateSpinnerObserver: AnyObservable<Bool> { get }
     
     func updateLastUpdateTime()
     func startMonitoring()
