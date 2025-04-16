@@ -1198,10 +1198,10 @@ extension ChatViewModel {
             .store(in: &subscriptions)
 
         Task {
-            await chatsProvider.stateObserver
+            await chatsProvider.isUpdatingOvertiming
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] state in
-                    self?.isHeaderLoading = state.isUpdating
+                .sink { [weak self] in
+                    self?.isHeaderLoading = $0
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
