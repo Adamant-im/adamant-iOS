@@ -91,6 +91,7 @@ final class ChatViewModel: NSObject {
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var cellIdForAnimation: String?
+    var animationType: MessageAnimationType?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -135,7 +136,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToIdAndPosition: String?
+    @ObservableValue var scrollToId: String?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -227,9 +228,11 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false
+        isNewChat: Bool = false,
+        messageAnimationType: MessageAnimationType = MessageAnimationType.none
     ) {
         self.messageIdToShow = messageIdToShow
+        animationType = messageAnimationType
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -545,7 +548,7 @@ final class ChatViewModel: NSObject {
                 }
 
                 await waitForMessage(withId: messageId)
-                scrollToIdAndPosition = messageId
+                scrollToId = messageId
                 
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
@@ -1994,4 +1997,10 @@ extension ChatViewModel: ElegantEmojiPickerDelegate {
             reactAction(previousArg.messageId, emoji: emoji)
         }
     }
+}
+
+enum MessageAnimationType {
+    case message
+    case reaction
+    case none
 }

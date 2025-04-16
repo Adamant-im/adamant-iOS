@@ -437,7 +437,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil,
-        newChat: Bool = false
+        newChat: Bool = false,
+        animateMessageType: MessageAnimationType = MessageAnimationType.none
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
@@ -445,7 +446,8 @@ final class ChatListViewController: KeyboardObservingViewController {
             account: accountService.account,
             chatroom: chatroom,
             messageIdToShow: messageId,
-            isNewChat: newChat
+            isNewChat: newChat,
+            messageAnimationType: animateMessageType
         )
 
         return vc
@@ -958,23 +960,27 @@ extension ChatListViewController {
                 message: text?.string,
                 image: image
             ) { [weak self] in
-                self?.presentChatroom(chatroom, with: self?.messageId(transaction: transaction))
+                guard let self else { return }
+                let idAndAnimationType: (String, MessageAnimationType) = self.messageId(transaction: transaction)
+                
+                self.presentChatroom(chatroom, with: idAndAnimationType.0, animationType: idAndAnimationType.1)
             }
         }
     }
 
-    private func messageId(transaction: ChatTransaction) -> String? {
-        if let richTransaction = transaction as? RichMessageTransaction {
-            return richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) ?? richTransaction.transactionId
+    private func messageId(transaction: ChatTransaction) -> (String, MessageAnimationType) {
+        if let richTransaction = transaction as? RichMessageTransaction,
+           let reactToId = richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) {
+            return (reactToId, .reaction)
         } else {
-            return transaction.transactionId
+            return (transaction.transactionId, .message)
         }
     }
 
     @MainActor
-    func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
+    func presentChatroom(_ chatroom: Chatroom, with message: String? = nil, animationType: MessageAnimationType) {
         // MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom, with: message)
+        let vc = chatViewController(for: chatroom, with: message, animateMessageType: animationType)
 
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController: vc)
@@ -1606,7 +1612,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
 
-            presenter.presentChatroom(chatroom, with: message.transactionId)
+            presenter.presentChatroom(chatroom, with: message.transactionId, animationType: .message)
         }
     }
 
@@ -1624,7 +1630,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
 
-            presenter.presentChatroom(chatroom)
+            presenter.presentChatroom(chatroom, animationType: .none)
         }
     }
 

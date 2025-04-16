@@ -9,4 +9,5 @@ import Foundation
 
 protocol ChatCellProtocol {
     func animateMessageHighlight()
+    func animateReactionHighlight()
 }

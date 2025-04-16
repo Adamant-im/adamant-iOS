@@ -127,6 +127,10 @@ extension ChatMediaCell {
 }
 
 extension ChatMediaCell: ChatCellProtocol {
+    func animateReactionHighlight() {
+        containerMediaView.animateReactionHighlight()
+    }
+    
     func animateMessageHighlight() {
         containerMediaView.animateMediaHighlight()
     }

@@ -248,6 +248,10 @@ extension ChatMediaContainerView {
     func animateMediaHighlight() {
         contentView.animateHighlightOverlay()
     }
+    
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
+    }
 }
 
 extension ChatMediaContainerView: ChatMenuManagerDelegate {
