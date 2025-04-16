@@ -56,7 +56,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
     
     private let chatUpdatingNotificator: AnyChatUpdatingNotificator
-    var isUpdatingOvertiming: AnyObservable<Bool> { chatUpdatingNotificator.needToShowChatUpdateSpinnerObeserver }
+    var isUpdatingOvertiming: AnyObservable<Bool> { chatUpdatingNotificator.needToShowChatUpdateSpinnerObserver }
 
     private(set) var isInitiallySynced: Bool = false {
         didSet {
