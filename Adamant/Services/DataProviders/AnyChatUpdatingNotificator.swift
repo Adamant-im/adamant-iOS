@@ -25,7 +25,7 @@ final class ChatUpdatingNotificator: AnyChatUpdatingNotificator {
         lastUpdate?.addingTimeInterval(AppDelegate.Constants.updateChatsInterval + 3)
     }
     
-    var needToShowChatUpdateSpinnerObeserver: AnyObservable<Bool> { $needToShowChatUpdateSpinner.eraseToAnyPublisher() }
+    var needToShowChatUpdateSpinnerObserver: AnyObservable<Bool> { $needToShowChatUpdateSpinner.eraseToAnyPublisher() }
     
     init() {}
     
