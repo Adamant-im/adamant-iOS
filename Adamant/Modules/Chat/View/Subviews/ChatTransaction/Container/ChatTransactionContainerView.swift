@@ -128,6 +128,8 @@ final class ChatTransactionContainerView: UIView {
             contentView.isSelected = isSelected
         }
     }
+    private var taskManager = TaskManager()
+    private var didCopy = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -198,16 +200,28 @@ extension ChatTransactionContainerView {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
     }
     
-    @objc fileprivate func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            didCopy = false
             contentView.animatePressDown()
             
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
+                
+                guard let self = self,
+                      gesture.state == .began || gesture.state == .changed else { return }
+                
+                await MainActor.run {
+                    self.longPressCopyAction()
+                    self.didCopy = true
+                }
+            }.stored(in: taskManager)
+            
         case .ended:
-            contentView.animatePressUp()
-            if let comment = model.content.comment, !comment.isEmpty {
-                UIPasteboard.general.string = comment
-                copyNotification?()
+            if !didCopy {
+                taskManager.clean()
+                longPressCopyAction()
             }
             
         case .cancelled, .failed:
@@ -215,6 +229,14 @@ extension ChatTransactionContainerView {
             
         default:
             break
+        }
+    }
+    
+    fileprivate func longPressCopyAction() {
+        contentView.animatePressUp()
+        if let comment = model.content.comment, !comment.isEmpty {
+            UIPasteboard.general.string = comment
+            copyNotification?()
         }
     }
 
