@@ -10,7 +10,7 @@ import CommonKit
 import Foundation
 
 final class RepeaterService {
-    private class Client: @unchecked Sendable {
+    private final class Client: @unchecked Sendable {
         let interval: TimeInterval
         let queue: DispatchQueue?
         var timer: Timer?

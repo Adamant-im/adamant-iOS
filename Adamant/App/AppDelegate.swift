@@ -175,7 +175,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // MARK: 6 Reachability & Autoupdate
-        repeater = RepeaterService()
+        repeater = container.resolve(RepeaterService.self)
 
         // Configure reachability
         if let reachability = container.resolve(ReachabilityMonitor.self) {
@@ -257,11 +257,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
-
-        if let accountService = container.resolve(AccountService.self) {
-            repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
-        } else {
-            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
+        
+        // Setup wallet auto update
+        if let service = container.resolve(WalletAutoUpdateService.self) {
+            Task { await service.start()}
         }
 
         if let addressBookService = container.resolve(AddressBookService.self) {

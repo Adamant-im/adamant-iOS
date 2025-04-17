@@ -488,6 +488,18 @@ struct AppAssembly: MainThreadAssembly {
                 wallet.injectDependencies(from: container)
             }
         }
+        
+        container.register(RepeaterService.self){ _ in 
+            RepeaterService()
+        }.inObjectScope(.container)
+                           
+        container.register(WalletAutoUpdateService.self) {
+            WalletAutoUpdateService(
+                visibleWalletService: $0.resolve(VisibleWalletsService.self)!,
+                walletStoreServiceProvider: $0.resolve(WalletStoreServiceProviderProtocol.self)!,
+                repeaterService: $0.resolve(RepeaterService.self)!
+            )
+        }.inObjectScope(.container)
 
         // MARK: ApiService Compose
         container.register(ApiServiceComposeProtocol.self) {
