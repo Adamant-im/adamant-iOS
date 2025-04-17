@@ -23,6 +23,7 @@ actor WalletAutoUpdateService {
     private let repeaterService: RepeaterService
     
     private var cancellables = Set<AnyCancellable>()
+    private var notificationCancellables = Set<AnyCancellable>()
     private var walletsRepetitions = Set<String>()
     
     init(
@@ -45,7 +46,17 @@ actor WalletAutoUpdateService {
                     await self.setup()
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &notificationCancellables)
+        
+        NotificationCenter.default
+            .notifications(named: .AdamantAccountService.userLoggedOut)
+            .sink { [weak self] _ in
+                Task {
+                    guard let self = self else { return }
+                    await self.removeState()
+                }
+            }
+            .store(in: &notificationCancellables)
     }
     
     private func setup() async {
@@ -103,6 +114,14 @@ actor WalletAutoUpdateService {
             print("unregistering: \(id)")
             repeaterService.unregisterForegroundCall(label: id)
         }
+    }
+    
+    func removeState() {
+        for id in walletsRepetitions {
+            repeaterService.unregisterForegroundCall(label: id)
+        }
+        walletsRepetitions.removeAll()
+        cancellables.removeAll()
     }
     
     private func getTimeIntervalFor(wallet: WalletCoreProtocol) -> TimeInterval {
