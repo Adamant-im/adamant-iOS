@@ -353,7 +353,7 @@ final class ChatListViewController: KeyboardObservingViewController {
             }
             .store(in: &subscriptions)
         
-        chatPreservation.forseUpdateNotifier
+        chatPreservation.forceUpdateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 guard let index = self?.tableView.indexPathForSelectedRow,

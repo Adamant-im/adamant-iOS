@@ -17,7 +17,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
 
     var updateNotifier = ObservableSender<Void>()
-    var forseUpdateNotifier = ObservableSender<Void>()
+    var forceUpdateNotifier = ObservableSender<Void>()
     
     init() {
         NotificationCenter.default
@@ -77,7 +77,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         }
         
         if isForsedUpdate {
-            forseUpdateNotifier.send()
+            forceUpdateNotifier.send()
         }
     }
 

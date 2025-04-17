@@ -10,7 +10,7 @@ import CommonKit
 
 protocol ChatPreservationProtocol: AnyObject, Sendable {
     var updateNotifier: ObservableSender<Void> { get }
-    var forseUpdateNotifier: ObservableSender<Void> { get }
+    var forceUpdateNotifier: ObservableSender<Void> { get }
     func getPreservedMessageFor(address: String) -> String?
     func getReplyMessage(address: String) -> MessageModel?
     func preserveChatState(message: String?, replyMessage: MessageModel?, files: [FileResult]?, forAddress address: String, isForsedUpdate: Bool)

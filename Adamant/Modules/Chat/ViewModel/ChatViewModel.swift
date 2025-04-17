@@ -383,9 +383,9 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
 
-    func preserveMessage(_ message: String, isForseUpdate: Bool = false) {
+    func preserveMessage(_ message: String, isForceUpdate: Bool = false) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForseUpdate)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForceUpdate)
     }
 
     func blockChat() {
@@ -1289,7 +1289,7 @@ extension ChatViewModel {
             .debounce(for: .seconds(10), scheduler: DispatchQueue.main)
             .sink { [weak self] text in
                 guard let self else { return }
-                self.preserveMessage(inputText, isForseUpdate: true)
+                self.preserveMessage(inputText, isForceUpdate: true)
             }
             .store(in: &subscriptions)
     }
