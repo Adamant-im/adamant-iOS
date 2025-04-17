@@ -374,19 +374,29 @@ extension AdamantChatsProvider {
             senderId: address,
             privateKey: privateKey
         )
-
-        if !isInitiallySynced {
-            isInitiallySynced = true
-            preLoadChats(array, address: address)
-        }
+        
+        isInitiallySynced = true
+        preLoadChats(array, address: address)
 
         setState(.upToDate, previous: prevState)
     }
 
     func preLoadChats(_ array: [Transaction], address: String) {
-        let preLoadChatsCount = preLoadChatsCount
-        array.prefix(preLoadChatsCount).forEach { transaction in
-            let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+        let prioritized = array.filter { transaction in
+            removedMessages.contains(String(transaction.id))
+        }
+
+        let regular = array.filter { transaction in
+            !removedMessages.contains(String(transaction.id))
+        }.prefix(preLoadChatsCount)
+
+        let preloadList = prioritized + regular
+
+        for transaction in preloadList {
+            let recipientAddress = transaction.recipientId == address
+                ? transaction.senderId
+                : transaction.recipientId
+
             Task {
                 let isChatLoading = isChatLoading(with: recipientAddress)
                 guard !isChatLoading else { return }
