@@ -31,9 +31,7 @@ final class ChatUpdatingNotificator: AnyChatUpdatingNotificator {
     
     func updateLastUpdateTime() {
         self.lastUpdate = .init()
-        if needToShowChatUpdateSpinner {
-            needToShowChatUpdateSpinner = false
-        }
+        needToShowChatUpdateSpinner = false
     }
     
     func startMonitoring() {
