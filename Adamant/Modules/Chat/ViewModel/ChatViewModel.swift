@@ -117,6 +117,7 @@ final class ChatViewModel: NSObject {
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
     let messagesUpdated = ObservableSender<Void>()
+    let draftSender = ObservableSender<Void>()
 
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -382,9 +383,9 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
 
-    func preserveMessage(_ message: String) {
+    func preserveMessage(_ message: String, isForseUpdate: Bool = false) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForseUpdate)
     }
 
     func blockChat() {
@@ -1260,6 +1261,36 @@ extension ChatViewModel {
         didUpdateCoreData
             .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
+            .store(in: &subscriptions)
+        
+        undateDraftSubscription()
+    }
+    
+    fileprivate func undateDraftSubscription() {
+        $inputText
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $replyMessage
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $filesPicked
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        draftSender
+            .debounce(for: .seconds(10), scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self else { return }
+                self.preserveMessage(inputText, isForseUpdate: true)
+            }
             .store(in: &subscriptions)
     }
     
