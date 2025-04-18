@@ -9,14 +9,20 @@
 import Foundation
 import Combine
 
-/// Actor responsible for managing and scheduling automatic wallet updates.
+/// Actor responsible for orchestrating automatic wallet updates throughout the app lifecycle.
 ///
-/// Listens to two primary event streams:
-/// 1. `visibleWalletService.statePublisher` — adjusts the set of active update tasks whenever wallet visibility changes.
-/// 2. `walletStoreServiceProvider.currentWalletPublisher` — fully reinitializes all update tasks whenever the underlying wallet list changes.
+/// After you call `start()`, it listens for:
+/// 1. **Login / Logout** via NotificationCenter:
+///    - On login it waits 0.5 s and then sets up subscriptions.
+///    - On logout it tears down all scheduling state.
+/// 2. **Wallet list changes** via `walletStoreServiceProvider.currentWalletPublisher`:
+///    - Fully reinitializes its internal wallet registry whenever the set of available wallets changes.
+/// 3. **Visibility changes** via `visibleWalletService.statePublisher`:
+///    - Adjusts which wallets are actively scheduled for periodic updates.
 ///
-/// For each visible wallet, uses `repeaterService` to register or unregister a background callback
-/// `updateWithRefreshUIBalance()` at an interval determined by the wallet’s type.
+/// For each visible wallet, it uses `repeaterService` to register a recurring `update()` call at a
+/// wallet‑type‑specific interval (shorter for new ADM accounts, longer for BTC/KLY, etc.), and
+/// unregisters any tasks when wallets go out of scope or the user logs out.
 actor WalletAutoUpdateService {
     private let visibleWalletService: VisibleWalletsService
     private let walletStoreServiceProvider: WalletStoreServiceProviderProtocol
@@ -103,8 +109,7 @@ actor WalletAutoUpdateService {
                 interval: getTimeIntervalFor(wallet: core),
                 queue: .global(qos: .utility),
                 callback: {
-                    print("[\(Date())] " + "updating wallet: \(id)" + "\n----------------------")
-                    core.updateWithRefreshUIBalance()
+                    core.update()
                 }
             )
         }
@@ -115,7 +120,6 @@ actor WalletAutoUpdateService {
         
         let toRemove = oldReps.subtracting(newReps)
         for id in toRemove {
-            print("unregistering: \(id)")
             repeaterService.unregisterForegroundCall(label: id)
         }
     }
@@ -132,31 +136,38 @@ actor WalletAutoUpdateService {
         switch wallet {
             case is AdmWalletService:
                 if let isNewAccount = accountService.account?.isNewAccount, isNewAccount {
-                    return WalletsUpdateConstants.admNewAccount.rawValue
+                    return WalletsUpdateConstants.admNewAccount.interval
                 }
-                return WalletsUpdateConstants.adm.rawValue
+                return WalletsUpdateConstants.adm.interval
             case is EthWalletService:
-                return WalletsUpdateConstants.erc20.rawValue
+                return WalletsUpdateConstants.erc20.interval
             case is ERC20WalletService:
-                return WalletsUpdateConstants.erc20.rawValue
+                return WalletsUpdateConstants.erc20.interval
             case is DashWalletService:
-                return WalletsUpdateConstants.dash.rawValue
+                return WalletsUpdateConstants.dash.interval
             case is DogeWalletService:
-                return WalletsUpdateConstants.doge.rawValue
+                return WalletsUpdateConstants.doge.interval
             case is BtcWalletService:
-                return WalletsUpdateConstants.btc.rawValue
+                return WalletsUpdateConstants.btc.interval
             case is KlyWalletService:
-                return WalletsUpdateConstants.kly.rawValue
+                return WalletsUpdateConstants.kly.interval
             default:
                 return 50
         }
     }
     
-    private enum WalletsUpdateConstants: TimeInterval {
-        case adm = 5
-        case erc20, dash = 25
-        case doge = 30
-        case btc, kly = 50
-        case admNewAccount = 2
+    private enum WalletsUpdateConstants {
+        case adm, erc20, dash, doge, btc, kly, admNewAccount
+        
+        var interval: TimeInterval {
+            switch self {
+                case .adm:              return 5
+                case .erc20, .dash:     return 25
+                case .doge:             return 30
+                case .btc, .kly:        return 50
+                case .admNewAccount:    return 2
+            }
+        }
     }
+
 }
