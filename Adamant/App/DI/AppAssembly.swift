@@ -497,7 +497,8 @@ struct AppAssembly: MainThreadAssembly {
             WalletAutoUpdateService(
                 visibleWalletService: $0.resolve(VisibleWalletsService.self)!,
                 walletStoreServiceProvider: $0.resolve(WalletStoreServiceProviderProtocol.self)!,
-                repeaterService: $0.resolve(RepeaterService.self)!
+                repeaterService: $0.resolve(RepeaterService.self)!, 
+                accountService: $0.resolve(AccountService.self)!
             )
         }.inObjectScope(.container)
 

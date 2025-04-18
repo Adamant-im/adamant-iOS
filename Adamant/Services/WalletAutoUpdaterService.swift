@@ -22,18 +22,22 @@ actor WalletAutoUpdateService {
     private let walletStoreServiceProvider: WalletStoreServiceProviderProtocol
     private let repeaterService: RepeaterService
     
+    private let accountService: AccountService
+    
     private var cancellables = Set<AnyCancellable>()
     private var notificationCancellables = Set<AnyCancellable>()
     private var walletsRepetitions = Set<String>()
     
-    init(
+   init(
         visibleWalletService: VisibleWalletsService,
         walletStoreServiceProvider: WalletStoreServiceProviderProtocol,
-        repeaterService: RepeaterService
+        repeaterService: RepeaterService,
+        accountService: AccountService
     ) {
         self.visibleWalletService = visibleWalletService
         self.walletStoreServiceProvider = walletStoreServiceProvider
         self.repeaterService = repeaterService
+        self.accountService = accountService
     }
     
     func start(){
@@ -127,6 +131,9 @@ actor WalletAutoUpdateService {
     private func getTimeIntervalFor(wallet: WalletCoreProtocol) -> TimeInterval {
         switch wallet {
             case is AdmWalletService:
+                if let isNewAccount = accountService.account?.isNewAccount, isNewAccount {
+                    return WalletsUpdateConstants.admNewAccount.rawValue
+                }
                 return WalletsUpdateConstants.adm.rawValue
             case is EthWalletService:
                 return WalletsUpdateConstants.erc20.rawValue
