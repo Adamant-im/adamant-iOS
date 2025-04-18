@@ -54,7 +54,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var isLoading = false
     var messageIdToShow: String?
-    var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
 
@@ -136,6 +135,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToIdAndPosition: String?
+    @ObservableValue var separatorIndex: Int?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -1322,13 +1322,13 @@ extension ChatViewModel {
 
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
-            updateSeparatorId()
             postProcess(messages: &messages)
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            updateSeparatorId()
             messagesUpdated.send()
         }
     }
