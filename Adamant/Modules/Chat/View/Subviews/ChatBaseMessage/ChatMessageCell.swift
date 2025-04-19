@@ -116,6 +116,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
                 isSelected,
                 originalColor: model.backgroundColor.uiColor
             )
+            if isSelected {
+                UIPasteboard.general.string = self.model.text.string
+                self.copyNotification?()
+            }
         }
     }
 
@@ -127,6 +131,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
+    private var taskManager = TaskManager()
+    private var didCopy = false
 
     // MARK: - Methods
 
@@ -489,19 +495,39 @@ private extension ChatMessageCell {
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            didCopy = false
             messageContainerView.animatePressDown()
             
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
+                
+                guard let self = self,
+                      gesture.state == .began || gesture.state == .changed else { return }
+                
+                await MainActor.run {
+                    self.longPressCopyAction()
+                    self.didCopy = true
+                }
+            }.stored(in: taskManager)
+            
         case .ended:
-            messageContainerView.animatePressUp()
-            UIPasteboard.general.string = model.text.string
-            copyNotification?()
-
+            if !didCopy {
+                taskManager.clean()
+                longPressCopyAction()
+            }
+            
         case .cancelled, .failed:
             messageContainerView.animatePressUp()
-
+            
         default:
             break
         }
+    }
+    
+    private func longPressCopyAction() {
+        self.messageContainerView.animatePressUp()
+        UIPasteboard.general.string = self.model.text.string
+        self.copyNotification?()
     }
 }
 

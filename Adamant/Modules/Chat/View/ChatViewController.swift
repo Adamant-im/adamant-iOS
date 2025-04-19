@@ -430,6 +430,7 @@ extension ChatViewController {
                 guard let id = $0
                 else { return }
                 self?.scrollToPosition(.messageId(id), animated: true)
+                self?.state.shouldScrollToNewMessages = false
                 self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
@@ -526,6 +527,19 @@ extension ChatViewController {
         viewModel.showBuyAndSell
             .sink { [weak self] in
                 self?.presentBuyAndSell()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$separatorIndex
+            .removeDuplicates()
+            .sink { [weak self] index in
+                guard let self = self,
+                      let index,
+                      index < self.messagesCollectionView.numberOfSections else { return }
+
+                self.messagesCollectionView.performBatchUpdates {
+                    self.messagesCollectionView.reloadSections(IndexSet(integer: index))
+                }
             }
             .store(in: &subscriptions)
     }
@@ -771,13 +785,14 @@ extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         if !state.isMessagesLoaded {
             viewModel.startPosition.map { scrollToPosition($0) }
+            state.shouldScrollToNewMessages = false
         }
     }
 
     fileprivate func updateMessagesPosition() {
         guard !state.isMessagesLoaded, !viewModel.messages.isEmpty else { return }
         state.isMessagesLoaded = true
-        if viewModel.messageIdToShow == nil {
+        if state.shouldScrollToNewMessages {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: true, scrollAt: .top)

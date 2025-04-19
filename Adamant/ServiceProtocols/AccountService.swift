@@ -172,7 +172,7 @@ protocol AccountService: AnyObject, Sendable {
     func loginWithStoredAccount() async throws -> AccountServiceResult
 
     /// Logout
-    func logout()
+    @MainActor func logout() async
 
     /// Reload current wallets state
     func reloadWallets() async

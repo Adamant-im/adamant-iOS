@@ -54,7 +54,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var isLoading = false
     var messageIdToShow: String?
-    var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
 
@@ -118,6 +117,7 @@ final class ChatViewModel: NSObject {
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
     let messagesUpdated = ObservableSender<Void>()
+    let draftSender = ObservableSender<Void>()
 
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -137,6 +137,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToId: String?
+    @ObservableValue var separatorIndex: Int?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -360,6 +361,7 @@ final class ChatViewModel: NSObject {
             guard await validateSendingMessage(message: message) else { return }
 
             replyMessage = nil
+            inputText = ""
 
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -384,9 +386,9 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
 
-    func preserveMessage(_ message: String) {
+    func preserveMessage(_ message: String, isForceUpdate: Bool = false) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForceUpdate)
     }
 
     func blockChat() {
@@ -1120,7 +1122,8 @@ extension ChatViewModel {
 
         self.replyMessage = nil
         self.filesPicked = nil
-
+        self.inputText = ""
+        
         try await chatFileService.sendFile(
             text: text,
             chatroom: chatroom,
@@ -1201,10 +1204,10 @@ extension ChatViewModel {
             .store(in: &subscriptions)
 
         Task {
-            await chatsProvider.stateObserver
+            await chatsProvider.isUpdatingOvertiming
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] state in
-                    self?.isHeaderLoading = state.isUpdating
+                .sink { [weak self] in
+                    self?.isHeaderLoading = $0
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
@@ -1261,6 +1264,36 @@ extension ChatViewModel {
         didUpdateCoreData
             .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
+            .store(in: &subscriptions)
+        
+        undateDraftSubscription()
+    }
+    
+    fileprivate func undateDraftSubscription() {
+        $inputText
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $replyMessage
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $filesPicked
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        draftSender
+            .debounce(for: .seconds(10), scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self else { return }
+                self.preserveMessage(inputText, isForceUpdate: true)
+            }
             .store(in: &subscriptions)
     }
     
@@ -1323,13 +1356,13 @@ extension ChatViewModel {
 
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
-            updateSeparatorId()
             postProcess(messages: &messages)
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            updateSeparatorId()
             messagesUpdated.send()
         }
     }

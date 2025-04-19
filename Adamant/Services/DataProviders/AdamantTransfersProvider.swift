@@ -27,6 +27,8 @@ actor AdamantTransfersProvider: TransfersProvider {
 
     @ObservableValue private(set) var state: DataProviderState = .empty
     var stateObserver: AnyObservable<DataProviderState> { $state.eraseToAnyPublisher() }
+    var isUpdatingOvertiming: CommonKit.AnyObservable<Bool> { $state.map { _ in false }.eraseToAnyPublisher() }
+    
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?

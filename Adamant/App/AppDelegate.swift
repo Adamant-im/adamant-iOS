@@ -47,6 +47,12 @@ extension StoreKey {
     }
 }
 
+extension AppDelegate {
+    enum Constants {
+        static let updateChatsInterval: TimeInterval = 10
+    }
+}
+
 // MARK: - Application
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -224,7 +230,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(
                 label: "chatsProvider",
-                interval: 10,
+                interval: Constants.updateChatsInterval,
                 queue: .global(qos: .utility),
                 callback: {
                     Task {

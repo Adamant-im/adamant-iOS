@@ -248,62 +248,61 @@ extension AdamantRichTransactionReplyService {
         guard let address = accountService.account?.address else {
             throw ApiServiceError.accountNotFound
         }
-
+        
         let isOut = transaction.senderId == address
-
+        
         let transactionStatus =
-            isOut
-            ? String.adamant.chat.transactionSent
-            : String.adamant.chat.transactionReceived
-
+        isOut
+        ? String.adamant.chat.transactionSent
+        : String.adamant.chat.transactionReceived
+        
         var message: String
-
+        
         switch transaction {
-        case let trs as MessageTransaction:
-            message = trs.message ?? ""
-        case let trs as TransferTransaction:
-            let trsComment = trs.comment ?? ""
-            let comment =
+            case let trs as MessageTransaction:
+                message = trs.message ?? ""
+            case let trs as TransferTransaction:
+                let trsComment = trs.comment ?? ""
+                let comment =
                 !trsComment.isEmpty
                 ? ": \(trsComment)"
                 : ""
-
-            message = "\(transactionStatus) \(trs.amount ?? 0.0) \(AdmWalletService.currencySymbol)\(comment)"
-        case let trs as RichMessageTransaction:
-            if let replyMessage = trs.getRichValue(for: RichContentKeys.reply.replyMessage) {
-                message = replyMessage
-                break
-            }
-
-            if let richContent = trs.richContent,
-                let transfer = RichMessageTransfer(content: richContent)
-            {
-                let comment =
+                
+                message = "\(transactionStatus) \(trs.amount ?? 0.0) \(AdmWalletService.currencySymbol)\(comment)"
+            case let trs as RichMessageTransaction:
+                if let replyMessage = trs.getRichValue(for: RichContentKeys.reply.replyMessage) {
+                    message = replyMessage
+                    break
+                }
+                
+                if let richContent = trs.richContent,
+                   let transfer = RichMessageTransfer(content: richContent)
+                {
+                    let comment =
                     !transfer.comments.isEmpty
                     ? ": \(transfer.comments)"
                     : ""
-
-                let humanType =
+                    
+                    let humanType =
                     walletServiceCompose.getWallet(
                         by: transfer.type
                     )?.core.tokenSymbol ?? transfer.type
-
-                message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
-                break
-            }
-
-            if let richContent = trs.richContent,
-                trs.getRichValue(for: RichContentKeys.file.files) != nil
-            {
-                message = FilePresentationHelper.getFilePresentationText(richContent)
-                break
-            }
-
-            message = unknownErrorMessage
-        default:
-            message = unknownErrorMessage
+                    
+                    message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
+                    break
+                }
+                
+                if let richContent = trs.richContent,
+                   let _: [[String: Any]] = trs.getRichValue(for: RichContentKeys.file.files) {
+                    message = FilePresentationHelper.getFilePresentationText(richContent)
+                    break
+                }
+                
+                message = unknownErrorMessage
+            default:
+                message = unknownErrorMessage
         }
-
+        
         return MessageProcessHelper.process(message)
     }
 

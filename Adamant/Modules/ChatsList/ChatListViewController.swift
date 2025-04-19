@@ -333,23 +333,32 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
 
         Task {
-            let chatsProviderState = await chatsProvider.stateObserver
-            let transfersProviderState = await transfersProvider.stateObserver
+            let chatsProviderState = await chatsProvider.isUpdatingOvertiming
 
             chatsProviderState
-                .combineLatest(transfersProviderState)
-                .map { $0.0.isUpdating || $0.1.isUpdating }
-                .removeDuplicates()
-                .values
-                .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    self?.setIsStateUpdating($0)
+                }
                 .store(in: &subscriptions)
         }
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 guard let deselectedIndex = self?.chatDeselectedIndex,
-                    let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
-                    let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row]
+                      let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+                      let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row]
+                else { return }
+                self?.configureCell(cell, for: chatroom)
+            }
+            .store(in: &subscriptions)
+        
+        chatPreservation.forceUpdateNotifier
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let index = self?.tableView.indexPathForSelectedRow,
+                          let cell = self?.tableView.cellForRow(at: index) as? ChatTableViewCell,
+                          let chatroom = self?.chatsController?.fetchedObjects?[safe: index.row]
                 else { return }
                 self?.configureCell(cell, for: chatroom)
             }
@@ -580,6 +589,8 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if !isMacOS { chatDeselectedIndex = indexPath }
+        
         if isBusy,
             indexPath.row == lastSystemChatPositionRow,
             let cell = tableView.cellForRow(at: indexPath),
