@@ -592,7 +592,10 @@ extension ChatMessageCell {
 
 extension ChatMessageCell: ChatCellProtocol {
     func animateMessageHighlight() {
-        messageContainerView.animateHighlight()
+        messageContainerView.animateHighlightOverlay()
+    }
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
     }
 }
 

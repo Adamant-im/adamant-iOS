@@ -708,7 +708,11 @@ extension ChatMessageReplyCell {
 
 extension ChatMessageReplyCell: ChatCellProtocol {
     func animateMessageHighlight() {
-        messageContainerView.animateHighlight()
+        messageContainerView.animateHighlightOverlay()
+    }
+    
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
     }
 }
 

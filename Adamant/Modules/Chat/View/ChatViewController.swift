@@ -425,7 +425,7 @@ extension ChatViewController {
             .sink { [weak self] in self?.processFileToolbarView($0) }
             .store(in: &subscriptions)
 
-        viewModel.$scrollToIdAndPosition
+        viewModel.$scrollToId
             .sink { [weak self] in
                 guard let id = $0
                 else { return }
@@ -794,6 +794,7 @@ extension ChatViewController {
         state.isMessagesLoaded = true
         if state.shouldScrollToNewMessages {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
+                viewModel.animationType = MessageAnimationType.none
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: true, scrollAt: .top)
             }
         }
@@ -877,6 +878,7 @@ extension ChatViewController {
                 state.isScrollingToBottom = true
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
+                viewModel.animationType = MessageAnimationType.none
                 self.scrollToPosition(.messageId(id), animated: true)
                 viewModel.shouldScrollToBottom = true
             }
@@ -892,6 +894,7 @@ extension ChatViewController {
                 let unreadId = self.viewModel.messagesWithUnredReactionsIds?.last
             else { return }
             state.isAnimatingCellHighlight = false
+            viewModel.animationType = .reaction
             viewModel.scroll(to: unreadId)
         }
         button.alpha = 0
@@ -951,7 +954,9 @@ extension ChatViewController {
     }
 
     @MainActor
-    fileprivate func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false, setExtraOffset: Bool = false, scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
+    fileprivate func scrollToPosition(_ position: ChatStartPosition,
+                                      animated: Bool = false,
+                                      setExtraOffset: Bool = false, scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
         chatMessagesCollectionView.fixedBottomOffset = nil
 
         switch position {
@@ -980,7 +985,7 @@ extension ChatViewController {
                 at: scrollAt,
                 animated: animated
             )
-
+            
             if setExtraOffset && !animated {
                 if checkIfNeedExtraOffsetForUnreadMessages() {
                     setExtraOffsetForNewMessages()
@@ -988,10 +993,12 @@ extension ChatViewController {
                 state.isAutoScrolling = false
             }
 
-            viewModel.cellIdForAnimation =
-                needToAnimateCell
-                ? id
-                : nil
+            if viewModel.animationType != MessageAnimationType.none {
+                viewModel.cellIdForAnimation =
+                needToAnimateCell ? id : nil
+                //if we will not trigger didEndScrolling
+                animateCell(at: .init(item: .zero, section: index))
+            }
 
             guard animated else { break }
 
@@ -1309,9 +1316,18 @@ extension ChatViewController {
                 self.state.isAnimatingCellHighlight = false
                 return
             }
-            
-            cell.animateMessageHighlight()
-            self.viewModel.shortVibro()
+            switch viewModel.animationType {
+            case .message:
+                cell.animateMessageHighlight()
+                viewModel.shortVibro()
+            case .reaction:
+                cell.animateReactionHighlight()
+                viewModel.shortVibro()
+            case nil:
+                break
+            case .some(.none):
+                break
+            }
             self.viewModel.cellIdForAnimation = nil
             self.state.isAnimatingCellHighlight = false
         }
@@ -1324,3 +1340,4 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
+

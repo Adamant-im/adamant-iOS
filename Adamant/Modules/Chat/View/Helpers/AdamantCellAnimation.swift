@@ -35,21 +35,6 @@ extension UIView {
         layer.cornerRadius = cornerRadius
     }
     
-    func animateHighlight(
-        highlightColor: UIColor = UIColor.adamant.active.withAlphaComponent(0.5),
-        duration: TimeInterval = 2.5
-    ) {
-        let originalColor = self.backgroundColor
-        
-        UIView.animate(withDuration: 0.35, animations: {
-            self.backgroundColor = highlightColor
-        }, completion: { _ in
-            UIView.animate(withDuration: duration - 0.35) {
-                self.backgroundColor = originalColor
-            }
-        })
-    }
-    
     func animateHighlightOverlay(
         overlayColor: UIColor = UIColor.adamant.active.withAlphaComponent(0.5)
     ) {

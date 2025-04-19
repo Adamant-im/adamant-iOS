@@ -400,6 +400,10 @@ extension ChatTransactionContainerView {
 
 extension ChatTransactionContainerView {
     func animateTransactionHighlight() {
-        contentView.animateHighlight()
+        contentView.animateHighlightOverlay()
+    }
+    
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
     }
 }
