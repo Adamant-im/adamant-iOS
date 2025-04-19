@@ -493,6 +493,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     @MainActor
     private func handleRefresh() async {
         defer { isRefreshing = false }
+        setIsStateUpdating(true)
         guard let result = await chatsProvider.update(notifyState: true) else { return }
 
         switch result {
