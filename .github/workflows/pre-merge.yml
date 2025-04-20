@@ -1,0 +1,15 @@
+name: Pre-merge Tests
+
+on:
+  pull_request_review:
+    types: [submitted]
+    branches: [ "develop" ]
+
+jobs:
+  trigger_tests:
+    if: |
+      github.event.review.state == 'approved' && 
+      github.event.pull_request.mergeable_state == 'clean'
+    uses: ./.github/workflows/test-execution.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
