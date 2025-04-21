@@ -340,6 +340,7 @@ extension ChatViewController {
         viewModel.messagesUpdated
             .sink { [weak self] _ in
                 self?.updateMessagesPosition()
+                self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
 
@@ -500,13 +501,6 @@ extension ChatViewController {
         viewModel.didTapSelectText
             .sink { [weak self] text in
                 self?.didTapSelectText(text: text)
-            }
-            .store(in: &subscriptions)
-
-        viewModel.$unreadMesaggesIndexes
-            .removeDuplicates()
-            .sink { [weak self] _ in
-                self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
 
