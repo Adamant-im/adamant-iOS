@@ -198,6 +198,7 @@ extension ChatDataSourceManager {
         case let .reply(id):
             viewModel.replyMessageIfNeeded(id: id)
         case let .scrollTo(message):
+            viewModel.animationType = .message
             viewModel.scroll(to: message.replyId)
         case let .copy(text):
             viewModel.copyMessageAction(text)
