@@ -7,5 +7,7 @@
 
 public enum UserDefaultsKey: String {
     case needsToShowNoActiveNodesAlert
-    case preferredPrimaryColumnWidthFraction
+    
+    case leftSplitViewController
+    case rightSplitViewController
 }

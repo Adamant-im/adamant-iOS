@@ -104,7 +104,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let tabScreens: TabScreens =
             UIScreen.main.traitCollection.userInterfaceIdiom == .pad
-            ? .splitControllers(makeSplitController(), makeSplitController())
+        ? .splitControllers(makeSplitController(storageKey: .leftSplitViewController), makeSplitController(storageKey: .rightSplitViewController))
             : .navigationControllers(chatList, account)
 
         tabScreens.viewControllers.0.tabBarItem.title = .adamant.tabItems.chats
@@ -763,17 +763,11 @@ private enum TabScreens {
 }
 
 @MainActor
-private func makeSplitController() -> UISplitViewController {
-    let controller = UISplitViewController()
+private func makeSplitController(storageKey: UserDefaultsKey) -> UISplitViewController {
+    let controller = AdamantSplitViewController()
+    controller.storageKey = storageKey
+    
     controller.preferredDisplayMode = .oneBesideSecondary
-    
-    @UserDefaultsStorage(.preferredPrimaryColumnWidthFraction) var preferredPrimaryColumnWidthFraction: Double?
-    
-    // We created our own AdamantSplitViewController (a custom subclass of UISplitViewController)
-    // so we can observe changes in the primary column's width and store that ratio in UserDefaults.
-    // Here, we retrieve the saved ratio for the primary column's width from UserDefaults.
-    // If no value has been stored yet, we default to 0.3337, which is roughly a 1:2 ratio.
-    controller.preferredPrimaryColumnWidthFraction = preferredPrimaryColumnWidthFraction ?? 0.3337
     
     let minimumPrimaryColumnWidth: CGFloat = UIScreen.main.bounds.width * 0.2
     // Set the minimum ratio to 1:5, or to 300px if 1:5 results in a smaller value
@@ -785,16 +779,18 @@ private func makeSplitController() -> UISplitViewController {
     return controller
 }
 
-final class AdamantSplitViewController: UISplitViewController {
-    private var fractionStorage = UserDefaultsStorage<Double>(.preferredPrimaryColumnWidthFraction)
+private final class AdamantSplitViewController: UISplitViewController {
+    var storageKey: UserDefaultsKey = .leftSplitViewController 
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        guard view.bounds.width > 0 else { return }
-        
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let stored = UserDefaults.standard.object(forKey: storageKey.rawValue) as? Double
+        preferredPrimaryColumnWidthFraction = stored ?? 0.3334
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
         let fraction = primaryColumnWidth / view.bounds.width
-        
-        fractionStorage.wrappedValue = fraction
+        UserDefaults.standard.set(fraction, forKey: storageKey.rawValue)
     }
 }
