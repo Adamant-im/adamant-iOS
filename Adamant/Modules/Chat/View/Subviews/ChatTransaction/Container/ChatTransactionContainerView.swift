@@ -207,7 +207,7 @@ extension ChatTransactionContainerView {
             contentView.animatePressDown()
             
             Task { [weak self] in
-                try? await Task.sleep(interval: 1)
+                try? await Task.sleep(interval: quickCopyInterval)
                 
                 guard let self = self,
                       gesture.state == .began || gesture.state == .changed else { return }
