@@ -597,7 +597,7 @@ private extension ChatMessageReplyCell {
             messageContainerView.animatePressDown()
             
             Task { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
+                try? await Task.sleep(interval: 1)
                 
                 guard let self = self,
                       gesture.state == .began || gesture.state == .changed else { return }
