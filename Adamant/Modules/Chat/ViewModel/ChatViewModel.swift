@@ -553,8 +553,8 @@ final class ChatViewModel: NSObject {
                 scrollToId = messageId
                 
                 dialog.send(.progress(false))
-                if let index = messages.firstIndex(where: { $0.id == messageId }) {
-                    markMessageAsRead(index: index)
+                if let chatroom {
+                    await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
             } catch {
                 print(error)
