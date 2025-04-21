@@ -162,6 +162,7 @@ protocol AccountService: AnyObject, Sendable {
 
     /// Update logged account info
     func update()
+    func updateOnlyADM()
     func updateWithRefreshUI()
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?)
 
@@ -172,7 +173,7 @@ protocol AccountService: AnyObject, Sendable {
     func loginWithStoredAccount() async throws -> AccountServiceResult
 
     /// Logout
-    func logout()
+    @MainActor func logout() async
 
     /// Reload current wallets state
     func reloadWallets() async

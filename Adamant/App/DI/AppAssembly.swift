@@ -53,6 +53,10 @@ struct AppAssembly: MainThreadAssembly {
                 notificationsService: r.resolve(NotificationsService.self)!
             )
         }.inObjectScope(.container)
+        
+        container.register(AnyChatUpdatingNotificator.self) { _ in
+            ChatUpdatingNotificator()
+        }.inObjectScope(.container)
 
         // MARK: Notifications
         container.register(NotificationsService.self) { r in
@@ -406,7 +410,8 @@ struct AppAssembly: MainThreadAssembly {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 SecureStore: r.resolve(SecureStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                chatUpdatingNotificator: r.resolve(AnyChatUpdatingNotificator.self)!
             )
         }.inObjectScope(.container)
 
@@ -483,6 +488,19 @@ struct AppAssembly: MainThreadAssembly {
                 wallet.injectDependencies(from: container)
             }
         }
+        
+        container.register(RepeaterService.self){ _ in 
+            RepeaterService()
+        }.inObjectScope(.container)
+                           
+        container.register(WalletAutoUpdateService.self) {
+            WalletAutoUpdateService(
+                visibleWalletService: $0.resolve(VisibleWalletsService.self)!,
+                walletStoreServiceProvider: $0.resolve(WalletStoreServiceProviderProtocol.self)!,
+                repeaterService: $0.resolve(RepeaterService.self)!, 
+                accountService: $0.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
 
         // MARK: ApiService Compose
         container.register(ApiServiceComposeProtocol.self) {

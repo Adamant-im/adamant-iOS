@@ -31,20 +31,22 @@ actor ChatMessagesListFactory {
 
         var processedTransactionIds: OrderedSet<String> = []
 
-        await withTaskGroup(of: [String].self) { group in
+        await withTaskGroup(of: String?.self) { group in
             for chatTransaction in transactions {
                 guard let transaction = chatTransaction as? RichMessageTransaction,
-                    transaction.additionalType == .reaction,
-                    transaction.isUnread
+                      transaction.additionalType == .reaction,
+                      transaction.isUnread
                 else { continue }
 
                 group.addTask { [weak self] in
-                    return await self?.coreDataRelationMapper.mapReactionRelationship(transaction: transaction) ?? []
+                    await self?.coreDataRelationMapper.mapReactionRelationship(transaction: transaction)
                 }
             }
 
             for await result in group {
-                processedTransactionIds.append(contentsOf: result)
+                if let id = result {
+                    processedTransactionIds.append(id)
+                }
             }
         }
         let transactionsWithoutReact = transactions.filter { chatTransaction in

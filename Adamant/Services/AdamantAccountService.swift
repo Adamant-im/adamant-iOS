@@ -225,6 +225,10 @@ extension AdamantAccountService {
     func update() {
         self.update(nil)
     }
+    
+    func updateOnlyADM() {
+        self.update(nil, updateOnlyADM: true)
+    }
 
     func updateAll() {
         update(nil, updateOnlyVisible: false)
@@ -238,7 +242,7 @@ extension AdamantAccountService {
         update(nil, updateOnlyVisible: true, shouldUpdateUIBalance: true)
     }
 
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool, shouldUpdateUIBalance: Bool = false) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
         switch state {
         case .notLogged, .isLoggingIn, .updating:
             return
@@ -253,8 +257,6 @@ extension AdamantAccountService {
         guard let loggedAccount = account, let publicKey = loggedAccount.publicKey else {
             return
         }
-
-        let wallets = walletServiceCompose.getWallets()
 
         Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
@@ -284,13 +286,17 @@ extension AdamantAccountService {
                 state = prevState
             }
         }
-
-        for wallet in wallets {
-            if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
-                if shouldUpdateUIBalance {
-                    wallet.core.updateWithRefreshUIBalance()
-                } else {
-                    wallet.core.update()
+        
+        if !updateOnlyADM {
+            let wallets = walletServiceCompose.getWallets()
+            
+            for wallet in wallets {
+                if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
+                    if shouldUpdateUIBalance {
+                        wallet.core.updateWithRefreshUIBalance()
+                    } else {
+                        wallet.core.update()
+                    }
                 }
             }
         }
@@ -386,7 +392,7 @@ extension AdamantAccountService {
 
         // Logout first
         case .updating, .loggedIn:
-            logout()
+            await logout()
 
         // Go login
         case .notLogged:
@@ -460,25 +466,24 @@ extension AdamantAccountService {
 
 // MARK: - Log Out
 extension AdamantAccountService {
-    func logout() {
-        Task { @MainActor in
-            if account != nil {
-                NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
-            }
-            
-            dropSavedAccount()
-            
-            let wasLogged = account != nil
-            account = nil
-            keypair = nil
-            passphrase = nil
-            state = .notLogged
-            await apiService.cancelCurrentTasks()
-            coreDataStack.clearCoreData()
-            
-            guard wasLogged else { return }
-            NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
+    @MainActor
+    func logout() async {
+        await apiService.cancelCurrentTasks()
+        
+        if account != nil {
+            NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
         }
+        
+        dropSavedAccount()
+        let wasLogged = account != nil
+        account = nil
+        keypair = nil
+        passphrase = nil
+        state = .notLogged
+        coreDataStack.clearCoreData()
+        
+        guard wasLogged else { return }
+        NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
     }
 }
 

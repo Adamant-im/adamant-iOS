@@ -333,23 +333,32 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
 
         Task {
-            let chatsProviderState = await chatsProvider.stateObserver
-            let transfersProviderState = await transfersProvider.stateObserver
+            let chatsProviderState = await chatsProvider.isUpdatingOvertiming
 
             chatsProviderState
-                .combineLatest(transfersProviderState)
-                .map { $0.0.isUpdating || $0.1.isUpdating }
-                .removeDuplicates()
-                .values
-                .sink { @MainActor [weak self] in self?.setIsStateUpdating($0) }
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    self?.setIsStateUpdating($0)
+                }
                 .store(in: &subscriptions)
         }
         chatPreservation.updateNotifier
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 guard let deselectedIndex = self?.chatDeselectedIndex,
-                    let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
-                    let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row]
+                      let cell = self?.tableView.cellForRow(at: deselectedIndex) as? ChatTableViewCell,
+                      let chatroom = self?.chatsController?.fetchedObjects?[safe: deselectedIndex.row]
+                else { return }
+                self?.configureCell(cell, for: chatroom)
+            }
+            .store(in: &subscriptions)
+        
+        chatPreservation.forceUpdateNotifier
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let index = self?.tableView.indexPathForSelectedRow,
+                          let cell = self?.tableView.cellForRow(at: index) as? ChatTableViewCell,
+                          let chatroom = self?.chatsController?.fetchedObjects?[safe: index.row]
                 else { return }
                 self?.configureCell(cell, for: chatroom)
             }
@@ -437,7 +446,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil,
-        newChat: Bool = false
+        newChat: Bool = false,
+        animateMessageType: MessageAnimationType = MessageAnimationType.none
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
@@ -445,7 +455,8 @@ final class ChatListViewController: KeyboardObservingViewController {
             account: accountService.account,
             chatroom: chatroom,
             messageIdToShow: messageId,
-            isNewChat: newChat
+            isNewChat: newChat,
+            messageAnimationType: animateMessageType
         )
 
         return vc
@@ -484,6 +495,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     @MainActor
     private func handleRefresh() async {
         defer { isRefreshing = false }
+        setIsStateUpdating(true)
         guard let result = await chatsProvider.update(notifyState: true) else { return }
 
         switch result {
@@ -578,6 +590,8 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if !isMacOS { chatDeselectedIndex = indexPath }
+        
         if isBusy,
             indexPath.row == lastSystemChatPositionRow,
             let cell = tableView.cellForRow(at: indexPath),
@@ -958,23 +972,27 @@ extension ChatListViewController {
                 message: text?.string,
                 image: image
             ) { [weak self] in
-                self?.presentChatroom(chatroom, with: self?.messageId(transaction: transaction))
+                guard let self else { return }
+                let idAndAnimationType: (String, MessageAnimationType) = self.messageId(transaction: transaction)
+                
+                self.presentChatroom(chatroom, with: idAndAnimationType.0, animationType: idAndAnimationType.1)
             }
         }
     }
 
-    private func messageId(transaction: ChatTransaction) -> String? {
-        if let richTransaction = transaction as? RichMessageTransaction {
-            return richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) ?? richTransaction.transactionId
+    private func messageId(transaction: ChatTransaction) -> (String, MessageAnimationType) {
+        if let richTransaction = transaction as? RichMessageTransaction,
+           let reactToId = richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) {
+            return (reactToId, .reaction)
         } else {
-            return transaction.transactionId
+            return (transaction.transactionId, .message)
         }
     }
 
     @MainActor
-    func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
+    func presentChatroom(_ chatroom: Chatroom, with message: String? = nil, animationType: MessageAnimationType) {
         // MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom, with: message)
+        let vc = chatViewController(for: chatroom, with: message, animateMessageType: animationType)
 
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController: vc)
@@ -1288,6 +1306,9 @@ extension ChatListViewController {
             if chatroom.hasUnreadMessages {
                 chatroom.markAsReaded()
                 self.removeManualAdress(adress: adress)
+                Task {
+                    await self.chatsProvider.update(notifyState: true)
+                }
             } else {
                 chatroom.markAsUnread()
                 self.chatsManuallyMarkedAsUnread.insert(adress)
@@ -1601,7 +1622,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
 
-            presenter.presentChatroom(chatroom, with: message.transactionId)
+            presenter.presentChatroom(chatroom, with: message.transactionId, animationType: .message)
         }
     }
 
@@ -1619,7 +1640,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
 
-            presenter.presentChatroom(chatroom)
+            presenter.presentChatroom(chatroom, animationType: .none)
         }
     }
 

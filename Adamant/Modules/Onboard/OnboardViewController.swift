@@ -80,6 +80,14 @@ final class OnboardViewController: UIViewController {
         onboarding.dataSource = self
         setColors()
     }
+    
+    override func viewWillTransition(to size: CGSize,
+                                     with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.onboarding.updateLayoutForCurrentSize()
+        }
+    }
 
     // MARK: - Other
 

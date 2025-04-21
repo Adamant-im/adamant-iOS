@@ -99,6 +99,10 @@ extension AdamantAccount {
     public var isEnoughMoneyForTransaction: Bool {
         balance >= AdamantApiService.KvsFee
     }
+    
+    public var isNewAccount: Bool {
+        balance == 0 && unconfirmedBalance == 0
+    }
 }
 // MARK: - JSON
 /*

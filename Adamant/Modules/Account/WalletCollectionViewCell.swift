@@ -50,7 +50,7 @@ private extension WalletCollectionViewCell {
     @MainActor
     func update(item: WalletCollectionViewCellModel) {
         currencyImageView.image = item.currencyImage
-        if item.currencyNetwork == item.currencySymbol {
+        if item.currencyNetwork == item.currencySymbol || item.currencySymbol == EthWalletService.currencySymbol {
             currencySymbolLabel.text = item.currencySymbol
         } else {
             let currencyFont = currencySymbolLabel.font ?? .systemFont(ofSize: 12)

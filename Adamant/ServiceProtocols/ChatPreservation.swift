@@ -17,6 +17,8 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
 
     var updateNotifier = ObservableSender<Void>()
+    var forceUpdateNotifier = ObservableSender<Void>()
+    
     init() {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
@@ -40,7 +42,8 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         message: String?,
         replyMessage: MessageModel?,
         files: [FileResult]?,
-        forAddress address: String
+        forAddress address: String,
+        isForsedUpdate: Bool = false
     ) {
         var shouldNotify = false
 
@@ -71,6 +74,10 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
 
         if shouldNotify {
             updateNotifier.send()
+        }
+        
+        if isForsedUpdate {
+            forceUpdateNotifier.send()
         }
     }
 

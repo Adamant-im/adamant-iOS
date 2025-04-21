@@ -47,6 +47,12 @@ extension StoreKey {
     }
 }
 
+extension AppDelegate {
+    enum Constants {
+        static let updateChatsInterval: TimeInterval = 10
+    }
+}
+
 // MARK: - Application
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -169,7 +175,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // MARK: 6 Reachability & Autoupdate
-        repeater = RepeaterService()
+        repeater = container.resolve(RepeaterService.self)
 
         // Configure reachability
         if let reachability = container.resolve(ReachabilityMonitor.self) {
@@ -224,7 +230,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(
                 label: "chatsProvider",
-                interval: 10,
+                interval: Constants.updateChatsInterval,
                 queue: .global(qos: .utility),
                 callback: {
                     Task {
@@ -251,11 +257,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
-
-        if let accountService = container.resolve(AccountService.self) {
-            repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
-        } else {
-            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
+        
+        // Setup wallet auto update
+        if let service = container.resolve(WalletAutoUpdateService.self) {
+            Task { await service.start()}
         }
 
         if let addressBookService = container.resolve(AddressBookService.self) {
@@ -409,7 +414,7 @@ extension AppDelegate {
         chatListNav.dismiss(animated: true, completion: nil)
         tabbar.selectedIndex = 0
 
-        let vc = chatListVC.chatViewController(for: chatroom, with: transactionID)
+        let vc = chatListVC.chatViewController(for: chatroom, with: transactionID, animateMessageType: .message)
 
         vc.hidesBottomBarWhenPushed = true
 

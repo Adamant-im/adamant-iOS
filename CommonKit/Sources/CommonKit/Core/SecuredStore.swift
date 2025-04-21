@@ -34,7 +34,7 @@ extension StoreKey {
     public enum visibleWallets {
         public static let invisibleWallets = "invisible.wallets"
         public static let indexWallets = "index.wallets"
-        public static let indexWalletsWithInvisible = "index.wallets.include.ivisible"
+        public static let indexWalletsWithInvisible = "index.wallets.include.invisible"
         public static let useCustomIndexes = "visible.wallets.useCustomIndexes"
         public static let useCustomVisibility = "visible.wallets.useCustomVisibility"
     }

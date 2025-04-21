@@ -54,7 +54,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var isLoading = false
     var messageIdToShow: String?
-    var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
 
@@ -91,6 +90,7 @@ final class ChatViewModel: NSObject {
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var cellIdForAnimation: String?
+    var animationType: MessageAnimationType?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -117,6 +117,7 @@ final class ChatViewModel: NSObject {
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
     let messagesUpdated = ObservableSender<Void>()
+    let draftSender = ObservableSender<Void>()
 
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
@@ -135,7 +136,8 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToIdAndPosition: String?
+    @ObservableValue var scrollToId: String?
+    @ObservableValue var separatorIndex: Int?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -227,9 +229,11 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false
+        isNewChat: Bool = false,
+        messageAnimationType: MessageAnimationType = MessageAnimationType.none
     ) {
         self.messageIdToShow = messageIdToShow
+        animationType = messageAnimationType
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -357,6 +361,7 @@ final class ChatViewModel: NSObject {
             guard await validateSendingMessage(message: message) else { return }
 
             replyMessage = nil
+            inputText = ""
 
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -381,9 +386,9 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
 
-    func preserveMessage(_ message: String) {
+    func preserveMessage(_ message: String, isForceUpdate: Bool = false) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForceUpdate)
     }
 
     func blockChat() {
@@ -428,6 +433,7 @@ final class ChatViewModel: NSObject {
         let message = _messages.wrappedValue[index]
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
+            await _ = chatsProvider.update(notifyState: true)
         }
     }
 
@@ -529,7 +535,7 @@ final class ChatViewModel: NSObject {
         Task {
             do {
                 guard await !chatsProvider.isMessageDeleted(id: messageId) else {
-                    dialog.send(.alert(.adamant.chat.messageWasDeleted))
+                    dialog.send(.warning(.adamant.chat.messageWasDeleted))
                     return
                 }
 
@@ -544,7 +550,7 @@ final class ChatViewModel: NSObject {
                 }
 
                 await waitForMessage(withId: messageId)
-                scrollToIdAndPosition = messageId
+                scrollToId = messageId
                 
                 dialog.send(.progress(false))
                 if let index = messages.firstIndex(where: { $0.id == messageId }) {
@@ -1116,7 +1122,8 @@ extension ChatViewModel {
 
         self.replyMessage = nil
         self.filesPicked = nil
-
+        self.inputText = ""
+        
         try await chatFileService.sendFile(
             text: text,
             chatroom: chatroom,
@@ -1197,10 +1204,10 @@ extension ChatViewModel {
             .store(in: &subscriptions)
 
         Task {
-            await chatsProvider.stateObserver
+            await chatsProvider.isUpdatingOvertiming
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] state in
-                    self?.isHeaderLoading = state.isUpdating
+                .sink { [weak self] in
+                    self?.isHeaderLoading = $0
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
@@ -1257,6 +1264,36 @@ extension ChatViewModel {
         didUpdateCoreData
             .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
+            .store(in: &subscriptions)
+        
+        undateDraftSubscription()
+    }
+    
+    fileprivate func undateDraftSubscription() {
+        $inputText
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $replyMessage
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $filesPicked
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        draftSender
+            .debounce(for: .seconds(10), scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self else { return }
+                self.preserveMessage(inputText, isForceUpdate: true)
+            }
             .store(in: &subscriptions)
     }
     
@@ -1319,13 +1356,13 @@ extension ChatViewModel {
 
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
-            updateSeparatorId()
             postProcess(messages: &messages)
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            updateSeparatorId()
             messagesUpdated.send()
         }
     }
@@ -1993,4 +2030,10 @@ extension ChatViewModel: ElegantEmojiPickerDelegate {
             reactAction(previousArg.messageId, emoji: emoji)
         }
     }
+}
+
+enum MessageAnimationType {
+    case message
+    case reaction
+    case none
 }

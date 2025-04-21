@@ -95,19 +95,12 @@ final class ChatTableViewCell: UITableViewCell {
                 }
 
             case .failed:
-                if isPhone {
-                    clockView.isHidden = false
-                    clockView.image = .asset(named: "status_failed")
-                    clockView.tintColor = .adamant.attention
-                    macOsImage.isHidden = true
-                    lastMessageLeadingAnchor.constant = 27
-                } else {
-                    macOsImage.isHidden = false
-                    macOsImage.image = .asset(named: "status_failed")
-                    macOsImage.tintColor = .adamant.attention
-                    clockView.isHidden = true
-                }
-
+                clockView.isHidden = false
+                clockView.image = .asset(named: "status_failed")
+                clockView.tintColor = .adamant.attention
+                macOsImage.isHidden = true
+                lastMessageLeadingAnchor.constant = 27
+                
             case .delivered:
                 clockView.isHidden = true
                 macOsImage.isHidden = true
