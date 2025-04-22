@@ -441,22 +441,33 @@ final class ChatListViewController: KeyboardObservingViewController {
             navigationController?.pushViewController(controller, animated: true)
         }
     }
-
+    
     // MARK: Helpers
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil,
         newChat: Bool = false,
-        animateMessageType: MessageAnimationType = MessageAnimationType.none
+        animateMessageType: MessageAnimationType = .none
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
+
+        var idAndAnimationType: (String?, MessageAnimationType) = (
+            messageId,
+            animateMessageType
+        )
+
+        if let id = messageId,
+           let transaction = unreadController?.fetchedObjects?.first(where: { $0.transactionId == id }) {
+            idAndAnimationType = self.messageId(transaction: transaction)
+        }
+
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageIdToShow: messageId,
+            messageIdToShow: idAndAnimationType.0,
             isNewChat: newChat,
-            messageAnimationType: animateMessageType
+            messageAnimationType: idAndAnimationType.1
         )
 
         return vc
