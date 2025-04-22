@@ -38,4 +38,5 @@ enum ChatDialog {
     case dismissMenu
     case renameAlert
     case actionMenu
+    case copy(String)
 }

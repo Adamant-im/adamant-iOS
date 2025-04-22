@@ -128,8 +128,7 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     }
 
     func copyToPasteboard() {
-        UIPasteboard.general.string = title
-        dialogService.showToastMessage(.adamant.alert.copiedToPasteboardNotification)
+        dialogService.copyToPasteboard(text: title, withNotification: true)
     }
 }
 

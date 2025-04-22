@@ -440,6 +440,7 @@ extension AdamantDialogService {
                     UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
                         UIPasteboard.general.string = stringForPasteboard
                         self?.showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
+                        self?.copyToPasteboard(text: stringForPasteboard, withNotification: true)
                         didSelect?(.copyToPasteboard)
                     }
                 )
@@ -718,6 +719,15 @@ extension AdamantDialogService {
                 from: textField.beginningOfDocument,
                 to: textField.endOfDocument
             )
+        }
+    }
+}
+
+extension AdamantDialogService {
+    func copyToPasteboard(text: String, withNotification showNotification: Bool = true) {
+        UIPasteboard.general.string = text
+        if showNotification {
+            showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
         }
     }
 }

@@ -19,7 +19,7 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
     private var didCopy = false
 
     var subscription: AnyCancellable?
-    var copyNotification: (() -> Void)?
+    var copyAction: ((String) -> Void)?
 
     var model: ChatMediaContainerView.Model = .default {
         didSet {
@@ -42,8 +42,7 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
         didSet {
             containerMediaView.isSelected = isSelected
             if isSelected && model.content.comment.string != "" {
-                UIPasteboard.general.string = model.content.comment.string
-                copyNotification?()
+                copyAction?(model.content.comment.string)
             }
         }
     }
@@ -146,8 +145,7 @@ extension ChatMediaCell {
     private func longPressCopyAction() {
         cellContainerView.animatePressUp()
         if model.content.comment.string != "" {
-            UIPasteboard.general.string = model.content.comment.string
-            copyNotification?()
+            copyAction?(model.content.comment.string)
         }
     }
 }

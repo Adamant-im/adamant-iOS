@@ -34,6 +34,9 @@ extension String.adamant {
         static var delete: String {
             String.localized("Shared.Delete", comment: "Shared alert 'Delete' button. Used anywhere")
         }
+        static var copy: String {
+            String.localized("Shared.Copy", comment: "Shared alert 'Copy' button. Used anywhere")
+        }
 
         // MARK: Titles and messages
         static var error: String {

@@ -18,6 +18,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     // MARK: Dependencies
 
     var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    var copyAction: ((String) -> Void)?
 
     // MARK: Proprieties
 
@@ -88,8 +90,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
     }
     
-    var copyNotification: (() -> Void)?
-
     var reactionsContanerViewWidth: CGFloat {
         if getReaction(for: model.address) == nil && getReaction(for: model.opponentAddress) == nil {
             return .zero
@@ -117,8 +117,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
                 originalColor: model.backgroundColor.uiColor
             )
             if isSelected {
-                UIPasteboard.general.string = self.model.text.string
-                self.copyNotification?()
+                copyAction?(self.model.text.string)
             }
         }
     }
@@ -526,8 +525,7 @@ private extension ChatMessageCell {
     
     private func longPressCopyAction() {
         self.messageContainerView.animatePressUp()
-        UIPasteboard.general.string = self.model.text.string
-        self.copyNotification?()
+        copyAction?(self.model.text.string)
     }
 }
 

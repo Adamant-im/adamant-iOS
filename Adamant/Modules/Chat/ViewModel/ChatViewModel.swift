@@ -491,6 +491,29 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
+    
+    func copyMessage(id: String) {
+        guard let chatMessage = messages.first(where: { $0.messageId == id }) else { return }
+        
+        var textToCopy: String? = .none
+        
+        switch chatMessage.content {
+            case let .message(model):
+                textToCopy = model.value.text.string
+                
+            case let .reply(model):
+                textToCopy = model.value.message.string
+                
+            case let .transaction(model):
+                textToCopy = model.value.content.comment ?? ""
+                
+            case let .file(model):
+                textToCopy = model.value.content.comment.string
+        }
+        
+        dialog.send(.copy(textToCopy ?? ""))
+    }
+
 
     func retrySendMessage(id: String) {
         Task {
@@ -612,8 +635,7 @@ final class ChatViewModel: NSObject {
     }
 
     func copyMessageAction(_ text: String) {
-        UIPasteboard.general.string = text
-        dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+        dialog.send(.copy(text))
     }
 
     func copyTextInPartAction(_ text: String) {

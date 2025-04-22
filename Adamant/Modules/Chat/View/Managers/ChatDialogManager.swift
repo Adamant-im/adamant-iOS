@@ -117,6 +117,8 @@ extension ChatDialogManager {
             showRenameAlert()
         case .actionMenu:
             showActionMenu()
+        case let .copy(text):
+            dialogService.copyToPasteboard(text: text, withNotification: true)
         }
     }
 
@@ -291,6 +293,7 @@ extension ChatDialogManager {
             actions: [
                 makeRetryAction(id: id),
                 makeCancelSendingAction(id: id),
+                makeCopyAction(id: id),
                 makeCancelAction()
             ],
             from: nil
@@ -457,6 +460,12 @@ extension ChatDialogManager {
     fileprivate func makeCancelSendingAction(id: String) -> UIAlertAction {
         .init(title: .adamant.alert.delete, style: .default) { [weak viewModel] _ in
             viewModel?.cancelMessage(id: id)
+        }
+    }
+    
+    fileprivate func makeCopyAction(id: String) -> UIAlertAction {
+        .init(title: .adamant.alert.copy, style: .default) { [weak viewModel] _ in
+            viewModel?.copyMessage(id: id)
         }
     }
 

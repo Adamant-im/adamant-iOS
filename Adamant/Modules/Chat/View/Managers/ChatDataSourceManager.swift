@@ -92,8 +92,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -117,8 +117,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -152,8 +152,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -177,8 +177,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }

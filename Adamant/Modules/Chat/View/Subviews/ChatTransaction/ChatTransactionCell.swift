@@ -17,9 +17,9 @@ final class ChatTransactionCell: MessageContentCell, ChatModelView {
     private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
 
     var subscription: AnyCancellable?
-    var copyNotification: (() -> Void)? {
+    var copyAction: ((String) -> Void)? {
         didSet {
-            transactionView.copyNotification = copyNotification
+            transactionView.copyAction = copyAction
         }
     }
 
@@ -58,8 +58,7 @@ final class ChatTransactionCell: MessageContentCell, ChatModelView {
         didSet {
             transactionView.isSelected = isSelected
             if let comment = model.content.comment, !comment.isEmpty && isSelected {
-                UIPasteboard.general.string = comment
-                copyNotification?()
+                copyAction?(comment)
             }
         }
     }

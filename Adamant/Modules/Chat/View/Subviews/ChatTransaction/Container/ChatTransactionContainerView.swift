@@ -28,7 +28,7 @@ final class ChatTransactionContainerView: UIView {
         didSet { contentView.actionHandler = actionHandler }
     }
     
-    var copyNotification: (() -> Void)?
+    var copyAction: ((String) -> Void)?
 
     private let contentView = ChatTransactionContentView()
 
@@ -235,8 +235,7 @@ extension ChatTransactionContainerView {
     fileprivate func longPressCopyAction() {
         contentView.animatePressUp()
         if let comment = model.content.comment, !comment.isEmpty {
-            UIPasteboard.general.string = comment
-            copyNotification?()
+            copyAction?(comment)
         }
     }
 
