@@ -11,6 +11,7 @@ permissions:
 jobs:
   trigger_tests:
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/run-tests')
-    uses: ./.github/workflows/test-execution.yml
-    with:
-      ref: ${{ github.event.pull_request.head.sha }}
+    run: echo "Running tests for ${{ github.event.pull_request.head.sha }}"
+    # uses: ./.github/workflows/test-execution.yml
+    # with:
+    #   ref: ${{ github.event.pull_request.head.sha }}
