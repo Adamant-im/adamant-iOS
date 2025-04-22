@@ -2,6 +2,7 @@ name: Trello
 on:
     pull_request:
         types: [opened, edited, closed, reopened, ready_for_review, converted_to_draft, review_requested]
+        branches: ["develop"]
     pull_request_review:
 
 jobs:
@@ -16,3 +17,5 @@ jobs:
                   trello-list-id-pr-open: 63d9ac5683f55bd5c72343a7
                   trello-list-id-pr-merged: 5de26db71739b84c2868835a
                   trello-list-id-pr-draft: 5a760215702d26bbdf8ebff5
+                  trello-add-members-to-cards: false
+                  trello-remove-unrelated-members: false
