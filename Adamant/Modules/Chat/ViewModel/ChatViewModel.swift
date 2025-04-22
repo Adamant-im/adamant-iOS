@@ -74,6 +74,7 @@ final class ChatViewModel: NSObject {
             updatePositionIfNeeded()
         }
     }
+    private(set) var unreadMesaggesIndexes: Set<Int>?
 
     private var tempCancellables = Set<AnyCancellable>()
     private var hideHeaderTimer: AnyCancellable?
@@ -123,7 +124,6 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
-    @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
     @ObservableValue private(set) var unreadMessagesIds: OrderedSet<String>?
     @ObservableValue private(set) var messagesWithUnredReactionsIds: OrderedSet<String>?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -553,8 +553,8 @@ final class ChatViewModel: NSObject {
                 scrollToId = messageId
                 
                 dialog.send(.progress(false))
-                if let index = messages.firstIndex(where: { $0.id == messageId }) {
-                    markMessageAsRead(index: index)
+                if let chatroom {
+                    await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
             } catch {
                 print(error)
