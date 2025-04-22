@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   trigger_tests:
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/run-tests')
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '@adamant-ci test')
     runs-on: ubuntu-latest
     steps:
       - run: echo "Running tests for ${{ github.event.pull_request.head.sha }}"
