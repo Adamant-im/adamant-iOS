@@ -986,12 +986,21 @@ extension ChatViewController {
                 }
                 state.isAutoScrolling = false
             }
-
+            
             if viewModel.animationType != MessageAnimationType.none {
-                viewModel.cellIdForAnimation =
-                needToAnimateCell ? id : nil
-                //if we will not trigger didEndScrolling
-                animateCell(at: .init(item: .zero, section: index))
+                viewModel.cellIdForAnimation = needToAnimateCell ? id : nil
+            }
+            
+            let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+            let indexPath = IndexPath(item: index, section: 0)
+
+            //if we will not trigger didEndScrolling
+            if visibleIndexPaths.contains(indexPath) {
+                state.isAutoScrolling = false
+
+                if viewModel.animationType != MessageAnimationType.none {
+                    animateCell(at: indexPath)
+                }
             }
 
             guard animated else { break }
