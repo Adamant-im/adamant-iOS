@@ -8,7 +8,6 @@ jobs:
   trigger_tests:
     if: |
       github.event.review.state == 'approved' && 
-      github.event.pull_request.mergeable_state == 'clean' &&
       github.event.pull_request.base.ref == 'develop'
     uses: ./.github/workflows/test-execution.yml
     with:
