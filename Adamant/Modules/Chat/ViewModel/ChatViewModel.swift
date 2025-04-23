@@ -650,6 +650,10 @@ final class ChatViewModel: NSObject {
         dialog.send(.removeMessageAlert(id: id))
     }
 
+    func showFailedMessageAlert(id: String) {
+        dialog.send(.failedMessageAlert(id: id, sender: nil))
+    }
+
     func reactAction(_ id: String, emoji: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
 

@@ -130,8 +130,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
-    private var taskManager = TaskManager()
-    private var didCopy = false
+    private var longPressTask: Task<Void, Never>?
+    private var didPerformLongPressAction = false
 
     // MARK: - Methods
 
@@ -172,7 +172,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     }
     
     private func configureLongPressGesture() {
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.minimumPressDuration = 0.2
         messageContainerView.addGestureRecognizer(longPress)
         messageContainerView.isUserInteractionEnabled = true
@@ -490,43 +490,6 @@ private extension ChatMessageCell {
     @objc func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
-    
-    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            didCopy = false
-            messageContainerView.animatePressDown()
-            
-            Task { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
-                
-                guard let self = self,
-                      gesture.state == .began || gesture.state == .changed else { return }
-                
-                await MainActor.run {
-                    self.longPressCopyAction()
-                    self.didCopy = true
-                }
-            }.stored(in: taskManager)
-            
-        case .ended:
-            if !didCopy {
-                taskManager.clean()
-                longPressCopyAction()
-            }
-            
-        case .cancelled, .failed:
-            messageContainerView.animatePressUp()
-            
-        default:
-            break
-        }
-    }
-    
-    private func longPressCopyAction() {
-        self.messageContainerView.animatePressUp()
-        copyAction?(self.model.text.string)
-    }
 }
 
 extension ChatMessageCell: ChatMenuManagerDelegate {
@@ -594,6 +557,72 @@ extension ChatMessageCell: ChatCellProtocol {
     }
     func animateReactionHighlight() {
         opponentReactionLabel.animateHighlightOverlay()
+    }
+}
+
+// MARK: - Long Press
+extension ChatMessageCell {
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if !isMacOS, model.backgroundColor == .failed {
+            handleLongPressToShowFailed(gesture)
+            return
+        }
+        handleLongPressToCopy(gesture)
+    }
+    
+    private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(gesture) { [weak self] in
+            self?.longPressCopyAction()
+        }
+    }
+    
+    private func handleLongPressToShowFailed(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(gesture) { [weak self] in
+            guard let id = self?.model.id else { return }
+            self?.actionHandler(.showFailedMessageAlert(id: id))
+        }
+    }
+    
+    private func processLongPress(
+        _ gesture: UILongPressGestureRecognizer,
+        perform action: @escaping () -> Void
+    ) {
+        switch gesture.state {
+            case .began:
+                didPerformLongPressAction = false
+                messageContainerView.animatePressDown()
+                
+                longPressTask = Task { [weak self] in
+                    try? await Task.sleep(interval: 1.5)
+                    guard let self = self,
+                          gesture.state == .began || gesture.state == .changed
+                    else { return }
+                    await MainActor.run {
+                        action()
+                        self.didPerformLongPressAction = true
+                    }
+                }
+                
+            case .ended:
+                messageContainerView.animatePressUp()
+                longPressTask?.cancel()
+                
+                if !didPerformLongPressAction {
+                    action()
+                }
+                
+            case .cancelled, .failed:
+                messageContainerView.animatePressUp()
+                longPressTask?.cancel()
+                
+            default:
+                break
+        }
+    }
+    
+    private func longPressCopyAction() {
+        self.messageContainerView.animatePressUp()
+        copyAction?(self.model.text.string)
     }
 }
 

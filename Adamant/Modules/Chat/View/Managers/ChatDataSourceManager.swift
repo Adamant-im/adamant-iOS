@@ -222,6 +222,8 @@ extension ChatDataSourceManager {
             )
         case let .forceDownloadAllFiles(messageId, files):
             viewModel.forceDownloadAllFiles(messageId: messageId, files: files)
+        case let .showFailedMessageAlert(id):
+            viewModel.showFailedMessageAlert(id: id)
         }
     }
 }
