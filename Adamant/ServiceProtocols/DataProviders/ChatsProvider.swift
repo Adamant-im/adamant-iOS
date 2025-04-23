@@ -296,8 +296,8 @@ protocol ChatsProvider: DataProvider, Actor {
     func markMessageAsRead(chatroom: Chatroom, message: String)
 
     @MainActor func removeChatPositon(for address: String)
-    @MainActor func setChatPositon(for address: String, position: Double?)
-    @MainActor func getChatPositon(for address: String) -> Double?
+    @MainActor func setChatPositon(for address: String, topMessageId: String?)
+    @MainActor func getChatPositon(for address: String) -> String?
 
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

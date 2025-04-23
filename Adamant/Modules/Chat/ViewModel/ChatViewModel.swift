@@ -144,7 +144,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPosition: ChatStartPosition?
+    var startPositionId: String?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -421,9 +421,9 @@ final class ChatViewModel: NSObject {
         hasPartnerName = !newName.isEmpty
     }
 
-    func saveChatOffset(_ offset: CGFloat?) {
+    func saveChatOffset(_ topMessageId: String?) {
         guard let address = chatroom?.partner?.address else { return }
-        chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
+        chatsProvider.setChatPositon(for: address, topMessageId: topMessageId)
     }
 
     func markMessageAsRead(index: Int) {
@@ -1300,13 +1300,11 @@ extension ChatViewModel {
     fileprivate func makeStartPosition() {
         guard messageIdToShow == nil,
               let address = chatroom?.partner?.address else {
-            startPosition = nil
+            startPositionId = nil
             return
         }
 
-        startPosition = chatsProvider
-            .getChatPositon(for: address)
-            .map { .offset(.init($0)) }
+        startPositionId = chatsProvider.getChatPositon(for: address)
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {

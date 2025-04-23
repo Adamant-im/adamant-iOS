@@ -186,10 +186,13 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         viewModel.preserveMessage(inputBar.text)
+
+        let messageId = topVisibleMessageIdConsideringHalfVisible()
+
         viewModel.saveChatOffset(
             state.isScrollPositionNearlyTheBottom
                 ? nil
-                : chatMessagesCollectionView.bottomOffset
+                : messageId
         )
     }
     
@@ -430,8 +433,8 @@ extension ChatViewController {
             .sink { [weak self] in
                 guard let id = $0
                 else { return }
-                self?.scrollToPosition(.messageId(id), animated: true)
-                self?.state.shouldScrollToNewMessages = false
+                self?.scrollToPosition(id, animated: true)
+                self?.state.shouldScrollToNewMessagesOrSavedPosition = false
                 self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
@@ -777,19 +780,17 @@ extension ChatViewController {
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: state.isScrollPositionNearlyTheBottom)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
-        if !state.isMessagesLoaded {
-            viewModel.startPosition.map { scrollToPosition($0) }
-            state.shouldScrollToNewMessages = false
-        }
     }
 
     fileprivate func updateMessagesPosition() {
         guard !state.isMessagesLoaded, !viewModel.messages.isEmpty else { return }
         state.isMessagesLoaded = true
-        if state.shouldScrollToNewMessages {
-            if let unreadMessage = viewModel.unreadMessagesIds?.first {
+        if state.shouldScrollToNewMessagesOrSavedPosition {
+            if viewModel.startPositionId != nil {
+                viewModel.startPositionId.map { scrollToPosition($0, scrollAt: .top) }
+            } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
-                scrollToPosition(.messageId(unreadMessage), setExtraOffset: true, scrollAt: .top)
+                scrollToPosition(unreadMessage, setExtraOffset: true, scrollAt: .top)
             }
         }
     }
@@ -873,7 +874,7 @@ extension ChatViewController {
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
-                self.scrollToPosition(.messageId(id), animated: true)
+                self.scrollToPosition(id, animated: true)
                 viewModel.shouldScrollToBottom = true
             }
         }
@@ -948,68 +949,52 @@ extension ChatViewController {
     }
 
     @MainActor
-    fileprivate func scrollToPosition(_ position: ChatStartPosition,
+    fileprivate func scrollToPosition(_ id: String,
                                       animated: Bool = false,
-                                      setExtraOffset: Bool = false, scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
+                                      setExtraOffset: Bool = false,
+                                      scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
         chatMessagesCollectionView.fixedBottomOffset = nil
-
-        switch position {
-        case let .offset(offset):
-            state.isAutoScrolling = true
-            chatMessagesCollectionView.setBottomOffset(offset, safely: state.isViewAppeared)
+        
+        var index = viewModel.messages.firstIndex(where: { $0.messageId == id })
+        
+        guard let index = index else { return }
+        
+        state.isAutoScrolling = true
+        messagesCollectionView.scrollToItem(
+            at: .init(item: .zero, section: index),
+            at: scrollAt,
+            animated: animated
+        )
+        
+        if setExtraOffset && !animated {
+            if checkIfNeedExtraOffsetForUnreadMessages() {
+                setExtraOffsetForNewMessages()
+            }
             state.isAutoScrolling = false
-            guard !state.isViewAppeared else { return }
-            chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
-        case let .messageId(id, scrollToBottomIfNotFound):
-            var index = viewModel.messages.firstIndex(where: { $0.messageId == id })
-            var needToAnimateCell = true
-
-            if scrollToBottomIfNotFound,
-                index == nil
-            {
-                index = viewModel.messages.count - 1
-                needToAnimateCell = false
-            }
-
-            guard let index = index else { break }
-
-            state.isAutoScrolling = true
-            messagesCollectionView.scrollToItem(
-                at: .init(item: .zero, section: index),
-                at: scrollAt,
-                animated: animated
-            )
-            
-            if setExtraOffset && !animated {
-                if checkIfNeedExtraOffsetForUnreadMessages() {
-                    setExtraOffsetForNewMessages()
-                }
-                state.isAutoScrolling = false
-            }
+        }
+        
+        if viewModel.animationType != MessageAnimationType.none {
+            viewModel.cellIdForAnimation = id
+        }
+        
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        //if we will not trigger didEndScrolling
+        if visibleIndexPaths.contains(indexPath) {
+            state.isAutoScrolling = false
             
             if viewModel.animationType != MessageAnimationType.none {
-                viewModel.cellIdForAnimation = needToAnimateCell ? id : nil
+                animateCell(at: indexPath)
             }
-            
-            let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
-            let indexPath = IndexPath(item: index, section: 0)
-
-            //if we will not trigger didEndScrolling
-            if visibleIndexPaths.contains(indexPath) {
-                state.isAutoScrolling = false
-
-                if viewModel.animationType != MessageAnimationType.none {
-                    animateCell(at: indexPath)
-                }
-            }
-
-            guard animated else { break }
-
-            viewModel.animateScrollIfNeeded(
-                to: index,
-                visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
-            )
         }
+        
+        guard animated else { return }
+        
+        viewModel.animateScrollIfNeeded(
+            to: index,
+            visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
+        )
     }
 
     fileprivate func setExtraOffsetForNewMessages() {
@@ -1040,7 +1025,7 @@ extension ChatViewController {
 
             totalUnreadHeight += attributes.frame.height
 
-            if totalUnreadHeight + 120 > visibleHeight {
+            if totalUnreadHeight + 320 > visibleHeight {
                 return true
             }
         }
@@ -1228,6 +1213,49 @@ extension ChatViewController {
             in: messagesCollectionView
         )
     }
+    
+    fileprivate func topVisibleMessageIdConsideringHalfVisible() -> String? {
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+
+        guard !visibleIndexPaths.isEmpty else { return nil }
+
+        let sortedIndexPaths = visibleIndexPaths.sorted { lhs, rhs in
+            guard
+                let lFrame = messagesCollectionView.layoutAttributesForItem(at: lhs)?.frame,
+                let rFrame = messagesCollectionView.layoutAttributesForItem(at: rhs)?.frame
+            else {
+                return false
+            }
+            return lFrame.minY < rFrame.minY
+        }
+
+        let visibleRect = CGRect(
+            x: messagesCollectionView.contentOffset.x,
+            y: messagesCollectionView.contentOffset.y + topViewHeight,
+            width: messagesCollectionView.bounds.width,
+            height: messagesCollectionView.bounds.height - topViewHeight
+        )
+
+        for indexPath in sortedIndexPaths {
+            guard let layoutAttributes = messagesCollectionView.layoutAttributesForItem(at: indexPath) else {
+                continue
+            }
+
+            let cellFrame = layoutAttributes.frame
+            let intersection = visibleRect.intersection(cellFrame)
+
+            let isHalfOrMoreVisible = intersection.height >= cellFrame.height / 2
+            let isOnlyVisible = visibleIndexPaths.count == 1
+
+            if isHalfOrMoreVisible || isOnlyVisible {
+                if viewModel.messages.indices.contains(indexPath.section) {
+                    return viewModel.messages[indexPath.section].messageId
+                }
+            }
+        }
+
+        return nil
+    }
 
     fileprivate func animateScroll(isStarted: Bool) {
         UIView.animate(withDuration: 0.1) {
@@ -1344,3 +1372,10 @@ private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
 
+private var topViewHeight: CGFloat {
+    if isMacOS {
+        return 45
+    } else {
+        return 100
+    }
+}
