@@ -527,7 +527,7 @@ extension ChatViewController {
             }
             .store(in: &subscriptions)
         
-        viewModel.$separatorIndex
+        viewModel.separatorState.$separatorIndex
             .removeDuplicates()
             .sink { [weak self] index in
                 guard let self = self,
@@ -773,7 +773,9 @@ extension ChatViewController {
 
 extension ChatViewController {
     fileprivate func updateIsScrollPositionNearlyTheBottom() {
-        state.isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
+        let isNearBottom = chatMessagesCollectionView.bottomOffset < 150
+        state.isScrollPositionNearlyTheBottom = isNearBottom
+        viewModel.separatorState.IsScrollPositionNearlyTheBottom = isNearBottom
     }
 
     fileprivate func updateMessages() {

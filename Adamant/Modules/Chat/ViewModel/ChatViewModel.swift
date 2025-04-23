@@ -54,8 +54,7 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var isLoading = false
     var messageIdToShow: String?
-    var separatorId: String?
-    var didAddSeparator: Bool = false
+    var separatorState = NewMessageSeparatorState()
 
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -137,7 +136,6 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToId: String?
-    @ObservableValue var separatorIndex: Int?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
@@ -1816,28 +1814,31 @@ extension ChatViewModel {
     }
 
     fileprivate func updateSeparatorId() {
-        guard !didAddSeparator, !messages.isEmpty else { return }
-
-        didAddSeparator = true
-        guard let firstUnreadId = unreadMessagesIds?.first else {
-            separatorId = nil
-            separatorIndex = nil
-            return
+        guard !separatorState.didAddSeparator, !messages.isEmpty else { return }
+        
+        if separatorState.isFirstUpdate || !separatorState.IsScrollPositionNearlyTheBottom {
+            separatorState.isFirstUpdate = false
+            guard let firstUnreadId = unreadMessagesIds?.first else {
+                separatorState.separatorId = nil
+                separatorState.separatorIndex = nil
+                return
+            }
+            
+            separatorState.didAddSeparator = true
+            separatorState.separatorId = firstUnreadId
+            updateSeparatorIndex()
         }
-
-        separatorId = firstUnreadId
-        updateSeparatorIndex()
     }
 
     fileprivate func updateSeparatorIndex() {
-        guard let separatorId = separatorId,
+        guard let separatorId = separatorState.separatorId,
             let index = messages.firstIndex(where: { $0.id == separatorId })
         else {
-            separatorIndex = nil
+            separatorState.separatorIndex = nil
             return
         }
 
-        separatorIndex = index - 1
+        separatorState.separatorIndex = index - 1
     }
 }
 
