@@ -464,7 +464,7 @@ extension ChatDialogManager {
     }
     
     fileprivate func makeCopyAction(id: String) -> UIAlertAction {
-        .init(title: .adamant.alert.copy, style: .default) { [weak viewModel] _ in
+        .init(title: .adamant.alert.copyToPasteboard, style: .default) { [weak viewModel] _ in
             viewModel?.copyMessage(id: id)
         }
     }
