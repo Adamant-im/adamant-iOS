@@ -255,6 +255,14 @@ extension ChatMediaContainerView {
 }
 
 extension ChatMediaContainerView: ChatMenuManagerDelegate {
+    var isFailedMessage: Bool {
+        model.status == .failed
+    }
+    
+    func showFailedMenu() {
+        self.actionHandler(.showFailedMessageAlert(id: model.id))
+    }
+    
     func getCopyView() -> UIView? {
         copy(with: model)?.contentView
     }
@@ -277,6 +285,10 @@ extension ChatMediaContainerView: ChatMenuManagerDelegate {
             getPositionOnScreen: getPositionOnScreen
         )
         actionHandler(.presentMenu(arg: arguments))
+    }
+    
+    func presentMenuProgrammatically(for contentView: UIView) {
+        chatMenuManager.presentMenuProgrammatically(for: contentView)
     }
 }
 

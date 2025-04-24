@@ -21,6 +21,8 @@ protocol ChatMenuManagerDelegate: AnyObject {
         tapLocation: CGPoint,
         getPositionOnScreen: @escaping () -> CGPoint
     )
+    var isFailedMessage: Bool { get }
+    func showFailedMenu()
 }
 
 @MainActor
@@ -39,13 +41,6 @@ final class ChatMenuManager: NSObject {
             contentView.addInteraction(interaction)
             return
         }
-
-        let longPressGesture = UILongPressGestureRecognizer(
-            target: self,
-            action: #selector(handleLongPress(_:))
-        )
-        longPressGesture.minimumPressDuration = 0.17
-        contentView.addGestureRecognizer(longPressGesture)
     }
 
     func presentMenuProgrammatically(for contentView: UIView) {
@@ -70,32 +65,6 @@ final class ChatMenuManager: NSObject {
             getPositionOnScreen: getPositionOnScreen
         )
     }
-
-    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard !isMacOS else { return }
-
-        guard gesture.state == .began,
-            let contentView = gesture.view
-        else { return }
-
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-
-        let size = contentView.frame.size
-
-        let copyView = delegate?.getCopyView() ?? contentView
-
-        let getPositionOnScreen: () -> CGPoint = {
-            contentView.convert(CGPoint.zero, to: nil)
-        }
-
-        delegate?.presentMenu(
-            copyView: copyView,
-            size: size,
-            location: locationOnScreen,
-            tapLocation: .zero,
-            getPositionOnScreen: getPositionOnScreen
-        )
-    }
 }
 
 extension ChatMenuManager: UIContextMenuInteractionDelegate {
@@ -103,6 +72,10 @@ extension ChatMenuManager: UIContextMenuInteractionDelegate {
         _ interaction: UIContextMenuInteraction,
         configurationForMenuAtLocation location: CGPoint
     ) -> UIContextMenuConfiguration? {
+        if let delegate = delegate, delegate.isFailedMessage {
+            delegate.showFailedMenu()
+            return nil
+        }
         presentMacOverlay(interaction, configurationForMenuAtLocation: location)
         return nil
     }

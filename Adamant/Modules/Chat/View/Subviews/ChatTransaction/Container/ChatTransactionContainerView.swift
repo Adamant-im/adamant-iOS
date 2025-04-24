@@ -128,9 +128,11 @@ final class ChatTransactionContainerView: UIView {
             contentView.isSelected = isSelected
         }
     }
-    private var taskManager = TaskManager()
-    private var didCopy = false
 
+    // MARK: Gesture Helper
+    var GestureTaskManager: TaskManager = TaskManager()
+    var didPerformLongPressAction: Bool = false
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -161,7 +163,7 @@ extension ChatTransactionContainerView {
     }
     
     fileprivate func configureLongPressGesture() {
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.minimumPressDuration = 0.2
         contentView.addGestureRecognizer(longPress)
         contentView.isUserInteractionEnabled = true
@@ -198,45 +200,6 @@ extension ChatTransactionContainerView {
 
     @objc fileprivate func onStatusButtonTap() {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
-    }
-    
-    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            didCopy = false
-            contentView.animatePressDown()
-            
-            Task { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(1.5) * 1_000_000_000)
-                
-                guard let self = self,
-                      gesture.state == .began || gesture.state == .changed else { return }
-                
-                await MainActor.run {
-                    self.longPressCopyAction()
-                    self.didCopy = true
-                }
-            }.stored(in: taskManager)
-            
-        case .ended:
-            if !didCopy {
-                taskManager.clean()
-                longPressCopyAction()
-            }
-            
-        case .cancelled, .failed:
-            contentView.animatePressUp()
-            
-        default:
-            break
-        }
-    }
-    
-    fileprivate func longPressCopyAction() {
-        contentView.animatePressUp()
-        if let comment = model.content.comment, !comment.isEmpty {
-            copyAction?(comment)
-        }
     }
 
     fileprivate func updateOwnReaction() {
@@ -361,6 +324,14 @@ extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView: ChatMenuManagerDelegate {
+    var isFailedMessage: Bool {
+        model.status == .failed
+    }
+    
+    func showFailedMenu() {
+        self.actionHandler(.showFailedMessageAlert(id: model.id))
+    }
+    
     func getCopyView() -> UIView? {
         copy(with: model)?.contentView
     }
@@ -394,6 +365,58 @@ extension ChatTransactionContainerView {
         view.updateLayout()
         view.contentView.setFixWidth(width: contentView.frame.width)
         return view
+    }
+}
+
+extension ChatTransactionContainerView: GestureHelper {
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if !isMacOS, isFailedMessage {
+            handleLongPressToShowFailed(gesture)
+            return
+        }
+        if isMacOS {
+            handleLongPressToCopy(gesture)
+            return
+        }
+        handleLongPressToOpenMenu(gesture)
+    }
+    
+    private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let text = self?.model.content.comment else { return }
+                self?.copyAction?(text) },
+            onGestureBegan: { [weak self] in
+                self?.contentView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.contentView.animatePressUp() }
+        )
+    }
+    
+    private func handleLongPressToShowFailed(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let id = self?.model.id else { return }
+                self?.actionHandler(.showFailedMessageAlert(id: id)) },
+            onGestureBegan: { [weak self] in
+                self?.contentView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.contentView.animatePressUp() }
+        )
+    }
+    
+    private func handleLongPressToOpenMenu(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            touchDuration: 0.2,
+            perform:     { [weak self] in
+                guard let view = self?.contentView else { return } 
+                self?.chatMenuManager.presentMenuProgrammatically(for: view)
+            },
+            onGestureBegan: { [weak self] in
+                self?.contentView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.contentView.animatePressUp() }
+        )
     }
 }
 

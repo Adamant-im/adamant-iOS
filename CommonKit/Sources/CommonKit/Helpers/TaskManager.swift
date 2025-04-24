@@ -1,21 +1,20 @@
 //
 //  TaskManager.swift
-//  Adamant
+//  CommonKit
 //
-//  Created by Stanislav Jelezoglo on 18.02.2023.
-//  Copyright © 2023 Adamant. All rights reserved.
+//  Created by Dmitrij Meidus on 23.04.25.
 //
 
-import Foundation
-
-final class TaskManager {
+public final class TaskManager {
     private var tasks = Set<Task<Void, Never>>()
+    
+    public init() {}
 
-    func insert(_ task: Task<(), Never>) {
+    public func insert(_ task: Task<(), Never>) {
         tasks.insert(task)
     }
 
-    func clean() {
+    public func clean() {
         tasks.forEach { $0.cancel() }
     }
 
@@ -24,7 +23,7 @@ final class TaskManager {
     }
 }
 
-extension Task where Success == Void, Failure == Never {
+public extension Task where Success == Void, Failure == Never {
     func stored(in taskManager: TaskManager) {
         taskManager.insert(self)
     }

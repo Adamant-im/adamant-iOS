@@ -87,7 +87,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
 
-                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.actionHandler = { [weak self] in self?.handleAction($0) 
+                }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
