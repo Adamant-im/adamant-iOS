@@ -36,6 +36,7 @@ final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
                 if let chatTrs = try privateContext.fetch(chatRequest).first {
                     if chatTrs.isHidden {
                         transaction.isUnread = false
+                        transaction.chatroom?.updateLastTransaction()
                         
                         if privateContext.hasChanges {
                             try privateContext.save()
