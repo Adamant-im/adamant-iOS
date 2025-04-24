@@ -49,6 +49,14 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var qqPrefix: String {
         return Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var nodeGroups: [NodeGroup] {
         [.dash]

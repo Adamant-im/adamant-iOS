@@ -48,6 +48,14 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             )
         } ?? []
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     @MainActor
     var hasEnabledNode: Bool {

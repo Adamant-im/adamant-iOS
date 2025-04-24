@@ -55,6 +55,18 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     var qqPrefix: String {
         return Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
+    
+    var balanceCheckIntervalNewAccount: Int? {
+        Self.coinInfo?.balanceCheckIntervalNewAccount
+    }
 
     var nodeGroups: [NodeGroup] {
         [.adm]
@@ -130,7 +142,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     // MARK: - Logic
     override init() {
         super.init()
-
+        
         // Notifications
         addObservers()
     }

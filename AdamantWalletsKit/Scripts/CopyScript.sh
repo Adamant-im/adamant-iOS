@@ -16,7 +16,7 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 echo "Cloning $PACKAGE_NAME from GitHub..."
-git clone --depth 1 --branch master "$GITHUB_REPO" "$TARGET_DIR"
+git clone --depth 1 --branch dev "$GITHUB_REPO" "$TARGET_DIR"
 
 # Check if cloning was successful
 if [ ! -d "$TARGET_DIR" ]; then

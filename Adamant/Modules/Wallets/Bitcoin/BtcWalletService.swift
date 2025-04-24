@@ -101,6 +101,14 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var qqPrefix: String {
         return Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         return true

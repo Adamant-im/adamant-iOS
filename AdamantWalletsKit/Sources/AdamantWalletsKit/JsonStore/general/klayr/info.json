@@ -15,10 +15,12 @@
   "qqPrefix": "klayr",
   "status": "active",
   "createCoin": true,
-  "defaultVisibility": true,
+  "defaultVisibility": false,
   "defaultOrdinalLevel": 50,
   "consensus": "dPoS",
   "blockTimeFixed": 10000,
+  "balanceCheckInterval": 50000,
+  "balanceValidInterval": 300000,
   "txFetchInfo": {
     "newPendingInterval": 3000,
     "oldPendingInterval": 3000,

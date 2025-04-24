@@ -111,6 +111,14 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
     var qqPrefix: String {
         Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         true

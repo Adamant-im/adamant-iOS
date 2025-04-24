@@ -67,6 +67,14 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var qqPrefix: String {
         EthWalletService.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        EthWalletService.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        EthWalletService.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         true
@@ -212,6 +220,9 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         serviceStateChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).stateChanged")
 
         self.setState(.notInitiated)
+        
+        print("qwe [\(Date())] " + "\(self.balanceCheckInterval!)" + "\n----------------------")
+        print("qwe [\(Date())] " + "\(self.balanceValidInterval!)" + "\n----------------------")
 
         // Notifications
         addObservers()

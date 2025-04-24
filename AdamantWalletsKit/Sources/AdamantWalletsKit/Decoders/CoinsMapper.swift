@@ -5,7 +5,8 @@
 //  Created by Sergei Veretennikov on 25.03.2025.
 //
 
-// Everything here goes synchronousely here's no data races or race conditions
+// Everything here goes synchronousely.
+// There are no data races or race conditions.
 
 import Foundation
 

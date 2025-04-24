@@ -323,6 +323,8 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var transactionFeeUpdated: Notification.Name { get }
 
     var qqPrefix: String { get }
+    var balanceCheckInterval: Int? { get }
+    var balanceValidInterval: Int? { get }
     var blockchainSymbol: String { get }
     var isDynamicFee: Bool { get }
     var diplayTransactionFee: Decimal { get }

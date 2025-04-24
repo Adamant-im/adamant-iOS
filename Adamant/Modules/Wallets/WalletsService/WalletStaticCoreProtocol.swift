@@ -31,6 +31,7 @@ extension WalletStaticCoreProtocol {
     static var qqPrefix: String {
         coinInfo?.qqPrefix ?? ""
     }
+    
     static var healthCheckParameters: CoinHealthCheckParameters {
         let coinInfoNH = coinInfo?.nodes?.healthCheck
         let coinInfoSIH = coinInfo?.services?.infoService?.healthCheck
@@ -84,6 +85,14 @@ extension WalletStaticCoreProtocol {
 
     static var oldPendingAttempts: Int {
         coinInfo?.txFetchInfo?.oldPendingAttempts ?? 0
+    }
+    
+    static var balanceCheckInterval: Int? {
+        Self.coinInfo?.balanceCheckInterval
+    }
+    
+    static var balanceValidInterval: Int? {
+        Self.coinInfo?.balanceValidInterval
     }
 
     var tokenName: String {
