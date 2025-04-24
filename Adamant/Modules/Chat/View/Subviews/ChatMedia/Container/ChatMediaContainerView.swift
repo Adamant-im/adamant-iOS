@@ -244,6 +244,14 @@ extension ChatMediaContainerView {
     @objc func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: contentView)
     }
+    
+    func animateMediaHighlight() {
+        contentView.animateHighlightOverlay()
+    }
+    
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
+    }
 }
 
 extension ChatMediaContainerView: ChatMenuManagerDelegate {

@@ -211,13 +211,6 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             .store(in: &subscriptions)
 
         NotificationCenter.default
-            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
-            .sink { @MainActor [weak self] _ in
-                self?.update()
-            }
-            .store(in: &subscriptions)
-
-        NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
             .sink { @MainActor [weak self] _ in
                 self?.dogeWallet = nil

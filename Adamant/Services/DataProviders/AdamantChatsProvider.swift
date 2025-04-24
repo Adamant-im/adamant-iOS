@@ -54,6 +54,9 @@ actor AdamantChatsProvider: ChatsProvider {
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
+    
+    private let chatUpdatingNotificator: AnyChatUpdatingNotificator
+    var isUpdatingOvertiming: AnyObservable<Bool> { chatUpdatingNotificator.needToShowChatUpdateSpinnerObserver }
 
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -85,7 +88,8 @@ actor AdamantChatsProvider: ChatsProvider {
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
         SecureStore: SecureStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        chatUpdatingNotificator: AnyChatUpdatingNotificator
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -96,6 +100,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.transactionService = transactionService
         self.SecureStore = SecureStore
         self.walletServiceCompose = walletServiceCompose
+        self.chatUpdatingNotificator = chatUpdatingNotificator
 
         Task {
             await setupSecureStore()
@@ -160,9 +165,11 @@ actor AdamantChatsProvider: ChatsProvider {
 
         if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
             if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
-                let h = Int64(raw)
+               let h = Int64(raw),
+               let chatsMarkAsUnread: Set<String> = store.get(StoreKey.chatProvider.markedChatsAsUnread)
             {
                 self.readedLastHeight = h
+                self.chatsMarkAsUnread = chatsMarkAsUnread
             }
         } else {
             store.remove(StoreKey.chatProvider.receivedLastHeight)
@@ -367,19 +374,36 @@ extension AdamantChatsProvider {
             senderId: address,
             privateKey: privateKey
         )
-
+        
         if !isInitiallySynced {
             isInitiallySynced = true
+            preLoadChats(array, address: address, withInitial: true)
+        } else {
             preLoadChats(array, address: address)
         }
 
         setState(.upToDate, previous: prevState)
     }
 
-    func preLoadChats(_ array: [Transaction], address: String) {
-        let preLoadChatsCount = preLoadChatsCount
-        array.prefix(preLoadChatsCount).forEach { transaction in
-            let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+    func preLoadChats(_ array: [Transaction], address: String, withInitial: Bool = false) {
+        let prioritized = array.filter { transaction in
+            removedMessages.contains(String(transaction.id))
+        }
+
+        let regular: ArraySlice<Transaction> = withInitial
+            ? array.filter { transaction in
+                !removedMessages.contains(String(transaction.id))
+            }.prefix(preLoadChatsCount)
+            : []
+
+        let preloadList = prioritized + regular
+        guard !preloadList.isEmpty else { return }
+
+        for transaction in preloadList {
+            let recipientAddress = transaction.recipientId == address
+                ? transaction.senderId
+                : transaction.recipientId
+
             Task {
                 let isChatLoading = isChatLoading(with: recipientAddress)
                 guard !isChatLoading else { return }
@@ -549,6 +573,7 @@ extension AdamantChatsProvider {
             }
         }
         setupAsReadyToSyncChats()
+        chatUpdatingNotificator.startMonitoring()
     }
 
     func setupAsReadyToSyncChats() {
@@ -559,6 +584,7 @@ extension AdamantChatsProvider {
 
     func disconnectFromSocket() {
         self.socketService.disconnect()
+        chatUpdatingNotificator.stopMonitoring()
     }
 
     func update(notifyState: Bool) async -> ChatsProviderResult? {
@@ -598,6 +624,7 @@ extension AdamantChatsProvider {
 
         switch state {
         case .upToDate, .empty, .updating:
+            chatUpdatingNotificator.updateLastUpdateTime()
             setState(.upToDate, previous: state, notify: notifyState)
 
             if prevHeight != receivedLastHeight,

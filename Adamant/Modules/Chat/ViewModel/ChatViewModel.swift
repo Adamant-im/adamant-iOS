@@ -42,6 +42,7 @@ final class ChatViewModel: NSObject {
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     private let visibleWalletsService: VisibleWalletsService
+    private let vibroService: VibroService
 
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -53,7 +54,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var isLoading = false
     var messageIdToShow: String?
-    var separatorIndex: Int?
     var separatorId: String?
     var didAddSeparator: Bool = false
 
@@ -74,6 +74,7 @@ final class ChatViewModel: NSObject {
             updatePositionIfNeeded()
         }
     }
+    private(set) var unreadMesaggesIndexes: Set<Int>?
 
     private var tempCancellables = Set<AnyCancellable>()
     private var hideHeaderTimer: AnyCancellable?
@@ -89,7 +90,8 @@ final class ChatViewModel: NSObject {
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
-    var needToAnimateCellIndex: Int?
+    var cellIdForAnimation: String?
+    var animationType: MessageAnimationType?
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -116,12 +118,12 @@ final class ChatViewModel: NSObject {
     let showBuyAndSell = ObservableSender<Void>()
     let didUpdateCoreData = ObservableSender<Void>()
     let messagesUpdated = ObservableSender<Void>()
+    let draftSender = ObservableSender<Void>()
 
     @ObservableValue private(set) var swipeableMessage: ChatSwipeWrapperModel = .default
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
-    @ObservableValue private(set) var unreadMesaggesIndexes: Set<Int>?
     @ObservableValue private(set) var unreadMessagesIds: OrderedSet<String>?
     @ObservableValue private(set) var messagesWithUnredReactionsIds: OrderedSet<String>?
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -134,21 +136,15 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToIdAndPosition: (id: String, position: UICollectionView.ScrollPosition)?
+    @ObservableValue var scrollToId: String?
+    @ObservableValue var separatorIndex: Int?
     @ObservableValue var filesPicked: [FileResult]? {
         didSet {
             updateFeeValue()
         }
     }
 
-    var startPosition: ChatStartPosition? {
-        if messageIdToShow != nil {
-            return nil
-        }
-
-        guard let address = chatroom?.partner?.address else { return nil }
-        return chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
-    }
+    var startPosition: ChatStartPosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -198,7 +194,8 @@ final class ChatViewModel: NSObject {
         apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol,
-        visibleWalletsService: VisibleWalletsService
+        visibleWalletsService: VisibleWalletsService,
+        vibroService: VibroService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -222,6 +219,7 @@ final class ChatViewModel: NSObject {
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         self.visibleWalletsService = visibleWalletsService
+        self.vibroService = vibroService
 
         super.init()
         setupObservers()
@@ -231,12 +229,15 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false
+        isNewChat: Bool = false,
+        messageAnimationType: MessageAnimationType = MessageAnimationType.none
     ) {
         self.messageIdToShow = messageIdToShow
+        animationType = messageAnimationType
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
+        makeStartPosition()
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
@@ -264,7 +265,7 @@ final class ChatViewModel: NSObject {
             dialog.send(.freeTokenAlert)
         }
     }
-
+    
     func presentKeyboardOnStartIfNeeded() {
         guard
             !inputText.isEmpty
@@ -360,6 +361,7 @@ final class ChatViewModel: NSObject {
             guard await validateSendingMessage(message: message) else { return }
 
             replyMessage = nil
+            inputText = ""
 
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -384,9 +386,9 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
 
-    func preserveMessage(_ message: String) {
+    func preserveMessage(_ message: String, isForceUpdate: Bool = false) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress)
+        chatPreservation.preserveChatState(message: message, replyMessage: replyMessage, files: filesPicked, forAddress: partnerAddress, isForsedUpdate: isForceUpdate)
     }
 
     func blockChat() {
@@ -431,6 +433,7 @@ final class ChatViewModel: NSObject {
         let message = _messages.wrappedValue[index]
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, message: message.messageId)
+            await _ = chatsProvider.update(notifyState: true)
         }
     }
 
@@ -493,9 +496,9 @@ final class ChatViewModel: NSObject {
         Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
-
+            
             let message = messages.first(where: { $0.messageId == id })
-
+            
             if case let .file(model) = message?.content {
                 try? await chatFileService.resendMessage(
                     with: id,
@@ -506,21 +509,21 @@ final class ChatViewModel: NSObject {
                 )
                 return
             }
-
+            
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {
                 switch error as? ChatsProviderError {
-                case .invalidTransactionStatus:
-                    break
-                case let .serverError(serverError):
-                    switch serverError {
-                    case .timestampIsInTheFuture:
-                        dialog.send(.timestampIsInTheFuture)
-                    default: dialog.send(.richError(error))
-                    }
-                default:
-                    dialog.send(.richError(error))
+                    case .invalidTransactionStatus:
+                        break
+                    case let .serverError(serverError):
+                        switch serverError {
+                            case .timestampIsInTheFuture:
+                                dialog.send(.timestampIsInTheFuture)
+                            default: dialog.send(.warning(error.localizedDescription))
+                        }
+                    default:
+                        dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -532,7 +535,7 @@ final class ChatViewModel: NSObject {
         Task {
             do {
                 guard await !chatsProvider.isMessageDeleted(id: messageId) else {
-                    dialog.send(.alert(.adamant.chat.messageWasDeleted))
+                    dialog.send(.warning(.adamant.chat.messageWasDeleted))
                     return
                 }
 
@@ -547,15 +550,11 @@ final class ChatViewModel: NSObject {
                 }
 
                 await waitForMessage(withId: messageId)
-
-                if let lastMessageId = messages.last?.id {
-                    let position: UICollectionView.ScrollPosition = (messageId == lastMessageId) ? .top : .bottom
-                    scrollToIdAndPosition = (id: messageId, position: position)
-                }
-
+                scrollToId = messageId
+                
                 dialog.send(.progress(false))
-                if let index = messages.firstIndex(where: { $0.id == messageId }) {
-                    markMessageAsRead(index: index)
+                if let chatroom {
+                    await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
             } catch {
                 print(error)
@@ -1092,6 +1091,10 @@ extension ChatViewModel {
     func unredMessageCount() -> Int? {
         unreadMessagesIds?.count
     }
+    
+    func shortVibro() {
+        vibroService.applyVibration(.rigid)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1105,7 +1108,7 @@ extension ChatViewModel {
     fileprivate func sendFiles(with text: String) async throws {
         guard apiServiceCompose.get(.ipfs)?.hasEnabledNode == true else {
             dialog.send(
-                .alert(
+                .warning(
                     ApiServiceError.noEndpointsAvailable(
                         nodeGroupName: NodeGroup.ipfs.name
                     ).localizedDescription
@@ -1119,7 +1122,8 @@ extension ChatViewModel {
 
         self.replyMessage = nil
         self.filesPicked = nil
-
+        self.inputText = ""
+        
         try await chatFileService.sendFile(
             text: text,
             chatroom: chatroom,
@@ -1200,10 +1204,10 @@ extension ChatViewModel {
             .store(in: &subscriptions)
 
         Task {
-            await chatsProvider.stateObserver
+            await chatsProvider.isUpdatingOvertiming
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] state in
-                    self?.isHeaderLoading = state.isUpdating
+                .sink { [weak self] in
+                    self?.isHeaderLoading = $0
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
@@ -1261,6 +1265,48 @@ extension ChatViewModel {
             .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.updateTransactions(performFetch: false) }
             .store(in: &subscriptions)
+        
+        undateDraftSubscription()
+    }
+    
+    fileprivate func undateDraftSubscription() {
+        $inputText
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $replyMessage
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        $filesPicked
+            .sink { [weak self] _ in
+                self?.draftSender.send()
+            }
+            .store(in: &subscriptions)
+        
+        draftSender
+            .debounce(for: .seconds(10), scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self else { return }
+                self.preserveMessage(inputText, isForceUpdate: true)
+            }
+            .store(in: &subscriptions)
+    }
+    
+    fileprivate func makeStartPosition() {
+        guard messageIdToShow == nil,
+              let address = chatroom?.partner?.address else {
+            startPosition = nil
+            return
+        }
+
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(.init($0)) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {
@@ -1311,13 +1357,12 @@ extension ChatViewModel {
             messagesWithUnredReactionsIds = reactId
             unreadMessagesIds = messageId
             postProcess(messages: &messages)
-            updateSeparatorId()
-
             setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            updateSeparatorId()
             messagesUpdated.send()
         }
     }
@@ -1481,22 +1526,24 @@ extension ChatViewModel {
         filesPicked: [FileResult]? = nil
     ) async {
         switch error as? ChatsProviderError {
-        case .messageNotValid:
-            inputText = sentText
-        case .notEnoughMoneyToSend:
-            inputText = sentText
-            self.filesPicked = filesPicked
-            guard await transfersProvider.hasTransactions else {
-                dialog.send(.freeTokenAlert)
-                return
-            }
-        case let .serverError(error):
-            if case .timestampIsInTheFuture = error {
-                dialog.send(.timestampIsInTheFuture)
-            }
-        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
-            .invalidTransactionStatus, .none:
-            break
+            case .messageNotValid:
+                inputText = sentText
+            case .notEnoughMoneyToSend:
+                inputText = sentText
+                self.filesPicked = filesPicked
+                guard await transfersProvider.hasTransactions else {
+                    dialog.send(.freeTokenAlert)
+                    return
+                }
+            case let .serverError(error):
+                switch error {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default: dialog.send(.warning(error.localizedDescription))
+                }
+            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .transactionNotFound,
+                    .invalidTransactionStatus, .none:
+                break
         }
     }
 
@@ -1983,4 +2030,10 @@ extension ChatViewModel: ElegantEmojiPickerDelegate {
             reactAction(previousArg.messageId, emoji: emoji)
         }
     }
+}
+
+enum MessageAnimationType {
+    case message
+    case reaction
+    case none
 }

@@ -177,6 +177,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
                 isSelected,
                 originalColor: model.backgroundColor.uiColor
             )
+            if model.message.string != "" && isSelected {
+                UIPasteboard.general.string = model.message.string
+                copyNotification?()
+            }
         }
     }
 
@@ -190,6 +194,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
+    private var taskManager = TaskManager()
+    private var didCopy = false
 
     // MARK: - Methods
 
@@ -587,13 +593,25 @@ private extension ChatMessageReplyCell {
     @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            didCopy = false
             messageContainerView.animatePressDown()
             
+            Task { [weak self] in
+                try? await Task.sleep(interval: quickCopyInterval)
+                
+                guard let self = self,
+                      gesture.state == .began || gesture.state == .changed else { return }
+                
+                await MainActor.run {
+                    self.longPressCopyAction()
+                    self.didCopy = true
+                }
+            }.stored(in: taskManager)
+            
         case .ended:
-            messageContainerView.animatePressUp()
-            if model.message.string != "" {
-                UIPasteboard.general.string = model.message.string
-                copyNotification?()
+            if !didCopy {
+                taskManager.clean()
+                longPressCopyAction()
             }
             
         case .cancelled, .failed:
@@ -601,6 +619,14 @@ private extension ChatMessageReplyCell {
             
         default:
             break
+        }
+    }
+    
+    private func longPressCopyAction() {
+        messageContainerView.animatePressUp()
+        if model.message.string != "" {
+            UIPasteboard.general.string = model.message.string
+            copyNotification?()
         }
     }
 }
@@ -677,6 +703,16 @@ extension ChatMessageReplyCell {
         longPress.minimumPressDuration = 0.2
         cellContainerView.addGestureRecognizer(longPress)
         cellContainerView.isUserInteractionEnabled = true
+    }
+}
+
+extension ChatMessageReplyCell: ChatCellProtocol {
+    func animateMessageHighlight() {
+        messageContainerView.animateHighlightOverlay()
+    }
+    
+    func animateReactionHighlight() {
+        opponentReactionLabel.animateHighlightOverlay()
     }
 }
 

@@ -97,7 +97,6 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
         loadWallets()
         setupView()
         addObservers()
-        updateBalances()
         setColors()
     }
 
@@ -150,8 +149,8 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     @objc private func updateBalances() {
-        refreshControl.endRefreshing()
         NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateAllBalances, object: nil)
+        refreshControl.endRefreshing()
     }
 
     private func setupView() {

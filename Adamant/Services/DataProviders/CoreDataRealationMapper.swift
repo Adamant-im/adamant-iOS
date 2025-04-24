@@ -9,7 +9,7 @@ import CommonKit
 import CoreData
 
 protocol CoreDataRealationMapperProtocol {
-    func mapReactionRelationship(transaction: RichMessageTransaction) async -> [String]
+    func mapReactionRelationship(transaction: RichMessageTransaction) async -> String?
 }
 
 final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
@@ -19,23 +19,30 @@ final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
         self.stack = stack
     }
 
-    func mapReactionRelationship(transaction: RichMessageTransaction) async -> [String] {
+    func mapReactionRelationship(transaction: RichMessageTransaction) async -> String? {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
-
+        
         return await privateContext.perform {
             guard let id = transaction.getRichValue(for: RichContentKeys.react.reactto_id) else {
-                return []
+                return nil
             }
-
-            let processedIds: [String] = [id]
-
+            
             let chatRequest = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
             chatRequest.predicate = NSPredicate(format: "transactionId == %@", id)
             chatRequest.fetchLimit = 1
-
+            
             do {
                 if let chatTrs = try privateContext.fetch(chatRequest).first {
+                    if chatTrs.isHidden {
+                        transaction.isUnread = false
+                        transaction.chatroom?.updateLastTransaction()
+                        
+                        if privateContext.hasChanges {
+                            try privateContext.save()
+                        }
+                        return nil
+                    }
                     let transactionInContext = privateContext.object(with: transaction.objectID) as? RichMessageTransaction
                     transactionInContext?.chatTransaction = chatTrs
                     chatTrs.addToRichMessageTransactions(transactionInContext!)
@@ -43,10 +50,10 @@ final class CoreDataRealationMapper: CoreDataRealationMapperProtocol {
                         try privateContext.save()
                     }
                 }
-
-                return processedIds
+                
+                return id
             } catch {
-                return processedIds
+                return id
             }
         }
     }

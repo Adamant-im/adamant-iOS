@@ -154,7 +154,7 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
                 let viewFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
                 overlay.frame = viewFrame
                 self.overlay = overlay
-                self.overlay?.pageControl.addTarget(self, action: #selector(didTapPageControl), for: .allTouchEvents)
+                self.overlay?.pageControl.addTarget(self, action: #selector(didTapPageControl), for: .valueChanged)
             }
         }
     }
@@ -274,3 +274,35 @@ public enum SwiftyOnboardStyle {
         }
     }
 }
+
+public extension SwiftyOnboard {
+    func updateLayoutForCurrentSize() {
+        let oldOffsetX = containerView.contentOffset.x
+        let oldWidth = containerView.bounds.width
+        let currentPageFraction = oldWidth > 0 ? oldOffsetX / oldWidth : 0
+        
+        containerView.frame = self.bounds
+        containerView.contentSize = CGSize(
+            width: self.bounds.width * CGFloat(pageCount),
+            height: self.bounds.height
+        )
+        
+        for (index, page) in pages.enumerated() {
+            let newX = self.bounds.width * CGFloat(index)
+            page.frame = CGRect(
+                x: newX,
+                y: 0,
+                width: self.bounds.width,
+                height: self.bounds.height
+            )
+        }
+        
+        if let overlay = overlay {
+            overlay.frame = self.bounds
+        }
+        
+        let newOffsetX = self.bounds.width * currentPageFraction
+        containerView.setContentOffset(CGPoint(x: newOffsetX, y: 0), animated: false)
+    }
+}
+

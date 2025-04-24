@@ -26,6 +26,7 @@ enum DataProviderState {
 protocol DataProvider: AnyObject, Actor {
     var state: DataProviderState { get }
     var stateObserver: AnyObservable<DataProviderState> { get }
+    var isUpdatingOvertiming: AnyObservable<Bool> { get }
     var isInitiallySynced: Bool { get }
 
     func reload() async

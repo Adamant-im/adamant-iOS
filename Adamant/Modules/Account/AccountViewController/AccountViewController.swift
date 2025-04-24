@@ -651,11 +651,13 @@ final class AccountViewController: FormViewController {
                 title: .adamant.alert.logoutButton,
                 style: .default
             ) { [weak self] _ in
-                guard let self = self else { return }
-                self.accountService.logout()
-                let vc = self.screensFactory.makeLogin()
-                vc.modalPresentationStyle = .overFullScreen
-                self.dialogService.present(vc, animated: true, completion: nil)
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    await self.accountService.logout()
+                    let vc = self.screensFactory.makeLogin()
+                    vc.modalPresentationStyle = .overFullScreen
+                    self.dialogService.present(vc, animated: true, completion: nil)
+                }
             }
 
             alert.addAction(cancel)
@@ -1114,6 +1116,12 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         destinationViewController: UIViewController,
         transitionSuccessful: Bool
     ) {
+        Task { @MainActor in
+            currentSelectedWallet = viewModel.state.wallets.first(where: { wallet in
+                wallet.model.index == pagingItem.identifier
+            })
+        }
+        
         DispatchQueue.onMainThreadSyncSafe {
             guard transitionSuccessful,
                 let first = startingViewController as? WalletViewController,
@@ -1137,6 +1145,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             })
         }
     }
+
 
     private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
         guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
