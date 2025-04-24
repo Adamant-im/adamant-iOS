@@ -36,6 +36,3 @@ extension ChatModelView {
         }
     }
 }
-
-let quickCopyInterval = 1.0
-

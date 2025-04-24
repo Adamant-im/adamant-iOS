@@ -15,7 +15,7 @@ public protocol GestureHelper: NSObject {
 public extension GestureHelper {
     func processLongPress(
         gesture: UILongPressGestureRecognizer,
-        touchDuration: TimeInterval = 1.5,
+        touchDuration: TimeInterval = 1.0,
         perform action: @escaping () -> Void,
         onGestureBegan onBegan: @escaping () -> Void,
         onGestureEnded onEnded: @escaping () -> Void
