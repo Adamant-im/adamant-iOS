@@ -110,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let tabScreens: TabScreens =
             UIScreen.main.traitCollection.userInterfaceIdiom == .pad
-            ? .splitControllers(makeSplitController(), makeSplitController())
+        ? .splitControllers(makeSplitController(storageKey: .leftSplitViewController), makeSplitController(storageKey: .rightSplitViewController))
             : .navigationControllers(chatList, account)
 
         tabScreens.viewControllers.0.tabBarItem.title = .adamant.tabItems.chats
@@ -768,19 +768,34 @@ private enum TabScreens {
 }
 
 @MainActor
-private func makeSplitController() -> UISplitViewController {
-    let controller = UISplitViewController()
-    controller.preferredDisplayMode = .oneBesideSecondary
+private func makeSplitController(storageKey: UserDefaultsKey) -> UISplitViewController {
+    let controller = AdamantSplitViewController()
+    controller.storageKey = storageKey
     
-    // Set the default ratio to 1:2
-    controller.preferredPrimaryColumnWidthFraction = 0.3337
+    controller.preferredDisplayMode = .oneBesideSecondary
     
     let minimumPrimaryColumnWidth: CGFloat = UIScreen.main.bounds.width * 0.2
     // Set the minimum ratio to 1:5, or to 300px if 1:5 results in a smaller value
-    controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 300 ? minimumPrimaryColumnWidth : 300
+    controller.minimumPrimaryColumnWidth = minimumPrimaryColumnWidth > 400 ? minimumPrimaryColumnWidth : 400
     
     // Set the maximum ratio to 3:1
     controller.maximumPrimaryColumnWidth = UIScreen.main.bounds.width * 0.75
     
     return controller
+}
+
+private final class AdamantSplitViewController: UISplitViewController {
+    var storageKey: UserDefaultsKey = .leftSplitViewController 
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let stored = UserDefaults.standard.object(forKey: storageKey.rawValue) as? Double
+        preferredPrimaryColumnWidthFraction = stored ?? 0.3334
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        let fraction = primaryColumnWidth / view.bounds.width
+        UserDefaults.standard.set(fraction, forKey: storageKey.rawValue)
+    }
 }
