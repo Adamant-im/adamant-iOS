@@ -405,7 +405,3 @@ protocol WalletServiceTwoStepSend: WalletCoreProtocol {
 protocol RawTransaction {
     var txHash: String? { get }
 }
-
-extension WalletCoreProtocol {
-    static var balanceLifetime: TimeInterval { 300 }
-}

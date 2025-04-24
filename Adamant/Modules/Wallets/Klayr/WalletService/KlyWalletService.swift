@@ -314,8 +314,8 @@ extension KlyWalletService {
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? 50000) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
 
             NotificationCenter.default.post(
