@@ -533,9 +533,10 @@ extension ChatViewController {
                 guard let self = self,
                       let index,
                       index < self.messagesCollectionView.numberOfSections else { return }
-
-                self.messagesCollectionView.performBatchUpdates {
-                    self.messagesCollectionView.reloadSections(IndexSet(integer: index))
+                UIView.performWithoutAnimation {
+                    self.messagesCollectionView.performBatchUpdates {
+                        self.messagesCollectionView.reloadSections(IndexSet(integer: index))
+                    }
                 }
             }
             .store(in: &subscriptions)
