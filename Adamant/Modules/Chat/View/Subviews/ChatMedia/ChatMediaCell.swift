@@ -132,8 +132,8 @@ extension ChatMediaCell: GestureHelper {
                 guard let text = self?.model.content.comment.string else { return }
                 self?.copyAction?(text) },
             onGestureBegan: { [weak self] in
-                self?.messageContainerView.animatePressDown() },
-            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+                self?.cellContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.cellContainerView.animatePressUp() }
         )
     }
     
@@ -144,8 +144,8 @@ extension ChatMediaCell: GestureHelper {
                 guard let id = self?.model.id else { return }
                 self?.actionHandler(.showFailedMessageAlert(id: id)) },
             onGestureBegan: { [weak self] in
-                self?.messageContainerView.animatePressDown() },
-            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+                self?.cellContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.cellContainerView.animatePressUp() }
         )
     }
     
@@ -158,7 +158,7 @@ extension ChatMediaCell: GestureHelper {
                 self?.containerMediaView.presentMenuProgrammatically(for: view)
             },
             onGestureBegan: { [weak self] in
-                self?.messageContainerView.animatePressDown() },
+                self?.cellContainerView.animatePressDown() },
             onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
         )
     }
