@@ -792,7 +792,8 @@ extension ChatViewController {
                 viewModel.startPositionId.map { scrollToPosition($0, scrollAt: .top) }
             } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
-                scrollToPosition(unreadMessage, setExtraOffset: true, scrollAt: .top)
+                let isFirstMessagesInChat = viewModel.unreadMessagesIds?.count == viewModel.messages.count
+                scrollToPosition(unreadMessage, setExtraOffset: !isFirstMessagesInChat, scrollAt: .top)
             }
         }
     }
@@ -957,7 +958,7 @@ extension ChatViewController {
                                       scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
-        var index = viewModel.messages.firstIndex(where: { $0.messageId == id })
+        let index = viewModel.messages.firstIndex(where: { $0.messageId == id })
         
         guard let index = index else { return }
         
