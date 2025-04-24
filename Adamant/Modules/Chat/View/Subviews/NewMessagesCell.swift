@@ -12,7 +12,7 @@ import UIKit
 final class NewMessagesCell: MessageReusableView {
     private let separatorLine: UIView = {
         let view = UIView()
-        view.backgroundColor = .adamant.chatRecipientBackground
+        view.backgroundColor = .adamant.chatSenderBackground
         return view
     }()
 
@@ -36,8 +36,8 @@ final class NewMessagesCell: MessageReusableView {
 
         let pixelSize = 1 / UIScreen.main.scale
         NSLayoutConstraint.activate([
-            separatorLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 18),
-            separatorLine.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -18),
+            separatorLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            separatorLine.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
             separatorLine.topAnchor.constraint(equalTo: topAnchor),
             separatorLine.heightAnchor.constraint(equalToConstant: pixelSize),
 
