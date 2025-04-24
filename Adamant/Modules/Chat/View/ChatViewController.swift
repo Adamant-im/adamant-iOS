@@ -585,12 +585,27 @@ extension ChatViewController {
 
     fileprivate func updateUnreadMessages() {
         guard state.canReadChat else { return }
-        
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
+
+        let adjustedVisibleRect = CGRect(
+            x: messagesCollectionView.contentOffset.x,
+            y: messagesCollectionView.contentOffset.y + topViewHeight,
+            width: messagesCollectionView.bounds.width,
+            height: messagesCollectionView.bounds.height - topViewHeight * 2
+        )
+
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
 
         for indexPath in visibleIndexPaths where unreadIndexes.contains(indexPath.section) {
-            viewModel.markMessageAsRead(index: indexPath.section)
+            guard let attributes = messagesCollectionView.layoutAttributesForItem(at: indexPath) else { continue }
+            let cellFrame = attributes.frame
+
+            let bottomPoint = CGPoint(x: cellFrame.midX, y: cellFrame.maxY)
+            let isBottomVisible = adjustedVisibleRect.contains(bottomPoint)
+
+            if isBottomVisible {
+                viewModel.markMessageAsRead(index: indexPath.section)
+            }
         }
     }
 
