@@ -275,10 +275,6 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
 
     // MARK: Notifications
 
-    /// Wallet updated.
-    /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
-    var walletUpdatedNotification: Notification.Name { get }
-
     /// Enabled state changed
     var serviceEnabledChanged: Notification.Name { get }
 

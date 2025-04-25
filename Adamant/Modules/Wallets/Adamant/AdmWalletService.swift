@@ -84,7 +84,6 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     var vibroService: VibroService!
 
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
     let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
@@ -212,11 +211,6 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     }
 
     private func postUpdateNotification(with wallet: WalletAccount) {
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
         Task { @MainActor in
             walletUpdateSender.send()
         }

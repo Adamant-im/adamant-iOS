@@ -136,7 +136,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var ethBIP32Service: EthBIP32ServiceProtocol!
 
     // MARK: - Notifications
-    let walletUpdatedNotification: Notification.Name
     let serviceEnabledChanged: Notification.Name
     let transactionFeeUpdated: Notification.Name
     let serviceStateChanged: Notification.Name
@@ -214,7 +213,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
     init(token: ERC20Token) {
         self.token = token
-        walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.\(token.symbol).walletUpdated")
         serviceEnabledChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).enabledChanged")
         transactionFeeUpdated = Notification.Name("adamant.erc20Wallet.\(token.symbol).feeUpdated")
         serviceStateChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).stateChanged")
@@ -300,12 +298,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         }
         
         walletUpdateSender.send()
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
 
         setState(.upToDate)
 
@@ -387,12 +379,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceLifetime) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
 
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
-
             await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
     }
@@ -429,12 +415,6 @@ extension ERC20WalletService {
             enabled = true
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
-        )
 
         await walletUpdateSender.send()
 

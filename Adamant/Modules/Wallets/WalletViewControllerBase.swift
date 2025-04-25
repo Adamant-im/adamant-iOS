@@ -424,8 +424,7 @@ extension WalletViewControllerBase {
             }
             .store(in: &subscriptions)
 
-        NotificationCenter.default
-            .notifications(named: service.core.walletUpdatedNotification)
+        service.core.walletUpdatePublisher
             .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }

@@ -10,6 +10,7 @@ import CommonKit
 import Eureka
 import SafariServices
 import UIKit
+import Combine
 
 extension String.adamant.wallets {
     static var adamant: String {
@@ -87,7 +88,9 @@ final class AdmWalletViewController: WalletViewControllerBase {
 
     // MARK: - Props & Deps
     var hideFreeTokensRow = false
-
+    
+    var cancellables: Set<AnyCancellable> = []
+    
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -198,12 +201,14 @@ final class AdmWalletViewController: WalletViewControllerBase {
 
         // Notifications
         if let service = service {
-            NotificationCenter.default.addObserver(
-                forName: service.core.walletUpdatedNotification,
-                object: service.core,
-                queue: OperationQueue.main,
-                using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
-            )
+            service.core.walletUpdatePublisher
+                .receive(on: DispatchQueue.main)
+                .sink { _ in
+                    MainActor.assumeIsolatedSafe { 
+                        self.updateRows() 
+                    }
+                }
+                .store(in: &cancellables)
         }
 
         NotificationCenter.default.addObserver(

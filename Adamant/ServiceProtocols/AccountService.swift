@@ -36,13 +36,6 @@ extension Notification.Name {
         /// - Adamant.AccountService.newStayInState with new state
         static let stayInChanged = Notification.Name("adamant.accountService.stayInChanged")
 
-        /// Raised when wallets collection updated
-        ///
-        /// UserInfo:
-        /// - AdamantUserInfoKey.AccountService.updatedWallet: wallet object
-        /// - AdamantUserInfoKey.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
-        static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
-
         private init() {}
     }
 }
