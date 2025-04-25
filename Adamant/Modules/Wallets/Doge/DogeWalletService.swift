@@ -310,7 +310,7 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
 
         balanceInvalidationSubscription = Task { [weak self] in
             guard let self = self else { return }
-            try await Task.sleep(interval: Double(self.balanceValidInterval ?? 50000) / 1000, pauseInBackground: true)
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceLifetime) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
 
             NotificationCenter.default.post(

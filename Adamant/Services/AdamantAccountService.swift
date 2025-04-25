@@ -164,7 +164,7 @@ extension AdamantAccountService {
         balanceInvalidationSubscription = Task { [weak self] in
             guard let self = self else { return }
             try await Task.sleep(
-                interval: Double(wallet?.core.balanceValidInterval ?? 50000) / 1000,
+                interval: Double(wallet?.core.balanceValidInterval ?? AdmWalletService.balanceLifetime) / 1000,
                 pauseInBackground: true
             )
             
