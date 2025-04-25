@@ -790,7 +790,11 @@ private final class AdamantSplitViewController: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let stored = UserDefaults.standard.object(forKey: storageKey.rawValue) as? Double
-        preferredPrimaryColumnWidthFraction = stored ?? 0.3334
+        guard let stored = stored, stored > 0.3334, stored < 0.75 else {
+            preferredPrimaryColumnWidthFraction = 0.3334
+            return
+        }
+        preferredPrimaryColumnWidthFraction = stored
     }
     
     override func viewWillLayoutSubviews() {
