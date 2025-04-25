@@ -1150,8 +1150,7 @@ extension ChatListViewController {
         descriptionParts.insert(draftPrefix, at: 0)
         
         let result: NSMutableAttributedString = .init(string: "")
-        for (index, part) in descriptionParts.enumerated() {
-            if index > 0 { result.append(NSAttributedString(string: " ")) }
+        for part in descriptionParts {
             result.append(part)
         }
         
