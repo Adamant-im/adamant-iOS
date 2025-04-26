@@ -791,7 +791,7 @@ extension ChatViewController {
     fileprivate func updateIsScrollPositionNearlyTheBottom() {
         let isNearBottom = chatMessagesCollectionView.bottomOffset < 150
         state.isScrollPositionNearlyTheBottom = isNearBottom
-        viewModel.separatorState.IsScrollPositionNearlyTheBottom = isNearBottom
+        viewModel.separatorState.isScrollPositionNearlyTheBottom = isNearBottom
     }
 
     fileprivate func updateMessages() {

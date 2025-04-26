@@ -13,5 +13,5 @@ struct NewMessageSeparatorState {
     var separatorId: String?
     var isFirstUpdate: Bool = true
     var didAddSeparator: Bool = false
-    var IsScrollPositionNearlyTheBottom = true
+    var isScrollPositionNearlyTheBottom = true
 }

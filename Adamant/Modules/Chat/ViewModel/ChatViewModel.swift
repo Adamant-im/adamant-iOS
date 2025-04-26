@@ -1816,7 +1816,7 @@ extension ChatViewModel {
     fileprivate func updateSeparatorId() {
         guard !separatorState.didAddSeparator, !messages.isEmpty else { return }
         
-        if separatorState.isFirstUpdate || !separatorState.IsScrollPositionNearlyTheBottom {
+        if separatorState.isFirstUpdate || !separatorState.isScrollPositionNearlyTheBottom {
             separatorState.isFirstUpdate = false
             guard let firstUnreadId = unreadMessagesIds?.first else {
                 separatorState.separatorId = nil

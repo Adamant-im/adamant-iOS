@@ -788,7 +788,7 @@ extension AdamantChatsProvider {
         return transaction
     }
 
-    @MainActor func removeChatPositon(for address: String) {
+    @MainActor func removeChatPosition(for address: String) {
         chatPositon.removeValue(forKey: address)
     }
 

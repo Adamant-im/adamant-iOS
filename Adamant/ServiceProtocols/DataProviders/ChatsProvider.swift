@@ -295,7 +295,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func markChatAsRead(chatroom: Chatroom)
     func markMessageAsRead(chatroom: Chatroom, message: String)
 
-    @MainActor func removeChatPositon(for address: String)
+    @MainActor func removeChatPosition(for address: String)
     @MainActor func setChatPositon(for address: String, topMessageId: String?)
     @MainActor func getChatPositon(for address: String) -> String?
 
