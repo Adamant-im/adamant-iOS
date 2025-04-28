@@ -28,7 +28,16 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         stack.spacing = 6
         return stack
     }()
-
+    
+    private lazy var verticalTitlesStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [titleLabel, horizontalStack])
+        stack.axis = .vertical
+        stack.alignment = .leading
+        stack.distribution = .fillProportionally
+        stack.spacing = 0
+        return stack
+    }()
+    
     var title: String? {
         get { titleLabel.text }
         set { titleLabel.text = newValue }
@@ -113,25 +122,19 @@ final class VisibleWalletsCheckmarkRowView: UIView {
             $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview().inset(8)
         }
-
+        
         addSubview(checkmarkView)
         checkmarkView.snp.makeConstraints {
             $0.size.equalTo(44)
             $0.top.trailing.bottom.equalToSuperview().inset(2)
         }
-
-        addSubview(titleLabel)
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(checkmarkView)
+        
+        addSubview(verticalTitlesStack)
+        verticalTitlesStack.snp.makeConstraints {
+            $0.centerY.equalTo(logoImageView.snp.centerY)
             $0.leading.equalTo(logoImageView.snp.trailing).offset(8)
         }
-
-        addSubview(horizontalStack)
-        horizontalStack.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(2)
-            $0.leading.equalTo(titleLabel)
-        }
-
+        
         addSubview(balanceLabel)
         balanceLabel.contentMode = .left
         balanceLabel.snp.makeConstraints {
@@ -146,6 +149,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
 private func makeTitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 15, weight: .regular)
+    label.accessibilityIdentifier = "VisibleWalletsCheckmarkRowView.titleLabel"
     return label
 }
 
@@ -154,6 +158,7 @@ private func makeSubtitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .preferredFont(forTextStyle: .caption1)
     label.contentMode = .left
+    label.accessibilityIdentifier = "VisibleWalletsCheckmarkRowView.subtitleLabel"
     return label
 }
 
@@ -163,6 +168,7 @@ private func makeCaptionLabel() -> UILabel {
     label.font = .systemFont(ofSize: 12, weight: .regular)
     label.contentMode = .left
     label.textColor = .lightGray
+    label.accessibilityIdentifier = "VisibleWalletsCheckmarkRowView.captionLabel"
     return label
 }
 
@@ -170,5 +176,6 @@ private func makeCaptionLabel() -> UILabel {
 private func makeAdditionalLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 15, weight: .regular)
+    label.accessibilityIdentifier = "VisibleWalletsCheckmarkRowView.additionalLabel"
     return label
 }
