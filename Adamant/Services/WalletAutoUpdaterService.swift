@@ -109,6 +109,9 @@ actor WalletAutoUpdateService {
                 interval: getTimeIntervalFor(wallet: core),
                 queue: .global(qos: .utility),
                 callback: {
+                    if wallet.core is AdmWalletService{
+                        self.accountService.update()
+                    }
                     core.update()
                 }
             )

@@ -84,6 +84,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     var vibroService: VibroService!
 
     // MARK: - Notifications
+    let adamantAccount = Notification.Name("adamant.admWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
@@ -160,6 +161,13 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
                 self?.admWallet = nil
             }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .notifications(named: .AdamantAccountService.walletUpdated, object: nil)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
     }
 
     func updateWithRefreshUIBalance(){
@@ -191,8 +199,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
 
         admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
 
-        if let wallet = wallet {
-            postUpdateNotification(with: wallet)
+        if wallet != nil {
+            Task { @MainActor in
+                walletUpdateSender.send()
+            }
         }
 
         if isRaised {
@@ -208,12 +218,6 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
 
     func validate(address: String) -> AddressValidationResult {
         addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
-    }
-
-    private func postUpdateNotification(with wallet: WalletAccount) {
-        Task { @MainActor in
-            walletUpdateSender.send()
-        }
     }
 
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -254,7 +258,9 @@ extension AdmWalletService: NSFetchedResultsControllerDelegate {
 
         if newCount != wallet.notifications {
             wallet.notifications = newCount
-            postUpdateNotification(with: wallet)
+            Task { @MainActor in
+                walletUpdateSender.send()
+            }
         }
     }
 }

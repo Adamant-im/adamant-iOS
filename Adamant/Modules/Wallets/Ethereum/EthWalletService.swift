@@ -339,7 +339,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
 
         balanceInvalidationSubscription = Task { [weak self] in
             guard let self = self else { return }
-            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceLifetime) / 1000, pauseInBackground: true)
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
 
             await self.walletUpdateSender.send()

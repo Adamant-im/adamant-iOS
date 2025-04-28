@@ -27,14 +27,16 @@ extension Notification.Name {
         /// Raised on account info (balance) updated.
         static let forceUpdateBalance = Notification.Name("adamant.accountService.forceUpdateBalance")
 
-        /// Raised on account info (balance) updated.
-        static let forceUpdateAllBalances = Notification.Name("adamant.accountService.forceUpdateAllBalances")
-
         /// Raised when user changed Stay In option.
         ///
         /// UserInfo:
         /// - Adamant.AccountService.newStayInState with new state
         static let stayInChanged = Notification.Name("adamant.accountService.stayInChanged")
+
+        /// Raised when wallets collection updated
+        ///
+        /// Use only for communication between AdmanatAccountService and AdamantWalletService.
+        static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
 
         private init() {}
     }
@@ -155,8 +157,7 @@ protocol AccountService: AnyObject, Sendable {
 
     /// Update logged account info
     func update()
-    func updateOnlyADM()
-    func updateWithRefreshUI()
+    func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?)
 
     /// Login into Adamant using passphrase.

@@ -403,5 +403,5 @@ protocol RawTransaction {
 }
 
 extension WalletCoreProtocol {
-    static var balanceLifetime: Int { 300000 } // 5 minutes
+    static var balanceCheckIntervalDefault: Int { 300000 } // 5 minutes
 }

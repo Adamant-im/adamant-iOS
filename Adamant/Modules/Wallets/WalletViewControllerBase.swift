@@ -425,6 +425,7 @@ extension WalletViewControllerBase {
             .store(in: &subscriptions)
 
         service.core.walletUpdatePublisher
+            .receive(on: DispatchQueue.main)
             .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }
@@ -451,6 +452,7 @@ extension WalletViewControllerBase {
             .store(in: &subscriptions)
     }
 
+    @MainActor
     fileprivate func updateWalletUI() {
         guard let service = service else { return }
 

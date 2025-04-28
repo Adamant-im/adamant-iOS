@@ -145,7 +145,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     @objc private func updateBalances() {
-        NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateAllBalances, object: nil)
+        accountService.update(shouldUpdateUIBalance: true, updateOnlyADM: false, updateOnlyVisible: false)
         refreshControl.endRefreshing()
     }
 

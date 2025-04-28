@@ -59,11 +59,6 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             self?.update()
         }
         
-        NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateAllBalances, object: nil, queue: OperationQueue.main) {
-            [weak self] _ in
-            self?.updateAll()
-        }
-        
         NotificationCenter.default
             .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
             .sink { @MainActor [weak self] _ in
@@ -164,7 +159,7 @@ extension AdamantAccountService {
         balanceInvalidationSubscription = Task { [weak self] in
             guard let self = self else { return }
             try await Task.sleep(
-                interval: Double(wallet?.core.balanceValidInterval ?? AdmWalletService.balanceLifetime) / 1000,
+                interval: Double(wallet?.core.balanceValidInterval ?? AdmWalletService.balanceCheckIntervalDefault) / 1000,
                 pauseInBackground: true
             )
             
@@ -228,20 +223,12 @@ extension AdamantAccountService {
         self.update(nil)
     }
     
-    func updateOnlyADM() {
-        self.update(nil, updateOnlyADM: true)
-    }
-    
-    func updateAll() {
-        update(nil, updateOnlyVisible: false)
-    }
-    
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         update(completion, updateOnlyVisible: true)
     }
     
-    func updateWithRefreshUI() {
-        update(nil, updateOnlyVisible: true, shouldUpdateUIBalance: true)
+    func update(shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false, updateOnlyVisible: Bool = true) {
+        update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: true, updateOnlyADM: updateOnlyADM)
     }
     
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
