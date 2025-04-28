@@ -9,6 +9,7 @@
 import Combine
 import CommonKit
 import UIKit
+import SwiftUI
 
 final class ChatMediaContainerView: UIView {
     private let spacingView: UIView = {
@@ -88,9 +89,28 @@ final class ChatMediaContainerView: UIView {
         button.addTarget(self, action: #selector(onStatusButtonTap), for: .touchUpInside)
         return button
     }()
+    
+    private lazy var progressRingHostingView: UIView = {
+        let progressBar = CircularProgressView { [weak self] in
+            guard let self else { return .init(progress: .zero, hidden: true) }
+            return self.statusProgressState
+        }
+        let hosting = UIHostingController(rootView: progressBar)
+        hosting.view.backgroundColor = .clear
+        hosting.view.isUserInteractionEnabled = false
+        return hosting.view
+    }()
 
     private lazy var contentView = ChatMediaContentView()
     private lazy var chatMenuManager = ChatMenuManager(delegate: self)
+    
+    private var statusProgressState = CircularProgressState(
+        lineWidth: 2.0,
+        backgroundColor: .clear,
+        progressColor: .adamant.primary,
+        progress: .zero,
+        hidden: true
+    )
 
     // MARK: Dependencies
 
@@ -123,6 +143,11 @@ final class ChatMediaContainerView: UIView {
     }
 
     @objc func onStatusButtonTap() {
+        if model.status == .busy {
+            actionHandler(.cancelUploading(messageId: model.id))
+            return
+        }
+        
         if model.status == .failed,
             let file = model.content.fileModel.files.first
         {
@@ -153,9 +178,15 @@ extension ChatMediaContainerView {
             $0.verticalEdges.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(4)
         }
-
+        
         reactionsStack.snp.makeConstraints { $0.width.equalTo(reactionsWidth) }
         chatMenuManager.setup(for: contentView)
+        
+        reactionsStack.insertSubview(progressRingHostingView, aboveSubview: statusButton)
+        progressRingHostingView.snp.makeConstraints { make in
+            make.center.equalTo(statusButton)
+            make.size.equalTo(31)
+        }
     }
 
     func update() {
@@ -166,12 +197,34 @@ extension ChatMediaContainerView {
         updateOwnReaction()
         updateOpponentReaction()
         updateStatus(model.status)
+        updateProgressRing()
     }
 
     func updateStatus(_ status: FileMessageStatus) {
         statusButton.setImage(status.image, for: .normal)
         statusButton.tintColor = status.imageTintColor
         statusButton.isHidden = status == .success
+    }
+    
+    func averageUploadProgress() -> Double {
+        let files = model.content.fileModel.files
+        
+        let progresses = files
+            .compactMap { $0.progress }
+        
+        guard !progresses.isEmpty else {
+            return 0.0
+        }
+        
+        let totalProgress = progresses.reduce(0, +)
+        return Double(totalProgress) / Double(progresses.count)
+    }
+    
+    func updateProgressRing() {
+        let averageProgress = averageUploadProgress()
+
+        statusProgressState.progress = averageProgress / 100
+        statusProgressState.hidden = averageProgress == 0 || averageProgress == 100
     }
 
     func updateLayout() {
