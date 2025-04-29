@@ -996,7 +996,7 @@ extension ChatListViewController {
            let reactToId = richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) {
             return (reactToId, .reaction)
         } else {
-            return (transaction.transactionId, .message)
+            return (transaction.transactionId, .none)
         }
     }
 

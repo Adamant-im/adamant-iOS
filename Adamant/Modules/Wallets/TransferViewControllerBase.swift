@@ -1019,7 +1019,7 @@ class TransferViewControllerBase: FormViewController {
             message = AdamantMessage.richMessage(payload: payload)
         }
 
-        chatsProvider.removeChatPositon(for: admAddress)
+        chatsProvider.removeChatPosition(for: admAddress)
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
 

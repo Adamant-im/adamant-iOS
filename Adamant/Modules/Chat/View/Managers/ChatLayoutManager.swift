@@ -124,9 +124,8 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
         MainActor.assumeIsolatedSafe {
-            guard let separatorIndex = viewModel.separatorIndex, section == separatorIndex else {
-                return .zero
-            }
+            guard let separatorIndex = viewModel.separatorState.separatorIndex,
+                    section == separatorIndex else { return .zero }
             return CGSize(width: messagesCollectionView.bounds.width, height: 25)
         }
     }

@@ -72,7 +72,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageReusableView {
         DispatchQueue.onMainThreadSyncSafe {
-            guard let separatorIndex = viewModel.separatorIndex, indexPath.section == separatorIndex else {
+            guard let separatorIndex = viewModel.separatorState.separatorIndex, indexPath.section == separatorIndex else {
                 return MessageReusableView()
             }
 
