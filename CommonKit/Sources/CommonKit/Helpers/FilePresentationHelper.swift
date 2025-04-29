@@ -101,7 +101,7 @@ public class FilePresentationHelper {
         
         let text = [mediaText, fileText].filter {
             !$0.isEmpty
-        }.joined()
+        }.joined() + " "
         
         return text
     }

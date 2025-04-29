@@ -621,8 +621,12 @@ private extension FilePresentationHelper {
             return NSMutableAttributedString(string: string)
         }
         
-        let (emojiPrefix, markdownBody) = extractEmojiPrefixAndBody(from: string)
+        var (emojiPrefix, markdownBody) = extractEmojiPrefixAndBody(from: string)
         
+        if !emojiPrefix.isEmpty, !markdownBody.isEmpty, !markdownBody.hasPrefix(" ") {
+            markdownBody = " " + markdownBody
+        }
+
         var parsedEmodji = parser.parse(emojiPrefix)
         var parsedComment = parser.parse(markdownBody)
         
