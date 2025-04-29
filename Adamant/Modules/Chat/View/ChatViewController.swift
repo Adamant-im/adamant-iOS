@@ -320,6 +320,22 @@ extension ChatViewController {
                 self?.state.isAppActive = false
             }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .controllerPresentedLifecycleNotification)
+            .sink { [weak self] notification in
+                guard let self,
+                      let id = notification.userInfo?["id"] as? String,
+                      let isPresented = notification.userInfo?["isPresented"] as? Bool else { return }
+
+                if isPresented {
+                    self.state.presentedControllerIDs.insert(id)
+                } else {
+                    self.state.presentedControllerIDs.remove(id)
+                    updateUnreadMessages()
+                }
+            }
+            .store(in: &subscriptions)
 
         viewModel.didTapAdmNodesList
             .sink { [weak self] in

@@ -269,6 +269,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.languageService = languageService
 
         super.init(style: .grouped)
+        postLifecycleNotification(isPresented: true)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -834,6 +835,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
 
     deinit {
+        postLifecycleNotification(isPresented: false)
         refreshTask?.cancel()
     }
 
@@ -954,6 +956,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
 
         row.value = getFeeValue()
         row.updateCell()
+    }
+    
+    private func postLifecycleNotification(isPresented: Bool) {
+        NotificationCenter.default.post(
+            name: .controllerPresentedLifecycleNotification,
+            object: nil,
+            userInfo: ["id": controllerIdKey, "isPresented": isPresented]
+        )
     }
 
     func getFeeValue() -> String {
@@ -1105,3 +1115,5 @@ class TransactionDetailsViewControllerBase: FormViewController {
         )
     }
 }
+
+fileprivate let controllerIdKey: String = "transactionDetailsController"

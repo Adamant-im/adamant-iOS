@@ -57,6 +57,7 @@ final class ComplexTransferViewController: UIViewController {
         self.nodesStorage = nodesStorage
 
         super.init(nibName: nil, bundle: nil)
+        self.postLifecycleNotification(isPresented: true)
     }
 
     required init?(coder: NSCoder) {
@@ -93,6 +94,7 @@ final class ComplexTransferViewController: UIViewController {
     }
 
     deinit {
+        self.postLifecycleNotification(isPresented: false)
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -112,6 +114,14 @@ final class ComplexTransferViewController: UIViewController {
 
     @objc func cancel() {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
+    }
+    
+    private func postLifecycleNotification(isPresented: Bool) {
+        NotificationCenter.default.post(
+            name: .controllerPresentedLifecycleNotification,
+            object: nil,
+            userInfo: ["id": controllerIdKey, "isPresented": isPresented]
+        )
     }
 }
 
@@ -266,3 +276,9 @@ extension ComplexTransferViewController {
         super.pressesBegan(presses, with: event)
     }
 }
+
+extension Notification.Name {
+    static let controllerPresentedLifecycleNotification = Notification.Name("controllerPresentedLifecycleNotification")
+}
+
+fileprivate let controllerIdKey: String = "complexTransferViewController"
