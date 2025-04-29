@@ -120,7 +120,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         logoImageView.snp.makeConstraints {
             $0.size.equalTo(25)
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().inset(8)
+            $0.leading.equalToSuperview().inset(20)
         }
         
         addSubview(checkmarkView)
