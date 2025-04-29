@@ -81,6 +81,7 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -108,10 +109,9 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     // MARK: -
 
     func initWallet(
-        withPassphrase passphrase: String,
-        withPassword password: String
+        withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool
     ) async throws -> WalletAccount {
-        try await initWallet(passphrase: passphrase, password: password)
+        try await initWallet(passphrase: passphrase, password: password, storeInKVS: storeInKVS)
     }
 
     func setInitiationFailed(reason: String) {
@@ -203,8 +203,6 @@ extension KlyWalletService: SwinjectDependentService {
         klyNodeApiService = container.resolve(KlyNodeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-
-        addTransactionObserver()
     }
 
     func addTransactionObserver() {
@@ -427,8 +425,8 @@ extension KlyWalletService {
 }
 
 // MARK: - Init Wallet
-extension KlyWalletService {
-    fileprivate func initWallet(passphrase: String, password: String) async throws -> WalletAccount {
+private extension KlyWalletService {
+    func initWallet(passphrase: String, password: String, storeInKVS: Bool) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -479,7 +477,16 @@ extension KlyWalletService {
         else {
             throw WalletServiceError.accountNotFound
         }
-
+        
+        setState(.upToDate)
+        
+        Task {
+            await self.update()
+            self.addTransactionObserver()
+        }
+        
+        guard storeInKVS else { return eWallet }
+        
         // Save into KVS
 
         do {
@@ -488,30 +495,18 @@ extension KlyWalletService {
             if address != eWallet.address {
                 updateKvsAddress(kvsAddressModel)
             }
-
-            setState(.upToDate)
-
-            Task {
-                await update()
-            }
-
+            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                setState(.upToDate)
-
-                Task {
-                    await update()
-                }
-
+                
                 updateKvsAddress(kvsAddressModel)
 
                 return eWallet
             default:
-                setState(.upToDate)
                 throw error
             }
         }

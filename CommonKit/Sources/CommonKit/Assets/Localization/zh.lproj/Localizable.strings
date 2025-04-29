@@ -248,25 +248,25 @@
 "AccountTab.Section.Application" = "应用";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT钱包";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
+"AccountTab.Wallets.ethereum" = "以太坊";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr钱包";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
+"AccountTab.Wallets.bitcoin" = "比特币";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "狗狗钱包";
+"AccountTab.Wallets.doge" = "狗狗";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "达世币钱包";
+"AccountTab.Wallets.dash" = "达世币";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "%@钱包";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account page: scene title */
 "AccountTab.Title" = "帐户";
@@ -870,6 +870,12 @@
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "密码短语";
 
+/* QRGenerator: Password textview placeholder */
+"QrGeneratorScene.Password.Placeholder" = "密码";
+
+/* QRGenerator: Toggle textview title */
+"QrGeneratorScene.Toggle.Title" = "秘密钱包";
+
 /* QRGenerator: small 'Tap to save' tooltip under generated QR */
 "QrGeneratorScene.TapToSave" = "点击保存";
 
@@ -1173,6 +1179,12 @@
 /* Transfer: fiat value of crypto-amout */
 "TransferScene.Row.Fiat" = "价值";
 
+/* Transfer: sender address */
+"TransferScene.Row.SenderAddress" = "地址";
+
+/* Transfer: type of wallet */
+"TransferScene.Row.Type" = "类型";
+
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "余额";
 
@@ -1360,3 +1372,36 @@
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
 
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
+
+/* Secret Wallets */
+"SecretWallets.Menu.Regular" = "💰 普通";
+"SecretWallets.Menu.Regular.WithoutEmoji" = "普通";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ 秘密 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ 秘密 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ 秘密 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ 秘密 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ 秘密 5";
+"SecretWallets.Menu.Secret1.Emoji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emoji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emoji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emoji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emoji" = "🔐5️⃣";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 添加秘密";
+"SecretWallets.Menu.TellMeMore" = "💡 关于钱包";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
+"SecretWallets.Menu.Title" = "活动钱包";
+"SecretWallets.Menu.AddSecretWallet.Title" = "输入密码以添加秘密钱包";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "密码";
+"SecretWallets.Menu.AddSecretWallet.Add" = "添加";
+"SecretWallets.Row.Title" = "秘密钱包（添加）";
+
+/* Secret Wallets Coins names*/
+"SecretWallets.Coin.Regular" = "%@ 钱包";
+"SecretWallets.Coin.SecretRegular" = "常规 %@ 钱包";
+"SecretWallets.Coin.Secret1" = "秘密 %@ 钱包 🔐1️⃣";
+"SecretWallets.Coin.Secret2" = "秘密 %@ 钱包 🔐2️⃣";
+"SecretWallets.Coin.Secret3" = "秘密 %@ 钱包 🔐3️⃣";
+"SecretWallets.Coin.Secret4" = "秘密 %@ 钱包 🔐4️⃣";
+"SecretWallets.Coin.Secret5" = "秘密 %@ 钱包 🔐5️⃣";

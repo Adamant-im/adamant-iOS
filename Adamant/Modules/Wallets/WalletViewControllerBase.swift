@@ -23,6 +23,10 @@ protocol WalletViewControllerDelegate: AnyObject {
 }
 
 class WalletViewControllerBase: FormViewController, WalletViewController {
+    var walletName: String {
+        fatalError("Should be overridden")
+    }
+    
     // MARK: - Rows
     enum BaseRows {
         case address, balance, send
@@ -54,6 +58,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 
     let dialogService: DialogService
     let screensFactory: ScreensFactory
+    let secretWalletsViewModel: SecretWalletsViewModel
     var service: WalletService?
 
     // MARK: - Properties, WalletViewController
@@ -89,6 +94,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         accountService: AccountService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,
+        secretWalletsViewModel: SecretWalletsViewModel,
         service: WalletService?
     ) {
         self.dialogService = dialogService
@@ -96,6 +102,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         self.accountService = accountService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
+        self.secretWalletsViewModel = secretWalletsViewModel
         self.service = service
         super.init(nibName: "WalletViewControllerBase", bundle: nil)
     }
@@ -313,6 +320,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 }
 
                 self?.dialogService.presentShareAlertFor(
+                    title: self?.makeTitle(),
                     string: address,
                     types: types,
                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -324,9 +332,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         return addressRow
     }
-
-    func setTitle() {}
-
+    
+    func makeTitle() -> String {
+        guard service != nil else { return "" }
+        return secretWalletsViewModel.getCurrentWalletCoinName(withCoinName: walletName)
+    }
+    
+    func setTitle() {
+        walletTitleLabel.text = makeTitle()
+    }
+    
     // MARK: - Other
 
     private var currentUiState: WalletServiceState = .upToDate

@@ -194,6 +194,7 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
             }
 
             dialogService.presentShareAlertFor(
+                title: nil,
                 string: value,
                 types: [.copyToPasteboard, .share],
                 excludedActivityTypes: nil,

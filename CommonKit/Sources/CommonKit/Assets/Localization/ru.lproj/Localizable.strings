@@ -248,25 +248,25 @@
 "AccountTab.Section.Application" = "Приложение";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "Кошелек ADAMANT";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
+"AccountTab.Wallets.ethereum" = "Ethereum";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Кошелек Klayr";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "Кошелек Bitcoin";
+"AccountTab.Wallets.bitcoin" = "Bitcoin";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "Кошелек Doge";
+"AccountTab.Wallets.doge" = "Doge";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "Кошелек Dash";
+"AccountTab.Wallets.dash" = "Dash";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "Кошелек %@";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
@@ -878,6 +878,12 @@
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "Пароль";
 
+/* QRGenerator: Password textview placeholder */
+"QrGeneratorScene.Password.Placeholder" = "Пароль";
+
+/* QRGenerator: Toggle textview title */
+"QrGeneratorScene.Toggle.Title" = "Секретные кошельки";
+
 /* QRGenerator: small 'Tap to save' tooltip under generated QR */
 "QrGeneratorScene.TapToSave" = "Нажмите для сохранения";
 
@@ -1184,6 +1190,12 @@
 /* Transfer: fiat value of crypto-amout */
 "TransferScene.Row.Fiat" = "Ценность";
 
+/* Transfer: sender address */
+"TransferScene.Row.SenderAddress" = "Адрес";
+
+/* Transfer: type of wallet */
+"TransferScene.Row.Type" = "Тип";
+
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Баланс";
 
@@ -1370,3 +1382,36 @@
 "Chat.Alert.ReviewNodesList" = "К списку узлов ADM";
 
 "Chat.Timestamp.InFuture.Error" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит.\nПроверьте время на устройстве или попробуйте отправить сообщение снова.";
+
+/* Secret Wallets */
+"SecretWallets.Menu.Regular" = "💰 Обычный";
+"SecretWallets.Menu.Regular.WithoutEmoji" = "Обычный";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ Секретный 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ Секретный 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ Секретный 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ Секретный 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ Секретный 5";
+"SecretWallets.Menu.Secret1.Emoji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emoji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emoji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emoji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emoji" = "🔐5️⃣";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 Добавить секретный";
+"SecretWallets.Menu.TellMeMore" = "💡 О кошельках";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
+"SecretWallets.Menu.Title" = "Активные кошельки";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Введите пароль, чтобы добавить секретный кошелек";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Пароль";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Добавить";
+"SecretWallets.Row.Title" = "Секретные кошельки (Добавить)";
+
+/* Secret Wallets Coins names*/
+"SecretWallets.Coin.Regular" = "%@ кошелёк";
+"SecretWallets.Coin.SecretRegular" = "Обычный %@ кошелёк";
+"SecretWallets.Coin.Secret1" = "Секретный %@ кошелёк 🔐1️⃣";
+"SecretWallets.Coin.Secret2" = "Секретный %@ кошелёк 🔐2️⃣";
+"SecretWallets.Coin.Secret3" = "Секретный %@ кошелёк 🔐3️⃣";
+"SecretWallets.Coin.Secret4" = "Секретный %@ кошелёк 🔐4️⃣";
+"SecretWallets.Coin.Secret5" = "Секретный %@ кошелёк 🔐5️⃣";

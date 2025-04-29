@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -53,13 +53,22 @@
                     <rect key="frame" x="0.0" y="184" width="378" height="231"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="secret_wallets_regular" translatesAutoresizingMaskIntoConstraints="NO" id="Man-rA-gFA">
+                    <rect key="frame" x="271.5" y="45" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="35" id="45y-Er-QMf"/>
+                        <constraint firstAttribute="height" constant="35" id="YhE-0q-neO"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="LHk-7R-5oq" firstAttribute="top" secondItem="6hF-gW-1fF" secondAttribute="bottom" constant="28" id="0d9-Ro-csQ"/>
+                <constraint firstItem="Man-rA-gFA" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="45" id="4Gw-op-P7G"/>
                 <constraint firstAttribute="bottom" secondItem="LHk-7R-5oq" secondAttribute="bottom" id="5u8-dI-fD1"/>
                 <constraint firstItem="6hF-gW-1fF" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="13" id="EN0-a5-cHs"/>
                 <constraint firstAttribute="trailing" secondItem="LHk-7R-5oq" secondAttribute="trailing" id="FJv-73-Ayr"/>
+                <constraint firstItem="Man-rA-gFA" firstAttribute="leading" secondItem="IVQ-4p-zci" secondAttribute="trailing" constant="45" id="Uol-2s-20a"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="25" id="Z7D-Q0-s2x"/>
                 <constraint firstItem="LHk-7R-5oq" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="eip-WC-PKw"/>
                 <constraint firstItem="6hF-gW-1fF" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="gMH-Q7-bMw"/>
@@ -69,13 +78,15 @@
             <connections>
                 <outlet property="addressButton" destination="Iro-jA-X5P" id="u6V-wQ-5UR"/>
                 <outlet property="avatarImageView" destination="IVQ-4p-zci" id="FoL-e1-OKu"/>
+                <outlet property="secretWalletsImageView" destination="Man-rA-gFA" id="pbA-HV-NNe"/>
                 <outlet property="walletViewContainer" destination="LHk-7R-5oq" id="u0m-up-Zyy"/>
             </connections>
-            <point key="canvasLocation" x="35" y="-95.5"/>
+            <point key="canvasLocation" x="33.600000000000001" y="-95.802098950524751"/>
         </view>
     </objects>
     <resources>
         <image name="avatar_placeholder" width="75" height="75"/>
-        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
+        <image name="secret_wallets_regular" width="55.5" height="55.5"/>
+        <image name="square.and.arrow.up" catalog="system" width="110" height="128"/>
     </resources>
 </document>

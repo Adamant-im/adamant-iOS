@@ -248,25 +248,25 @@
 "AccountTab.Section.Application" = "Application";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT Wallet";
+"AccountTab.Wallets.adamant" = "ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
+"AccountTab.Wallets.ethereum" = "Ethereum";
 
 /* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr Wallet";
+"AccountTab.Wallets.kly" = "Klayr";
 
 /* Account tab: Bitcoin wallet */
-"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
+"AccountTab.Wallets.bitcoin" = "Bitcoin";
 
 /* Account tab: Doge wallet */
-"AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+"AccountTab.Wallets.doge" = "Doge";
 
 /* Account tab: Dash wallet */
-"AccountTab.Wallets.dash_wallet" = "Dash Wallet";
+"AccountTab.Wallets.dash" = "Dash";
 
 /* Account tab: ERC20 wallet */
-"AccountTab.Wallets.erc20_wallet" = "%@ Wallet";
+"AccountTab.Wallets.erc20" = "%@";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";
@@ -877,6 +877,12 @@
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "Passphrase";
 
+/* QRGenerator: Password textview placeholder */
+"QrGeneratorScene.Password.Placeholder" = "Password";
+
+/* QRGenerator: Toggle textview title */
+"QrGeneratorScene.Toggle.Title" = "Secret wallets";
+
 /* QRGenerator: small 'Tap to save' tooltip under generated QR */
 "QrGeneratorScene.TapToSave" = "Tap to save";
 
@@ -1183,6 +1189,12 @@
 /* Transfer: fiat value of crypto-amout */
 "TransferScene.Row.Fiat" = "Value";
 
+/* Transfer: sender address */
+"TransferScene.Row.SenderAddress" = "Address";
+
+/* Transfer: type of wallet */
+"TransferScene.Row.Type" = "Type";
+ 
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Balance";
 
@@ -1369,3 +1381,36 @@
 "Chat.Alert.ReviewNodesList" = "Review ADM node list";
 
 "Chat.Timestamp.InFuture.Error" = "A network node rejected the message because the time on your device is ahead.\nCheck the device's time or try sending a message again.";
+
+/* Secret Wallets */
+"SecretWallets.Menu.Regular" = "💰 Regular";
+"SecretWallets.Menu.Regular.WithoutEmoji" = "Regular";
+"SecretWallets.Menu.Secret1" = "🔐1️⃣ Secret 1";
+"SecretWallets.Menu.Secret2" = "🔐2️⃣ Secret 2";
+"SecretWallets.Menu.Secret3" = "🔐3️⃣ Secret 3";
+"SecretWallets.Menu.Secret4" = "🔐4️⃣ Secret 4";
+"SecretWallets.Menu.Secret5" = "🔐5️⃣ Secret 5";
+"SecretWallets.Menu.Secret1.Emoji" = "🔐1️⃣";
+"SecretWallets.Menu.Secret2.Emoji" = "🔐2️⃣";
+"SecretWallets.Menu.Secret3.Emoji" = "🔐3️⃣";
+"SecretWallets.Menu.Secret4.Emoji" = "🔐4️⃣";
+"SecretWallets.Menu.Secret5.Emoji" = "🔐5️⃣";
+"SecretWallets.Menu.AddSecretWallet" = "🪄 Add secret wallet";
+"SecretWallets.Menu.TellMeMore" = "💡 Tell me more";
+"SecretWallets.Menu.TellMeMore.Title" = "Lorem Ipsum";
+"SecretWallets.Menu.TellMeMore.Subtitle" = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+"SecretWallets.Menu.TellMeMore.LearnMore" = "Learn more";
+"SecretWallets.Menu.Title" = "Active wallets";
+"SecretWallets.Menu.AddSecretWallet.Title" = "Enter password to add secret wallet";
+"SecretWallets.Menu.AddSecretWallet.PasswordPlaceholder" = "Password";
+"SecretWallets.Menu.AddSecretWallet.Add" = "Add";
+"SecretWallets.Row.Title" = "Secret wallets (Add)";
+
+/* Secret Wallets Coins names*/
+"SecretWallets.Coin.Regular" = "%@ Wallet";
+"SecretWallets.Coin.SecretRegular" = "Regular %@ Wallet";
+"SecretWallets.Coin.Secret1" = "Secret %@ Wallet 🔐1️⃣";
+"SecretWallets.Coin.Secret2" = "Secret %@ Wallet 🔐2️⃣";
+"SecretWallets.Coin.Secret3" = "Secret %@ Wallet 🔐3️⃣";
+"SecretWallets.Coin.Secret4" = "Secret %@ Wallet 🔐4️⃣";
+"SecretWallets.Coin.Secret5" = "Secret %@ Wallet 🔐5️⃣";

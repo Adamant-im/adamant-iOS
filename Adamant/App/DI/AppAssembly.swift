@@ -100,7 +100,7 @@ struct AppAssembly: MainThreadAssembly {
             SecretWalletsFactory(
                 visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
                 accountService: r.resolve(AccountService.self)!,
-                SecureStore: r.resolve(SecureStore.self)!
+                container: container
             )
         }.inObjectScope(.container)
 
@@ -116,7 +116,18 @@ struct AppAssembly: MainThreadAssembly {
                 secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!
             )
         }.inObjectScope(.container)
-
+        
+        container.register(SecretWalletsViewModel.self) { r in
+            SecretWalletsViewModel(secretWalletsManager: r.resolve(SecretWalletsManagerProtocol.self)!)
+        }.inObjectScope(.container)
+        
+        container.register(SecretWalletsAlertMenuView.self) { r in
+            SecretWalletsAlertMenuView(
+                dialogService: r.resolve(DialogService.self)!,
+                secretWalletsViewModel: r.resolve(SecretWalletsViewModel.self)!
+            )
+        }.inObjectScope(.transient)
+        
         // MARK: IncreaseFeeService
         container.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(

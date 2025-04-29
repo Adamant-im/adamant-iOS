@@ -138,7 +138,11 @@ extension AdamantAccountService {
     private func getSavedPassphrase() -> String? {
         return SecureStore.get(.passphrase)
     }
-
+    
+    func getCurrentPassphrase() -> String? {
+        passphrase
+    }
+    
     func dropSavedAccount() {
         useBiometry = false
         isBalanceExpired = true
@@ -335,7 +339,15 @@ extension AdamantAccountService {
         self.passphrase = passphrase
 
         _ = await initWallets()
-
+        
+        let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
+        
+        NotificationCenter.default.post(
+            name: Notification.Name.AdamantAccountService.userLoggedIn,
+            object: self,
+            userInfo: userInfo
+        )
+        
         return .success(account: account, alert: nil)
     }
 
@@ -406,15 +418,7 @@ extension AdamantAccountService {
             self.account = account
             self.keypair = keypair
             markBalanceAsFresh()
-
-            let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
-
-            NotificationCenter.default.post(
-                name: Notification.Name.AdamantAccountService.userLoggedIn,
-                object: self,
-                userInfo: userInfo
-            )
-
+            
             self.state = .loggedIn
             return account
         } catch let error as ApiServiceError {
@@ -447,7 +451,8 @@ extension AdamantAccountService {
                 group.addTask {
                     let result = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
-                        withPassword: .empty
+                        withPassword: .empty,
+                        storeInKVS: true
                     )
                     return result
                 }

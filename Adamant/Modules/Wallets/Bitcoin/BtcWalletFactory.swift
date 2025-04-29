@@ -23,6 +23,7 @@ struct BtcWalletFactory: WalletFactory {
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!,
             service: service
         )
     }
@@ -33,7 +34,8 @@ struct BtcWalletFactory: WalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             screensFactory: screensFactory,
-            addressBook: assembler.resolve(AddressBookService.self)!
+            addressBook: assembler.resolve(AddressBookService.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 
@@ -49,7 +51,9 @@ struct BtcWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            secretWalletManager: assembler.resolve(SecretWalletsManagerProtocol.self)!,
+            secretWalletViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 

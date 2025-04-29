@@ -8,37 +8,31 @@
 import Web3Core
 
 protocol EthBIP32ServiceProtocol {
-    func keyStore(passphrase: String) async throws -> BIP32Keystore
+    func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore
 }
 
 actor EthBIP32Service: EthBIP32ServiceProtocol {
-    private var passphrase: String?
-    private var keystore: BIP32Keystore?
-
     private var ethApiService: EthApiServiceProtocol
-
+    private var keystores: [String: BIP32Keystore] = [:]
+    
     init(ethApiService: EthApiServiceProtocol) {
         self.ethApiService = ethApiService
     }
-    func keyStore(passphrase: String) async throws -> BIP32Keystore {
-        if let keystore = self.keystore, passphrase == self.passphrase {
+    
+    func keyStore(passphrase: String, withPassword password: String) async throws -> BIP32Keystore {
+        if let keystore = self.keystores[passphrase + password] {
             return keystore
         }
         do {
-            guard
-                let store = try BIP32Keystore(
-                    mnemonics: passphrase,
-                    password: EthWalletService.walletPassword,
-                    mnemonicsPassword: "",
-                    language: .english,
-                    prefixPath: EthWalletService.walletPath
-                )
-            else {
+            guard let store = try BIP32Keystore(mnemonics: passphrase,
+                                                password: EthWalletService.walletPassword,
+                                                mnemonicsPassword: password,
+                                                language: .english,
+                                                prefixPath: EthWalletService.walletPath) else {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
-            self.passphrase = passphrase
-            self.keystore = store
             await ethApiService.setKeystoreManager(.init([store]))
+            keystores[passphrase + password] = store
             return store
         }
     }

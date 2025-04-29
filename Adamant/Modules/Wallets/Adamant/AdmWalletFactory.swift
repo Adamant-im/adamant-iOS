@@ -23,6 +23,7 @@ struct AdmWalletFactory: WalletFactory {
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!,
             service: service
         )
     }
@@ -37,7 +38,8 @@ struct AdmWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             walletService: service,
-            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 
@@ -53,7 +55,9 @@ struct AdmWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            secretWalletManager: assembler.resolve(SecretWalletsManagerProtocol.self)!,
+            secretWalletViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 

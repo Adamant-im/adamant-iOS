@@ -15,8 +15,9 @@ final class AccountWalletsViewModel {
     var state: AccountWalletsState = .default
     
     private let walletsStoreService: WalletStoreServiceProviderProtocol
-    private var subscriptions = Set<AnyCancellable>()
-
+    private var walletSubscriptions: Set<AnyCancellable> = []
+    private var currentWalletPublisherSubscription: Set<AnyCancellable> = []
+    
     init(walletsStoreService: WalletStoreServiceProviderProtocol) {
         self.walletsStoreService = walletsStoreService
         setup()
@@ -27,8 +28,18 @@ extension AccountWalletsViewModel {
     fileprivate func setup() {
         addObservers()
     }
-
-    fileprivate func addObservers() {
+    
+    func addObservers() {
+        walletsStoreService.currentWalletPublisher
+            .sink(
+                receiveValue: { [weak self] _ in
+                    self?.updateState()
+                }
+            )
+            .store(in: &currentWalletPublisherSubscription)
+    }
+    
+    func addWalletObservers() {
         for wallet in walletsStoreService.sorted(includeInvisible: false) {
             updateInfo(for: wallet)
             wallet.core.walletUpdatePublisher
@@ -37,11 +48,11 @@ extension AccountWalletsViewModel {
                         self?.updateInfo(for: wallet)
                     }
                 )
-                .store(in: &subscriptions)
+                .store(in: &walletSubscriptions)
         }
     }
-
-    fileprivate func updateInfo(for wallet: WalletService) {
+    
+    func updateInfo(for wallet: WalletService) {
         let coreService = wallet.core
         let tokenID = coreService.tokenUniqueID
         if let index = state.wallets.firstIndex(where: { $0.model.coinID == tokenID }) {
@@ -72,8 +83,8 @@ extension AccountWalletsViewModel {
 
 extension AccountWalletsViewModel {
     func updateState() {
-        subscriptions.removeAll()
+        walletSubscriptions.removeAll()
         state.wallets.removeAll()
-        setup()
+        addWalletObservers()
     }
 }

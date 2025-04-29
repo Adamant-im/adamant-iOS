@@ -23,6 +23,7 @@ struct DashWalletFactory: WalletFactory {
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!,
             service: service
         )
     }
@@ -32,7 +33,8 @@ struct DashWalletFactory: WalletFactory {
             walletService: service,
             dialogService: assembler.resolve(DialogService.self)!,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            screensFactory: screensFactory
+            screensFactory: screensFactory,
+            secretWalletsViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 
@@ -48,7 +50,9 @@ struct DashWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!,
+            secretWalletManager: assembler.resolve(SecretWalletsManagerProtocol.self)!,
+            secretWalletViewModel: assembler.resolve(SecretWalletsViewModel.self)!
         )
     }
 

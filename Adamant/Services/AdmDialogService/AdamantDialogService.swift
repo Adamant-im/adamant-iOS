@@ -313,6 +313,7 @@ extension AdamantDialogService {
     }
 
     func presentShareAlertFor(
+        title: String? = nil,
         string: String,
         types: [ShareType],
         excludedActivityTypes: [UIActivity.ActivityType]?,
@@ -323,6 +324,7 @@ extension AdamantDialogService {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
 
         let alert = createShareAlertFor(
+            title: title,
             stringForPasteboard: string,
             stringForShare: string,
             stringForQR: string,
@@ -363,6 +365,7 @@ extension AdamantDialogService {
     }
 
     func presentShareAlertFor(
+        title: String? = nil,
         stringForPasteboard: String,
         stringForShare: String,
         stringForQR: String,
@@ -375,6 +378,7 @@ extension AdamantDialogService {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
 
         let alert = createShareAlertFor(
+            title: title,
             stringForPasteboard: stringForPasteboard,
             stringForShare: stringForShare,
             stringForQR: stringForQR,
@@ -390,6 +394,7 @@ extension AdamantDialogService {
     }
 
     private func createShareAlertFor(
+        title: String? = nil,
         stringForPasteboard: String,
         stringForShare: String,
         stringForQR: String,
@@ -401,7 +406,7 @@ extension AdamantDialogService {
         didSelect: ((ShareType) -> Void)? = nil
     ) -> UIAlertController {
         let alert = UIAlertController(
-            title: nil,
+            title: title,
             message: nil,
             preferredStyleSafe: .actionSheet,
             source: from
@@ -665,18 +670,16 @@ extension AdamantAlertAction {
 }
 
 extension AdamantDialogService {
-    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?) {
-        switch style {
-        case .alert, .actionSheet:
-            let uiStyle = style.asUIAlertControllerStyle()
-            if let actions = actions {
-                let uiActions: [UIAlertAction] = actions.map { $0.asUIAlertAction() }
-
-                showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
-            } else {
-                showAlert(title: title, message: message, style: uiStyle, actions: nil, from: from)
-            }
-        }
+    func showAlert(
+        title: String?,
+        message: String?,
+        style: AdamantAlertStyle,
+        actions: [AdamantAlertAction]?,
+        from: UIAlertController.SourceView?
+    ) {
+        let uiStyle = style.asUIAlertControllerStyle()
+        let uiActions = actions?.map { $0.asUIAlertAction() }
+        showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
     }
 
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?) {

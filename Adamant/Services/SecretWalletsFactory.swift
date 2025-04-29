@@ -7,20 +7,21 @@
 //
 
 import CommonKit
+import Swinject
 
 struct SecretWalletsFactory {
     private let visibleWalletsService: VisibleWalletsService
     private let accountService: AccountService
-    private let SecureStore: SecureStore
-
+    private let container: Container
+    
     init(
         visibleWalletsService: VisibleWalletsService,
         accountService: AccountService,
-        SecureStore: SecureStore
+        container: Container
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
-        self.SecureStore = SecureStore
+        self.container = container
     }
 
     func makeSecretWallet(withPassword password: String) -> WalletStoreServiceProtocol {
@@ -37,17 +38,27 @@ struct SecretWalletsFactory {
             ERC20WalletService(token: $0)
         }
         wallets.append(contentsOf: erc20WalletServices)
+        
         let walletServiceCompose = AdamantWalletServiceCompose(wallets: wallets)
-        Task.detached(priority: .userInitiated) {
+        Task { @MainActor in
+            await injectDependencies(in: walletServiceCompose)
             await initWallets(withPass: password, for: walletServiceCompose)
         }
+        
         let wallet = AdamantWalletStoreService(visibleWalletsService: visibleWalletsService, walletServiceCompose: walletServiceCompose)
 
         return wallet
     }
-
+    
+    @MainActor
+    private func injectDependencies(in walletService: WalletServiceCompose) async {
+        walletService.getWallets().forEach { wallet in
+            (wallet.core as? SwinjectDependentService)?.injectDependencies(from: container)
+        }
+    }
+    
     private func initWallets(withPass password: String, for walletService: WalletServiceCompose) async {
-        guard let passphrase: String = SecureStore.get(StoreKey.accountService.passphrase) else {
+        guard let passphrase: String = accountService.getCurrentPassphrase() else {
             print("No passphrase found")
             return
         }
@@ -57,7 +68,8 @@ struct SecretWalletsFactory {
                 taskGroup.addTask {
                     _ = try? await wallet.core.initWallet(
                         withPassphrase: passphrase,
-                        withPassword: password
+                        withPassword: password,
+                        storeInKVS: false
                     )
                 }
             }

@@ -17,20 +17,22 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
 
     private let blockchainType: String
     private let coinId: String
+    private let coinAddress: String
     private let coreDataStack: CoreDataStack
     private lazy var transactionController = getTransactionController()
     private var subscriptions = Set<AnyCancellable>()
 
     @ObservableValue private var transactions: [TransactionDetails] = []
-
+    
     var transactionsPublisher: any Observable<[TransactionDetails]> {
         $transactions
     }
 
     // MARK: Init
 
-    init(coinId: String, coreDataStack: CoreDataStack, blockchainType: String) {
+    init(coinId: String, coinAddress: String, coreDataStack: CoreDataStack, blockchainType: String) {
         self.coinId = coinId
+        self.coinAddress = coinAddress
         self.coreDataStack = coreDataStack
         self.blockchainType = blockchainType
         super.init()
@@ -67,6 +69,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
             coinTransaction.senderId = transaction.senderAddress
             coinTransaction.isOutgoing = transaction.isOutgoing
             coinTransaction.coinId = coinId
+            coinTransaction.uniqueId = coinId + coinAddress
             coinTransaction.transactionId = transaction.txId
             coinTransaction.transactionStatus = transaction.transactionStatus
             coinTransaction.blockchainType = blockchainType
@@ -106,25 +109,50 @@ extension AdamantCoinStorageService {
         )
         .sink { [weak self] notification in
             let changes = notification.managedObjectContextChanges(of: CoinTransaction.self)
-
+            
+            guard let self else {
+                return
+            }
+            
+            let uniqueId = self.coinId + self.coinAddress
+            
             if let inserted = changes.inserted, !inserted.isEmpty {
                 let filteredInserted: [TransactionDetails] = inserted.filter {
-                    $0.coinId == self?.coinId
+                    $0.uniqueId == uniqueId
                 }
-                self?.transactions.append(contentsOf: filteredInserted)
+                self.transactions.append(contentsOf: filteredInserted)
             }
 
             if let updated = changes.updated, !updated.isEmpty {
-                let filteredUpdated = updated.filter { $0.coinId == self?.coinId }
-
+                let filteredUpdated = updated.filter { $0.uniqueId == uniqueId }
+                
                 filteredUpdated.forEach { coinTransaction in
-                    guard
-                        let index = self?.transactions.firstIndex(where: {
-                            $0.txId == coinTransaction.txId
-                        })
+                    guard let index = self.transactions.firstIndex(where: {
+                        $0.txId == coinTransaction.txId
+                    })
                     else { return }
-
-                    self?.transactions[index] = coinTransaction
+                    
+                    /*
+                     Workaround to correctly set isOutgoing when multiple transactions share the same txId across different accounts.
+                     
+                     This situation can happen when sending funds from a regular account to a secret one or vica versa — technically is the same transaction, but it should show different isOutgoing for sender and reciever.
+                     
+                     Currently, there's no reliable way to assign a truly unique ID to each TransactionDetails instance, so this workaround helps distinguish them for now.
+                     PR - https://github.com/Adamant-im/adamant-iOS/pull/741
+                     */
+                    self.transactions[index] = SimpleTransactionDetails(
+                        defaultCurrencySymbol: coinTransaction.defaultCurrencySymbol,
+                        txId: coinTransaction.txId,
+                        senderAddress: coinTransaction.senderAddress,
+                        recipientAddress: coinTransaction.recipientAddress,
+                        dateValue: coinTransaction.dateValue,
+                        amountValue: coinTransaction.amountValue,
+                        feeValue: coinTransaction.feeValue,
+                        confirmationsValue: coinTransaction.confirmationsValue,
+                        blockValue: coinTransaction.blockValue,
+                        isOutgoing: self.coinAddress == coinTransaction.senderAddress ? true : false,
+                        transactionStatus: coinTransaction.transactionStatus,
+                        nonceRaw: coinTransaction.nonceRaw)
                 }
             }
         }
@@ -136,7 +164,7 @@ extension AdamantCoinStorageService {
             entityName: CoinTransaction.entityCoinName
         )
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "coinId = %@", coinId)
+            NSPredicate(format: "uniqueId = %@", coinId + coinAddress)
         ])
         request.sortDescriptors = [
             NSSortDescriptor(key: "date", ascending: true),
@@ -157,7 +185,7 @@ extension AdamantCoinStorageService {
     /// - Returns: Transaction, if found
     fileprivate func getTransactionFromDB(id: String, context: NSManagedObjectContext) -> CoinTransaction? {
         let request = NSFetchRequest<CoinTransaction>(entityName: CoinTransaction.entityCoinName)
-        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.predicate = NSPredicate(format: "transactionId == %@ AND uniqueId == %@", String(id), coinId + coinAddress)
         request.fetchLimit = 1
 
         do {

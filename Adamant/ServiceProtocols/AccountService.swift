@@ -201,4 +201,7 @@ protocol AccountService: AnyObject, Sendable {
 
     /// Update use TouchID or FaceID to log in
     func updateUseBiometry(_ newValue: Bool)
+    
+    /// Get current passphrase
+    func getCurrentPassphrase() -> String?
 }

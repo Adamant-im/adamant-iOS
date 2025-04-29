@@ -117,6 +117,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -225,8 +226,8 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         .init(sentDate: nil, status: .notInitiated)
     }
-
-    func initWallet(withPassphrase: String, withPassword: String) async throws -> WalletAccount {
+    
+    func initWallet(withPassphrase: String, withPassword: String, storeInKVS: Bool) async throws -> WalletAccount {
         throw InternalAPIError.unknownError
     }
 

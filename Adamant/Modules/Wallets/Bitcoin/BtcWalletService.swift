@@ -202,6 +202,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -451,8 +452,8 @@ extension BtcWalletService {
         setState(.initiationFailed(reason: reason))
         btcWallet = nil
     }
-
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -475,8 +476,7 @@ extension BtcWalletService {
             addressConverter: addressConverter
         )
         self.btcWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
+        
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
@@ -489,8 +489,18 @@ extension BtcWalletService {
             self.enabled = true
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
-
+        
+        self.setState(.upToDate)
+        
+        Task {
+            await self.update()
+            self.addTransactionObserver()
+        }
+        
+        guard storeInKVS else { return eWallet }
+        
         // MARK: 4. Save address into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
@@ -500,25 +510,14 @@ extension BtcWalletService {
                 }
                 throw WalletServiceError.accountNotFound
             }
-
-            service.setState(.upToDate)
-
-            Task {
-                service.update()
-            }
-
+            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-
-                Task {
-                    await service.update()
-                }
-
+                
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
                         service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
@@ -528,7 +527,6 @@ extension BtcWalletService {
                 return eWallet
 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }
@@ -556,8 +554,6 @@ extension BtcWalletService: SwinjectDependentService {
         btcTransactionFactory = container.resolve(BitcoinKitTransactionFactoryProtocol.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-
-        addTransactionObserver()
     }
 }
 
@@ -805,11 +801,11 @@ extension BtcWalletService: PrivateKeyGenerator {
     }
 
     var keyFormat: KeyFormat { .WIF }
-
-    func generatePrivateKeyFor(passphrase: String) -> String? {
+    
+    func generatePrivateKeyFor(passphrase: String, password: String = "") -> String? {
         guard
             AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase),
-            let privateKeyData = passphrase.data(using: .utf8)?.sha256()
+            let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password)
         else {
             return nil
         }

@@ -55,13 +55,13 @@ extension Web3Error {
             return .internalError(message: message, error: nil)
 
         case .transactionSerializationError,
-            .dataError,
-            .walletError,
-            .unknownError,
-            .rpcError,
-            .revert,
-            .revertCustom,
-            .typeError:
+                .dataError,
+                .walletError,
+                .unknownError,
+                .rpcError,
+                .revert,
+                .revertCustom,
+                .typeError:
             return .internalError(message: "Unknown error", error: nil)
         case .valueError(let desc):
             return .internalError(message: "Unknown error \(String(describing: desc))", error: nil)
@@ -180,7 +180,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
 
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
-
+    
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         $historyTransactions.eraseToAnyPublisher()
     }
@@ -201,6 +201,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -415,7 +416,7 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService {
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
         }
@@ -429,8 +430,8 @@ extension EthWalletService {
         }
 
         // MARK: 2. Create keys and addresses
-
-        let store = try await ethBIP32Service.keyStore(passphrase: passphrase)
+        
+        let store = try await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password)
         walletStorage = .init(keystore: store, unicId: tokenUniqueID)
 
         let eWallet = walletStorage?.getWallet()
@@ -441,8 +442,7 @@ extension EthWalletService {
 
         // MARK: 3. Update
         ethWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
+        
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
@@ -455,8 +455,18 @@ extension EthWalletService {
             enabled = true
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-
+        
+        self.setState(.upToDate)
+        
+        Task {
+            await self.update()
+            self.addTransactionObserver()
+        }
+        
+        guard storeInKVS else { return eWallet }
+        
         // MARK: 4. Save into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         let service = self
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
@@ -465,24 +475,13 @@ extension EthWalletService {
                     service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
-
-            service.setState(.upToDate)
-
-            Task {
-                await service.update()
-            }
-
+            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-
-                Task {
-                    await service.update()
-                }
 
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
@@ -493,7 +492,6 @@ extension EthWalletService {
                 return eWallet
 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }
@@ -555,8 +553,6 @@ extension EthWalletService: SwinjectDependentService {
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
-
-        addTransactionObserver()
     }
 }
 
@@ -855,22 +851,14 @@ extension EthWalletService: PrivateKeyGenerator {
 
     var keyFormat: KeyFormat { .HEX }
 
-    func generatePrivateKeyFor(passphrase: String) -> String? {
+    func generatePrivateKeyFor(passphrase: String, password: String) async -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             return nil
         }
-
-        guard
-            let keystore = try? BIP32Keystore(
-                mnemonics: passphrase,
-                password: EthWalletService.walletPassword,
-                mnemonicsPassword: "",
-                language: .english,
-                prefixPath: EthWalletService.walletPath
-            ),
-            let account = keystore.addresses?.first,
-            let privateKeyData = try? keystore.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account)
-        else {
+        
+        guard let keystore = try? await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password),
+              let account = keystore.addresses?.first,
+              let privateKeyData = try? keystore.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account) else {
             return nil
         }
 

@@ -200,6 +200,7 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: dynamicRichMessageType
     )
@@ -392,8 +393,8 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService {
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
-
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool) async throws -> WalletAccount {
+        
         // MARK: 1. Prepare
         setState(.notInitiated)
 
@@ -402,7 +403,7 @@ extension ERC20WalletService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
 
-        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase)
+        let keystore = try await ethBIP32Service.keyStore(passphrase: passphrase, withPassword: password)
 
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
@@ -432,7 +433,8 @@ extension ERC20WalletService {
 
         self.setState(.upToDate, silent: true)
         Task {
-            await update()
+            await self.update()
+            self.addTransactionObserver()
         }
         return eWallet
     }
@@ -455,8 +457,6 @@ extension ERC20WalletService: SwinjectDependentService {
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         ethBIP32Service = container.resolve(EthBIP32ServiceProtocol.self)
-
-        addTransactionObserver()
     }
 }
 

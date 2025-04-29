@@ -149,6 +149,7 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
+        coinAddress: wallet?.address ?? "",
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
@@ -304,7 +305,7 @@ extension DashWalletService {
     }
 
     @MainActor
-    func initWallet(withPassphrase passphrase: String, withPassword password: String) async throws -> WalletAccount {
+    func initWallet(withPassphrase passphrase: String, withPassword password: String, storeInKVS: Bool) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
         }
@@ -329,8 +330,7 @@ extension DashWalletService {
         )
 
         self.dashWallet = eWallet
-        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
+        
         NotificationCenter.default.post(
             name: walletUpdatedNotification,
             object: self,
@@ -343,8 +343,18 @@ extension DashWalletService {
             self.enabled = true
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
-
+        
+        self.setState(.upToDate)
+        
+        Task {
+            await self.update()
+            self.addTransactionObserver()
+        }
+        
+        guard storeInKVS else { return eWallet }
+        
         // MARK: 4. Save address into KVS
+        let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             let service = self
@@ -353,12 +363,7 @@ extension DashWalletService {
                     service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                 }
             }
-
-            service.setState(.upToDate)
-
-            Task {
-                service.update()
-            }
+            
             return eWallet
         } catch let error as WalletServiceError {
             let service = self
@@ -366,23 +371,16 @@ extension DashWalletService {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
-
-                Task {
-                    await service.update()
-                }
-
+                
                 if let kvsAddressModel {
                     service.save(kvsAddressModel) { result in
                         service.kvsSaveCompletionRecursion(kvsAddressModel, result: result)
                     }
                 }
-
-                service.setState(.upToDate)
+                
                 return eWallet
 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }
@@ -411,8 +409,6 @@ extension DashWalletService: SwinjectDependentService {
         dashApiService = container.resolve(DashApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
-
-        addTransactionObserver()
     }
 }
 
@@ -628,9 +624,9 @@ extension DashWalletService: PrivateKeyGenerator {
     }
 
     var keyFormat: KeyFormat { .WIF }
-
-    func generatePrivateKeyFor(passphrase: String) -> String? {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
+    
+    func generatePrivateKeyFor(passphrase: String, password: String) -> String? {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = makeBinarySeed(withMnemonicSentence: passphrase, withSalt: password) else {
             return nil
         }
 

@@ -1061,7 +1061,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - Tools
 
     func shareValue(_ value: String, from: UIView) {
-        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) {
+        dialogService.presentShareAlertFor(title: nil, string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) {
             [weak self] in
             guard let tableView = self?.tableView else {
                 return

@@ -31,8 +31,15 @@ struct PKGeneratorView: View {
     }
 }
 
-extension PKGeneratorView {
-    fileprivate var loadingBackground: some View {
+private extension PKGeneratorView {
+    private var inactiveBaseColor: Color {
+        Color(UIColor.gray.withAlphaComponent(0.5))
+    }
+    private var activeBaseColor: Color {
+        Color(UIColor.adamant.primary)
+    }
+    
+    var loadingBackground: some View {
         HStack {
             Spacer()
 
@@ -60,20 +67,33 @@ extension PKGeneratorView {
                     placeholder: .adamant.qrGenerator.passphrasePlaceholder,
                     text: $viewModel.state.passphrase
                 )
-
-                Button(action: { viewModel.generateKeys() }) {
+                
+                Toggle(isOn: $viewModel.state.isSecretWalletsEnabled) {
+                    Text(String.adamant.qrGenerator.toggleTitle)
+                        .foregroundColor(viewModel.state.isSecretWalletsEnabled ? activeBaseColor : inactiveBaseColor)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: Color(uiColor: .adamant.active)))
+                
+                if viewModel.state.isSecretWalletsEnabled {
+                    AdamantSecureField(
+                        placeholder: .adamant.qrGenerator.passwordPlaceholder,
+                        text: $viewModel.state.secretWalletPassword
+                    )
+                }
+                
+                Button(action: { viewModel.generateKeys() }, label: {
                     Text(String.adamant.pkGenerator.generateButton)
                         .foregroundStyle(Color(uiColor: .adamant.primary))
                         .padding(.horizontal, 30)
                         .background(loadingBackground)
                         .expanded(axes: .horizontal)
-                }
+                })
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }
     }
-
-    fileprivate func keyView(_ keyInfo: PKGeneratorState.KeyInfo) -> some View {
-        NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }) {
+    
+    func keyView(_ keyInfo: PKGeneratorState.KeyInfo) -> some View {
+        NavigationButton(action: { viewModel.onTap(key: keyInfo.key) }, content: {
             HStack {
                 Image(uiImage: keyInfo.icon)
                     .renderingMode(.template)
@@ -93,6 +113,6 @@ extension PKGeneratorView {
                 Text(keyInfo.key).lineLimit(1)
                     .foregroundStyle(Color(uiColor: .adamant.secondary))
             }
-        }
+        })
     }
 }

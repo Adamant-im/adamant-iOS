@@ -13,12 +13,16 @@ struct PKGeneratorState {
     var keys: [KeyInfo]
     var buttonDescription: AttributedString
     var isLoading: Bool
-
+    var isSecretWalletsEnabled: Bool
+    var secretWalletPassword: String
+    
     static let `default` = Self(
         passphrase: .empty,
         keys: .init(),
         buttonDescription: .init(),
-        isLoading: false
+        isLoading: false,
+        isSecretWalletsEnabled: false,
+        secretWalletPassword: ""
     )
 }
 

@@ -19,6 +19,7 @@ extension CoinTransaction {
     @NSManaged public var amount: NSDecimalNumber?
     @NSManaged public var transactionId: String
     @NSManaged public var coinId: String?
+    @NSManaged public var uniqueId: String?
     @NSManaged public var senderId: String?
     @NSManaged public var recipientId: String?
     @NSManaged public var date: NSDate?

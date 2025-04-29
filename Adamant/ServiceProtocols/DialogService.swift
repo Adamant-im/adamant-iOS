@@ -210,6 +210,7 @@ protocol DialogService: AnyObject {
         didSelect: ((AddressChatShareType) -> Void)?
     )
     func presentShareAlertFor(
+        title: String?,
         string: String,
         types: [ShareType],
         excludedActivityTypes: [UIActivity.ActivityType]?,
@@ -218,6 +219,7 @@ protocol DialogService: AnyObject {
         completion: (() -> Void)?
     )
     func presentShareAlertFor(
+        title: String?,
         stringForPasteboard: String,
         stringForShare: String,
         stringForQR: String,
