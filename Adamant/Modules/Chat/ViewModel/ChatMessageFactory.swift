@@ -220,6 +220,7 @@ extension ChatMessageFactory {
         let replyMessage = makeAttributed(replyMessageRaw)
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = FilePresentationHelper.getFilePresentationText(from: decodedMessage, parsedWith: Self.markdownReplyParser, resolveLinkColor: true)
+        let decodedAttributedMessage = MessageProcessHelper.process(attributedText: decodedMessageMarkDown)
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
 
         let address =
@@ -238,7 +239,7 @@ extension ChatMessageFactory {
                     id: transaction.txId,
                     replyId: replyId,
                     message: replyMessage,
-                    messageReply: decodedMessageMarkDown,
+                    messageReply: decodedAttributedMessage,
                     backgroundColor: backgroundColor,
                     isFromCurrentSender: isFromCurrentSender,
                     reactions: reactions,

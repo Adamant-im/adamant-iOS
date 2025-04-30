@@ -241,7 +241,7 @@ extension AdamantRichTransactionReplyService {
             message = decodedMessage
         }
 
-        return MessageProcessHelper.process(message)
+        return message
     }
 
     fileprivate func getReplyMessage(from transaction: BaseTransaction) throws -> String {
@@ -303,7 +303,7 @@ extension AdamantRichTransactionReplyService {
                 message = unknownErrorMessage
         }
         
-        return MessageProcessHelper.process(message)
+        return message
     }
 
     fileprivate func setReplyMessage(

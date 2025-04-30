@@ -1036,8 +1036,6 @@ extension ChatListViewController {
                 guard var text = message.message else {
                     return nil
                 }
-                text = MessageProcessHelper.process(text)
-                
                 var attributedText = markdownParser.parse(text).resolveLinkColor()
                 attributedText = MessageProcessHelper.process(attributedText: attributedText)
                 
