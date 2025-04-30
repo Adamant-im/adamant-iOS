@@ -20,11 +20,7 @@ struct ChatViewControllerState {
     var isAppActive = true
     var isScrollingToBottom = false
     var shouldScrollToNewMessagesOrSavedPosition = true
-    var presentedControllerIDs: Set<String> = [] {
-        didSet {
-            print("can read:", presentedControllerIDs.isEmpty)
-        }
-    }
+    var presentedControllerIDs: Set<String> = []
     
     //calculation for animation, might use for something else in the future
     var isAnimationAllowed: Bool {
