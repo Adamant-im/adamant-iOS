@@ -49,9 +49,11 @@ final class ChatFileService: ChatFileProtocol, Sendable {
     private var fileDownloadAttemptsCount: [String: Int] = [:]
     private var uploadingFilesDictionary: [String: FileMessage] = [:]
     private var previewDownloadsAttemps: [String: Int] = [:]
-    private var uploadTasks: [String: [String: Task<UploadFileResult, Error>]] = [:]
     private let synchronizer = AsyncStreamSender<@MainActor () -> Void>()
     private let _updateFileFields = ObservableSender<FileUpdateProperties>()
+    
+    // [messageId: [fileID: Task]] we can cancel all tasks for one message by messageId, uploading is managing by fileID
+    private var uploadTasks: [String: [String: Task<UploadFileResult, Error>]] = [:]
 
     private var subscriptions = Set<AnyCancellable>()
     private let maxDownloadAttemptsCount = 3
