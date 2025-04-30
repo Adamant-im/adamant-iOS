@@ -18,6 +18,8 @@
   "defaultOrdinalLevel": 20,
   "consensus": "PoS",
   "blockTimeFixed": 12000,
+  "balanceCheckInterval": 25000,
+  "balanceValidInterval": 300000,
   "txFetchInfo": {
     "newPendingInterval": 4000,
     "oldPendingInterval": 3000,

@@ -31,6 +31,9 @@ public struct CoinInfoDTO: Codable {
     public let defaultGasLimit: Int?
     public let warningGasPriceGwei: Int?
     public let blockTimeAvg: Int?
+    public let balanceCheckInterval: Int?
+    public let balanceCheckIntervalNewAccount: Int? // Only for ADM
+    public let balanceValidInterval: Int?
     public let nodes: Nodes?
     public let services: Services?
     public let links: [Link]?

@@ -275,10 +275,6 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
 
     // MARK: Notifications
 
-    /// Wallet updated.
-    /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
-    var walletUpdatedNotification: Notification.Name { get }
-
     /// Enabled state changed
     var serviceEnabledChanged: Notification.Name { get }
 
@@ -323,6 +319,8 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var transactionFeeUpdated: Notification.Name { get }
 
     var qqPrefix: String { get }
+    var balanceCheckInterval: Int? { get }
+    var balanceValidInterval: Int? { get }
     var blockchainSymbol: String { get }
     var isDynamicFee: Bool { get }
     var diplayTransactionFee: Decimal { get }
@@ -405,5 +403,5 @@ protocol RawTransaction {
 }
 
 extension WalletCoreProtocol {
-    static var balanceLifetime: TimeInterval { 300 }
+    static var balanceCheckIntervalDefault: Int { 300000 } // 5 minutes
 }

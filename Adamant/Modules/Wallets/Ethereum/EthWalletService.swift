@@ -111,6 +111,14 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
     var qqPrefix: String {
         Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         true
@@ -152,7 +160,6 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
     var ethBIP32Service: EthBIP32ServiceProtocol!
 
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.ethWallet.stateChanged")
@@ -322,12 +329,6 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
         }
         
         walletUpdateSender.send()
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
 
         setState(.upToDate)
         await calculateFee()
@@ -337,15 +338,9 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
@@ -442,12 +437,6 @@ extension EthWalletService {
         // MARK: 3. Update
         ethWallet = eWallet
         let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
-        )
 
         await walletUpdateSender.send()
 

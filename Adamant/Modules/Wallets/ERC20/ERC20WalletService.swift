@@ -67,6 +67,14 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var qqPrefix: String {
         EthWalletService.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        EthWalletService.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        EthWalletService.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         true
@@ -128,7 +136,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var ethBIP32Service: EthBIP32ServiceProtocol!
 
     // MARK: - Notifications
-    let walletUpdatedNotification: Notification.Name
     let serviceEnabledChanged: Notification.Name
     let transactionFeeUpdated: Notification.Name
     let serviceStateChanged: Notification.Name
@@ -206,13 +213,12 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
 
     init(token: ERC20Token) {
         self.token = token
-        walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.\(token.symbol).walletUpdated")
         serviceEnabledChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).enabledChanged")
         transactionFeeUpdated = Notification.Name("adamant.erc20Wallet.\(token.symbol).feeUpdated")
         serviceStateChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).stateChanged")
 
         self.setState(.notInitiated)
-
+        
         // Notifications
         addObservers()
     }
@@ -292,12 +298,6 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         }
         
         walletUpdateSender.send()
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
 
         setState(.upToDate)
 
@@ -375,15 +375,9 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
@@ -421,12 +415,6 @@ extension ERC20WalletService {
             enabled = true
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
-
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
-        )
 
         await walletUpdateSender.send()
 

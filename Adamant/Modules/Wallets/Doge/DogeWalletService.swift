@@ -106,6 +106,14 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var qqPrefix: String {
         return Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var nodeGroups: [NodeGroup] {
         [.doge]
@@ -116,7 +124,6 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     @Atomic private(set) var isWarningGasPrice = false
 
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.dogeWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.dogeWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.dogeWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.dogeWallet.feeUpdated")
@@ -276,12 +283,6 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         }
         
         walletUpdateSender.send()
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
 
         setState(.upToDate)
     }
@@ -301,15 +302,9 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await self.walletUpdateSender.send()
         }.eraseToAnyCancellable()
@@ -348,12 +343,6 @@ extension DogeWalletService {
         )
         self.dogeWallet = eWallet
         let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
-        )
 
         await walletUpdateSender.send()
 

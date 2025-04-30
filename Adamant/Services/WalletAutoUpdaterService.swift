@@ -109,6 +109,9 @@ actor WalletAutoUpdateService {
                 interval: getTimeIntervalFor(wallet: core),
                 queue: .global(qos: .utility),
                 callback: {
+                    if wallet.core is AdmWalletService{
+                        self.accountService.update()
+                    }
                     core.update()
                 }
             )
@@ -133,41 +136,11 @@ actor WalletAutoUpdateService {
     }
     
     private func getTimeIntervalFor(wallet: WalletCoreProtocol) -> TimeInterval {
-        switch wallet {
-            case is AdmWalletService:
-                if let isNewAccount = accountService.account?.isNewAccount, isNewAccount {
-                    return WalletsUpdateConstants.admNewAccount.interval
-                }
-                return WalletsUpdateConstants.adm.interval
-            case is EthWalletService:
-                return WalletsUpdateConstants.erc20.interval
-            case is ERC20WalletService:
-                return WalletsUpdateConstants.erc20.interval
-            case is DashWalletService:
-                return WalletsUpdateConstants.dash.interval
-            case is DogeWalletService:
-                return WalletsUpdateConstants.doge.interval
-            case is BtcWalletService:
-                return WalletsUpdateConstants.btc.interval
-            case is KlyWalletService:
-                return WalletsUpdateConstants.kly.interval
-            default:
-                return 50
-        }
-    }
-    
-    private enum WalletsUpdateConstants {
-        case adm, erc20, dash, doge, btc, kly, admNewAccount
-        
-        var interval: TimeInterval {
-            switch self {
-                case .adm:              return 5
-                case .erc20, .dash:     return 25
-                case .doge:             return 30
-                case .btc, .kly:        return 50
-                case .admNewAccount:    return 2
+        if let isNewAccount = accountService.account?.isNewAccount, isNewAccount {
+            if let wallet = wallet as? AdmWalletService {
+                return Double(wallet.balanceCheckIntervalNewAccount ?? 50000) / 1000
             }
         }
+        return Double(wallet.balanceCheckInterval ?? 50000) / 1000
     }
-
 }

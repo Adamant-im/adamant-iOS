@@ -410,8 +410,7 @@ class TransferViewControllerBase: FormViewController {
             }
             .store(in: &subscriptions)
 
-        NotificationCenter.default
-            .notifications(named: walletCore.walletUpdatedNotification)
+        walletCore.walletUpdatePublisher
             .sink { @MainActor [weak self] _ in
                 self?.reloadFormData()
             }

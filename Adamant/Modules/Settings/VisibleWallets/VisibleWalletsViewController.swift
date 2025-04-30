@@ -103,8 +103,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
 
     private func addObservers() {
         for (index, wallet) in wallets.enumerated() {
-            NotificationCenter.default.publisher(for: wallet.walletUpdatedNotification, object: wallet)
-                .removeDuplicates()
+            wallet.walletUpdatePublisher
                 .receive(on: DispatchQueue.main)
                 .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
                 .sink { [weak self] _ in
@@ -146,7 +145,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     @objc private func updateBalances() {
-        NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateAllBalances, object: nil)
+        accountService.update(shouldUpdateUIBalance: true, updateOnlyADM: false, updateOnlyVisible: false)
         refreshControl.endRefreshing()
     }
 

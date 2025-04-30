@@ -204,13 +204,6 @@
 			);
 			target = E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */;
 		};
-		D3A8618F2DA1C1AD0007B599 /* Exceptions for "NotificationServiceExtension" folder in "TransferNotificationContentExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				WalletImages/bitcoin_notificationContent.png,
-			);
-			target = E957E12C229B10F80019732A /* TransferNotificationContentExtension */;
-		};
 		D3A861992DA1C1B10007B599 /* Exceptions for "TransferNotificationContentExtension" folder in "TransferNotificationContentExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -258,7 +251,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				D3A8618E2DA1C1AD0007B599 /* Exceptions for "NotificationServiceExtension" folder in "NotificationServiceExtension" target */,
-				D3A8618F2DA1C1AD0007B599 /* Exceptions for "NotificationServiceExtension" folder in "TransferNotificationContentExtension" target */,
 			);
 			path = NotificationServiceExtension;
 			sourceTree = "<group>";

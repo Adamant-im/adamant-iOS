@@ -101,6 +101,14 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var qqPrefix: String {
         return Self.qqPrefix
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     var isSupportIncreaseFee: Bool {
         return true
@@ -149,7 +157,6 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     private let walletPath = "m/44'/0'/21'/0/0"
 
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.btcWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.btcWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
@@ -309,12 +316,6 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         
         walletUpdateSender.send()
         
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
-        
         setState(.upToDate)
 
         if let rate = try? await getFeeRate() {
@@ -386,15 +387,9 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await walletUpdateSender.send()
         }.eraseToAnyCancellable()
@@ -476,12 +471,6 @@ extension BtcWalletService {
         )
         self.btcWallet = eWallet
         let kvsAddressModel = makeKVSAddressModel(wallet: eWallet)
-
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
-        )
 
         await walletUpdateSender.send()
 

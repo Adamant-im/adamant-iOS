@@ -48,6 +48,14 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             )
         } ?? []
     }
+    
+    var balanceCheckInterval: Int? {
+        Self.balanceCheckInterval
+    }
+    
+    var balanceValidInterval: Int? {
+        Self.balanceValidInterval
+    }
 
     @MainActor
     var hasEnabledNode: Bool {
@@ -89,7 +97,6 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
 
     // MARK: Notifications
 
-    let walletUpdatedNotification = Notification.Name("adamant.klyWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.klyWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.klyWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.klyWallet.stateChanged")
@@ -279,12 +286,6 @@ extension KlyWalletService {
         }
         
         walletUpdateSender.send()
-        
-        NotificationCenter.default.post(
-            name: walletUpdatedNotification,
-            object: self,
-            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-        )
 
         if let nonce = try? await getNonce(address: wallet.address) {
             wallet.nonce = nonce
@@ -306,15 +307,9 @@ extension KlyWalletService {
         wallet.isBalanceInitialized = true
 
         balanceInvalidationSubscription = Task { [weak self] in
-            try await Task.sleep(interval: Self.balanceLifetime, pauseInBackground: true)
-            guard let self else { return }
+            guard let self = self else { return }
+            try await Task.sleep(interval: Double(self.balanceValidInterval ?? Self.balanceCheckIntervalDefault) / 1000, pauseInBackground: true)
             wallet.isBalanceInitialized = false
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await walletUpdateSender.send()
         }.eraseToAnyCancellable()
@@ -456,12 +451,6 @@ extension KlyWalletService {
                 isNewApi: true
             )
             self.klyWallet = wallet
-
-            NotificationCenter.default.post(
-                name: walletUpdatedNotification,
-                object: self,
-                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
-            )
 
             await walletUpdateSender.send()
         } catch {
