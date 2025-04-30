@@ -191,8 +191,13 @@ public final class FilesStorageKit: FilesStorageProtocol, @unchecked Sendable {
 
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let fileURL = folder.appendingPathComponent(name)
-
+        let fileURL: URL
+        if name.lowercased().hasSuffix(".jpeg") {
+            fileURL = folder.appendingPathComponent(name)
+        } else {
+            fileURL = folder.appendingPathComponent(name).appendingPathExtension("jpeg")
+        }
+        
         try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
 
         return fileURL
