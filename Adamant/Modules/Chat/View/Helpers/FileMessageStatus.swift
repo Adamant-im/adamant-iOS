@@ -17,7 +17,7 @@ enum FileMessageStatus: Equatable {
 
     var image: UIImage {
         switch self {
-        case .busy: return .asset(named: "status_pending") ?? .init()
+        case .busy: return .asset(named: "status_failed") ?? .init()
         case .success: return .asset(named: "status_success") ?? .init()
         case .failed: return .asset(named: "status_failed") ?? .init()
         case let .needToDownload(failed):

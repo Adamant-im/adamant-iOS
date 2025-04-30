@@ -741,9 +741,9 @@ final class ChatViewModel: NSObject {
         updateMessages(resetLoadingProperty: false)
     }
 
-    func cancelFileUploading(messageId: String, file: ChatFile) {
+    func cancelFileUploading(messageId: String) {
         Task {
-            await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
+            await chatFileService.cancelUpload(messageId: messageId)
         }
     }
 

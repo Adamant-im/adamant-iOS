@@ -21,7 +21,7 @@ enum ChatAction {
     case react(id: String, emoji: String)
     case presentMenu(arg: ChatContextMenuArguments)
     case openFile(messageId: String, file: ChatFile)
-    case cancelUploading(messageId: String, file: ChatFile)
+    case cancelUploading(messageId: String)
     case autoDownloadContentIfNeeded(messageId: String, files: [ChatFile])
     case forceDownloadAllFiles(messageId: String, files: [ChatFile])
 }

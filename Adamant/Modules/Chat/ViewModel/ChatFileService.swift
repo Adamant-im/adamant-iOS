@@ -49,9 +49,11 @@ final class ChatFileService: ChatFileProtocol, Sendable {
     private var fileDownloadAttemptsCount: [String: Int] = [:]
     private var uploadingFilesDictionary: [String: FileMessage] = [:]
     private var previewDownloadsAttemps: [String: Int] = [:]
-    private var uploadTasks: [String: Task<UploadFileResult, Error>] = [:]
     private let synchronizer = AsyncStreamSender<@MainActor () -> Void>()
     private let _updateFileFields = ObservableSender<FileUpdateProperties>()
+    
+    // [messageId: [fileID: Task]] we can cancel all tasks for one message by messageId, uploading is managing by fileID
+    private var uploadTasks: [String: [String: Task<UploadFileResult, Error>]] = [:]
 
     private var subscriptions = Set<AnyCancellable>()
     private let maxDownloadAttemptsCount = 3
@@ -204,17 +206,24 @@ final class ChatFileService: ChatFileProtocol, Sendable {
         return decodedData
     }
 
-    func cancelUpload(messageId: String, fileId: String) async {
-        if let task = uploadTasks[fileId] {
+    func cancelUpload(messageId: String) async {
+        guard let tasks = uploadTasks[messageId] else { return }
+
+        var fileIdsToRemove: [String] = []
+        
+        for (fileId, task) in tasks {
             task.cancel()
-            uploadTasks[fileId] = nil
             uploadingFiles.removeAll { $0 == fileId }
-        } else {
-            await removeFromRichFile(
-                oldId: fileId,
-                txId: messageId
-            )
+            fileIdsToRemove.append(fileId)
         }
+
+        await removeFilesFromRichFile(
+            oldIds: fileIdsToRemove,
+            txId: messageId
+        )
+
+        uploadTasks[messageId] = nil
+        uploadingFilesDictionary[messageId] = nil
     }
 
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool {
@@ -973,10 +982,13 @@ extension ChatFileService {
                 saveEncrypted: saveEncrypted
             )
 
-            uploadTasks[file.url.absoluteString] = uploadTask
+            if uploadTasks[txId] == nil {
+                uploadTasks[txId] = [:]
+            }
+            uploadTasks[txId]?[file.url.absoluteString] = uploadTask
 
             defer {
-                uploadTasks[file.url.absoluteString] = nil
+                uploadTasks[txId]?[file.url.absoluteString] = nil
             }
 
             do {
@@ -1004,6 +1016,12 @@ extension ChatFileService {
                     txId: txId
                 )
             } catch is CancellationError {
+                guard let (fileMessage, _) = uploadingFilesDictionary[richMessageId: txId],
+                      fileMessage.files.contains(where: { $0.file.url.absoluteString == file.url.absoluteString })
+                else {
+                    return
+                }
+
                 await removeFromRichFile(
                     oldId: file.url.absoluteString,
                     txId: txId
@@ -1134,9 +1152,41 @@ extension ChatFileService {
         uploadingFilesDictionary[txId] = fileMessage
 
         if !updatedFiles.isEmpty {
-            // skip double update which causes bugs
-            // first update: here
-            // second update: if fileMessages is empty in sendFile method
+//             skip double update which causes bugs
+//             first update: here
+//             second update: if fileMessages is empty in sendFile method
+            try? await chatsProvider.updateTxMessageContent(
+                txId: txId,
+                richMessage: richMessage
+            )
+        }
+    }
+    
+    fileprivate func removeFilesFromRichFile(
+        oldIds: [String],
+        txId: String
+    ) async {
+        oldIds.forEach { oldId in
+            uploadingFiles.removeAll { $0 == oldId }
+        }
+
+        guard var (fileMessage, richMessage) = uploadingFilesDictionary[richMessageId: txId]
+        else { return }
+
+        richMessage.files = richMessage.files.filter { file in
+            !oldIds.contains(file.id)
+        }
+        fileMessage.adamantMessage = .richMessage(payload: richMessage)
+
+        let updatedFiles = fileMessage.files.filter { file in
+            let url = file.file.url
+            return !oldIds.contains(url.absoluteString)
+        }
+
+        fileMessage.files = updatedFiles
+        uploadingFilesDictionary[txId] = fileMessage
+
+        if !updatedFiles.isEmpty {
             try? await chatsProvider.updateTxMessageContent(
                 txId: txId,
                 richMessage: richMessage

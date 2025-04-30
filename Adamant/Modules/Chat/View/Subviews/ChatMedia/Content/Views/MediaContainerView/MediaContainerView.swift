@@ -133,19 +133,12 @@ extension MediaContainerView {
                         txStatus: model.txStatus
                     )
                     mediaView.buttonActionHandler = { [weak self, file, model] in
-                        let action: ChatAction =
-                            if file.isBusy, file.isUploading {
-                                .cancelUploading(
-                                    messageId: model.messageId,
-                                    file: file
-                                )
-                            } else {
-                                .openFile(
-                                    messageId: model.messageId,
-                                    file: file
-                                )
-                            }
-                        self?.actionHandler(action)
+                        self?.actionHandler(
+                            .openFile(
+                                messageId: model.messageId,
+                                file: file
+                            )
+                        )
                     }
 
                     if let resolution = file.file.resolution,
