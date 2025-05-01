@@ -25,7 +25,4 @@ struct ChatViewControllerState {
     var isAnimationAllowed: Bool {
         isMessagesLoaded && !isAutoScrolling && !isScrollingToBottom
     }
-    var canReadChat: Bool {
-        !isAutoScrolling && isViewAppeared && (!isMacOS || isAppActive)
-    }
 }

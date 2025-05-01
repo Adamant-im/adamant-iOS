@@ -40,6 +40,32 @@ final class ChatViewController: MessagesViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var bottomMessageId: String?
     private var state = ChatViewControllerState()
+    
+    var canReadChat: Bool {
+        guard !state.isAutoScrolling,
+              state.isViewAppeared,
+              (!isMacOS || state.isAppActive)
+        else {
+            print("qwe [\(Date())] " + "false: guard" + "\n----------------------")
+            return false
+        }
+        
+        if let split = splitViewController {
+            if split.presentedViewController != nil {
+                print("qwe [\(Date())] " + "false: presented controller" + "\n----------------------")
+                return false
+            }
+            
+            if let detailNav = split.viewControllers.last as? UINavigationController,
+               detailNav.viewControllers.count > 1 {
+                print("qwe [\(Date())] " + "false: detailNav.viewControllers.count - \(detailNav.viewControllers.count)" + "\n----------------------")
+                return false
+            }
+        }
+        print("qwe [\(Date())] " + "true" + "\n----------------------")
+        
+        return true
+    }
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -585,7 +611,7 @@ extension ChatViewController {
     }
 
     fileprivate func updateUnreadMessages() {
-        guard state.canReadChat else { return }
+        guard canReadChat else { return }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
 
         let adjustedVisibleRect = CGRect(
