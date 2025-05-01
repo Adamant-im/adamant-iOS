@@ -23,20 +23,25 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         NotificationCenter.default
             .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
-                self?.clearPreservedMessages()
+                self?.clearAllPreservedMessages()
             }
             .store(in: &notificationsSet)
     }
 
     // MARK: Notification actions
 
-    private func clearPreservedMessages() {
+    private func clearAllPreservedMessages() {
         preservedMessages = [:]
         preservedReplayMessage = [:]
         preservedFiles = [:]
-
-        updateNotifier.send()
     }
+    
+    func clearPreservedMessagesForSigleChat(address: String) {
+        preservedMessages.removeValue(forKey: address)
+        preservedReplayMessage.removeValue(forKey: address)
+        preservedFiles.removeValue(forKey: address)
+    }
+    
 
     func preserveChatState(
         message: String?,

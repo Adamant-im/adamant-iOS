@@ -320,6 +320,7 @@ final class ChatViewModel: NSObject {
 
     func sendMessage(text: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        chatPreservation.clearPreservedMessagesForSigleChat(address: partnerAddress)
 
         guard chatroom?.partner?.isDummy != true else {
             dialog.send(.dummy(partnerAddress))
