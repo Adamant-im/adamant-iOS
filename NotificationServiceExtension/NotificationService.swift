@@ -43,11 +43,8 @@ class NotificationService: UNNotificationServiceExtension {
     // MARK: - Hanlder
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
-    var shouldIgnoreNotification = false
-    
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        shouldIgnoreNotification = false
         AdamantUtilities.consoleLog(
             "Push notification received",
             request.content.userInfo.debugDescription,
@@ -82,13 +79,6 @@ class NotificationService: UNNotificationServiceExtension {
             contentHandler(bestAttemptContent)
             return
         }
-        let lastReadIds = UserDefaultsManager.lastReadId
-        
-        if let lastReadIds,
-           lastReadIds.contains(String(transaction.id)) {
-            shouldIgnoreNotification = true
-            return
-        }
 
         // MARK: 3. Working on transaction
         let partnerAddress: String
@@ -117,7 +107,9 @@ class NotificationService: UNNotificationServiceExtension {
             partnerName = partnerAddress.checkAndReplaceSystemWallets()
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
-        
+
+        var shouldIgnoreNotification = false
+
         var isReaction = false
 
         // MARK: 5. Content
@@ -321,6 +313,11 @@ class NotificationService: UNNotificationServiceExtension {
             break
         }
 
+        guard !shouldIgnoreNotification else {
+            contentHandler(UNNotificationContent())
+            return
+        }
+
         bestAttemptContent.sound = getSound(
             SecureStore: SecureStore,
             isReaction: isReaction
@@ -341,9 +338,7 @@ class NotificationService: UNNotificationServiceExtension {
     override func serviceExtensionTimeWillExpire() {
         // Called just before the extension will be terminated by the system.
         // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
-        if !shouldIgnoreNotification,
-           let contentHandler = contentHandler,
-           let bestAttemptContent = bestAttemptContent {
+        if let contentHandler = contentHandler, let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
     }

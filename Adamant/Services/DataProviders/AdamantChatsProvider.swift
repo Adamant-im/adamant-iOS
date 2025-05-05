@@ -323,7 +323,6 @@ extension AdamantChatsProvider {
         SecureStore.remove(StoreKey.chatProvider.receivedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.readedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
-        UserDefaultsManager.lastReadId = nil
 
         // Set State
         setState(.empty, previous: prevState, notify: notify)

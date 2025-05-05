@@ -9,8 +9,7 @@ import Foundation
 
 @propertyWrapper
 public struct UserDefaultsStorage<T> {
-    //user group.adamant.adamant-messenger to share UserDefaults Data to NotificationService and another app targets
-    private let defaults = UserDefaults(suiteName: "group.adamant.adamant-messenger") ?? UserDefaults.standard
+    private let defaults = UserDefaults.standard
     private let key: String
 
     public var wrappedValue: T? {

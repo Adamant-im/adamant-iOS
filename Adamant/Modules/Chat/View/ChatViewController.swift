@@ -997,7 +997,7 @@ extension ChatViewController {
         }
         
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
-        let indexPath = IndexPath(item: 0, section: index)
+        let indexPath = IndexPath(item: index, section: 0)
         
         //if we will not trigger didEndScrolling
         if visibleIndexPaths.contains(indexPath) {

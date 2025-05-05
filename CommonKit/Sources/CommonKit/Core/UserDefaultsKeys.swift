@@ -10,5 +10,4 @@ public enum UserDefaultsKey: String {
     
     case leftSplitViewController
     case rightSplitViewController
-    case lastReadId
 }
