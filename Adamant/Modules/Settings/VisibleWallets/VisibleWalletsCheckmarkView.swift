@@ -132,7 +132,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         addSubview(verticalTitlesStack)
         verticalTitlesStack.snp.makeConstraints {
             $0.centerY.equalTo(logoImageView.snp.centerY)
-            $0.leading.equalTo(logoImageView.snp.trailing).offset(20)
+            $0.leading.equalTo(logoImageView.snp.trailing).offset(16)
         }
         
         addSubview(balanceLabel)
