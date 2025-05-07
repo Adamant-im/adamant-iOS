@@ -1728,8 +1728,12 @@ extension ChatViewModel {
             return .failed
         }
 
-        if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
-            return .busy
+        if model.content.fileModel.files.contains(where: { $0.isUploading }) {
+            return .uploading
+        }
+
+        if model.content.fileModel.files.contains(where: { $0.isDownloading }) {
+            return .downloading
         }
 
         if model.content.fileModel.files.contains(where: {
