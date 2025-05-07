@@ -36,7 +36,7 @@ final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
         preservedFiles = [:]
     }
     
-    func clearPreservedMessagesForSigleChat(address: String) {
+    func clearPreservedMessagesForSingleChat(address: String) {
         preservedMessages.removeValue(forKey: address)
         preservedReplayMessage.removeValue(forKey: address)
         preservedFiles.removeValue(forKey: address)
