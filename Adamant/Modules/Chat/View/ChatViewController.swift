@@ -590,9 +590,9 @@ extension ChatViewController {
 
         let adjustedVisibleRect = CGRect(
             x: messagesCollectionView.contentOffset.x,
-            y: messagesCollectionView.contentOffset.y + topViewHeight,
+            y: messagesCollectionView.contentOffset.y + hidenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
-            height: messagesCollectionView.bounds.height - topViewHeight * 2
+            height: messagesCollectionView.bounds.height - hidenScrollViewPartHeight * 2
         )
 
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
@@ -1250,9 +1250,9 @@ extension ChatViewController {
 
         let visibleRect = CGRect(
             x: messagesCollectionView.contentOffset.x,
-            y: messagesCollectionView.contentOffset.y + topViewHeight,
+            y: messagesCollectionView.contentOffset.y + hidenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
-            height: messagesCollectionView.bounds.height - topViewHeight
+            height: messagesCollectionView.bounds.height - hidenScrollViewPartHeight
         )
 
         for indexPath in sortedIndexPaths {
@@ -1390,11 +1390,4 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
-
-private var topViewHeight: CGFloat {
-    if isMacOS {
-        return 45
-    } else {
-        return 100
-    }
-}
+private let hidenScrollViewPartHeight: CGFloat = 95
