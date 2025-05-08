@@ -331,9 +331,10 @@ class NotificationService: UNNotificationServiceExtension {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }
         bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
+        
+        // MARK: 8 Set current budge
         let storedBadgeString: String? = SecureStore.get(StoreKey.notificationsService.customBadgeNumber)
         let currentBadge = (Int(storedBadgeString ?? "0") ?? 0) + 1
-
         bestAttemptContent.badge = NSNumber(value: currentBadge)
         SecureStore.set(String(currentBadge), for: StoreKey.notificationsService.customBadgeNumber)
 
