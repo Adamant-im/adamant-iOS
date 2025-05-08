@@ -1390,4 +1390,4 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
-private let hidenScrollViewPartHeight: CGFloat = 95
+private let hidenScrollViewPartHeight: CGFloat = 94
