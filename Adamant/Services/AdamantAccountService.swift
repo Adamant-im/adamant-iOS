@@ -165,6 +165,10 @@ extension AdamantAccountService {
             
             isBalanceExpired = true
             NotificationCenter.default.post(
+                name: .AdamantAccountService.walletUpdated,
+                object: self
+            )
+            NotificationCenter.default.post(
                 name: .AdamantAccountService.accountDataUpdated,
                 object: self
             )
@@ -227,8 +231,8 @@ extension AdamantAccountService {
         update(completion, updateOnlyVisible: true)
     }
     
-    func update(shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false, updateOnlyVisible: Bool = true) {
-        update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: true, updateOnlyADM: updateOnlyADM)
+    func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
+        update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: shouldUpdateUIBalance, updateOnlyADM: updateOnlyADM)
     }
     
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
@@ -248,7 +252,9 @@ extension AdamantAccountService {
         }
         
         Task { @Sendable in
+            print("qwe [\(Date())] " + "Getting account" + "\n----------------------")
             let result = await apiService.getAccount(byPublicKey: publicKey)
+            print("qwe [\(Date())] " + "Stopped getting account" + "\n----------------------")
             
             switch result {
                 case .success(let account):
