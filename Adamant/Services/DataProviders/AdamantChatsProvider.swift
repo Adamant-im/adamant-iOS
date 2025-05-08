@@ -1552,6 +1552,19 @@ extension AdamantChatsProvider {
             return nil
         }
     }
+    
+    nonisolated func getChatTransactionFromDB(id: String) -> ChatTransaction? {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+
+        do {
+            let result = try stack.container.viewContext.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
 }
 
 // MARK: - Processing

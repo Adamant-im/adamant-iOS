@@ -90,7 +90,7 @@ final class ChatViewModel: NSObject {
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var cellIdForAnimation: String?
-    var animationType: MessageAnimationType?
+    var animationType: MessageAnimationType = MessageAnimationType.none
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -227,11 +227,9 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false,
-        messageAnimationType: MessageAnimationType = MessageAnimationType.none
+        isNewChat: Bool = false
     ) {
-        self.messageIdToShow = messageIdToShow
-        animationType = messageAnimationType
+        setUpMessagetoShow(messageId: messageIdToShow)
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -300,8 +298,17 @@ final class ChatViewModel: NSObject {
     }
 
     func updatePositionIfNeeded() {
-        if let messageIdToShow = messageIdToShow {
-            scroll(to: messageIdToShow)
+        if let messageIdToShow = messageIdToShow,
+           let transaction = chatsProvider.getChatTransactionFromDB(id: messageIdToShow) {
+            let chatId = messageId(transaction: transaction)
+            scroll(to: chatId)
+        }
+    }
+    
+    fileprivate func setUpMessagetoShow(messageId: String?) {
+        if let messageId {
+            self.messageIdToShow = messageId
+            separatorState.shouldScrollToNewMessagesOrSavedPosition = false
         }
     }
 
@@ -529,6 +536,7 @@ final class ChatViewModel: NSObject {
 
     func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        messageIdToShow = nil
 
         Task {
             do {
@@ -1839,6 +1847,17 @@ extension ChatViewModel {
         }
 
         separatorState.separatorIndex = index - 1
+    }
+    
+    fileprivate func messageId(transaction: ChatTransaction) -> String {
+        if let richTransaction = transaction as? RichMessageTransaction,
+           let reactToId = richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) {
+            animationType = .reaction
+            return reactToId
+        } else {
+            animationType = .message
+            return transaction.transactionId
+        }
     }
 }
 

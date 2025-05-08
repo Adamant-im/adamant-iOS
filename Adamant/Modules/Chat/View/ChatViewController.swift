@@ -434,7 +434,6 @@ extension ChatViewController {
                 guard let id = $0
                 else { return }
                 self?.scrollToPosition(id, animated: true)
-                self?.state.shouldScrollToNewMessagesOrSavedPosition = false
                 self?.viewModel.messageIdToShow = nil
             }
             .store(in: &subscriptions)
@@ -803,11 +802,11 @@ extension ChatViewController {
     fileprivate func updateMessagesPosition() {
         guard !state.isMessagesLoaded, !viewModel.messages.isEmpty else { return }
         state.isMessagesLoaded = true
-        if state.shouldScrollToNewMessagesOrSavedPosition {
+        if viewModel.separatorState.shouldScrollToNewMessagesOrSavedPosition {
+            viewModel.animationType = MessageAnimationType.none
             if viewModel.startPositionId != nil {
                 viewModel.startPositionId.map { scrollToPosition($0, scrollAt: .top) }
             } else if let unreadMessage = viewModel.unreadMessagesIds?.first {
-                viewModel.animationType = MessageAnimationType.none
                 let isFirstMessagesInChat = viewModel.unreadMessagesIds?.count == viewModel.messages.count
                 scrollToPosition(unreadMessage, setExtraOffset: !isFirstMessagesInChat, scrollAt: .top)
             }
@@ -997,7 +996,7 @@ extension ChatViewController {
         }
         
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
-        let indexPath = IndexPath(item: index, section: 0)
+        let indexPath = IndexPath(item: 0, section: index)
         
         //if we will not trigger didEndScrolling
         if visibleIndexPaths.contains(indexPath) {
@@ -1373,9 +1372,7 @@ extension ChatViewController {
             case .reaction:
                 cell.animateReactionHighlight()
                 viewModel.shortVibro()
-            case nil:
-                break
-            case .some(.none):
+            case .none:
                 break
             }
             self.viewModel.cellIdForAnimation = nil
