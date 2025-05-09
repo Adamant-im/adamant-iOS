@@ -106,7 +106,7 @@ final class ChatMediaContainerView: UIView {
     
     private var statusProgressState = CircularProgressState(
         lineWidth: 2.0,
-        backgroundColor: .clear,
+        backgroundColor: .lightGray,
         progressColor: .adamant.primary,
         progress: .zero,
         hidden: true
@@ -143,7 +143,7 @@ final class ChatMediaContainerView: UIView {
     }
 
     @objc func onStatusButtonTap() {
-        if model.status == .busy {
+        if model.status == .uploading {
             actionHandler(.cancelUploading(messageId: model.id))
             return
         }
@@ -185,7 +185,7 @@ extension ChatMediaContainerView {
         reactionsStack.insertSubview(progressRingHostingView, aboveSubview: statusButton)
         progressRingHostingView.snp.makeConstraints { make in
             make.center.equalTo(statusButton)
-            make.size.equalTo(31)
+            make.size.equalTo(30)
         }
     }
 
@@ -222,9 +222,18 @@ extension ChatMediaContainerView {
     
     func updateProgressRing() {
         let averageProgress = averageUploadProgress()
-
+        
+        if averageProgress == 0 {
+            statusProgressState.backgroundGradient = LinearGradient(
+                gradient: Gradient(colors: [.white, .black]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+        )} else {
+            statusProgressState.backgroundGradient = nil
+        }
         statusProgressState.progress = averageProgress / 100
-        statusProgressState.hidden = averageProgress == 0 || averageProgress == 100
+        statusProgressState.hidden = averageProgress == 100 || !(model.status == .uploading)
+        statusProgressState.isSpinning = (model.status == .uploading && averageProgress == 0)
     }
 
     func updateLayout() {

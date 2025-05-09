@@ -90,7 +90,7 @@ final class ChatViewModel: NSObject {
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var cellIdForAnimation: String?
-    var animationType: MessageAnimationType?
+    var animationType: MessageAnimationType = MessageAnimationType.none
     var indexPathsForVisibleItems: () -> [IndexPath] = { .init() }
     var scrolledMessageId: Set<String>?
     var shouldScrollToBottom: Bool = true
@@ -142,7 +142,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPositionId: String?
+    var startPosition: ChatStartPosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -227,11 +227,9 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false,
-        messageAnimationType: MessageAnimationType = MessageAnimationType.none
+        isNewChat: Bool = false
     ) {
-        self.messageIdToShow = messageIdToShow
-        animationType = messageAnimationType
+        setUpMessagetoShow(messageId: messageIdToShow)
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -300,8 +298,17 @@ final class ChatViewModel: NSObject {
     }
 
     func updatePositionIfNeeded() {
-        if let messageIdToShow = messageIdToShow {
-            scroll(to: messageIdToShow)
+        if let messageIdToShow = messageIdToShow,
+           let transaction = chatsProvider.getChatTransactionFromDB(id: messageIdToShow) {
+            let chatId = messageId(transaction: transaction)
+            scroll(to: chatId)
+        }
+    }
+    
+    fileprivate func setUpMessagetoShow(messageId: String?) {
+        if let messageId {
+            self.messageIdToShow = messageId
+            separatorState.shouldScrollToNewMessagesOrSavedPosition = false
         }
     }
 
@@ -320,6 +327,7 @@ final class ChatViewModel: NSObject {
 
     func sendMessage(text: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        chatPreservation.clearPreservedMessagesForSingleChat(address: partnerAddress)
 
         guard chatroom?.partner?.isDummy != true else {
             dialog.send(.dummy(partnerAddress))
@@ -419,9 +427,9 @@ final class ChatViewModel: NSObject {
         hasPartnerName = !newName.isEmpty
     }
 
-    func saveChatOffset(_ topMessageId: String?) {
+    func saveChatOffset(_ offset: CGFloat?, collectionHeight: CGFloat?) {
         guard let address = chatroom?.partner?.address else { return }
-        chatsProvider.setChatPositon(for: address, topMessageId: topMessageId)
+        chatsProvider.setChatPositon(for: address, position: offset, collectionHeight: collectionHeight)
     }
 
     func markMessageAsRead(index: Int) {
@@ -529,6 +537,7 @@ final class ChatViewModel: NSObject {
 
     func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        messageIdToShow = nil
 
         Task {
             do {
@@ -1298,11 +1307,13 @@ extension ChatViewModel {
     fileprivate func makeStartPosition() {
         guard messageIdToShow == nil,
               let address = chatroom?.partner?.address else {
-            startPositionId = nil
+            startPosition = nil
             return
         }
 
-        startPositionId = chatsProvider.getChatPositon(for: address)
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(yOffset: $0.0, oldCollectionHeight: $0.1) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {
@@ -1728,8 +1739,12 @@ extension ChatViewModel {
             return .failed
         }
 
-        if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
-            return .busy
+        if model.content.fileModel.files.contains(where: { $0.isUploading }) {
+            return .uploading
+        }
+
+        if model.content.fileModel.files.contains(where: { $0.isDownloading }) {
+            return .downloading
         }
 
         if model.content.fileModel.files.contains(where: {
@@ -1839,6 +1854,17 @@ extension ChatViewModel {
         }
 
         separatorState.separatorIndex = index - 1
+    }
+    
+    fileprivate func messageId(transaction: ChatTransaction) -> String {
+        if let richTransaction = transaction as? RichMessageTransaction,
+           let reactToId = richTransaction.getRichValue(for: RichContentKeys.react.reactto_id) {
+            animationType = .reaction
+            return reactToId
+        } else {
+            animationType = .message
+            return transaction.transactionId
+        }
     }
 }
 
