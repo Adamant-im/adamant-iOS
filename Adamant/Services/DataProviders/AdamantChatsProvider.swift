@@ -1357,8 +1357,12 @@ extension AdamantChatsProvider {
 
         do {
             let locallyID = signedTransaction.generateId() ?? UUID().uuidString
-            transaction.transactionId = locallyID
-            transaction.chatMessageId = locallyID
+            if transaction.transactionId.isEmpty {
+                transaction.transactionId = locallyID
+            }
+            if transaction.chatMessageId?.isEmpty ?? true {
+                transaction.chatMessageId = locallyID
+            }
 
             let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
 
