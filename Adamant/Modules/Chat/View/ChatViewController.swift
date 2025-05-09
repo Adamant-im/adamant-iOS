@@ -984,8 +984,7 @@ extension ChatViewController {
             }
             
             chatMessagesCollectionView.setBottomOffset(finalOffset, safely: state.isViewAppeared)
-            state.isAutoScrolling = false
-            
+            state.isAutoScrolling = false 
             guard !state.isViewAppeared else { return }
             chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
         case let .messageId(id, scrollToBottomIfNotFound):
@@ -1354,9 +1353,7 @@ extension ChatViewController {
             case .reaction:
                 cell.animateReactionHighlight()
                 viewModel.shortVibro()
-            case nil:
-                break
-            case .some(.none):
+            case .none:
                 break
             }
             self.viewModel.cellIdForAnimation = nil
