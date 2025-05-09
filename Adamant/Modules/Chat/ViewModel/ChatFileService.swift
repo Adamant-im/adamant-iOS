@@ -209,6 +209,9 @@ final class ChatFileService: ChatFileProtocol, Sendable {
     func cancelUpload(messageId: String) async {
         guard let tasks = uploadTasks[messageId] else { return }
 
+        uploadTasks[messageId] = nil
+        uploadingFilesDictionary[messageId] = nil
+
         var fileIdsToRemove: [String] = []
         
         for (fileId, task) in tasks {
@@ -221,9 +224,6 @@ final class ChatFileService: ChatFileProtocol, Sendable {
             oldIds: fileIdsToRemove,
             txId: messageId
         )
-
-        uploadTasks[messageId] = nil
-        uploadingFilesDictionary[messageId] = nil
     }
 
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool {
@@ -993,6 +993,7 @@ extension ChatFileService {
 
             do {
                 let result = try await uploadTask.value
+                try Task.checkCancellation()
 
                 sendProgress(
                     for: result.file.cid,
