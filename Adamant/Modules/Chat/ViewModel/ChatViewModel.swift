@@ -142,7 +142,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPositionId: String?
+    var startPosition: ChatStartPosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -320,6 +320,7 @@ final class ChatViewModel: NSObject {
 
     func sendMessage(text: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        chatPreservation.clearPreservedMessagesForSingleChat(address: partnerAddress)
 
         guard chatroom?.partner?.isDummy != true else {
             dialog.send(.dummy(partnerAddress))
@@ -419,9 +420,9 @@ final class ChatViewModel: NSObject {
         hasPartnerName = !newName.isEmpty
     }
 
-    func saveChatOffset(_ topMessageId: String?) {
+    func saveChatOffset(_ offset: CGFloat?, collectionHeight: CGFloat?) {
         guard let address = chatroom?.partner?.address else { return }
-        chatsProvider.setChatPositon(for: address, topMessageId: topMessageId)
+        chatsProvider.setChatPositon(for: address, position: offset, collectionHeight: collectionHeight)
     }
 
     func markMessageAsRead(index: Int) {
@@ -1298,11 +1299,13 @@ extension ChatViewModel {
     fileprivate func makeStartPosition() {
         guard messageIdToShow == nil,
               let address = chatroom?.partner?.address else {
-            startPositionId = nil
+            startPosition = nil
             return
         }
 
-        startPositionId = chatsProvider.getChatPositon(for: address)
+        startPosition = chatsProvider
+            .getChatPositon(for: address)
+            .map { .offset(yOffset: $0.0, oldCollectionHeight: $0.1) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {

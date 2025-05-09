@@ -40,7 +40,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactionsBySignature: [String] = []
     private var chatsMarkAsUnread: Set<String>? = Set()
 
-    @MainActor private var chatPositon: [String: String] = [:]
+    @MainActor private var chatPositon: [String: (CGFloat, CGFloat)] = [:]
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
 
@@ -799,11 +799,11 @@ extension AdamantChatsProvider {
         chatPositon.removeValue(forKey: address)
     }
 
-    @MainActor func setChatPositon(for address: String, topMessageId: String?) {
-        chatPositon[address] = topMessageId
+    @MainActor func setChatPositon(for address: String, position: CGFloat?, collectionHeight: CGFloat?) {
+        chatPositon[address] = (position, collectionHeight) as? (CGFloat, CGFloat)
     }
 
-    @MainActor func getChatPositon(for address: String) -> String? {
+    @MainActor func getChatPositon(for address: String) -> (CGFloat, CGFloat)? {
         return chatPositon[address]
     }
 
