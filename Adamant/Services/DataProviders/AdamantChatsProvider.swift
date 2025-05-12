@@ -40,7 +40,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactionsBySignature: [String] = []
     private var chatsMarkAsUnread: Set<String>? = Set()
 
-    @MainActor private var chatPositon: [String: String] = [:]
+    @MainActor private var chatPositon: [String: (CGFloat, CGFloat)] = [:]
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
 
@@ -800,11 +800,11 @@ extension AdamantChatsProvider {
         chatPositon.removeValue(forKey: address)
     }
 
-    @MainActor func setChatPositon(for address: String, topMessageId: String?) {
-        chatPositon[address] = topMessageId
+    @MainActor func setChatPositon(for address: String, position: CGFloat?, collectionHeight: CGFloat?) {
+        chatPositon[address] = (position, collectionHeight) as? (CGFloat, CGFloat)
     }
 
-    @MainActor func getChatPositon(for address: String) -> String? {
+    @MainActor func getChatPositon(for address: String) -> (CGFloat, CGFloat)? {
         return chatPositon[address]
     }
 
@@ -1358,8 +1358,12 @@ extension AdamantChatsProvider {
 
         do {
             let locallyID = signedTransaction.generateId() ?? UUID().uuidString
-            transaction.transactionId = locallyID
-            transaction.chatMessageId = locallyID
+            if transaction.transactionId.isEmpty {
+                transaction.transactionId = locallyID
+            }
+            if transaction.chatMessageId?.isEmpty ?? true {
+                transaction.chatMessageId = locallyID
+            }
 
             let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
 
@@ -1548,6 +1552,19 @@ extension AdamantChatsProvider {
 
         do {
             let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
+    nonisolated func getChatTransactionFromDB(id: String) -> ChatTransaction? {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+
+        do {
+            let result = try stack.container.viewContext.fetch(request)
             return result.first
         } catch {
             return nil

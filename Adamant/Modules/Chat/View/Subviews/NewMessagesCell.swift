@@ -34,7 +34,7 @@ final class NewMessagesCell: MessageReusableView {
         separatorLine.translatesAutoresizingMaskIntoConstraints = false
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        let pixelSize = 1 / UIScreen.main.scale
+        let pixelSize = 2 / UIScreen.main.scale
         NSLayoutConstraint.activate([
             separatorLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             separatorLine.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),

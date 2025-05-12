@@ -9,17 +9,23 @@
 import CommonKit
 import UIKit
 
-enum FileMessageStatus: Equatable {
-    case busy
-    case needToDownload(failed: Bool)
-    case failed
+enum FileMessageStatus: Hashable {
+    case uploading
+    case downloading
     case success
+    case failed
+    case needToDownload(failed: Bool)
 
     var image: UIImage {
         switch self {
-        case .busy: return .asset(named: "status_failed") ?? .init()
-        case .success: return .asset(named: "status_success") ?? .init()
-        case .failed: return .asset(named: "status_failed") ?? .init()
+        case .uploading:
+            return UIImage(systemName: "square.fill") ?? UIImage()
+        case .downloading:
+            return .asset(named: "status_pending") ?? .init()
+        case .success:
+            return .asset(named: "status_success") ?? .init()
+        case .failed:
+            return .asset(named: "status_failed") ?? .init()
         case let .needToDownload(failed):
             guard !failed else {
                 return .asset(named: "download-circular-error") ?? .init()
@@ -30,8 +36,10 @@ enum FileMessageStatus: Equatable {
 
     var imageTintColor: UIColor {
         switch self {
-        case .busy, .needToDownload, .success: return .adamant.primary
-        case .failed: return .adamant.attention
+        case .uploading, .downloading, .needToDownload, .success:
+            return .adamant.primary
+        case .failed:
+            return .adamant.attention
         }
     }
 }
