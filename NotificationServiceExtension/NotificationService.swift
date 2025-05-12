@@ -87,7 +87,6 @@ class NotificationService: UNNotificationServiceExtension {
         if let lastReadIds,
            lastReadIds.contains(String(transaction.id)) {
             shouldIgnoreNotification = true
-            return
         }
 
         // MARK: 3. Working on transaction
@@ -333,13 +332,16 @@ class NotificationService: UNNotificationServiceExtension {
         if let data = try? JSONEncoder().encode(transaction), let transactionRaw = String(data: data, encoding: .utf8) {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }
-        bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
         
-        // MARK: 8 Set current budge
-        let storedBadgeString: String? = SecureStore.get(StoreKey.notificationsService.customBadgeNumber)
-        let currentBadge = (Int(storedBadgeString ?? "0") ?? 0) + 1
-        bestAttemptContent.badge = NSNumber(value: currentBadge)
-        SecureStore.set(String(currentBadge), for: StoreKey.notificationsService.customBadgeNumber)
+        // MARK: 8 Set current budge and Message
+        var badgeValue = (Int(SecureStore.get(StoreKey.notificationsService.customBadgeNumber) ?? "0") ?? 0)
+        if !shouldIgnoreNotification {
+            badgeValue += 1
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
+        }
+        
+        bestAttemptContent.badge = NSNumber(value: badgeValue)
+        SecureStore.set(String(badgeValue), for: StoreKey.notificationsService.customBadgeNumber)
 
         contentHandler(bestAttemptContent)
     }
@@ -347,8 +349,7 @@ class NotificationService: UNNotificationServiceExtension {
     override func serviceExtensionTimeWillExpire() {
         // Called just before the extension will be terminated by the system.
         // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
-        if !shouldIgnoreNotification,
-           let contentHandler = contentHandler,
+        if let contentHandler = contentHandler,
            let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
