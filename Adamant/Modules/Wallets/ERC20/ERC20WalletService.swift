@@ -452,78 +452,67 @@ extension ERC20WalletService: SwinjectDependentService {
 extension ERC20WalletService {
     func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> EthTransaction {
         let sender = wallet?.address
-        let isOutgoing: Bool
-
-        // MARK: 1. Transaction details
-        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3(
-            waitsForConnectivity: waitsForConnectivity
-        ) { web3 in
+        var details: Web3Core.TransactionDetails?
+        var receipt: TransactionReceipt?
+        
+        details = try await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
-
-        let receipt = try await erc20ApiService.requestWeb3(
-            waitsForConnectivity: waitsForConnectivity
-        ) { web3 in
+        
+        receipt = try await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionReceipt(hash)
         }.get()
-
-        // MARK: 3. Check if transaction is delivered
-        guard receipt.status == .ok,
-            let blockNumber = details.blockNumber
-        else {
-            let transaction = details.transaction.asEthTransaction(
-                date: nil,
-                gasUsed: receipt.gasUsed,
-                gasPrice: receipt.effectiveGasPrice,
-                blockNumber: nil,
-                confirmations: nil,
-                receiptStatus: receipt.status,
-                isOutgoing: false
-            )
-            return transaction
+        
+        guard details != nil || receipt != nil else {
+            throw WalletServiceError.remoteServiceError(message: "Both transaction details and receipt are unavailable.")
         }
 
-        // MARK: 4. Block timestamp & confirmations
-        let currentBlock = try await erc20ApiService.requestWeb3(
-            waitsForConnectivity: waitsForConnectivity
-        ) { web3 in
-            try await web3.eth.blockNumber()
-        }.get()
+        let isOutgoing: Bool = {
+            guard let sender = sender else { return false }
+            return details?.transaction.sender?.address == sender
+        }()
 
-        let block = try await erc20ApiService.requestWeb3(
-            waitsForConnectivity: waitsForConnectivity
-        ) { web3 in
-            try await web3.eth.block(by: receipt.blockHash)
-        }.get()
+        let tx = details?.transaction
+        let timestamp: Date? = await {
+            guard let blockNumber = receipt?.blockNumber else { return nil }
+            let blockHex = "0x" + String(blockNumber, radix: 16)
+            do {
+                return try await fetchBlockTimestamp(blockNumberHex: blockHex)
+            } catch {
+                print("❌ Failed to fetch block timestamp:", error)
+                return nil
+            }
+        }()
 
-        guard currentBlock >= blockNumber else {
-            throw WalletServiceError.remoteServiceError(
-                message: "ERC20 confirmations calculating error"
-            )
-        }
+        let confirmations: String? = await {
+            guard let blockNumber = details?.blockNumber else { return nil }
+            do {
+                let currentBlock = try await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
+                    try await web3.eth.blockNumber()
+                }.get()
+                return String(currentBlock - blockNumber)
+            } catch {
+                return nil
+            }
+        }()
 
-        let confirmations = currentBlock - blockNumber
-
-        let transaction = details.transaction
-
-        if let sender = sender {
-            isOutgoing = transaction.sender?.address == sender
-        } else {
-            isOutgoing = false
-        }
-
-        let ethTransaction = transaction.asEthTransaction(
-            date: block.timestamp,
-            gasUsed: receipt.gasUsed,
-            gasPrice: receipt.effectiveGasPrice,
-            blockNumber: String(blockNumber),
-            confirmations: String(confirmations),
-            receiptStatus: receipt.status,
+        let ethTransaction = tx?.asEthTransaction(
+            date: timestamp,
+            gasUsed: receipt?.gasUsed,
+            gasPrice: receipt?.effectiveGasPrice,
+            blockNumber: details?.blockNumber.map { String($0) },
+            confirmations: confirmations,
+            receiptStatus: receipt?.status ?? .notYetProcessed,
             isOutgoing: isOutgoing,
+            hash: tx?.txHash ?? hash,
             for: self.token
         )
 
-        return ethTransaction
+        guard let result = ethTransaction else {
+            throw WalletServiceError.remoteServiceError(message: "Unable to create ECR20Transaction.")
+        }
+
+        return result
     }
 
     func getBalance(address: String) async throws -> Decimal {
@@ -606,6 +595,7 @@ extension ERC20WalletService {
         }.get()
 
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
+        
         return transactions
     }
 
@@ -666,5 +656,43 @@ extension ERC20WalletService {
 
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
+    }
+    
+    func fetchBlockTimestamp(blockNumberHex: String) async throws -> Date {
+        let body: [String: Any] = [
+            "jsonrpc": "2.0",
+            "method": "eth_getBlockByNumber",
+            "params": [blockNumberHex, false],
+            "id": 1
+        ]
+
+        let response: APIResponseModel = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
+            let result = await core.sendRequestBasic(
+                origin: origin,
+                path: "",
+                method: .post,
+                jsonParameters: body,
+                timeout: .common
+            )
+            return .success(result)
+        }.get()
+
+        guard
+            let data = response.data,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let block = json["result"] as? [String: Any],
+            let timestampHex = block["timestamp"] as? String,
+            let timestampInt = UInt64(timestampHex.stripHexPrefix(), radix: 16)
+        else {
+            throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
+        }
+
+        return Date(timeIntervalSince1970: TimeInterval(timestampInt))
+    }
+}
+
+private extension String {
+    func stripHexPrefix() -> String {
+        hasPrefix("0x") ? String(dropFirst(2)) : self
     }
 }
