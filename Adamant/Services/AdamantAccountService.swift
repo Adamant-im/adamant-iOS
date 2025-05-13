@@ -227,10 +227,6 @@ extension AdamantAccountService {
         self.update(nil)
     }
     
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
-        update(completion, updateOnlyVisible: true)
-    }
-    
     func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
         update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: shouldUpdateUIBalance, updateOnlyADM: updateOnlyADM)
     }
@@ -264,6 +260,7 @@ extension AdamantAccountService {
         }
         
         let isBalanceExpiredPrev = isBalanceExpired
+        let balancePrev = account?.balance
         
         let prevState = state
         state = .updating
@@ -299,7 +296,9 @@ extension AdamantAccountService {
                     isBalanceExpired = true
                     state = prevState
             }
-            if isBalanceExpiredPrev != isBalanceExpired, shouldUpdateUIBalance {
+            
+            // Holde case when the expiring change or when the balance change
+            if (isBalanceExpiredPrev != isBalanceExpired && shouldUpdateUIBalance) || (account?.balance != balancePrev) {
                 NotificationCenter.default.post(
                     name: .AdamantAccountService.walletUpdated,
                     object: self
