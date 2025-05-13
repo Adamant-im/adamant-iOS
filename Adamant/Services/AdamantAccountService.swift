@@ -236,6 +236,25 @@ extension AdamantAccountService {
     }
     
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
+        if !updateOnlyADM {
+            let wallets = walletServiceCompose.getWallets()
+            if shouldUpdateUIBalance{
+                isBalanceExpired = true
+            }
+            
+            for wallet in wallets {
+                if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
+                    Task{
+                        if shouldUpdateUIBalance {
+                            wallet.core.updateWithRefreshUIBalance()
+                        } else {
+                            wallet.core.update()
+                        }
+                    }
+                }
+            }
+        }
+        
         switch state {
             case .notLogged, .isLoggingIn, .updating:
                 return
@@ -243,6 +262,8 @@ extension AdamantAccountService {
             case .loggedIn:
                 break
         }
+        
+        let isBalanceExpiredPrev = isBalanceExpired
         
         let prevState = state
         state = .updating
@@ -252,9 +273,7 @@ extension AdamantAccountService {
         }
         
         Task { @Sendable in
-            print("qwe [\(Date())] " + "Getting account" + "\n----------------------")
             let result = await apiService.getAccount(byPublicKey: publicKey)
-            print("qwe [\(Date())] " + "Stopped getting account" + "\n----------------------")
             
             switch result {
                 case .success(let account):
@@ -280,19 +299,11 @@ extension AdamantAccountService {
                     isBalanceExpired = true
                     state = prevState
             }
-        }
-        
-        if !updateOnlyADM {
-            let wallets = walletServiceCompose.getWallets()
-            
-            for wallet in wallets {
-                if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
-                    if shouldUpdateUIBalance {
-                        wallet.core.updateWithRefreshUIBalance()
-                    } else {
-                        wallet.core.update()
-                    }
-                }
+            if isBalanceExpiredPrev != isBalanceExpired, shouldUpdateUIBalance {
+                NotificationCenter.default.post(
+                    name: .AdamantAccountService.walletUpdated,
+                    object: self
+                )
             }
         }
     }

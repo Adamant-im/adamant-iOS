@@ -303,21 +303,19 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
         guard let wallet = await getWallet() else {
             return
         }
+        
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
 
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             if wallet.balance < balance, wallet.isBalanceInitialized {

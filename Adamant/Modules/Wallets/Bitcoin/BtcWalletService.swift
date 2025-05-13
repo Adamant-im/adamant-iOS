@@ -289,21 +289,19 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         guard let wallet = btcWallet else {
             return
         }
+        
+        if updateWithRefreshUIBalance {
+            wallet.isBalanceInitialized = false
+            walletUpdateSender.send()
+        }
 
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {

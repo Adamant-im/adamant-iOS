@@ -1057,7 +1057,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
     nonisolated func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         MainActor.assertIsolated()
-
+        
         return DispatchQueue.onMainThreadSyncSafe {
             return viewModel.state.wallets[safe: index] ?? AccountWalletCellState.default
         }

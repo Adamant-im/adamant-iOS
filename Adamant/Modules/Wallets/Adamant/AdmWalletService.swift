@@ -172,7 +172,6 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
 
     func updateWithRefreshUIBalance(){
         Task {        
-            admWallet?.isBalanceInitialized = false
             await walletUpdateSender.send()
             update()
         }

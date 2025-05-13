@@ -72,7 +72,7 @@ public final class AdamantApiService: @unchecked Sendable {
         
         task.startTask(
             Task {
-                await service.request(
+                return await service.request(
                     waitsForConnectivity: waitsForConnectivity,
                     taskId: taskId,
                     isCancelled: {

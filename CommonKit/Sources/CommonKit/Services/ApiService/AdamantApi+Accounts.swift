@@ -37,7 +37,7 @@ extension AdamantApiService {
                 parameters: ["publicKey": publicKey],
                 encoding: .url
             )
-
+            
             return response.flatMap { $0.resolved() }
         }) {
         case let .success(value):
