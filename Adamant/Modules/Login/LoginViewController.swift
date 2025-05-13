@@ -496,13 +496,9 @@ extension LoginViewController {
         dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
 
         Task {
-            let result = await apiService.getAccount(byPassphrase: passphrase)
+            let result = await loginIntoExistingAccount(passphrase: passphrase)
 
-            switch result {
-            case .success:
-                loginIntoExistingAccount(passphrase: passphrase)
-
-            case .failure(let error):
+            if case .failure(let error) = result {
                 dialogService.showRichError(error: error)
             }
         }
@@ -527,28 +523,34 @@ extension LoginViewController {
     }
 
     @MainActor
-    private func loginIntoExistingAccount(passphrase: String) {
-        Task {
-            do {
-                let result = try await accountService.loginWith(passphrase: passphrase, password: .empty)
+    private func loginIntoExistingAccount(passphrase: String) async -> ApiServiceResult<AdamantAccount> {
+        do {
+            let loginResult = try await accountService.loginWith(passphrase: passphrase, password: .empty)
 
+            dialogService.dismissProgress()
+
+            switch loginResult {
+            case let .success(account, alert):
                 if let nav = navigationController {
                     nav.popViewController(animated: true)
                 } else {
                     dismiss(animated: true, completion: nil)
                 }
 
-                dialogService.dismissProgress()
-
-                if case .success(_, let alert) = result,
-                    let alert = alert
-                {
+                if let alert {
                     dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
                 }
-            } catch {
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
+
+                return .success(account)
+
+            case let .failure(accountError):
+                return .failure(.internalError(message: accountError.localizedDescription, error: accountError))
             }
+
+        } catch {
+            dialogService.dismissProgress()
+            dialogService.showRichError(error: error)
+            return .failure(.internalError(message: error.localizedDescription, error: error))
         }
     }
 }
