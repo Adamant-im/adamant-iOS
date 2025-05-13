@@ -283,7 +283,7 @@ extension ChatMediaContentView.Model {
         }
 
         if !comment.string.isEmpty {
-            spaceCount += 3
+            spaceCount += 2
         }
 
         return fileModel.height()
