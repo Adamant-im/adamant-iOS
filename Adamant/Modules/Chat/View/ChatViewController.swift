@@ -796,8 +796,10 @@ extension ChatViewController {
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
         if !state.isMessagesLoaded {
-            viewModel.startPosition.map { scrollToPosition($0) }
-            state.shouldScrollToNewMessages = false
+            viewModel.startPosition.map {
+                scrollToPosition($0)
+                state.shouldScrollToNewMessages = false
+            }
         }
     }
 
