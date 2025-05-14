@@ -500,37 +500,38 @@ final class ChatViewModel: NSObject {
 
     func retrySendMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
+                  let message = messages.first(where: { $0.messageId == id })
             else { return }
-            
-            let message = messages.first(where: { $0.messageId == id })
-            
-            if case let .file(model) = message?.content {
-                try? await chatFileService.resendMessage(
-                    with: id,
-                    text: model.value.content.comment.string,
-                    chatroom: chatroom,
-                    replyMessage: nil,
-                    saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-                )
-                return
-            }
-            
+
             do {
-                try await chatsProvider.retrySendMessage(transaction)
-            } catch {
-                switch error as? ChatsProviderError {
-                    case .invalidTransactionStatus:
-                        break
-                    case let .serverError(serverError):
-                        switch serverError {
-                            case .timestampIsInTheFuture:
-                                dialog.send(.timestampIsInTheFuture)
-                            default: dialog.send(.warning(error.localizedDescription))
-                        }
-                    default:
-                        dialog.send(.richError(error))
+                if case let .file(model) = message.content {
+                    try await chatFileService.resendMessage(
+                        with: id,
+                        text: model.value.content.comment.string,
+                        chatroom: chatroom,
+                        replyMessage: nil,
+                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+                    )
+                } else {
+                    try await chatsProvider.retrySendMessage(transaction)
                 }
+            } catch let error as ChatsProviderError {
+                switch error {
+                case .invalidTransactionStatus:
+                    break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default:
+                        dialog.send(.warning(error.localizedDescription))
+                    }
+                default:
+                    dialog.send(.richError(error))
+                }
+            } catch {
+                dialog.send(.richError(error))
             }
         }.stored(in: tasksStorage)
     }
