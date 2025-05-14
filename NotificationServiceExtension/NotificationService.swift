@@ -82,7 +82,7 @@ class NotificationService: UNNotificationServiceExtension {
             contentHandler(bestAttemptContent)
             return
         }
-        let lastReadIds = UserDefaultsManager.lastReadId
+        let lastReadIds = UserDefaultsManager.lastReceivedId
         
         if let lastReadIds,
            lastReadIds.contains(String(transaction.id)) {

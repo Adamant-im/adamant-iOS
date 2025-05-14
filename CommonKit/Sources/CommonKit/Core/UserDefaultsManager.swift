@@ -8,8 +8,8 @@ public struct UserDefaultsManager {
     @UserDefaultsStorage(.needsToShowNoActiveNodesAlert)
     static var needsToShowNoActiveNodesAlert: Bool?
 
-    @UserDefaultsStorage(.lastReadId)
-    public static var lastReadId: [String]?
+    @UserDefaultsStorage(.lastReceivedId)
+    public static var lastReceivedId: [String]?
 
     public static func setInitialUserDefaults() {
         needsToShowNoActiveNodesAlert = true
@@ -17,13 +17,13 @@ public struct UserDefaultsManager {
 }
 
 public extension UserDefaultsManager {
-    static func addLastReadId(_ id: String) {
-        var ids = lastReadId ?? []
+    static func addLastReceivedId(_ id: String) {
+        var ids = lastReceivedId ?? []
         ids.removeAll { $0 == id }
         ids.insert(id, at: 0)
         if ids.count > 100 {
             ids = Array(ids.prefix(100))
         }
-        lastReadId = ids
+        lastReceivedId = ids
     }
 }
