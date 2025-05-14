@@ -174,6 +174,11 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         dogeApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        dogeApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,

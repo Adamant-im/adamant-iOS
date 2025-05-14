@@ -79,8 +79,8 @@ open class HealthCheckWrapper<Service: Sendable, Error: HealthCheckableError>: S
         var lastConnectionError: Error?
 
         while true {
-            let node = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
-                .first { !usedNodesIds.contains($0.id) }
+            let nodes = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
+            let node = nodes.first { !usedNodesIds.contains($0.id) }
 
             guard let node else { break }
             usedNodesIds.insert(node.id)

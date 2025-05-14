@@ -69,6 +69,11 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             .map { $0.0 && $0.1 }
             .eraseToAnyPublisher()
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        klyNodeApiService.hasAllowedNodePublisher
+    }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
 

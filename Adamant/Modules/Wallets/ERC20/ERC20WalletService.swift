@@ -204,6 +204,11 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         erc20ApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        erc20ApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,

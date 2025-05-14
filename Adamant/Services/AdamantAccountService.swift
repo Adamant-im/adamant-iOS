@@ -175,8 +175,8 @@ extension AdamantAccountService {
             
             isBalanceExpired = true
             NotificationCenter.default.post(
-                name: .AdamantAccountService.walletUpdated,
-                object: self
+                name: .AdamantAccountService.isBalanceExpired,
+                object: isBalanceExpired
             )
             NotificationCenter.default.post(
                 name: .AdamantAccountService.accountDataUpdated,
@@ -233,6 +233,9 @@ extension AdamantAccountService {
 // MARK: - AccountService
 extension AdamantAccountService {
     // MARK: Update logged account info
+    /// Does not update UI balance, but the
+    /// `func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
+    /// does, via `wallets.first(where: {$0.core is AdmWalletService})?.core.update()`in completion
     func update() {
         self.update(nil)
     }
@@ -306,14 +309,6 @@ extension AdamantAccountService {
                     isBalanceExpired = true
                     state = prevState
             }
-            
-            // Holde case when t he expiring change or when the balance change
-//            if (isBalanceExpiredPrev != isBalanceExpired && resetBalanceAndUpdate) || (account?.balance != balancePrev) {
-//                NotificationCenter.default.post(
-//                    name: .AdamantAccountService.walletUpdated,
-//                    object: self
-//                )
-//            }
         }
     }
 }

@@ -115,6 +115,11 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         dashApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        dashApiService.hasAllowedNodePublisher
+    }
 
     // MARK: - Notifications
     let serviceEnabledChanged = Notification.Name("adamant.dashWallet.enabledChanged")

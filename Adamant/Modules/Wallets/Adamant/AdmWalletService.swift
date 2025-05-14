@@ -126,6 +126,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         apiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        apiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -163,9 +168,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .notifications(named: .AdamantAccountService.walletUpdated, object: nil)
-            .sink { [weak self] _ in
-                self?.update()
+            .publisher(for: .AdamantAccountService.isBalanceExpired)
+            .compactMap { $0.object as? Bool }
+            .sink { [weak self] isExpired in
+                self?.resetBalanceAndUpdate()
             }
             .store(in: &subscriptions)
     }

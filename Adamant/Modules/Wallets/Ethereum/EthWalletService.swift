@@ -205,6 +205,11 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         ethApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        ethApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,

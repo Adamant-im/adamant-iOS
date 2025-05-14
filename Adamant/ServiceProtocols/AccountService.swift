@@ -36,7 +36,7 @@ extension Notification.Name {
         /// Raised when wallets collection updated
         ///
         /// Use only for communication between AdmanatAccountService and AdamantWalletService.
-        static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
+        static let isBalanceExpired = Notification.Name("adamant.accountService.isBalanceExpired")
 
         private init() {}
     }

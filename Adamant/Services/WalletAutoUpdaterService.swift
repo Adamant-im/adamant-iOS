@@ -109,7 +109,6 @@ actor WalletAutoUpdateService {
                 interval: getTimeIntervalFor(wallet: core),
                 queue: .global(qos: .utility),
                 callback: {
-                    print("qwe [\(Date())] " + "Update \(wallet.core.tokenName)" + "\n----------------------")
                     guard !(wallet.core is AdmWalletService) else {
                         self.accountService.update(resetBalanceAndUpdate: false, updateOnlyADM: true, updateOnlyVisible: false)
                         return

@@ -206,6 +206,11 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         btcApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        btcApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -264,7 +269,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             .store(in: &subscriptions)
     }
 
-    func addTransactionObserver() {
+    private func addTransactionObserver() {
         coinStorage.transactionsPublisher
             .sink { [weak self] transactions in
                 self?.transactions = transactions

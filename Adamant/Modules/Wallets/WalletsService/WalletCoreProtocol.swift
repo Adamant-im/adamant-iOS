@@ -292,6 +292,10 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
 
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
+    
+    // It is used to update the balance after the node is turned on
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> { get }
 
     @MainActor
     var walletUpdatePublisher: AnyObservable<Void> { get }
