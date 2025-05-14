@@ -291,24 +291,23 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance(){
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = ethWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = await getWallet() else {
             return
         }
         
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return

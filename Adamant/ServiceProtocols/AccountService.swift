@@ -157,7 +157,7 @@ protocol AccountService: AnyObject, Sendable {
 
     /// Update logged account info
     func update()
-    func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
+    func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
 
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult

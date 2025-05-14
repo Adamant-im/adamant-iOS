@@ -245,24 +245,23 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance(){
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = dogeWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = dogeWallet else {
             return
         }
         
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return

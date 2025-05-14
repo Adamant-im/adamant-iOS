@@ -170,14 +170,26 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             .store(in: &subscriptions)
     }
 
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate(){
         Task {        
             await walletUpdateSender.send()
-            update()
+            await update({ [weak self] in
+                guard let self = self, let isBalanceExpired = self.accountService?.isBalanceExpired else {
+                    return
+                }
+                self.admWallet?.isBalanceInitialized = !isBalanceExpired
+            })
         }
     }
     
     func update() {
+        Task{
+            await update(nil)
+        }
+    }
+    
+    @MainActor
+    func update(_ completion: (() -> Void)?) async {
         guard let accountService = accountService, let account = accountService.account else {
             admWallet = nil
             return
@@ -196,7 +208,12 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
             isRaised = false
         }
 
-        admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
+        let isBalanceInitialized = admWallet?.isBalanceInitialized
+        if isBalanceInitialized == false, !accountService.isBalanceExpired {
+            admWallet?.isBalanceInitialized = !accountService.isBalanceExpired
+        }
+        
+        completion?()
 
         if wallet != nil {
             Task { @MainActor in
@@ -205,7 +222,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, WalletStaticCoreProt
         }
 
         if isRaised {
-            Task { @MainActor in vibroService.applyVibration(.success) }
+            Task {
+                @MainActor in
+                vibroService.applyVibration(.success)
+            }
         }
     }
 

@@ -271,28 +271,27 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             }
             .store(in: &subscriptions)
     }
-
+    
     func update() {
         Task {
             await update()
         }
     }
 
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = btcWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = btcWallet else {
             return
-        }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
         }
 
         switch state {

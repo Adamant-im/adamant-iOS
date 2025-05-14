@@ -60,6 +60,16 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         }
         
         NotificationCenter.default
+            .notifications(named: .AdamantReachabilityMonitor.reachabilityChanged)
+            .sink { @MainActor [weak self] data in
+                let connection = data.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
+                
+                guard connection == true else { return }
+                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
             .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
             .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
@@ -227,22 +237,14 @@ extension AdamantAccountService {
         self.update(nil)
     }
     
-    func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
-        update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: shouldUpdateUIBalance, updateOnlyADM: updateOnlyADM)
-    }
-    
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
+    func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
+        let wallets = walletServiceCompose.getWallets()
         if !updateOnlyADM {
-            let wallets = walletServiceCompose.getWallets()
-            if shouldUpdateUIBalance{
-                isBalanceExpired = true
-            }
-            
-            for wallet in wallets {
+            for wallet in wallets where !(wallet.core is AdmWalletService) {
                 if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
                     Task{
-                        if shouldUpdateUIBalance {
-                            wallet.core.updateWithRefreshUIBalance()
+                        if resetBalanceAndUpdate {
+                            wallet.core.resetBalanceAndUpdate()
                         } else {
                             wallet.core.update()
                         }
@@ -251,6 +253,17 @@ extension AdamantAccountService {
             }
         }
         
+        if resetBalanceAndUpdate{
+            isBalanceExpired = true
+            wallets.first(where: {$0.core is AdmWalletService})?.core.resetBalanceAndUpdate()
+        }
+        
+        update({ _ in
+            wallets.first(where: {$0.core is AdmWalletService})?.core.update()
+        })
+    }
+    
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         switch state {
             case .notLogged, .isLoggingIn, .updating:
                 return
@@ -258,9 +271,6 @@ extension AdamantAccountService {
             case .loggedIn:
                 break
         }
-        
-        let isBalanceExpiredPrev = isBalanceExpired
-        let balancePrev = account?.balance
         
         let prevState = state
         state = .updating
@@ -297,13 +307,13 @@ extension AdamantAccountService {
                     state = prevState
             }
             
-            // Holde case when the expiring change or when the balance change
-            if (isBalanceExpiredPrev != isBalanceExpired && shouldUpdateUIBalance) || (account?.balance != balancePrev) {
-                NotificationCenter.default.post(
-                    name: .AdamantAccountService.walletUpdated,
-                    object: self
-                )
-            }
+            // Holde case when t he expiring change or when the balance change
+//            if (isBalanceExpiredPrev != isBalanceExpired && resetBalanceAndUpdate) || (account?.balance != balancePrev) {
+//                NotificationCenter.default.post(
+//                    name: .AdamantAccountService.walletUpdated,
+//                    object: self
+//                )
+//            }
         }
     }
 }

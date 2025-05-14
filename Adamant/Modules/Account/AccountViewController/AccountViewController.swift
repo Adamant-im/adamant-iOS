@@ -981,7 +981,7 @@ final class AccountViewController: FormViewController {
         }
         
         Task { @MainActor in
-            accountService.update(shouldUpdateUIBalance: true, updateOnlyADM: false, updateOnlyVisible: true)
+            accountService.update(resetBalanceAndUpdate: true, updateOnlyADM: false, updateOnlyVisible: true)
         }
         refreshControl.endRefreshing()
     }
