@@ -273,5 +273,8 @@ extension UIColor {
 
         // Outcome transfer icon background, light red
         public static let transferOutcomeIconBackground = #colorLiteral(red: 0.9411764706, green: 0.5215686275, blue: 0.5294117647, alpha: 1)  //#F08587
+        
+        // Sending file Animation
+        public static let sendingFileAnimation = #colorLiteral(red: 0.2901960784, green: 0.2901960784, blue: 0.2901960784, alpha: 1)
     }
 }

@@ -19,7 +19,9 @@ enum FileMessageStatus: Hashable {
     var image: UIImage {
         switch self {
         case .uploading:
-            return UIImage(systemName: "square.fill") ?? UIImage()
+            let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .regular)
+            let image = UIImage(systemName: "square.fill", withConfiguration: config) ?? UIImage()
+            return image
         case .downloading:
             return .asset(named: "status_pending") ?? .init()
         case .success:

@@ -185,7 +185,7 @@ extension ChatMediaContainerView {
         reactionsStack.insertSubview(progressRingHostingView, aboveSubview: statusButton)
         progressRingHostingView.snp.makeConstraints { make in
             make.center.equalTo(statusButton)
-            make.size.equalTo(30)
+            make.size.equalTo(29)
         }
     }
 
@@ -225,14 +225,14 @@ extension ChatMediaContainerView {
         
         if averageProgress == 0 {
             statusProgressState.backgroundGradient = LinearGradient(
-                gradient: Gradient(colors: [.white, .black]),
+                gradient: Gradient(colors: [.white, Color(.adamant.sendingFileAnimationGrayColor)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
         )} else {
             statusProgressState.backgroundGradient = nil
         }
         statusProgressState.progress = averageProgress / 100
-        statusProgressState.hidden = averageProgress == 100 || !(model.status == .uploading)
+        statusProgressState.hidden = !(model.status == .uploading)
         statusProgressState.isSpinning = (model.status == .uploading && averageProgress == 0)
     }
 
