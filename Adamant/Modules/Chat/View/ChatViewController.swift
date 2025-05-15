@@ -164,7 +164,6 @@ final class ChatViewController: MessagesViewController {
         super.viewDidAppear(animated)
         defer {
             state.isViewAppeared = true
-            updateUnreadMessages()
         }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
@@ -220,7 +219,9 @@ final class ChatViewController: MessagesViewController {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        updateUnreadMessages()
+        if state.canReadByDidScroll {
+            updateUnreadMessages()
+        }
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
 
@@ -340,6 +341,7 @@ extension ChatViewController {
         viewModel.messagesUpdated
             .sink { [weak self] _ in
                 self?.updateMessagesPosition()
+                self?.state.canReadByDidScroll = true
                 self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
@@ -808,6 +810,7 @@ extension ChatViewController {
         state.isMessagesLoaded = true
         if state.shouldScrollToNewMessages {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
+                state.isAutoScrolling = true
                 viewModel.animationType = MessageAnimationType.none
                 let isFirstMessagesInChat = viewModel.unreadMessagesIds?.count == viewModel.messages.count
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: !isFirstMessagesInChat, scrollAt: .top)
@@ -1030,6 +1033,7 @@ extension ChatViewController {
                     setExtraOffsetForNewMessages()
                 }
                 state.isAutoScrolling = false
+                updateUnreadMessages()
             }
             
             if viewModel.animationType != MessageAnimationType.none {
