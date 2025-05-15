@@ -811,7 +811,6 @@ extension ChatViewController {
                 viewModel.animationType = MessageAnimationType.none
                 let isFirstMessagesInChat = viewModel.unreadMessagesIds?.count == viewModel.messages.count
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: !isFirstMessagesInChat, scrollAt: .top)
-
             }
         }
     }
@@ -881,6 +880,22 @@ extension ChatViewController {
             break
         }
     }
+    
+    fileprivate func markMessageFromCurrentToBottomAsRead() {
+        guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
+
+        let visibleSections = messagesCollectionView.indexPathsForVisibleItems.map { $0.section }
+        guard let minSection = visibleSections.min() else { return }
+
+        let totalSections = messagesCollectionView.numberOfSections
+        guard totalSections > 0 else { return }
+
+        for section in minSection..<totalSections {
+            if unreadIndexes.contains(section) {
+                viewModel.markMessageAsRead(index: section)
+            }
+        }
+    }
 }
 
 // MARK: Making entities
@@ -892,6 +907,7 @@ extension ChatViewController {
             guard let self else { return }
             if viewModel.shouldScrollToBottom {
                 state.isScrollingToBottom = true
+                markMessageFromCurrentToBottomAsRead()
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
