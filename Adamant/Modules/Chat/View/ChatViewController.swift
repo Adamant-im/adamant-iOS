@@ -163,15 +163,19 @@ final class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         defer {
-            state.isViewAppeared = true
+            state.isFirstTimeViewAppeared = true
+            if state.isViewDissappeared == true {
+                state.isViewDissappeared.toggle()
+                updateUnreadMessages()
+            }
         }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
-        if !state.isViewAppeared {
+        if !state.isFirstTimeViewAppeared {
             viewModel.presentKeyboardOnStartIfNeeded()
         }
 
-        guard isMacOS, !state.isViewAppeared else { return }
+        guard isMacOS, !state.isFirstTimeViewAppeared else { return }
         focusInputBarWithoutAnimation()
     }
 
@@ -190,6 +194,7 @@ final class ChatViewController: MessagesViewController {
                 ? nil
             : chatMessagesCollectionView.bottomOffset, collectionHeight: messagesCollectionView.contentSize.height
         )
+        state.isViewDissappeared = true
     }
     
     override func collectionView(
@@ -229,7 +234,7 @@ final class ChatViewController: MessagesViewController {
             updateDateHeaderIfNeeded()
         }
         guard
-            state.isViewAppeared,
+            state.isFirstTimeViewAppeared,
             scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
         else { return }
 
@@ -864,7 +869,7 @@ extension ChatViewController {
     }
 
     fileprivate func updateDateHeaderIfNeeded() {
-        guard state.isViewAppeared else { return }
+        guard state.isFirstTimeViewAppeared else { return }
 
         let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
@@ -1004,9 +1009,9 @@ extension ChatViewController {
                 finalOffset += heightDiff
             }
             
-            chatMessagesCollectionView.setBottomOffset(finalOffset, safely: state.isViewAppeared)
-            state.isAutoScrolling = false 
-            guard !state.isViewAppeared else { return }
+            chatMessagesCollectionView.setBottomOffset(finalOffset, safely: state.isFirstTimeViewAppeared)
+            state.isAutoScrolling = false
+            guard !state.isFirstTimeViewAppeared else { return }
             chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
         case let .messageId(id, scrollToBottomIfNotFound):
             var index = viewModel.messages.firstIndex(where: { $0.messageId == id })
@@ -1145,7 +1150,7 @@ extension ChatViewController {
                 )
             }
 
-            if state.isViewAppeared {
+            if state.isFirstTimeViewAppeared {
                 messageInputBar.inputTextView.becomeFirstResponder()
             }
         }
@@ -1179,7 +1184,7 @@ extension ChatViewController {
                     )
                 }
             )
-            if state.isViewAppeared {
+            if state.isFirstTimeViewAppeared {
                 messageInputBar.inputTextView.becomeFirstResponder()
             }
         }

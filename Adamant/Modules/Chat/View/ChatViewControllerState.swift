@@ -11,7 +11,7 @@ import CommonKit
 struct ChatViewControllerState {
     var isMessagesLoaded = false
     var isScrollPositionNearlyTheBottom = true
-    var isViewAppeared = false
+    var isFirstTimeViewAppeared = false
     var scrollToUnreadBottomConstraint: Constraint?
     var isScrollDownButtonHidden = true
     var previousUnreadCount: Int = 0
@@ -20,13 +20,15 @@ struct ChatViewControllerState {
     var isAppActive = true
     var isScrollingToBottom = false
     var shouldScrollToNewMessages = true
+    var isViewDissappeared = false
     var isInitialMessagesWereUpdated = false
+
     
     //calculation for animation, might use for something else in the future
     var isAnimationAllowed: Bool {
         isMessagesLoaded && !isAutoScrolling && !isScrollingToBottom
     }
     var canReadChat: Bool {
-        !isAutoScrolling && isViewAppeared && (!isMacOS || isAppActive)
+        !isAutoScrolling && isFirstTimeViewAppeared && (!isMacOS || isAppActive) && !isViewDissappeared
     }
 }
