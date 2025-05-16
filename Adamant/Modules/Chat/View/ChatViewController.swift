@@ -224,7 +224,9 @@ final class ChatViewController: MessagesViewController {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        updateUnreadMessages()
+        if state.isInitialMessagesWereUpdated {
+            updateUnreadMessages()
+        }
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
 
@@ -344,6 +346,7 @@ extension ChatViewController {
         viewModel.messagesUpdated
             .sink { [weak self] _ in
                 self?.updateMessagesPosition()
+                self?.state.isInitialMessagesWereUpdated = true
                 self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
@@ -800,8 +803,10 @@ extension ChatViewController {
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
         if !state.isMessagesLoaded {
-            viewModel.startPosition.map { scrollToPosition($0) }
-            state.shouldScrollToNewMessages = false
+            viewModel.startPosition.map {
+                scrollToPosition($0)
+                state.shouldScrollToNewMessages = false
+            }
         }
     }
 
@@ -810,10 +815,10 @@ extension ChatViewController {
         state.isMessagesLoaded = true
         if state.shouldScrollToNewMessages {
             if let unreadMessage = viewModel.unreadMessagesIds?.first {
+                state.isAutoScrolling = true
                 viewModel.animationType = MessageAnimationType.none
                 let isFirstMessagesInChat = viewModel.unreadMessagesIds?.count == viewModel.messages.count
                 scrollToPosition(.messageId(unreadMessage), setExtraOffset: !isFirstMessagesInChat, scrollAt: .top)
-
             }
         }
     }
@@ -883,6 +888,22 @@ extension ChatViewController {
             break
         }
     }
+    
+    fileprivate func markMessagesFromCurrentToBottomAsRead() {
+        guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
+
+        let visibleSections = messagesCollectionView.indexPathsForVisibleItems.map { $0.section }
+        guard let minSection = visibleSections.min() else { return }
+
+        let totalSections = messagesCollectionView.numberOfSections
+        guard totalSections > 0 else { return }
+
+        for section in minSection..<totalSections {
+            if unreadIndexes.contains(section) {
+                viewModel.markMessageAsRead(index: section)
+            }
+        }
+    }
 }
 
 // MARK: Making entities
@@ -894,6 +915,7 @@ extension ChatViewController {
             guard let self else { return }
             if viewModel.shouldScrollToBottom {
                 state.isScrollingToBottom = true
+                markMessagesFromCurrentToBottomAsRead()
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
@@ -1016,6 +1038,7 @@ extension ChatViewController {
                     setExtraOffsetForNewMessages()
                 }
                 state.isAutoScrolling = false
+                updateUnreadMessages()
             }
             
             if viewModel.animationType != MessageAnimationType.none {
