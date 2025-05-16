@@ -56,7 +56,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         self.coreDataStack = coreDataStack
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.update()
+            self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
         }
         
         NotificationCenter.default
@@ -64,7 +64,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
-                self?.update()
+                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
             }
             .store(in: &subscriptions)
         
@@ -75,9 +75,12 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             }
             .store(in: &subscriptions)
         
-        connection.filter { $0 }.sink { [weak self] _ in
-            self?.update()
-        }.store(in: &subscriptions)
+        connection
+            .filter { $0 }
+            .sink { [weak self] connection in
+                guard connection == true else { return }
+                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
+            }.store(in: &subscriptions)
         
         setupSecureStore()
     }    
@@ -165,6 +168,10 @@ extension AdamantAccountService {
             
             isBalanceExpired = true
             NotificationCenter.default.post(
+                name: .AdamantAccountService.isBalanceExpired,
+                object: isBalanceExpired
+            )
+            NotificationCenter.default.post(
                 name: .AdamantAccountService.accountDataUpdated,
                 object: self
             )
@@ -217,21 +224,34 @@ extension AdamantAccountService {
 }
 
 // MARK: - AccountService
-extension AdamantAccountService {
-    // MARK: Update logged account info
-    func update() {
-        self.update(nil)
+extension AdamantAccountService {    
+    func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
+        let wallets = walletServiceCompose.getWallets()
+        if !updateOnlyADM {
+            for wallet in wallets where !(wallet.core is AdmWalletService) {
+                if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
+                    Task{
+                        if resetBalanceAndUpdate {
+                            wallet.core.resetBalanceAndUpdate()
+                        } else {
+                            wallet.core.update()
+                        }
+                    }
+                }
+            }
+        }
+        
+        if resetBalanceAndUpdate{
+            isBalanceExpired = true
+            wallets.first(where: {$0.core is AdmWalletService})?.core.resetBalanceAndUpdate()
+        }
+        
+        update({ _ in
+                wallets.first(where: {$0.core is AdmWalletService})?.core.update()
+        })
     }
     
     func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
-        update(completion, updateOnlyVisible: true)
-    }
-    
-    func update(shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false, updateOnlyVisible: Bool = true) {
-        update(nil, updateOnlyVisible: updateOnlyVisible, shouldUpdateUIBalance: true, updateOnlyADM: updateOnlyADM)
-    }
-    
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool = true, shouldUpdateUIBalance: Bool = false, updateOnlyADM: Bool = false) {
         switch state {
             case .notLogged, .isLoggingIn, .updating:
                 return
@@ -261,32 +281,18 @@ extension AdamantAccountService {
                     markBalanceAsFresh()
                     self.account = account
                     
+                    state = .loggedIn
+                    completion?(.success(account: account, alert: nil))
+                    
                     NotificationCenter.default.post(
                         name: .AdamantAccountService.accountDataUpdated,
                         object: self
                     )
                     
-                    state = .loggedIn
-                    completion?(.success(account: account, alert: nil))
-                    
                 case .failure(let error):
                     completion?(.failure(.apiError(error: error)))
                     isBalanceExpired = true
                     state = prevState
-            }
-        }
-        
-        if !updateOnlyADM {
-            let wallets = walletServiceCompose.getWallets()
-            
-            for wallet in wallets {
-                if !updateOnlyVisible || !(walletsStoreService?.isInvisible(wallet) ?? false) {
-                    if shouldUpdateUIBalance {
-                        wallet.core.updateWithRefreshUIBalance()
-                    } else {
-                        wallet.core.update()
-                    }
-                }
             }
         }
     }

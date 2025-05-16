@@ -174,6 +174,11 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         dogeApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        dogeApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -245,33 +250,30 @@ final class DogeWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance(){
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = dogeWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = dogeWallet else {
             return
         }
-
+        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {

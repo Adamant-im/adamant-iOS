@@ -125,7 +125,7 @@ final class KlyTransferViewController: TransferViewControllerBase {
                     throw error
                 }
 
-                service.update()
+                walletCore.update()
 
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)

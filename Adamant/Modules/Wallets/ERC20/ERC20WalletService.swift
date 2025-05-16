@@ -204,6 +204,11 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         erc20ApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        erc20ApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -260,33 +265,30 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance() {
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = ethWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = ethWallet else {
             return
-        }
-
+        }     
+        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             if wallet.balance < balance, wallet.isBalanceInitialized {

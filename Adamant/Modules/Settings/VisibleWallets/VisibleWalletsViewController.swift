@@ -147,7 +147,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
 
     @objc private func updateBalances() {
-        accountService.update(shouldUpdateUIBalance: true, updateOnlyADM: false, updateOnlyVisible: false)
+        accountService.update(resetBalanceAndUpdate: true, updateOnlyADM: false, updateOnlyVisible: false)
         refreshControl.endRefreshing()
     }
 

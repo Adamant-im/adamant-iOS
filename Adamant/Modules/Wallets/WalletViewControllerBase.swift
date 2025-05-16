@@ -448,7 +448,21 @@ extension WalletViewControllerBase {
             .store(in: &subscriptions)
 
         service.core.hasEnabledNodePublisher
-            .sink { [weak self] _ in self?.updateWalletUI() }
+            .sink { [weak self] _ in 
+                self?.updateWalletUI() 
+            }
+            .store(in: &subscriptions)
+        
+        service.core.hasAllowedNodePublisher
+            .sink { [weak self] hasAllowedNode in 
+                if hasAllowedNode {
+                    guard self?.service?.core is AdmWalletService == false else { 
+                        self?.accountService.update(resetBalanceAndUpdate: false, updateOnlyADM: true, updateOnlyVisible: false)
+                        return
+                    }
+                    self?.service?.core.update()
+                }
+            }
             .store(in: &subscriptions)
     }
 

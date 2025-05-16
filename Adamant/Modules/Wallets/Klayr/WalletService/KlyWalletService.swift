@@ -69,6 +69,11 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             .map { $0.0 && $0.1 }
             .eraseToAnyPublisher()
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        klyNodeApiService.hasAllowedNodePublisher
+    }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
 
@@ -249,14 +254,18 @@ extension KlyWalletService {
             .store(in: &subscriptions)
     }
 
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = klyWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    fileprivate func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = klyWallet else {
             return
         }
@@ -267,11 +276,6 @@ extension KlyWalletService {
 
         case .upToDate:
             break
-        }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
         }
         
         setState(.updating)

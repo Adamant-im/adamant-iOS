@@ -206,6 +206,11 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         btcApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        btcApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -264,28 +269,32 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             .store(in: &subscriptions)
     }
 
-    func addTransactionObserver() {
+    private func addTransactionObserver() {
         coinStorage.transactionsPublisher
             .sink { [weak self] transactions in
                 self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
-
+    
     func update() {
         Task {
             await update()
         }
     }
 
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = btcWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = btcWallet else {
             return
         }
@@ -295,15 +304,8 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
