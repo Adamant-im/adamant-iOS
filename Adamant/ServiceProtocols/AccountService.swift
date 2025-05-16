@@ -156,7 +156,6 @@ protocol AccountService: AnyObject, Sendable {
     // MARK: Account functions
 
     /// Update logged account info
-    func update()
     func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
 
     /// Login into Adamant using passphrase.

@@ -56,25 +56,15 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         self.coreDataStack = coreDataStack
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.update()
+            self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
         }
-        
-        NotificationCenter.default
-            .notifications(named: .AdamantReachabilityMonitor.reachabilityChanged)
-            .sink { @MainActor [weak self] data in
-                let connection = data.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
-                
-                guard connection == true else { return }
-                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
-            }
-            .store(in: &subscriptions)
         
         NotificationCenter.default
             .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
             .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
-                self?.update()
+                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
             }
             .store(in: &subscriptions)
         
@@ -85,9 +75,12 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             }
             .store(in: &subscriptions)
         
-        connection.filter { $0 }.sink { [weak self] _ in
-            self?.update()
-        }.store(in: &subscriptions)
+        connection
+            .filter { $0 }
+            .sink { [weak self] connection in
+                guard connection == true else { return }
+                self?.update(resetBalanceAndUpdate: false, updateOnlyADM: false, updateOnlyVisible: true)
+            }.store(in: &subscriptions)
         
         setupSecureStore()
     }    
@@ -231,15 +224,7 @@ extension AdamantAccountService {
 }
 
 // MARK: - AccountService
-extension AdamantAccountService {
-    // MARK: Update logged account info
-    /// Does not update UI balance, but the
-    /// `func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
-    /// does, via `wallets.first(where: {$0.core is AdmWalletService})?.core.update()`in completion
-    func update() {
-        self.update(nil)
-    }
-    
+extension AdamantAccountService {    
     func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool) {
         let wallets = walletServiceCompose.getWallets()
         if !updateOnlyADM {
@@ -262,7 +247,7 @@ extension AdamantAccountService {
         }
         
         update({ _ in
-            wallets.first(where: {$0.core is AdmWalletService})?.core.update()
+                wallets.first(where: {$0.core is AdmWalletService})?.core.update()
         })
     }
     
@@ -296,13 +281,13 @@ extension AdamantAccountService {
                     markBalanceAsFresh()
                     self.account = account
                     
+                    state = .loggedIn
+                    completion?(.success(account: account, alert: nil))
+                    
                     NotificationCenter.default.post(
                         name: .AdamantAccountService.accountDataUpdated,
                         object: self
                     )
-                    
-                    state = .loggedIn
-                    completion?(.success(account: account, alert: nil))
                     
                 case .failure(let error):
                     completion?(.failure(.apiError(error: error)))
