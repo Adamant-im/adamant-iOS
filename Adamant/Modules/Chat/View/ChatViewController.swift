@@ -164,7 +164,7 @@ final class ChatViewController: MessagesViewController {
         super.viewDidAppear(animated)
         defer {
             state.isFirstTimeViewAppeared = true
-            if state.isFirstTimeViewAppeared == true {
+            if state.isViewDissappeared == true {
                 state.isViewDissappeared.toggle()
                 updateUnreadMessages()
             }
