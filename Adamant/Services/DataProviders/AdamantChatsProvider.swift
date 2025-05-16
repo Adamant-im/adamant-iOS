@@ -323,6 +323,7 @@ extension AdamantChatsProvider {
         SecureStore.remove(StoreKey.chatProvider.receivedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.readedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
+        UserDefaultsManager.lastReceivedId = nil
 
         // Set State
         setState(.empty, previous: prevState, notify: notify)
@@ -1921,6 +1922,9 @@ extension AdamantChatsProvider {
             var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
             if unreadTransactions.count == 0 {
                 unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
+            }
+            unreadTransactions.forEach {
+                UserDefaultsManager.addLastReceivedId($0.transactionId)
             }
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
             for (chatroom, trs) in chatrooms {

@@ -555,14 +555,13 @@ final class ChatViewModel: NSObject {
                         recipient: partnerAddress
                     )
                 }
-
-                await waitForMessage(withId: messageId)
-                scrollToId = messageId
-                
-                dialog.send(.progress(false))
                 if let chatroom {
                     await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
+
+                await waitForMessage(withId: messageId)
+                scrollToId = messageId
+                dialog.send(.progress(false))
             } catch {
                 print(error)
                 dialog.send(.progress(false))
