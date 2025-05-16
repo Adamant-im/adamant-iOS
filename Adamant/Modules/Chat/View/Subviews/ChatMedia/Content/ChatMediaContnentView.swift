@@ -278,12 +278,8 @@ extension ChatMediaContentView.Model {
 
         var spaceCount: CGFloat = fileModel.isMediaFilesOnly ? .zero : 1
 
-        if isReply {
+        if isReply || !comment.string.isEmpty{
             spaceCount += 2
-        }
-
-        if !comment.string.isEmpty {
-            spaceCount += 3
         }
 
         return fileModel.height()
