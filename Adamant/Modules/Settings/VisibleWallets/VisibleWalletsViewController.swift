@@ -109,8 +109,8 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
                 .sink { [weak self] _ in
                     guard let self = self else { return }
                     let indexPath = IndexPath(row: index, section: 0)
-                    if let cell = self.tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell {
-                        cell.balance = wallet.wallet?.balance
+                    UIView.performWithoutAnimation { [weak self] in
+                        self?.tableView.reloadRows(at: [indexPath], with: .none)
                     }
                 }
                 .store(in: &subscriptions)
