@@ -219,7 +219,7 @@ final class ChatViewController: MessagesViewController {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        if state.canReadByDidScroll {
+        if state.isInitialMessagesWereUpdated {
             updateUnreadMessages()
         }
         updateIsScrollPositionNearlyTheBottom()
@@ -341,7 +341,7 @@ extension ChatViewController {
         viewModel.messagesUpdated
             .sink { [weak self] _ in
                 self?.updateMessagesPosition()
-                self?.state.canReadByDidScroll = true
+                self?.state.isInitialMessagesWereUpdated = true
                 self?.updateUnreadMessages()
             }
             .store(in: &subscriptions)
@@ -884,7 +884,7 @@ extension ChatViewController {
         }
     }
     
-    fileprivate func markMessageFromCurrentToBottomAsRead() {
+    fileprivate func markMessagesFromCurrentToBottomAsRead() {
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
 
         let visibleSections = messagesCollectionView.indexPathsForVisibleItems.map { $0.section }
@@ -910,7 +910,7 @@ extension ChatViewController {
             guard let self else { return }
             if viewModel.shouldScrollToBottom {
                 state.isScrollingToBottom = true
-                markMessageFromCurrentToBottomAsRead()
+                markMessagesFromCurrentToBottomAsRead()
                 self.messagesCollectionView.scrollToBottom(animated: true)
             } else if let id = viewModel.unreadMessagesIds?.first {
                 viewModel.animationType = MessageAnimationType.none
