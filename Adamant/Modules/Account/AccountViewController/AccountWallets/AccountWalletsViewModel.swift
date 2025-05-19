@@ -12,13 +12,14 @@ import Foundation
 
 @MainActor
 final class AccountWalletsViewModel {
-    var state: AccountWalletsState = .default
+    var state: AccountWalletsState
     
     private let walletsStoreService: WalletStoreServiceProviderProtocol
     private var subscriptions = Set<AnyCancellable>()
 
     init(walletsStoreService: WalletStoreServiceProviderProtocol) {
         self.walletsStoreService = walletsStoreService
+        state = AccountWalletsState()
         setup()
     }
 }

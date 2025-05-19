@@ -9,10 +9,8 @@
 import CommonKit
 import Parchment
 
-struct AccountWalletsState {
-    var wallets: [AccountWalletCellState]
-    
-    static let `default` = Self(wallets: [])
+struct AccountWalletsState: Sendable {
+    @Atomic var wallets: [AccountWalletCellState] = []
 }
 
 struct AccountWalletCellState {
