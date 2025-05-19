@@ -16,9 +16,11 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
 
     func markAsReaded() {
         hasUnreadMessages = false
-
+        
         if let trs = transactions as? Set<ChatTransaction> {
-            trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
+            trs.filter { $0.isUnread }.forEach {
+                $0.isUnread = false
+            }
         }
     }
 
@@ -29,8 +31,11 @@ public class Chatroom: NSManagedObject, @unchecked Sendable {
             return
         }
         message.isUnread = false
-
-        message.richMessageTransactions?.forEach { $0.isUnread = false }
+        
+        
+        message.richMessageTransactions?.forEach {
+            $0.isUnread = false
+        }
 
         if let context = message.managedObjectContext, context.hasChanges {
             try? context.save()
