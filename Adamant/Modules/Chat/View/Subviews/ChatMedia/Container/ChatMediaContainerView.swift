@@ -184,7 +184,12 @@ extension ChatMediaContainerView {
         
         reactionsStack.insertSubview(progressRingHostingView, aboveSubview: statusButton)
         progressRingHostingView.snp.makeConstraints { make in
-            make.center.equalTo(statusButton)
+            if isMacOS {
+                make.centerX.equalTo(statusButton).offset(-1)
+            } else {
+                make.centerX.equalTo(statusButton)
+            }
+            make.centerY.equalTo(statusButton)
             make.size.equalTo(29)
         }
     }
