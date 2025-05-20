@@ -214,9 +214,7 @@ extension ChatMediaContainerView {
     func totalUploadProgress() -> Double {
         let files = model.content.fileModel.files
 
-        let totalBytes: Int64 = files.reduce(0) { result, file in
-            result + file.file.size
-        }
+        let totalBytes = files.map { $0.file.size }.reduce(0, +)
 
         let uploadedBytes: Int64 = files.reduce(0) { result, file in
             let progress = Double(file.progress ?? 0) / 100.0
