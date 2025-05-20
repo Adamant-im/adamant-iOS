@@ -166,8 +166,8 @@ final class ChatViewController: MessagesViewController {
             state.isFirstTimeViewAppeared = true
             if state.isViewDissappeared == true {
                 state.isViewDissappeared.toggle()
-                updateUnreadMessages()
             }
+            updateUnreadMessages()
         }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
