@@ -913,15 +913,7 @@ extension ChatViewController {
         let button = ChatScrollButton(position: .down)
         button.action = { [weak self] in
             guard let self else { return }
-            if viewModel.shouldScrollToBottom {
-                state.isScrollingToBottom = true
-                markMessagesFromCurrentToBottomAsRead()
-                self.messagesCollectionView.scrollToBottom(animated: true)
-            } else if let id = viewModel.unreadMessagesIds?.first {
-                viewModel.animationType = MessageAnimationType.none
-                self.scrollToPosition(.messageId(id), animated: true)
-                viewModel.shouldScrollToBottom = true
-            }
+            scrollButtonAction()
         }
         button.alpha = 0
         return button
@@ -957,6 +949,60 @@ extension ChatViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter
         )
         return collection
+    }
+    
+    fileprivate func scrollButtonAction() {
+        if viewModel.shouldScrollToBottom {
+            scrollToBottom()
+            return
+        }
+
+        guard let firstUnreadId = viewModel.unreadMessagesIds?.first,
+              let unreadIndex = viewModel.messages.firstIndex(where: { $0.messageId == firstUnreadId }) else {
+            scrollToBottom()
+            return
+        }
+
+        let visibleBounds = messagesCollectionView.bounds
+        let restrictedVisibleRect = visibleBounds.insetBy(dx: 0, dy: 100)
+
+        let visibleSections: Set<Int> = Set(
+            messagesCollectionView.indexPathsForVisibleItems.compactMap { indexPath in
+                guard let attributes = messagesCollectionView.layoutAttributesForItem(at: indexPath) else {
+                    return nil
+                }
+
+                let frame = attributes.frame
+                if restrictedVisibleRect.intersects(frame) {
+                    return indexPath.section
+                } else {
+                    return nil
+                }
+            }
+        )
+
+        if visibleSections.contains(unreadIndex) {
+            scrollToBottom()
+            return
+        }
+
+        if let separatorIndex = viewModel.separatorState.separatorIndex,
+           unreadIndex == separatorIndex + 1 {
+            viewModel.animationType = .none
+            scrollToPosition(.messageId(firstUnreadId), animated: false, setExtraOffset: true, scrollAt: .top)
+            viewModel.shouldScrollToBottom = true
+            return
+        }
+
+        viewModel.animationType = .none
+        scrollToPosition(.messageId(firstUnreadId), animated: true, scrollAt: .top)
+        viewModel.shouldScrollToBottom = true
+    }
+    
+    fileprivate func scrollToBottom() {
+        state.isScrollingToBottom = true
+        markMessagesFromCurrentToBottomAsRead()
+        messagesCollectionView.scrollToBottom(animated: true)
     }
 }
 
