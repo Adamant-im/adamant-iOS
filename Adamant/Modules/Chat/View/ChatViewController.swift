@@ -836,12 +836,16 @@ extension ChatViewController {
     fileprivate func updateScrollDownButtonVisibility() {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
         self.scrollDownButton.updateCounter(topCount)
-        guard state.isScrollDownButtonHidden != state.isScrollPositionNearlyTheBottom else { return }
-        state.isScrollDownButtonHidden = state.isScrollPositionNearlyTheBottom
+
+        let shouldShowButton = (topCount > 0) || !state.isScrollPositionNearlyTheBottom
+        guard state.isScrollDownButtonHidden != !shouldShowButton else { return }
+
+        state.isScrollDownButtonHidden = !shouldShowButton
         let buttonUpdate = {
-            self.scrollDownButton.alpha = self.state.isScrollPositionNearlyTheBottom ? 0 : 1
+            self.scrollDownButton.alpha = shouldShowButton ? 1 : 0
             self.updateScrollToUnreadButtonPosition()
         }
+
         if state.isAnimationAllowed {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
                 buttonUpdate()
@@ -1441,4 +1445,11 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
-private let hiddenScrollViewPartHeight: CGFloat = 94
+//not a real height just for reading messages
+private var hiddenScrollViewPartHeight: CGFloat {
+    if isMacOS {
+        return 93
+    } else {
+        return 85
+    }
+}
