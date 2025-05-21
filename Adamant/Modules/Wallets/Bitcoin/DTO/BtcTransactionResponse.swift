@@ -69,7 +69,7 @@ struct RawBtcStatus: Decodable {
 
 extension RawBtcTransactionResponse {
     func asBtcTransaction<T: BaseBtcTransaction>(_ as: T.Type, for address: String, height: Decimal? = nil) -> T {
-        let transactionStatus: TransactionStatus = status.confirmed ? .success : .pending
+        let transactionStatus: TransactionStatus = status.confirmed ? .success : .registered
 
         var date: Date?
         if let time = status.time {
