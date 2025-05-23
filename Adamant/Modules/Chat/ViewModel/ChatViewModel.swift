@@ -308,7 +308,6 @@ final class ChatViewModel: NSObject {
     fileprivate func setUpMessagetoShow(messageId: String?) {
         if let messageId {
             self.messageIdToShow = messageId
-            separatorState.shouldScrollToNewMessagesOrSavedPosition = false
         }
     }
 
@@ -538,12 +537,6 @@ final class ChatViewModel: NSObject {
 
     func scroll(to messageId: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        if let chatroom,
-           let messageIdToShow {
-            Task(priority: .high) {
-                await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageIdToShow)
-            }
-        }
         messageIdToShow = nil
 
         Task {
