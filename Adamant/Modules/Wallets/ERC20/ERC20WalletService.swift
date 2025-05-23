@@ -479,7 +479,6 @@ extension ERC20WalletService {
             do {
                 return try await fetchBlockTimestamp(blockNumberHex: blockHex)
             } catch {
-                print("❌ Failed to fetch block timestamp:", error)
                 return nil
             }
         }()
