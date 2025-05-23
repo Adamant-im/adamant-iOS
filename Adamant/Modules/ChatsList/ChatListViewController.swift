@@ -980,6 +980,7 @@ extension ChatListViewController {
 
     @MainActor
     func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
+        defer { updateSelectedRow(chatroom: chatroom) }
         // MARK: 1. Create and config ViewController
         let vc = chatViewController(for: chatroom, with: message)
 
@@ -1602,14 +1603,6 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 return
             }
 
-            if let indexPath = tableView.indexPathForSelectedRow {
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-
-            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            }
-
             presenter.presentChatroom(chatroom, with: message.transactionId)
         }
     }
@@ -1620,14 +1613,6 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 return
             }
 
-            if let indexPath = tableView.indexPathForSelectedRow {
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-
-            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            }
-
             presenter.presentChatroom(chatroom)
         }
     }
@@ -1635,6 +1620,15 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     func didSelected(_ account: CoreDataAccount) {
         account.chatroom?.isForcedVisible = true
         newChatController(didSelectAccount: account, preMessage: nil, name: nil)
+    }
+    
+    func updateSelectedRow(chatroom: Chatroom) {
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        if let indexPath = self.chatsController?.indexPath(forObject: chatroom) {
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        }
     }
 }
 
