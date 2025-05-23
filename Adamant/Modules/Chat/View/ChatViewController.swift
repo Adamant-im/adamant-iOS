@@ -834,12 +834,16 @@ extension ChatViewController {
     fileprivate func updateScrollDownButtonVisibility() {
         let topCount = viewModel.unreadMessagesIds?.count ?? 0
         self.scrollDownButton.updateCounter(topCount)
-        guard state.isScrollDownButtonHidden != state.isScrollPositionNearlyTheBottom else { return }
-        state.isScrollDownButtonHidden = state.isScrollPositionNearlyTheBottom
+
+        let shouldShowButton = (topCount > 0) || !state.isScrollPositionNearlyTheBottom
+        guard state.isScrollDownButtonHidden != !shouldShowButton else { return }
+
+        state.isScrollDownButtonHidden = !shouldShowButton
         let buttonUpdate = {
-            self.scrollDownButton.alpha = self.state.isScrollPositionNearlyTheBottom ? 0 : 1
+            self.scrollDownButton.alpha = shouldShowButton ? 1 : 0
             self.updateScrollToUnreadButtonPosition()
         }
+
         if state.isAnimationAllowed {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
                 buttonUpdate()
@@ -911,15 +915,7 @@ extension ChatViewController {
         let button = ChatScrollButton(position: .down)
         button.action = { [weak self] in
             guard let self else { return }
-            if viewModel.shouldScrollToBottom {
-                state.isScrollingToBottom = true
-                markMessagesFromCurrentToBottomAsRead()
-                self.messagesCollectionView.scrollToBottom(animated: true)
-            } else if let id = viewModel.unreadMessagesIds?.first {
-                viewModel.animationType = MessageAnimationType.none
-                self.scrollToPosition(.messageId(id), animated: true)
-                viewModel.shouldScrollToBottom = true
-            }
+            scrollButtonAction()
         }
         button.alpha = 0
         return button
@@ -955,6 +951,53 @@ extension ChatViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter
         )
         return collection
+    }
+    
+    fileprivate func scrollButtonAction() {
+        if viewModel.shouldScrollToBottom {
+            scrollToBottom()
+            return
+        }
+
+        guard let firstUnreadId = viewModel.unreadMessagesIds?.first,
+              let unreadIndex = viewModel.messages.firstIndex(where: { $0.messageId == firstUnreadId }) else {
+            scrollToBottom()
+            return
+        }
+
+        let visibleBounds = messagesCollectionView.bounds
+        let restrictedVisibleRect = visibleBounds.insetBy(dx: 0, dy: 100)
+
+        let visibleSections: Set<Int> = Set(
+            messagesCollectionView.indexPathsForVisibleItems.compactMap {
+                guard let frame = messagesCollectionView.layoutAttributesForItem(at: $0)?.frame,
+                      restrictedVisibleRect.intersects(frame) else { return nil }
+                return $0.section
+            }
+        )
+
+        if visibleSections.contains(unreadIndex) {
+            scrollToBottom()
+            return
+        }
+
+        if let separatorIndex = viewModel.separatorState.separatorIndex,
+           unreadIndex == separatorIndex + 1 {
+            viewModel.animationType = .none
+            scrollToPosition(.messageId(firstUnreadId), animated: false, setExtraOffset: true, scrollAt: .top)
+            viewModel.shouldScrollToBottom = true
+            return
+        }
+
+        viewModel.animationType = .none
+        scrollToPosition(.messageId(firstUnreadId), animated: true, scrollAt: .top)
+        viewModel.shouldScrollToBottom = true
+    }
+    
+    fileprivate func scrollToBottom() {
+        state.isScrollingToBottom = true
+        markMessagesFromCurrentToBottomAsRead()
+        messagesCollectionView.scrollToBottom(animated: true)
     }
 }
 
@@ -1393,4 +1436,11 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
-private let hiddenScrollViewPartHeight: CGFloat = 94
+//not a real height just for reading messages
+private var hiddenScrollViewPartHeight: CGFloat {
+    if isMacOS {
+        return 93
+    } else {
+        return 85
+    }
+}
