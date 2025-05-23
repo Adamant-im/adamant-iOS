@@ -971,17 +971,10 @@ extension ChatViewController {
         let restrictedVisibleRect = visibleBounds.insetBy(dx: 0, dy: 100)
 
         let visibleSections: Set<Int> = Set(
-            messagesCollectionView.indexPathsForVisibleItems.compactMap { indexPath in
-                guard let attributes = messagesCollectionView.layoutAttributesForItem(at: indexPath) else {
-                    return nil
-                }
-
-                let frame = attributes.frame
-                if restrictedVisibleRect.intersects(frame) {
-                    return indexPath.section
-                } else {
-                    return nil
-                }
+            messagesCollectionView.indexPathsForVisibleItems.compactMap {
+                guard let frame = messagesCollectionView.layoutAttributesForItem(at: $0)?.frame,
+                      restrictedVisibleRect.intersects(frame) else { return nil }
+                return $0.section
             }
         )
 
