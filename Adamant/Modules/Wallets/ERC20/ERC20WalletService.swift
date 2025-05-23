@@ -452,14 +452,11 @@ extension ERC20WalletService: SwinjectDependentService {
 extension ERC20WalletService {
     func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> EthTransaction {
         let sender = wallet?.address
-        var details: Web3Core.TransactionDetails?
-        var receipt: TransactionReceipt?
-        
-        details = try await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
+        let details: Web3Core.TransactionDetails? = try? await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
-        
-        receipt = try await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
+
+        let receipt: TransactionReceipt? = try? await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionReceipt(hash)
         }.get()
         
