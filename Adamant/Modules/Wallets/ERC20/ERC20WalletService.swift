@@ -662,22 +662,17 @@ extension ERC20WalletService {
             "id": 1
         ]
 
-        let response: APIResponseModel = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
-            let result = await core.sendRequestBasic(
+        let result: EthBlockResponse = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
+            await core.sendRequestJsonResponse(
                 origin: origin,
                 path: "",
                 method: .post,
-                jsonParameters: body,
-                timeout: .common
+                jsonParameters: body
             )
-            return .success(result)
         }.get()
 
         guard
-            let data = response.data,
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let block = json["result"] as? [String: Any],
-            let timestampHex = block["timestamp"] as? String,
+            let timestampHex = result.result?.timestamp,
             let timestampInt = UInt64(timestampHex.stripHexPrefix(), radix: 16)
         else {
             throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
