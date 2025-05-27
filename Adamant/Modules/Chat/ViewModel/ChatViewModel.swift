@@ -1734,7 +1734,7 @@ extension ChatViewModel {
         if model.txStatus == .failed {
             return .failed
         }
-
+        
         if model.content.fileModel.files.contains(where: { $0.isUploading }) {
             return .uploading
         }
@@ -1754,6 +1754,10 @@ extension ChatViewModel {
                 guard let progress = $0.progress else { return false }
                 return progress < 100
             })
+
+            if model.content.fileModel.files.contains(where: { $0.file.nonce.isEmpty }) {
+                return .unableToDownload
+            }
 
             return .needToDownload(failed: failed)
         }
