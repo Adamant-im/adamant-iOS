@@ -673,7 +673,7 @@ extension ERC20WalletService {
 
         guard
             let timestampHex = result.result?.timestamp,
-            let timestampInt = UInt64(timestampHex.stripHexPrefix(), radix: 16)
+            let timestampInt = UInt64(timestampHex.trimHexPrefix(), radix: 16)
         else {
             throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
         }
@@ -682,8 +682,8 @@ extension ERC20WalletService {
     }
 }
 
-private extension String {
-    func stripHexPrefix() -> String {
+extension String {
+    func trimHexPrefix() -> String {
         hasPrefix("0x") ? String(dropFirst(2)) : self
     }
 }

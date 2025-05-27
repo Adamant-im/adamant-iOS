@@ -856,7 +856,7 @@ extension EthWalletService {
 
         guard
             let timestampHex = result.result?.timestamp,
-            let timestampInt = UInt64(timestampHex.stripHexPrefix(), radix: 16)
+            let timestampInt = UInt64(timestampHex.trimHexPrefix(), radix: 16)
         else {
             throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
         }
