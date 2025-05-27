@@ -41,9 +41,8 @@ extension View {
         return resultView
     }
 
-    // TODO: Remove this function (or fix)
     public func fullScreen() -> some View {
-        return frame(width: .infinity, height: .infinity)
+       return frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
     }
 
