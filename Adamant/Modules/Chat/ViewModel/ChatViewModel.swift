@@ -308,7 +308,6 @@ final class ChatViewModel: NSObject {
     fileprivate func setUpMessagetoShow(messageId: String?) {
         if let messageId {
             self.messageIdToShow = messageId
-            separatorState.shouldScrollToNewMessagesOrSavedPosition = false
         }
     }
 
@@ -555,9 +554,6 @@ final class ChatViewModel: NSObject {
                         messageId,
                         recipient: partnerAddress
                     )
-                }
-                if let chatroom {
-                    await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
 
                 await waitForMessage(withId: messageId)
