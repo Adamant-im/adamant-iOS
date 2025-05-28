@@ -474,7 +474,7 @@ extension ERC20WalletService {
             guard let blockNumber = receipt?.blockNumber else { return nil }
             let blockHex = "0x" + String(blockNumber, radix: 16)
             do {
-                return try await fetchBlockTimestamp(blockNumberHex: blockHex)
+                return try await erc20ApiService.fetchBlockTimestamp(blockNumberHex: blockHex)
             } catch {
                 return nil
             }
@@ -653,37 +653,6 @@ extension ERC20WalletService {
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
     }
-    
-    func fetchBlockTimestamp(blockNumberHex: String) async throws -> Date {
-        let body: [String: Any] = [
-            "jsonrpc": "2.0",
-            "method": "eth_getBlockByNumber",
-            "params": [blockNumberHex, false],
-            "id": 1
-        ]
-
-        let result: EthBlockResponse = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
-            await core.sendRequestJsonResponse(
-                origin: origin,
-                path: "",
-                method: .post,
-                jsonParameters: body
-            )
-        }.get()
-
-        guard
-            let timestampHex = result.result?.timestamp,
-            let timestampInt = UInt64(timestampHex.trimHexPrefix(), radix: 16)
-        else {
-            throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
-        }
-
-        return Date(timeIntervalSince1970: TimeInterval(timestampInt))
-    }
 }
 
-extension String {
-    func trimHexPrefix() -> String {
-        hasPrefix("0x") ? String(dropFirst(2)) : self
-    }
-}
+

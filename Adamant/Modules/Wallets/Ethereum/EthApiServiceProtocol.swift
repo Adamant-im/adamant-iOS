@@ -9,6 +9,7 @@
 import CommonKit
 @preconcurrency import Web3Core
 import web3swift
+import Foundation
 
 protocol EthApiServiceProtocol: ApiServiceProtocol {
     func requestWeb3<Output>(
@@ -22,4 +23,6 @@ protocol EthApiServiceProtocol: ApiServiceProtocol {
     ) async -> WalletServiceResult<Output>
 
     func setKeystoreManager(_ keystoreManager: KeystoreManager) async
+    
+    func fetchBlockTimestamp(blockNumberHex: String) async throws -> Date
 }

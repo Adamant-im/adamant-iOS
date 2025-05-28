@@ -687,7 +687,7 @@ extension EthWalletService {
             let timestamp: Date? = await {
                 let blockHex = "0x" + String(receipt.blockNumber, radix: 16)
                 do {
-                    return try await fetchBlockTimestamp(blockNumberHex: blockHex)
+                    return try await ethApiService.fetchBlockTimestamp(blockNumberHex: blockHex)
                 } catch {
                     return nil
                 }
@@ -835,33 +835,6 @@ extension EthWalletService {
 
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
-    }
-    
-    func fetchBlockTimestamp(blockNumberHex: String) async throws -> Date {
-        let body: [String: Any] = [
-            "jsonrpc": "2.0",
-            "method": "eth_getBlockByNumber",
-            "params": [blockNumberHex, false],
-            "id": 1
-        ]
-
-        let result: EthBlockResponse = try await ethApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
-            await core.sendRequestJsonResponse(
-                origin: origin,
-                path: "",
-                method: .post,
-                jsonParameters: body
-            )
-        }.get()
-
-        guard
-            let timestampHex = result.result?.timestamp,
-            let timestampInt = UInt64(timestampHex.trimHexPrefix(), radix: 16)
-        else {
-            throw WalletServiceError.remoteServiceError(message: "Invalid timestamp in block response")
-        }
-
-        return Date(timeIntervalSince1970: TimeInterval(timestampInt))
     }
 }
 
