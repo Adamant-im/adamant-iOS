@@ -460,16 +460,15 @@ extension ERC20WalletService {
             try await web3.eth.transactionReceipt(hash)
         }.get()
         
-        guard details != nil || receipt != nil else {
-            throw WalletServiceError.remoteServiceError(message: "Both transaction details and receipt are unavailable.")
+        guard let tx = details?.transaction else {
+            throw WalletServiceError.remoteServiceError(message: "Transaction details are required to construct transaction.")
         }
 
         let isOutgoing: Bool = {
             guard let sender = sender else { return false }
             return details?.transaction.sender?.address == sender
         }()
-
-        let tx = details?.transaction
+        
         let timestamp: Date? = await {
             guard let blockNumber = receipt?.blockNumber else { return nil }
             let blockHex = "0x" + String(blockNumber, radix: 16)
@@ -492,7 +491,7 @@ extension ERC20WalletService {
             }
         }()
 
-        let ethTransaction = tx?.asEthTransaction(
+        return tx.asEthTransaction(
             date: timestamp,
             gasUsed: receipt?.gasUsed,
             gasPrice: receipt?.effectiveGasPrice,
@@ -500,15 +499,9 @@ extension ERC20WalletService {
             confirmations: confirmations,
             receiptStatus: receipt?.status ?? .notYetProcessed,
             isOutgoing: isOutgoing,
-            hash: tx?.txHash ?? hash,
+            hash: tx.txHash ?? hash,
             for: self.token
         )
-
-        guard let result = ethTransaction else {
-            throw WalletServiceError.remoteServiceError(message: "Unable to create ERC20Transaction.")
-        }
-
-        return result
     }
 
     func getBalance(address: String) async throws -> Decimal {
