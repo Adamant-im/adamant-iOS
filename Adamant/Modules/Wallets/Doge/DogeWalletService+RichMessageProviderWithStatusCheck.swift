@@ -30,13 +30,15 @@ extension DogeWalletService {
         } catch {
             return .init(error: error)
         }
+        
+        let status = await getStatus(
+            dogeTransaction: dogeTransaction,
+            transaction: transaction
+        )
 
-        return await .init(
+        return .init(
             sentDate: dogeTransaction.date,
-            status: getStatus(
-                dogeTransaction: dogeTransaction,
-                transaction: transaction
-            )
+            status: status
         )
     }
 }
@@ -51,7 +53,7 @@ extension DogeWalletService {
             let dogeDate = dogeTransaction.date,
             confirmations > 0 || dogeDate.timeIntervalSinceNow > -60 * 15
         else {
-            return .pending
+            return .registered
         }
 
         // MARK: Check amount & address

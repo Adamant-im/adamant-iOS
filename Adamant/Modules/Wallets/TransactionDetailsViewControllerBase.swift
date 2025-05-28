@@ -185,6 +185,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             )
         }
     }
+    
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -597,9 +598,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             cell.detailTextLabel?.textColor = self?.transactionStatus?.color ?? UIColor.adamant.textColor
 
-            if let value = self?.transactionStatus?.localized,
-                !value.isEmpty
-            {
+            if let value = self?.transactionStatus?.localized, !value.isEmpty {
                 row.value = value
             } else {
                 row.value = TransactionStatus.registered.localized
