@@ -126,7 +126,6 @@ extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -154,8 +153,8 @@ extension ContextMenuOverlayView {
             }
         }
         .frame(
-            width: .infinity,
-            height: viewModel.menuSize.height
+            maxWidth: .infinity,
+            maxHeight: viewModel.menuSize.height
         )
         .offset(y: viewModel.menuLocation.y)
         .ignoresSafeArea()
@@ -167,7 +166,6 @@ extension ContextMenuOverlayView {
                 .onTapGesture {}
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -187,9 +185,7 @@ extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .fullScreen()
     }
-
 }
 
 private let minBottomOffset: CGFloat = 50
