@@ -79,6 +79,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var chatDeselectedIndex: IndexPath?
     private var isScrolling = false
     private var isRefreshing = false
+    private var selectedChatRoom: Chatroom?
 
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
 
@@ -140,6 +141,10 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
     private var swipedIndex: IndexPath?
+    
+    // MARK: Subjects
+    private var unreadBadgeUpdateSubject = ObservableSender<Int?>()
+    
     // MARK: Init
 
     init(
@@ -361,6 +366,14 @@ final class ChatListViewController: KeyboardObservingViewController {
                           let chatroom = self?.chatsController?.fetchedObjects?[safe: index.row]
                 else { return }
                 self?.configureCell(cell, for: chatroom)
+            }
+            .store(in: &subscriptions)
+        
+        unreadBadgeUpdateSubject
+            .debounce(for: .seconds(currentChatBudgeUpdateDelay), scheduler: DispatchQueue.main)
+            .sink { [weak self] count in
+                guard let self, let count else { return }
+                self.setBadgeValue(count)
             }
             .store(in: &subscriptions)
     }
@@ -615,6 +628,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
                 vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
+            self.selectedChatRoom = chatroom
         }
     }
 
@@ -785,7 +799,15 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
             tableView.endUpdates()
 
         case let c where c == unreadController:
-            setBadgeValue(controller.fetchedObjects?.count)
+            let unreadObjects = controller.fetchedObjects as? [ChatTransaction]
+
+            if let lastUnread = unreadObjects?.max(by: { ($0.sentDate ?? .distantPast) < ($1.sentDate ?? .distantPast) }),
+               lastUnread.chatroom == selectedChatRoom {
+                unreadBadgeUpdateSubject.send(controller.fetchedObjects?.count)
+            } else {
+                unreadBadgeUpdateSubject.send(nil)
+                setBadgeValue(controller.fetchedObjects?.count)
+            }
 
         default:
             break
@@ -1002,6 +1024,7 @@ extension ChatListViewController {
                 present(vc, animated: true)
             }
         }
+        selectedChatRoom = chatroom
     }
     private func presentBuyAndSell() {
         let buyAndSellVC = screensFactory.makeBuyAndSell()
@@ -1669,3 +1692,6 @@ extension UITableView {
         }
     }
 }
+
+//delay badge update for current chat to not update it if user will read it instantly
+fileprivate let currentChatBudgeUpdateDelay: TimeInterval = 1.0
