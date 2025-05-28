@@ -1104,7 +1104,9 @@ extension ChatFileService {
             )
         }
 
-        guard var (fileMessage, richMessage) = uploadingFilesDictionary[richMessageId: txId]
+        guard var (fileMessage, richMessage) =
+            uploadingFilesDictionary[richMessageId: txId] ??
+            uploadingFilesDictionary[replyRichMessageId: txId].map({ ($0.0, $0.1.reply_message) })
         else { return }
 
         var richFiles = richMessage.files
@@ -1126,7 +1128,17 @@ extension ChatFileService {
         }
 
         richMessage.files = richFiles
-        fileMessage.adamantMessage = .richMessage(payload: richMessage)
+        fileMessage.adamantMessage = {
+            if case let .richMessage(payload) = fileMessage.adamantMessage,
+               let reply = payload as? RichFileReply {
+                return .richMessage(payload: RichFileReply(
+                    replyto_id: reply.replyto_id,
+                    reply_message: richMessage
+                ))
+            } else {
+                return .richMessage(payload: richMessage)
+            }
+        }()
         uploadingFilesDictionary[txId] = fileMessage
 
         try? await chatsProvider.updateTxMessageContent(
@@ -1315,5 +1327,14 @@ extension Dictionary where Key == String, Value == FileMessage {
         else { return nil }
 
         return (fileMessage, richMessage)
+    }
+    
+    fileprivate subscript(replyRichMessageId txId: String) -> (FileMessage, RichFileReply)? {
+        guard let fileMessage = self[txId],
+              case let .richMessage(payload) = fileMessage.adamantMessage,
+              let reply = payload as? RichFileReply
+        else { return nil }
+
+        return (fileMessage, reply)
     }
 }
