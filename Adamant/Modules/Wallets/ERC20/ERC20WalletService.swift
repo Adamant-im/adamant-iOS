@@ -505,7 +505,7 @@ extension ERC20WalletService {
         )
 
         guard let result = ethTransaction else {
-            throw WalletServiceError.remoteServiceError(message: "Unable to create ECR20Transaction.")
+            throw WalletServiceError.remoteServiceError(message: "Unable to create ERC20Transaction.")
         }
 
         return result
