@@ -74,6 +74,9 @@ extension String.adamant {
         static var unknownToken: String {
             String.localized("Transaction.UnknownTokenTitle", comment: "Transaction: Unknown token")
         }
+        static var noActiveMessagingNodesTitle: String {
+            String.localized("TransferScene.NoActiveMessagingNodes", comment: "Message to show when no active messaging nodes dialog")
+        }
     }
 }
 
@@ -411,6 +414,7 @@ class TransferViewControllerBase: FormViewController {
             .store(in: &subscriptions)
 
         walletCore.walletUpdatePublisher
+            .receive(on: DispatchQueue.main)
             .sink { @MainActor [weak self] _ in
                 self?.reloadFormData()
             }
@@ -821,20 +825,9 @@ class TransferViewControllerBase: FormViewController {
             dialogService.showWarning(withMessage: .adamant.sharedErrors.networkError)
             return
         }
-
-        guard
-            apiServiceCompose.get(.adm)?.hasEnabledNode == true || admReportRecipient == nil
-        else {
-            dialogService.showWarning(
-                withMessage: ApiServiceError.noEndpointsAvailable(
-                    nodeGroupName: NodeGroup.adm.name
-                ).localizedDescription
-            )
-            return
-        }
-
+        
         for group in walletCore.nodeGroups {
-            guard apiServiceCompose.get(group)?.hasEnabledNode == true else {
+            guard apiServiceCompose.get(group)?.hasSupportedNode == true else {
                 dialogService.showWarning(
                     withMessage: ApiServiceError.noEndpointsAvailable(
                         nodeGroupName: group.name
@@ -842,6 +835,15 @@ class TransferViewControllerBase: FormViewController {
                 )
                 return
             }
+        }
+
+        guard
+            apiServiceCompose.get(.adm)?.hasSupportedNode == true || admReportRecipient == nil
+        else {
+            dialogService.showWarning(
+                withMessage: Self.noActiveMessagingNodesTitle.localizedDescription
+            )
+            return
         }
 
         var recipient: String = recipientAddress

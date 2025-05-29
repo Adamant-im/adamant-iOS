@@ -1244,6 +1244,9 @@
 /* Transfer: Processing message */
 "TransferScene.SendingFundsProgress" = "Отправляем токены…";
 
+/* Transfer: Title text when it is no available messaging (ADM) nodes */
+"TransferScene.NoActiveMessagingNodes" = "Нет доступных нод ADM, чтобы отправить сообщение. Посмотрите список узлов.";
+
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Готово!";
 
