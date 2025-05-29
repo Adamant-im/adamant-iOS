@@ -683,15 +683,20 @@ extension EthWalletService {
             let currentBlock = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.blockNumber()
             }.get()
-
-            let block = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
-                try await web3.eth.block(by: receipt.blockHash)
-            }.get()
+            
+            let timestamp: Date? = await {
+                let blockHex = "0x" + String(receipt.blockNumber, radix: 16)
+                do {
+                    return try await ethApiService.fetchBlockTimestamp(blockNumberHex: blockHex)
+                } catch {
+                    return nil
+                }
+            }()
 
             let confirmations = currentBlock - blockNumber
 
             let transaction = details.transaction.asEthTransaction(
-                date: block.timestamp,
+                date: timestamp,
                 gasUsed: receipt.gasUsed,
                 gasPrice: receipt.effectiveGasPrice,
                 blockNumber: String(blockNumber),
@@ -774,6 +779,7 @@ extension EthWalletService {
         }.get()
 
         let transactions = transactionsFrom + transactionsTo
+        
         return transactions.sorted { $0.date.compare($1.date) == .orderedDescending }
     }
 
