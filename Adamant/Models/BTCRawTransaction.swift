@@ -27,7 +27,7 @@ struct BTCRawTransaction {
 
     func asBtcTransaction<T: BaseBtcTransaction>(_ as: T.Type, for address: String, blockId: String? = nil) -> T {
         // MARK: Known values
-        var confirmationsValue: String? = nil
+        var confirmationsValue: String?
         var transactionStatus: TransactionStatus = .registered
 
         if let confirmations = confirmations {

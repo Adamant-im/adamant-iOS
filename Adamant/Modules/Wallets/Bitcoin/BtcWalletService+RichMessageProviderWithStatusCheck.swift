@@ -44,8 +44,8 @@ extension BtcWalletService {
         transaction: CoinTransaction,
         btcTransaction: BtcTransaction
     ) async -> TransactionStatus {
-        // Before we already stored another status in RawBtcTransactionResponse.asBtcTransaction(_:for:height:).
-        // So we don't need to double check anything here because it is already at least "registered".
+        // The status was already set in RawBtcTransactionResponse.asBtcTransaction(_:for:height:),
+        // so there's no need to check again for `.registered` — at this point it's guaranteed to be at least that.
         guard let status = btcTransaction.transactionStatus else {
             return .inconsistent(.unknown)
         }
