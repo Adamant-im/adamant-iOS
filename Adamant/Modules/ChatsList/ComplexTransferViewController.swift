@@ -146,26 +146,8 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             vc.recipientIsReadonly = true
             vc.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
             vc.showProgressView(animated: false)
-
+            
             Task {
-                guard service.core.hasEnabledNode else {
-                    vc.showAlertView(
-                        message: ApiServiceError.noEndpointsAvailable(
-                            nodeGroupName: service.core.tokenName
-                        ).errorDescription ?? .adamant.sharedErrors.unknownError,
-                        animated: true
-                    )
-                    return
-                }
-
-                guard admService?.core.hasEnabledNode ?? false else {
-                    vc.showAlertView(
-                        message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
-                        animated: true
-                    )
-                    return
-                }
-
                 do {
                     let walletAddress = try await service.core
                         .getWalletAddress(
