@@ -213,7 +213,7 @@ public final class NativeAdamantCore: AdamantCore {
     }
     
     // MARK: Address
-    public func getAddressFromPublicKey(_ publicKeyHex: String) -> String? {
+    public func getAddressFromPublicKey(_ publicKeyHex: String) -> String {
         let publicKey = Data(hex: publicKeyHex)
         let hash = publicKey.sha256()
         

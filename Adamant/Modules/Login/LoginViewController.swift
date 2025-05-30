@@ -492,66 +492,39 @@ extension LoginViewController {
             dialogService.showWarning(withMessage: AccountServiceError.invalidPassphrase.localized)
             return
         }
-
-        dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
-
+        
         Task {
-            let result = await loginIntoExistingAccount(passphrase: passphrase)
-
-            if case .failure(let error) = result {
-                dialogService.showRichError(error: error)
-            }
+            await loginIntoExistingAccount(passphrase: passphrase)
         }
     }
-
+    
     func generateNewPassphrase() {
         let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
-
+        
         hideNewPassphrase = false
-
+        
         form.rowBy(tag: Rows.saveYourPassphraseAlert.tag)?.evaluateHidden()
-
+        
         if let row: PassphraseRow = form.rowBy(tag: Rows.newPassphrase.tag) {
             row.value = passphrase
             row.updateCell()
             row.evaluateHidden()
         }
-
+        
         if let row = form.rowBy(tag: Rows.generateNewPassphraseButton.tag), let indexPath = row.indexPath {
             tableView.scrollToRow(at: indexPath, at: .none, animated: true)
         }
     }
-
+    
     @MainActor
-    private func loginIntoExistingAccount(passphrase: String) async -> ApiServiceResult<AdamantAccount> {
-        do {
-            let loginResult = try await accountService.loginWith(passphrase: passphrase, password: .empty)
-
-            dialogService.dismissProgress()
-
-            switch loginResult {
-            case let .success(account, alert):
-                if let nav = navigationController {
-                    nav.popViewController(animated: true)
-                } else {
-                    dismiss(animated: true, completion: nil)
-                }
-
-                if let alert {
-                    dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
-                }
-
-                return .success(account)
-
-            case let .failure(accountError):
-                return .failure(.internalError(message: accountError.localizedDescription, error: accountError))
+    private func loginIntoExistingAccount(passphrase: String) async {
+        try? await accountService.loginWith(passphrase: passphrase, password: .empty)
+            
+            if let nav = navigationController {
+                nav.popViewController(animated: true)
+            } else {
+                dismiss(animated: true, completion: nil)
             }
-
-        } catch {
-            dialogService.dismissProgress()
-            dialogService.showRichError(error: error)
-            return .failure(.internalError(message: error.localizedDescription, error: error))
-        }
     }
 }
 

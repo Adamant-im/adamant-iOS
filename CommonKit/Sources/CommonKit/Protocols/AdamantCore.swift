@@ -35,6 +35,8 @@ public protocol AdamantCore: AnyObject, Sendable {
         senderPublicKey senderKeyHex: String,
         privateKey privateKeyHex: String
     ) -> Data?
+    
+    func getAddressFromPublicKey(_ publicKeyHex: String) -> String
 }
 
 public protocol SignableTransaction {
