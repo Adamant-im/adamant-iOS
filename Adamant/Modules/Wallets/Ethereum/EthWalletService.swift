@@ -646,28 +646,28 @@ extension EthWalletService {
 extension EthWalletService {
     func getTransaction(by hash: String) async throws -> EthTransaction {
         let sender = wallet?.address
-
+        
         // MARK: 1. Transaction details
         let details = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
-
+        
         let isOutgoing: Bool
         if let sender = sender {
             isOutgoing = details.transaction.to.address != sender
         } else {
             isOutgoing = false
         }
-
+        
         // MARK: 2. Transaction receipt
         do {
             let receipt = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.transactionReceipt(hash)
             }.get()
-
+            
             // MARK: 3. Check if transaction is delivered
             guard receipt.status == .ok,
-                let blockNumber = details.blockNumber
+                  let blockNumber = details.blockNumber
             else {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
@@ -680,20 +680,25 @@ extension EthWalletService {
                 )
                 return transaction
             }
-
+            
             // MARK: 4. Block timestamp & confirmations
             let currentBlock = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.blockNumber()
             }.get()
-
-            let block = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
-                try await web3.eth.block(by: receipt.blockHash)
-            }.get()
-
+            
+            let timestamp: Date? = await {
+                let blockHex = "0x" + String(receipt.blockNumber, radix: 16)
+                do {
+                    return try await ethApiService.fetchBlockTimestamp(blockNumberHex: blockHex)
+                } catch {
+                    return nil
+                }
+            }()
+            
             let confirmations = currentBlock - blockNumber
-
+            
             let transaction = details.transaction.asEthTransaction(
-                date: block.timestamp,
+                date: timestamp,
                 gasUsed: receipt.gasUsed,
                 gasPrice: receipt.effectiveGasPrice,
                 blockNumber: String(blockNumber),
@@ -702,11 +707,11 @@ extension EthWalletService {
                 isOutgoing: isOutgoing,
                 hash: details.transaction.txHash
             )
-
+            
             return transaction
         } catch let error as Web3Error {
             switch error {
-            // Transaction not delivired yet
+                // Transaction not delivired yet
             case .inputError, .nodeError:
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
@@ -718,7 +723,7 @@ extension EthWalletService {
                     isOutgoing: isOutgoing
                 )
                 return transaction
-
+                
             default:
                 throw error
             }
