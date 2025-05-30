@@ -8,6 +8,7 @@
 
 import CryptoSwift
 import Foundation
+import BigInt
 
 /*
  * Native Adamanat Core
@@ -209,6 +210,19 @@ public final class NativeAdamantCore: AdamantCore {
         }
 
         return seed.sha256()
+    }
+    
+    // MARK: Address
+    public func getAddressFromPublicKey(_ publicKeyHex: String) -> String? {
+        let publicKey = Data(hex: publicKeyHex)
+        let hash = publicKey.sha256()
+        
+        let reversedBytes = (0..<8).map { i in
+            hash[7 - i]
+        }
+        let number = BigUInt(Data(reversedBytes))
+
+        return "U" + number.description
     }
 
     public init() {}
