@@ -44,6 +44,18 @@
       {
         "url": "https://dogenode3.adm.im",
         "alt_ip": "http://95.216.45.88:44098"
+      },
+      {
+        "url": "https://dogenode1.bbry.org",
+        "alt_ip": "http://147.93.132.93:14778"
+      },
+      {
+        "url": "https://dogenode2.bbry.org",
+        "alt_ip": "http://51.15.238.199:7954"
+      },
+      {
+        "url": "https://dogenode3.bbry.org",
+        "alt_ip": "http://65.108.52.254:25556"
       }
     ],
     "healthCheck": {
