@@ -50,7 +50,7 @@ struct EthTransaction: @unchecked Sendable {
     let from: String
     let to: String
     let gasUsed: Decimal?
-    let gasPrice: Decimal
+    let gasPrice: Decimal?
     let confirmations: String?
     let isError: Bool
     let receiptStatus: TransactionReceipt.TXStatus
@@ -149,10 +149,10 @@ extension EthTransaction: TransactionDetails {
     var feeCurrencySymbol: String? { EthWalletService.currencySymbol }
 
     var feeValue: Decimal? {
-        guard let gasUsed = gasUsed else {
-            return nil
-        }
-
+        guard let gasUsed = gasUsed,
+              let gasPrice
+        else { return nil }
+        
         return gasPrice * gasUsed
     }
 
@@ -207,12 +207,14 @@ extension CodableTransaction {
             txValue = nil
         }
 
-        let feePrice: BigUInt
-        if type == .eip1559 {
-            feePrice = (maxFeePerGas ?? BigUInt(0)) + (maxPriorityFeePerGas ?? BigUInt(0))
-        } else {
-            feePrice = gasPrice ?? BigUInt(0)
-        }
+        let feePrice: BigUInt? = {
+            if type == .eip1559 {
+                guard let maxFeePerGas, let maxPriorityFeePerGas else { return nil }
+                return maxFeePerGas + maxPriorityFeePerGas
+            } else {
+                return gasPrice
+            }
+        }()
 
         let gasPrice = gasPrice ?? feePrice
 
@@ -223,7 +225,7 @@ extension CodableTransaction {
             from: sender?.address ?? "",
             to: recipient.address,
             gasUsed: gasUsed?.asDecimal(exponent: 0),
-            gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
+            gasPrice: gasPrice?.asDecimal(exponent: EthWalletService.currencyExponent),
             confirmations: confirmations,
             isError: receiptStatus != .failed,
             receiptStatus: receiptStatus,
