@@ -841,7 +841,7 @@ class TransferViewControllerBase: FormViewController {
             apiServiceCompose.get(.adm)?.hasSupportedNode == true || admReportRecipient == nil
         else {
             dialogService.showWarning(
-                withMessage: Self.noActiveMessagingNodesTitle.localizedDescription
+                withMessage: String.adamant.transfer.noActiveMessagingNodesTitle
             )
             return
         }
