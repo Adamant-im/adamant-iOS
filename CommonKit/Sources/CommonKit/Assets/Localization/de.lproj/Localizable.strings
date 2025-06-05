@@ -1267,6 +1267,9 @@
 /* Transfer: Processing message */
 "TransferScene.SendingFundsProgress" = "Senden…";
 
+/* Transfer: Title text when it is no available messaging (ADM) nodes */
+"TransferScene.NoActiveMessagingNodes" = "Keine aktiven Messaging-Knoten. Überprüfen Sie die ADM-Knotenliste.";
+
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 

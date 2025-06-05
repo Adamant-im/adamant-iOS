@@ -1233,6 +1233,9 @@
 /* Transfer: Processing message */
 "TransferScene.SendingFundsProgress" = "正在发送令牌…";
 
+/* Transfer: Title text when it is no available messaging (ADM) nodes */
+"TransferScene.NoActiveMessagingNodes" = "没有活动的消息节点。请查看 ADM 节点列表。";
+
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "完成！";
 
