@@ -44,7 +44,11 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     }
 
     func reloadData(newIds: [String], isOnBottom: Bool) {
-        let hasNewMessagesAtTop = newIds.first != currentIds.first
+        //Check for non-UUID for messages so that bot generated messages are not included in comparison
+        let topNewId = firstNonUUID(from: newIds)
+        let topCurrentId = firstNonUUID(from: currentIds)
+
+        let hasNewMessagesAtTop = topNewId != topCurrentId
         let hasNewMessagesAtBottom = newIds.last != currentIds.last
         let hasSameOrMoreMessages = newIds.count >= currentIds.count
 
@@ -84,22 +88,24 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     func stopDecelerating() {
         setContentOffset(contentOffset, animated: false)
     }
+    
+    
 }
 
-extension ChatMessagesCollectionView {
-    fileprivate var maxVerticalOffset: CGFloat {
+fileprivate extension ChatMessagesCollectionView {
+    var maxVerticalOffset: CGFloat {
         contentSize.height + fullInsets.bottom - bounds.height
     }
 
-    fileprivate var minVerticalOffset: CGFloat {
+    var minVerticalOffset: CGFloat {
         -fullInsets.top
     }
 
-    fileprivate var scrollGestureRecognizers: [UIGestureRecognizer] {
+    var scrollGestureRecognizers: [UIGestureRecognizer] {
         [panGestureRecognizer, pinchGestureRecognizer].compactMap { $0 }
     }
 
-    fileprivate var hasActiveScrollGestures: Bool {
+    var hasActiveScrollGestures: Bool {
         scrollGestureRecognizers.contains {
             switch $0.state {
             case .began, .changed:
@@ -112,13 +118,13 @@ extension ChatMessagesCollectionView {
         }
     }
 
-    fileprivate func applyNewIds(_ newIds: [String]) {
+    func applyNewIds(_ newIds: [String]) {
         reloadData()
         layoutIfNeeded()
         currentIds = newIds
     }
 
-    fileprivate func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
+    func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
         guard maxVerticalOffset > minVerticalOffset else { return }
 
         var offset = offset
@@ -131,5 +137,13 @@ extension ChatMessagesCollectionView {
         }
 
         contentOffset.y = offset
+    }
+    
+    func isUUID(_ id: String) -> Bool {
+        id.contains("-") && id.count >= 36
+    }
+    
+    func firstNonUUID(from ids: [String]) -> String? {
+        ids.first(where: { !isUUID($0) })
     }
 }
