@@ -69,6 +69,14 @@
         {
           "url": "https://ethnode3.adamant.im",
           "alt_ip": "http://46.4.37.157:44099"
+        },
+        {
+          "url": "https://ethnode2.bbry.org",
+          "alt_ip": "http://65.108.52.254:41311"
+        },
+        {
+          "url": "https://ethnode3.bbry.org",
+          "alt_ip": "http://100.42.184.57:7318"
         }
       ],
       "healthCheck": {
