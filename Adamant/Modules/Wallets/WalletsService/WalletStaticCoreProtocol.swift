@@ -151,4 +151,8 @@ extension WalletStaticCoreProtocol {
             )
         } ?? []
     }
+    
+    static var nodeDisplayName: String? {
+        coinInfo?.nodes?.displayName
+    }
 }

@@ -31,10 +31,10 @@ struct CoinsNodesListFactory {
         let view = CoinsNodesListView(viewModel: viewModel)
 
         switch context {
-        case .login:
-            return SelfRemovableHostingController(rootView: view)
-        case .menu:
-            return UIHostingController(rootView: view)
+            case .login:
+                return SelfRemovableHostingController(rootView: view)
+            case .menu:
+                return UIHostingController(rootView: view)
         }
     }
 }

@@ -66,6 +66,7 @@ public struct CoinInfoDTO: Codable {
     }
 
     public struct Service: Codable {
+        public let displayName: String?
         let description: Description
         public let list: [Node]
         public let healthCheck: NodeHealthCheck?
@@ -79,6 +80,7 @@ public struct CoinInfoDTO: Codable {
     }
 
     public struct Nodes: Codable {
+        public let displayName: String?
         public let list: [Node]
         public let healthCheck: NodeHealthCheck
         public let minVersion: String?
