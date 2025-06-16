@@ -181,29 +181,28 @@ final class ChatFileService: ChatFileProtocol, Sendable {
         file: FilesStorageKit.File,
         nonce: String,
         chatroom: Chatroom?
-    ) throws -> Data {
+    ) -> (Data?, CacheResult) {
         guard let keyPair = accountService.keypair else {
-            throw FileManagerError.cantDecryptFile
+            return (nil, .decryptionFailed)
         }
 
-        let data = try Data(contentsOf: file.url)
+        let data: Data
+        do {
+            data = try Data(contentsOf: file.url)
+        } catch {
+            return (nil, .decryptionFailed)
+        }
 
         guard file.isEncrypted else {
-            return data
+            return (data, .success)
         }
 
-        guard
-            let decodedData = adamantCore.decodeData(
-                data,
-                rawNonce: nonce,
-                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                privateKey: keyPair.privateKey
-            )
-        else {
-            throw FileManagerError.cantDecryptFile
-        }
-
-        return decodedData
+        return adamantCore.decodeData(
+            data,
+            rawNonce: nonce,
+            senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+            privateKey: keyPair.privateKey
+        )
     }
 
     func cancelUpload(messageId: String) async {
@@ -362,35 +361,40 @@ extension ChatFileService {
     fileprivate func cacheFileToMemoryIfNeeded(
         file: ChatFile,
         chatroom: Chatroom?
-    ) {
+    ) -> CacheResult {
         guard let id = file.file.preview?.id,
-            let nonce = file.file.preview?.nonce,
-            let fileDTO = try? filesStorage.getFile(with: id).get(),
-            fileDTO.isPreview,
-            filesStorage.isCachedLocally(id),
-            !filesStorage.isCachedInMemory(id),
-            let image = try? cacheFileToMemory(
-                id: id,
-                file: fileDTO,
-                nonce: nonce,
-                chatroom: chatroom
-            )
+              let nonce = file.file.preview?.nonce,
+              let fileDTO = try? filesStorage.getFile(with: id).get(),
+              fileDTO.isPreview,
+              filesStorage.isCachedLocally(id),
+              !filesStorage.isCachedInMemory(id)
         else {
-            return
+            return .success
         }
 
-        _updateFileFields.send(
-            .init(
-                id: file.file.id,
-                newId: nil,
-                fileNonce: nil,
-                preview: .some(image),
-                cached: nil,
-                downloadStatus: nil,
-                uploading: nil,
-                progress: nil
-            )
+        let (image, result) = cacheFileToMemory(
+            id: id,
+            file: fileDTO,
+            nonce: nonce,
+            chatroom: chatroom
         )
+
+        if let image {
+            _updateFileFields.send(
+                .init(
+                    id: file.file.id,
+                    newId: nil,
+                    fileNonce: nil,
+                    preview: .some(image),
+                    cached: nil,
+                    downloadStatus: nil,
+                    uploading: nil,
+                    progress: nil
+                )
+            )
+        }
+
+        return result
     }
 
     fileprivate func cacheFileToMemory(
@@ -398,20 +402,31 @@ extension ChatFileService {
         file: FilesStorageKit.File,
         nonce: String,
         chatroom: Chatroom?
-    ) throws -> UIImage? {
-        let data = try Data(contentsOf: file.url)
-
-        guard file.isEncrypted else {
-            return filesStorage.cacheImageToMemoryIfNeeded(id: id, data: data)
+    ) -> (UIImage?, CacheResult) {
+        let data: Data
+        do {
+            data = try Data(contentsOf: file.url)
+        } catch {
+            return (nil, .decryptionFailed)
         }
 
-        let decodedData = try getDecodedData(
-            file: file,
-            nonce: nonce,
-            chatroom: chatroom
-        )
+        let finalData: Data
+        var result: CacheResult
 
-        return filesStorage.cacheImageToMemoryIfNeeded(id: id, data: decodedData)
+        if file.isEncrypted {
+            let decoded = getDecodedData(file: file, nonce: nonce, chatroom: chatroom)
+            guard let decodedData = decoded.0 else {
+                return (nil, decoded.1)
+            }
+            finalData = decodedData
+            result = decoded.1
+        } else {
+            finalData = data
+            result = .success
+        }
+
+        let image = filesStorage.cacheImageToMemoryIfNeeded(id: id, data: finalData)
+        return (image, result)
     }
 
     fileprivate func downloadFile(
@@ -436,15 +451,16 @@ extension ChatFileService {
         }
 
         defer {
-            downloadingFiles[file.file.id] = nil
             sendUpdate(
                 for: [file.file.id],
                 downloadStatus: .init(
                     isPreviewDownloading: false,
-                    isOriginalDownloading: false
+                    isOriginalDownloading: false,
+                    isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed ?? false
                 ),
                 uploading: nil
             )
+            downloadingFiles[file.file.id] = nil
         }
 
         let downloadFile =
@@ -456,12 +472,11 @@ extension ChatFileService {
             && shouldDownloadPreviewFile
             && !filesStorage.isCachedLocally(file.file.preview?.id ?? .empty)
 
-        let downloadStatus: DownloadStatus = .init(
+        var downloadStatus: DownloadStatus = .init(
             isPreviewDownloading: downloadPreview,
-            isOriginalDownloading: downloadFile
+            isOriginalDownloading: downloadFile,
+            isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed ?? false
         )
-
-        downloadingFiles[file.file.id] = downloadStatus
 
         // Here we start showing progress from the last saved value (fileProgressValue) instead of zero because in the UI we need to show progress when the download is frozen. We have N attempts to download, and the progress is overridden.
         // So we start from the last saved progress and override it with 'downloadProgress' upon successful start of the download.
@@ -524,9 +539,14 @@ extension ChatFileService {
                     )
                 )
             } else if !filesStorage.isCachedInMemory(previewDTO.id) {
-                cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
+                let result = cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
+                if result == .decryptionFailed {
+                    downloadStatus.isDecodingFailed = true
+                }
             }
         }
+
+        downloadingFiles[file.file.id] = downloadStatus
 
         if downloadFile {
             try await downloadAndCacheFile(
@@ -663,34 +683,34 @@ extension ChatFileService {
         )
     }
 
-    fileprivate func downloadFile(
-        id: String,
-        storage: String,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
-        nonce: String,
-        saveEncrypted: Bool,
-        downloadProgress: @escaping @Sendable (Progress) -> Void
-    ) async throws -> (decodedData: Data, encodedData: Data) {
-        let encodedData = try await filesNetworkManager.downloadFile(
-            id,
-            type: storage,
-            downloadProgress: downloadProgress
-        ).get()
+fileprivate func downloadFile(
+    id: String,
+    storage: String,
+    senderPublicKey: String,
+    recipientPrivateKey: String,
+    nonce: String,
+    saveEncrypted: Bool,
+    downloadProgress: @escaping @Sendable (Progress) -> Void
+) async throws -> (decodedData: Data, encodedData: Data) {
+    let encodedData = try await filesNetworkManager.downloadFile(
+        id,
+        type: storage,
+        downloadProgress: downloadProgress
+    ).get()
 
-        guard
-            let decodedData = adamantCore.decodeData(
-                encodedData,
-                rawNonce: nonce,
-                senderPublicKey: senderPublicKey,
-                privateKey: recipientPrivateKey
-            )
-        else {
-            throw FileManagerError.cantDecryptFile
-        }
+    let (decodedDataOptional, cacheResult) = adamantCore.decodeData(
+        encodedData,
+        rawNonce: nonce,
+        senderPublicKey: senderPublicKey,
+        privateKey: recipientPrivateKey
+    )
 
-        return (decodedData, encodedData)
+    guard let decodedData = decodedDataOptional, cacheResult == .success else {
+        throw FileManagerError.cantDecryptFile
     }
+
+    return (decodedData, encodedData)
+}
 }
 
 extension ChatFileService {

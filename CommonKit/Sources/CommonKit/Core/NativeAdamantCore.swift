@@ -114,28 +114,28 @@ public final class NativeAdamantCore: AdamantCore {
         rawNonce: String,
         senderPublicKey senderKeyHex: String,
         privateKey privateKeyHex: String
-    ) -> Data? {
+    ) -> (Data?, CacheResult) {
         let message = data.bytes
         let nonce = rawNonce.hexBytes()
         let senderKey = senderKeyHex.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
 
         guard let publicKey = Crypto.ed2Curve.publicKey(senderKey) else {
-            print("FAIL to create ed2curve publick key from SHA256")
-            return nil
+            print("FAIL to create ed2curve public key from SHA256")
+            return (nil, .decryptionFailed)
         }
 
         guard let secretKey = Crypto.ed2Curve.privateKey(privateKey) else {
             print("FAIL to create ed2curve secret key from SHA256")
-            return nil
+            return (nil, .decryptionFailed)
         }
 
-        guard let decrepted = Crypto.box.open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
+        guard let decrypted = Crypto.box.open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
             print("FAIL to decrypt")
-            return nil
+            return (nil, .decryptionFailed)
         }
 
-        return decrepted.toData()
+        return (decrypted.toData(), .success)
     }
     // MARK: - Values
 
@@ -338,4 +338,9 @@ extension SignableTransaction {
             return []
         }
     }
+}
+
+public enum CacheResult {
+    case success
+    case decryptionFailed
 }

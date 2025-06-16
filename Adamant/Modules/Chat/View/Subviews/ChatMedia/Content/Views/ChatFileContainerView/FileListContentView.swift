@@ -200,6 +200,11 @@ extension FileListContentView {
             || chatFile.isBusy
             || model.txStatus == .failed
             || (chatFile.fileType.isMedia && chatFile.previewImage == nil)
+        
+        if chatFile.downloadStatus.isDecodingFailed {
+            downloadImageView.image = UIImage(systemName: "exclamationmark.triangle")
+            downloadImageView.layoutIfNeeded()
+        }
 
         if chatFile.isDownloading {
             if chatFile.previewImage == nil,

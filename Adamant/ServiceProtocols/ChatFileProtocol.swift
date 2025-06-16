@@ -59,7 +59,7 @@ protocol ChatFileProtocol: Sendable {
         file: FilesStorageKit.File,
         nonce: String,
         chatroom: Chatroom?
-    ) throws -> Data
+    ) -> (Data?, CacheResult)
 
     func resendMessage(
         with id: String,

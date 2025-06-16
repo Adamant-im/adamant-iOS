@@ -1787,7 +1787,7 @@ extension ChatViewModel {
                 return nil
             }
 
-            let data = try? chatFileService.getDecodedData(
+            let data = chatFileService.getDecodedData(
                 file: fileDTO,
                 nonce: file.file.nonce,
                 chatroom: chatroom
@@ -1804,7 +1804,7 @@ extension ChatViewModel {
                 namePossiblyWithExtension: filename,
                 extenstion: file.file.extension,
                 resolution: nil,
-                data: data
+                data: data.0
             )
         }
 

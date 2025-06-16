@@ -34,7 +34,7 @@ public protocol AdamantCore: AnyObject, Sendable {
         rawNonce: String,
         senderPublicKey senderKeyHex: String,
         privateKey privateKeyHex: String
-    ) -> Data?
+    ) -> (Data?, CacheResult)
 }
 
 public protocol SignableTransaction {
