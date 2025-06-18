@@ -195,6 +195,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }()
 
     static let awaitingValueString = TransactionStatus.notInitiated.localized
+    static let failedValueString = "❌"
 
     private lazy var currencyFormatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
@@ -314,6 +315,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.txId {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -427,6 +430,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let transaction = self?.transaction {
                 if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
                     row.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
+                } else if self?.transaction?.transactionStatus == .failed {
+                    row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.failedValueString, second: nil)
                 } else {
                     row.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
                     if transaction.recipientAddress.isEmpty {
@@ -463,6 +468,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -491,6 +498,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.amountValue, let formatter = self?.currencyFormatter {
                 row.value = formatter.string(from: value)
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -541,6 +550,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.confirmationsValue, value != "0" {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -575,6 +586,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 !value.isEmpty
             {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -635,6 +648,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let value = self?.fiatFormatter.string(from: amount * rate)
             {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -658,8 +673,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
+            if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
+            } 
         }
 
         detailsSection.append(fiatRow)
@@ -704,6 +722,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.txBlockchainComment {
                 row.value = value
+            } else if self?.transaction?.transactionStatus == .failed{
+                row.value = TransactionDetailsViewControllerBase.failedValueString
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -956,6 +976,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
 
     func getFeeValue() -> String {
+        if transaction?.transactionStatus == .failed{
+           return TransactionDetailsViewControllerBase.failedValueString
+        } 
         guard let value = transaction?.feeValue else {
             return TransactionDetailsViewControllerBase.awaitingValueString
         }
