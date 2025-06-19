@@ -54,6 +54,7 @@ final class ChatViewController: MessagesViewController {
         textColor: .adamant.textColor,
         numberOfLines: 1
     )
+    private var updateDownButtonPublisher = ObservableSender<Void>()
 
     private var sendTransaction: SendTransaction
 
@@ -154,7 +155,7 @@ final class ChatViewController: MessagesViewController {
             navigationController?.delegate = self
         }
         viewModel.updatePartnerName()
-        updateScrollDownButtonVisibility()
+        updateDownButtonPublisher.send()
 
         // Needs to check the current state of the chats update to present or hide spinner on appear instantly
         viewModel.checkUpdateState()
@@ -226,7 +227,12 @@ final class ChatViewController: MessagesViewController {
             updateUnreadMessages()
         }
         updateIsScrollPositionNearlyTheBottom()
-        updateScrollDownButtonVisibility()
+        if let ids = viewModel.unreadMessagesIds,
+           ids.count > 0 {
+            updateDownButtonPublisher.send()
+        } else {
+            updateScrollDownButtonVisibility()
+        }
 
         if scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating {
             updateDateHeaderIfNeeded()
@@ -512,7 +518,7 @@ extension ChatViewController {
         viewModel.$unreadMessagesIds
             .removeDuplicates()
             .sink { [weak self] _ in
-                self?.updateScrollDownButtonVisibility()
+                self?.updateDownButtonPublisher.send()
             }
             .store(in: &subscriptions)
 
@@ -540,6 +546,14 @@ extension ChatViewController {
                         self.messagesCollectionView.reloadSections(IndexSet(integer: index))
                     }
                 }
+            }
+            .store(in: &subscriptions)
+        
+        updateDownButtonPublisher
+            .debounce(for: .milliseconds(delayForDownButtonUpdate), scheduler: DispatchQueue.main)
+            .sink { [weak self] count in
+                guard let self else { return }
+                self.updateScrollDownButtonVisibility()
             }
             .store(in: &subscriptions)
     }
@@ -1444,3 +1458,5 @@ private var hiddenScrollViewPartHeight: CGFloat {
         return 85
     }
 }
+//this deley is to give a short time to read new message and dont show down button with unread count for milliseconds
+private let delayForDownButtonUpdate = 100
