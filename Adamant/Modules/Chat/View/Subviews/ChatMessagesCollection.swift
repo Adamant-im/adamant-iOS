@@ -89,7 +89,15 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         setContentOffset(contentOffset, animated: false)
     }
     
-    
+    func enableKeyboardDismissOnTap(targetView: UIView) {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func dismissKeyboard() {
+        self.superview?.endEditing(true)
+    }
 }
 
 fileprivate extension ChatMessagesCollectionView {
