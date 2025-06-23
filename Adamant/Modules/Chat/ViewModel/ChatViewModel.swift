@@ -995,7 +995,7 @@ final class ChatViewModel: NSObject {
             guard let message = messages[safe: index.section],
                 case let .file(model) = message.content
             else { return }
-
+            
             autoDownloadContentIfNeeded(
                 messageId: message.messageId,
                 files: model.value.content.fileModel.files

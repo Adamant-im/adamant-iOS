@@ -12,7 +12,7 @@ import UIKit
 struct DownloadStatus: Hashable {
     var isPreviewDownloading: Bool
     var isOriginalDownloading: Bool
-    var isDecodingFailed: Bool = false
+    var isDecodingFailed: Bool?
 
     static let `default` = Self(
         isPreviewDownloading: false,

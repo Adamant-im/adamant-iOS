@@ -456,7 +456,7 @@ extension ChatFileService {
                 downloadStatus: .init(
                     isPreviewDownloading: false,
                     isOriginalDownloading: false,
-                    isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed ?? false
+                    isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed
                 ),
                 uploading: nil
             )
@@ -475,7 +475,7 @@ extension ChatFileService {
         var downloadStatus: DownloadStatus = .init(
             isPreviewDownloading: downloadPreview,
             isOriginalDownloading: downloadFile,
-            isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed ?? false
+            isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed
         )
 
         // Here we start showing progress from the last saved value (fileProgressValue) instead of zero because in the UI we need to show progress when the download is frozen. We have N attempts to download, and the progress is overridden.
@@ -484,7 +484,8 @@ extension ChatFileService {
             for: [file.file.id],
             downloadStatus: .init(
                 isPreviewDownloading: downloadPreview,
-                isOriginalDownloading: downloadFile
+                isOriginalDownloading: downloadFile,
+                isDecodingFailed: downloadingFiles[file.file.id]?.isDecodingFailed
             ),
             uploading: nil,
             progress: downloadFile
@@ -509,6 +510,7 @@ extension ChatFileService {
             if downloadPreview {
                 try await downloadAndCacheFile(
                     id: previewDTO.id,
+                    fileId: file.file.id,
                     nonce: previewDTO.nonce,
                     storage: file.storage,
                     publicKey: chatroom?.partner?.publicKey ?? .empty,
@@ -540,17 +542,15 @@ extension ChatFileService {
                 )
             } else if !filesStorage.isCachedInMemory(previewDTO.id) {
                 let result = cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
-                if result == .decryptionFailed {
-                    downloadStatus.isDecodingFailed = true
-                }
             }
         }
 
+        downloadStatus.isDecodingFailed = downloadingFiles[file.file.id]?.isDecodingFailed
         downloadingFiles[file.file.id] = downloadStatus
 
         if downloadFile {
             try await downloadAndCacheFile(
-                id: file.file.id,
+                id: file.file.id, fileId: file.file.id,
                 nonce: file.nonce,
                 storage: file.storage,
                 publicKey: chatroom?.partner?.publicKey ?? .empty,
@@ -613,6 +613,7 @@ extension ChatFileService {
 
     fileprivate func downloadAndCacheFile(
         id: String,
+        fileId: String,
         nonce: String,
         storage: String,
         publicKey: String,
@@ -625,7 +626,7 @@ extension ChatFileService {
         isPreview: Bool,
         downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async throws {
-        let result = try await downloadFile(
+        let result = try await downloadFile( // 1
             id: id,
             storage: storage,
             senderPublicKey: publicKey,
@@ -634,19 +635,39 @@ extension ChatFileService {
             saveEncrypted: saveEncrypted,
             downloadProgress: downloadProgress
         )
+        
+        if result.cashResult == .decryptionFailed {
+            downloadingFiles[fileId] = .init(
+                isPreviewDownloading: false,
+                isOriginalDownloading: false,
+                isDecodingFailed: true
+            )
+            sendUpdate(
+                for: [fileId],
+                downloadStatus: .init(
+                    isPreviewDownloading: false,
+                    isOriginalDownloading: false,
+                    isDecodingFailed: downloadingFiles[fileId]?.isDecodingFailed
+                ),
+                uploading: nil
+            )
+            
+        }
 
-        try filesStorage.cacheFile(
-            id: id,
-            fileExtension: fileExtension,
-            url: nil,
-            decodedData: result.decodedData,
-            encodedData: result.encodedData,
-            ownerId: ownerId,
-            recipientId: recipientId,
-            saveEncrypted: saveEncrypted,
-            fileType: fileType,
-            isPreview: isPreview
-        )
+        if let data = result.decodedData {
+            try filesStorage.cacheFile(
+                id: id,
+                fileExtension: fileExtension,
+                url: nil,
+                decodedData: data,
+                encodedData: result.encodedData,
+                ownerId: ownerId,
+                recipientId: recipientId,
+                saveEncrypted: saveEncrypted,
+                fileType: fileType,
+                isPreview: isPreview
+            )
+        }
     }
 
     fileprivate func shouldAutoDownloadOriginal(
@@ -691,7 +712,7 @@ fileprivate func downloadFile(
     nonce: String,
     saveEncrypted: Bool,
     downloadProgress: @escaping @Sendable (Progress) -> Void
-) async throws -> (decodedData: Data, encodedData: Data) {
+) async throws -> (decodedData: Data?, encodedData: Data, cashResult: CacheResult) {
     let encodedData = try await filesNetworkManager.downloadFile(
         id,
         type: storage,
@@ -705,11 +726,7 @@ fileprivate func downloadFile(
         privateKey: recipientPrivateKey
     )
 
-    guard let decodedData = decodedDataOptional, cacheResult == .success else {
-        throw FileManagerError.cantDecryptFile
-    }
-
-    return (decodedData, encodedData)
+    return (decodedDataOptional, encodedData, cacheResult)
 }
 }
 

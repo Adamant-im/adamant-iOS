@@ -161,6 +161,7 @@ final class ChatMediaContainerView: UIView {
 
         let fileModel = model.content.fileModel
         let fileList = Array(fileModel.files.prefix(FilesConstants.maxFilesCount))
+        print("file model ...", fileModel.messageId, fileModel.files)
 
         actionHandler(
             .forceDownloadAllFiles(

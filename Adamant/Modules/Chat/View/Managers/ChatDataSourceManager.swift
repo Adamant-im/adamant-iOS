@@ -217,6 +217,7 @@ extension ChatDataSourceManager {
         case let .cancelUploading(messageId):
             viewModel.cancelFileUploading(messageId: messageId)
         case let .autoDownloadContentIfNeeded(messageId, files):
+            print("id and content", messageId, files)
             viewModel.autoDownloadContentIfNeeded(
                 messageId: messageId,
                 files: files

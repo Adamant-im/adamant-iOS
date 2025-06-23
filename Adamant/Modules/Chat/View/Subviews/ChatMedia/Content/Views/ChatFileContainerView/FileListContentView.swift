@@ -201,7 +201,7 @@ extension FileListContentView {
             || model.txStatus == .failed
             || (chatFile.fileType.isMedia && chatFile.previewImage == nil)
         
-        if chatFile.downloadStatus.isDecodingFailed {
+        if let status = chatFile.downloadStatus.isDecodingFailed {
             downloadImageView.image = UIImage(systemName: "exclamationmark.triangle")
             downloadImageView.layoutIfNeeded()
         }
