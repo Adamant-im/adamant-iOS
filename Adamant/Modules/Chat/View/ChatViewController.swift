@@ -323,18 +323,19 @@ extension ChatViewController {
             }
             .store(in: &subscriptions)
         
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
-            .sink { [weak self] notification in
-                guard let self,
-                      let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                      let window = self.view.window else { return }
-                
-                let convertedFrame = self.view.convert(frame, from: window)
-                let height = max(self.view.bounds.maxY - convertedFrame.minY, 0)
-                self.keyboardHeight = height
-            }
-            .store(in: &subscriptions)
-        
+        if !isMacOS {
+            NotificationCenter.default.publisher(for: UIResponder.keyboardDidChangeFrameNotification)
+                .sink { [weak self] notification in
+                    guard let self,
+                          let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                          let window = self.view.window else { return }
+                    
+                    let convertedFrame = self.view.convert(frame, from: window)
+                    let height = max(self.view.bounds.maxY - convertedFrame.minY - hiddenScrollViewPartHeight / 2, 0)
+                    print(UIScreen.main.bounds.height)
+                }
+                .store(in: &subscriptions)
+        }
 
         viewModel.didTapAdmNodesList
             .sink { [weak self] in
@@ -606,7 +607,7 @@ extension ChatViewController {
 
         let adjustedVisibleRect = CGRect(
             x: messagesCollectionView.contentOffset.x,
-            y: messagesCollectionView.contentOffset.y + hiddenScrollViewPartHeight + keyboardHeight,
+            y: messagesCollectionView.contentOffset.y + hiddenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
             height: messagesCollectionView.bounds.height - hiddenScrollViewPartHeight * 2 - keyboardHeight
         )
