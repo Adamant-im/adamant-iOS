@@ -61,10 +61,21 @@ final class TxStatusService: TxStatusServiceProtocol {
     }
 
     func forceUpdate(transaction: CoinTransaction) async {
+        subscription?.cancel()
+        
         status = .notInitiated
         saveStatuses()
+        
         await updateStatus()
+        
+        subscription = Task { [weak self] in
+            while await self?.observationIteration() == true {
+                try Task.checkCancellation()
+            }
+        }
+        .eraseToAnyCancellable()
     }
+
 }
 
 extension TxStatusService {
