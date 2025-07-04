@@ -56,6 +56,7 @@ final class ChatViewController: MessagesViewController {
     )
     private var updateDownButtonPublisher = ObservableSender<Void>()
 
+    private var keyboardHeight: CGFloat = 0
     private var sendTransaction: SendTransaction
 
     // swiftlint:disable unused_setter_value
@@ -327,6 +328,20 @@ extension ChatViewController {
                 self?.state.isAppActive = false
             }
             .store(in: &subscriptions)
+        
+        if !isMacOS {
+            NotificationCenter.default.publisher(for: UIResponder.keyboardDidChangeFrameNotification)
+                .sink { [weak self] notification in
+                    guard let self,
+                          let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                          let window = self.view.window else { return }
+                    
+                    let convertedFrame = self.view.convert(frame, from: window)
+                    let height = max(self.view.bounds.maxY - convertedFrame.minY - hiddenScrollViewPartHeight / 2, 0)
+                    print(UIScreen.main.bounds.height)
+                }
+                .store(in: &subscriptions)
+        }
 
         viewModel.didTapAdmNodesList
             .sink { [weak self] in
@@ -608,7 +623,7 @@ extension ChatViewController {
             x: messagesCollectionView.contentOffset.x,
             y: messagesCollectionView.contentOffset.y + hiddenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
-            height: messagesCollectionView.bounds.height - hiddenScrollViewPartHeight * 2
+            height: messagesCollectionView.bounds.height - hiddenScrollViewPartHeight * 2 - keyboardHeight
         )
 
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
@@ -964,6 +979,8 @@ extension ChatViewController {
             NewMessagesCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter
         )
+        collection.enableKeyboardDismissOnTap(targetView: collection)
+        
         return collection
     }
     
