@@ -1758,6 +1758,14 @@ extension ChatViewModel {
             if model.content.fileModel.files.contains(where: { $0.file.nonce.isEmpty }) {
                 return .unableToDownload
             }
+            
+            if model.content.fileModel.files.count > 1 {
+                let ids = model.content.fileModel.files.map { $0.file.id }
+                let uniqueIds = Set(ids)
+                if uniqueIds.count == 1 {
+                    return .unableToDownload
+                }
+            }
 
             return .needToDownload(failed: failed)
         }
