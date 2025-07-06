@@ -459,7 +459,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil,
-        newChat: Bool = false
+        newChat: Bool = false,
+        enterFromNotification: Bool = false
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
@@ -468,7 +469,8 @@ final class ChatListViewController: KeyboardObservingViewController {
             account: accountService.account,
             chatroom: chatroom,
             messageIdToShow: messageId,
-            isNewChat: newChat
+            isNewChat: newChat,
+            isEnterFromNotification: enterFromNotification
         )
 
         return vc

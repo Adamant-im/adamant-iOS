@@ -227,9 +227,11 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false
+        isNewChat: Bool = false,
+        isEnterFromNotification: Bool = false
     ) {
         setUpMessagetoShow(messageId: messageIdToShow)
+        self.separatorState.isEnterFromRemoteNotifivation = isEnterFromNotification
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -1831,7 +1833,7 @@ extension ChatViewModel {
     fileprivate func updateSeparatorId() {
         guard !separatorState.didAddSeparator, !messages.isEmpty else { return }
         
-        if separatorState.isFirstUpdate || !separatorState.isScrollPositionNearlyTheBottom {
+        if separatorState.shouldUpdateSeparator {
             separatorState.isFirstUpdate = false
             guard let firstUnreadId = unreadMessagesIds?.first else {
                 separatorState.separatorId = nil
@@ -1841,6 +1843,7 @@ extension ChatViewModel {
             
             separatorState.didAddSeparator = true
             separatorState.separatorId = firstUnreadId
+            separatorState.isEnterFromRemoteNotifivation = false
             updateSeparatorIndex()
         }
     }

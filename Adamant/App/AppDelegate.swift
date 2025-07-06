@@ -414,7 +414,7 @@ extension AppDelegate {
         chatListNav.dismiss(animated: true, completion: nil)
         tabbar.selectedIndex = 0
 
-        let vc = chatListVC.chatViewController(for: chatroom, with: transactionID)
+        let vc = chatListVC.chatViewController(for: chatroom, with: transactionID, enterFromNotification: true)
 
         vc.hidesBottomBarWhenPushed = true
 
