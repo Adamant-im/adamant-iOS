@@ -337,8 +337,7 @@ extension ChatViewController {
                           let window = self.view.window else { return }
                     
                     let convertedFrame = self.view.convert(frame, from: window)
-                    let height = max(self.view.bounds.maxY - convertedFrame.minY - hiddenScrollViewPartHeight / 2, 0)
-                    print(UIScreen.main.bounds.height)
+                    keyboardHeight = max(self.view.bounds.maxY - convertedFrame.minY - hiddenScrollViewPartHeight / 2, 0)
                 }
                 .store(in: &subscriptions)
         }
