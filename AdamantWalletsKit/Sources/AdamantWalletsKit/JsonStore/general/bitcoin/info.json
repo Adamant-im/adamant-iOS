@@ -40,6 +40,14 @@
       {
         "url": "https://btcnode3.adamant.im/bitcoind",
         "alt_ip": "http://195.201.242.108:44099/bitcoind"
+      },
+      {
+        "url": "https://btcnode1.bbry.org/bitcoind",
+        "alt_ip": "http://100.42.184.57:8617/bitcoind"
+      },
+      {
+        "url": "https://btcnode3.bbry.org/bitcoind",
+        "alt_ip": "http://23.105.226.67:39914/bitcoind"
       }
     ],
     "healthCheck": {
