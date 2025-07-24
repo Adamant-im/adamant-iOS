@@ -976,12 +976,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
 
     func getFeeValue() -> String {
-        if transaction?.transactionStatus == .failed{
-           return TransactionDetailsViewControllerBase.failedValueString
-        } 
-        guard let value = transaction?.feeValue else {
-            return TransactionDetailsViewControllerBase.awaitingValueString
-        }
+        guard let value = transaction?.feeValue, value > 0 else {
+                return TransactionDetailsViewControllerBase.awaitingValueString
+            }
 
         let feeValueRaw = feeFormatter.string(from: value) ?? ""
 

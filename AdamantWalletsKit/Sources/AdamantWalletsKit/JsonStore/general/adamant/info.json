@@ -271,28 +271,13 @@
         },
         "list": [
           {
-            "url": "https://ipfs4.adm.im",
-            "alt_ip": "http://95.216.45.88:44099"
+            "url": "https://ipfs1test.adamant.im"
           },
           {
-            "url": "https://ipfs5.adamant.im",
-            "alt_ip": "http://62.72.43.99:44099"
+            "url": "https://ipfs2test.adamant.im"
           },
           {
-            "url": "https://ipfs6.adamant.business",
-            "alt_ip": "http://75.119.138.235:44099"
-          },
-          {
-            "url": "https://ipfs4.bbry.org",
-            "alt_ip": "http://65.108.52.254:61399"
-          },
-          {
-            "url": "https://ipfs5.bbry.org",
-            "alt_ip": "http://23.105.226.67:41511"
-          },
-          {
-            "url": "https://ipfs6.bbry.org",
-            "alt_ip": "http://100.42.184.57:56777"
+            "url": "https://ipfs3test.adamant.im"
           }
         ],
         "healthCheck": {
