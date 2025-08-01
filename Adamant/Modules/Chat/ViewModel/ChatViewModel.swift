@@ -142,7 +142,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPosition: ChatStartPosition?
+    var startPosition: RestorePosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -1309,7 +1309,7 @@ extension ChatViewModel {
 
         startPosition = chatsProvider
             .getChatPositon(for: address)
-            .map { .offset(yOffset: $0.0, oldCollectionHeight: $0.1) }
+            .map { RestorePosition(offset: $0, oldCollectionHeight: $1) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {

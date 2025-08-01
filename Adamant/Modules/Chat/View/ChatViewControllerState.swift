@@ -7,6 +7,7 @@
 //
 import SnapKit
 import CommonKit
+import Foundation
 
 struct ChatViewControllerState {
     var isMessagesLoaded = false
@@ -22,6 +23,7 @@ struct ChatViewControllerState {
     var shouldScrollToNewMessages = true
     var isViewDissappeared = false
     var isInitialMessagesWereUpdated = false
+    var oldCollectionViewHeight: CGFloat?
 
     
     //calculation for animation, might use for something else in the future
