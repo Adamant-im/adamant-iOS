@@ -595,7 +595,7 @@ extension KlyWalletService {
             ).get()
 
             guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
+                throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
             }
 
             cachedWalletAddress[address] = result

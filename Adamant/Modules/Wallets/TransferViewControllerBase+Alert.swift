@@ -59,7 +59,7 @@ extension TransferViewControllerBase {
 
     // MARK: - Alert view
 
-    func showAlertView(message: String, animated: Bool) {
+    func showAlertView(message: String, animated: Bool, secondaryMessage: String? = nil, secondaryMessageURL: String? = nil) {
         if let progressView = progressView {
             hideView(progressView, animated: animated)
         }
@@ -71,6 +71,8 @@ extension TransferViewControllerBase {
         let callback: @MainActor () -> Void = {
             let alert = FullscreenAlertView()
             alert.message = message
+            alert.linkText = secondaryMessage
+            alert.linkURL = URL(string: secondaryMessageURL ?? "")
 
             self.view.addSubview(alert)
             alert.snp.makeConstraints {

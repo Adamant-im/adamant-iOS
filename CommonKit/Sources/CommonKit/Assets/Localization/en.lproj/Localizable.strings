@@ -293,7 +293,8 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
+"ApiService.InternalError.NoNodesAvailable" = "Failed to retrieve the user’s %@ wallet address\nPlease check your connection";
+"ApiService.InternalError.NoEndpointsAvailable" = "No active %@ nodes. Review the node list";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "No active ADM nodes to fetch the partner's %@ address";
@@ -1250,7 +1251,7 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Not enough tokens";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Recepient's wallet is not initiated yet";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Recipient has no public %@ wallet yet";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Invalid amount to send: %@";
@@ -1369,3 +1370,5 @@
 "Chat.Alert.ReviewNodesList" = "Review ADM node list";
 
 "Chat.Timestamp.InFuture.Error" = "A network node rejected the message because the time on your device is ahead.\nCheck the device's time or try sending a message again.";
+
+"LearnMore" = "Learn more";
