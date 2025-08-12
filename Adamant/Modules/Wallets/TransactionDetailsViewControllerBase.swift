@@ -317,6 +317,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -432,6 +433,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     row.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else if self?.transaction?.transactionStatus == .failed {
                     row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.failedValueString, second: nil)
+                    cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
                 } else {
                     row.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
                     if transaction.recipientAddress.isEmpty {
@@ -470,6 +472,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -500,6 +503,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = formatter.string(from: value)
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -523,6 +527,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
             row.value = self?.getFeeValue()
+            
+            if self?.transaction?.transactionStatus == .failed {
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
+            }
         }
 
         detailsSection.append(feeRow)
@@ -552,6 +560,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -588,6 +597,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -650,6 +660,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -676,6 +687,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if self?.transaction?.transactionStatus == .failed{
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
                 row.value = TransactionDetailsViewControllerBase.failedValueString
             } 
         }
@@ -724,6 +736,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = value
             } else if self?.transaction?.transactionStatus == .failed{
                 row.value = TransactionDetailsViewControllerBase.failedValueString
+                cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -976,7 +989,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
 
     func getFeeValue() -> String {
-        if transaction?.transactionStatus == .failed {
+        guard transaction?.transactionStatus != .failed else {
             return TransactionDetailsViewControllerBase.failedValueString
         }
         guard let value = transaction?.feeValue, value > 0 else {
