@@ -1475,4 +1475,4 @@ private var hiddenScrollViewPartHeight: CGFloat {
     }
 }
 //this deley is to give a short time to read new message and dont show down button with unread count for milliseconds
-private let delayForDownButtonUpdate = 100
+private let delayForDownButtonUpdate = 200
