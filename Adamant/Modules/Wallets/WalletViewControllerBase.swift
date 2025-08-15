@@ -491,7 +491,6 @@ extension WalletViewControllerBase {
             isBalanceInitialized: wallet.isBalanceInitialized
         )
         row.updateCell()
-        row.reload()
     }
 
     fileprivate func makeNodesList() -> UIViewController {
