@@ -26,7 +26,6 @@ class NotificationService: UNNotificationServiceExtension {
     private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
         var providers: [String: TransferNotificationContentProvider] = [
             EthProvider.richMessageType: EthProvider(),
-            KlyProvider.richMessageType: KlyProvider(),
             DogeProvider.richMessageType: DogeProvider(),
             DashProvider.richMessageType: DashProvider(),
             BtcProvider.richMessageType: BtcProvider()

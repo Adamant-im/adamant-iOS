@@ -28,7 +28,6 @@ struct SecretWalletsFactory {
             AdmWalletService(),
             BtcWalletService(),
             EthWalletService(),
-            KlyWalletService(),
             DogeWalletService(),
             DashWalletService()
         ]

@@ -25,10 +25,6 @@ extension DefaultNodesProvider {
             return BtcWalletService.nodes
         case .eth:
             return EthWalletService.nodes
-        case .klyNode:
-            return KlyWalletService.nodes
-        case .klyService:
-            return KlyWalletService.serviceNodes
         case .doge:
             return DogeWalletService.nodes
         case .dash:

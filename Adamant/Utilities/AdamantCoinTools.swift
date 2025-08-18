@@ -16,7 +16,6 @@ struct QQAddressInformation {
 enum QQAddressParam {
     case amount(String)
     case recipient(String)
-    case klyrMessage(String)
 
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
@@ -31,8 +30,6 @@ enum QQAddressParam {
             self = .amount(value)
         case "recipient":
             self = .recipient(value)
-        case "reference":
-            self = .klyrMessage(value)
         default:
             return nil
         }
