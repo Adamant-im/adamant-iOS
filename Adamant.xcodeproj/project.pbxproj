@@ -44,7 +44,6 @@
 		A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5D87BA2262CA01D00DC28F0 /* ProcedureKit */; };
 		A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* Clibsodium */; };
 		A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAED262C72EF004AC028 /* BitcoinKit */; };
-		A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAEF262C72EF004AC028 /* LiskKit */; };
 		A5F0A04B262C9CA90009672A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = A5F0A04A262C9CA90009672A /* Swinject */; };
 		A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F92993262C855B00C3E60A /* MarkdownKit */; };
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
@@ -312,7 +311,6 @@
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
 				AA8FFFCA2D4E6435001D8576 /* CryptoSwift in Frameworks */,
-				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
 				93FA403629401BFC00D20DB6 /* PopupKit in Frameworks */,
 				4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
@@ -474,7 +472,6 @@
 				A5785ADE262C63580001BC66 /* web3swift */,
 				A5DBBABC262C7221004AC028 /* Clibsodium */,
 				A5DBBAED262C72EF004AC028 /* BitcoinKit */,
-				A5DBBAEF262C72EF004AC028 /* LiskKit */,
 				A50AEB03262C815200B37C22 /* EFQRCode */,
 				A50AEB0B262C81E300B37C22 /* QRCodeReader */,
 				A5F92993262C855B00C3E60A /* MarkdownKit */,
@@ -1654,10 +1651,6 @@
 		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BitcoinKit;
-		};
-		A5DBBAEF262C72EF004AC028 /* LiskKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = LiskKit;
 		};
 		A5F0A04A262C9CA90009672A /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -142,7 +142,7 @@
 /* AccountService: Alert title. Changes in version 1.2 */
 "AccountService.update.v12.title" = "版本1.2更新：加密钱包";
 
-/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets */
 "AccountService.update.v12.message" = "您需要重新登录才能启动以太坊钱包";
 
 /* AccountService: User must relogin into app to initiate wallets */
@@ -189,9 +189,6 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "发送ETH";
-
-/* Account tab: 'Send KLY tokens' button */
-"AccountTab.Row.SendKly" = "发送KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "发送BTC";
@@ -252,9 +249,6 @@
 
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
-
-/* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr钱包";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
@@ -1017,9 +1011,6 @@
 
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "未找到交易";
-
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "收件人必须至少具有0.05 LSK--发送更多令牌";
 
 /* Transaction status: updating in progress */
 "TransactionStatus.Updating" = "正在更新…";

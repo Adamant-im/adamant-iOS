@@ -130,7 +130,7 @@
 /* AccountService: Alert title. Changes in version 1.2 */
 "AccountService.update.v12.title" = "Новое в версии 1.2: Криптокошельки";
 
-/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets */
 "AccountService.update.v12.message" = "Необходимо снова зайти в приложение чтобы создать Ethereum кошелёк";
 
 /* AccountService: User must relogin into app to initiate wallets */
@@ -177,9 +177,6 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "Отправить ETH";
-
-/* Account tab: 'Send KLY tokens' button */
-"AccountTab.Row.SendKly" = "Отправить KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "Отправить BTC";
@@ -252,9 +249,6 @@
 
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
-
-/* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Кошелек Klayr";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "Кошелек Bitcoin";
@@ -1094,9 +1088,6 @@
 
 /* Transaction details: 'Open transaction in explorer' row. */
 "TransactionDetailsScene.Row.Explorer" = "Открыть в Explorer";
-
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "На кошельке получателя должно быть больше 0.05 LSK — Отправьте больше токенов";
 
 /* Transaction details: fee row. */
 "TransactionDetailsScene.Row.Fee" = "Комиссия";

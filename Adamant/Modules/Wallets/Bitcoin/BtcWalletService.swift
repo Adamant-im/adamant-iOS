@@ -764,7 +764,7 @@ extension BtcWalletService {
     func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         let txId =
             offset == .zero
-            ? transactions.first?.txId
+            ? nil
             : transactions.last?.txId
 
         return try await getTransactions(fromTx: txId)

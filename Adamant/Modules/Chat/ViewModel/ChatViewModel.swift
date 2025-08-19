@@ -142,7 +142,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPosition: ChatStartPosition?
+    var startPosition: RestorePosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -1311,7 +1311,7 @@ extension ChatViewModel {
 
         startPosition = chatsProvider
             .getChatPositon(for: address)
-            .map { .offset(yOffset: $0.0, oldCollectionHeight: $0.1) }
+            .map { RestorePosition(offset: $0, oldCollectionHeight: $1) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {
@@ -1759,6 +1759,14 @@ extension ChatViewModel {
 
             if model.content.fileModel.files.contains(where: { $0.file.nonce.isEmpty }) {
                 return .unableToDownload
+            }
+            
+            if model.content.fileModel.files.count > 1 {
+                let ids = model.content.fileModel.files.map { $0.file.id }
+                let uniqueIds = Set(ids)
+                if uniqueIds.count == 1 {
+                    return .unableToDownload
+                }
             }
 
             return .needToDownload(failed: failed)

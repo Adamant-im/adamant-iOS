@@ -189,11 +189,20 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         viewModel.preserveMessage(inputBar.text)
+        
+        var bottomOffset = chatMessagesCollectionView.bottomOffset
+        var collectionHeight: CGFloat = messagesCollectionView.contentSize.height
+        if viewModel.separatorState.separatorIndex != nil {
+            collectionHeight -= separatorHeight
+            bottomOffset -= separatorHeight
+        }
+        
         viewModel.saveChatOffset(
             state.isScrollPositionNearlyTheBottom
                 ? nil
-            : chatMessagesCollectionView.bottomOffset, collectionHeight: messagesCollectionView.contentSize.height
+            : bottomOffset, collectionHeight: collectionHeight
         )
+            
         state.isViewDissappeared = true
     }
     
@@ -555,6 +564,7 @@ extension ChatViewController {
                 guard let self = self,
                       let index,
                       index < self.messagesCollectionView.numberOfSections else { return }
+                self.adjustScrollIfHeightIncreased()
                 UIView.performWithoutAnimation {
                     self.messagesCollectionView.performBatchUpdates {
                         self.messagesCollectionView.reloadSections(IndexSet(integer: index))
@@ -825,12 +835,16 @@ extension ChatViewController {
     }
 
     fileprivate func updateMessages() {
-        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id }, isOnBottom: state.isScrollPositionNearlyTheBottom)
+        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id },
+                                              isOnBottom: state.isScrollPositionNearlyTheBottom)
+
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
+
         if !state.isMessagesLoaded {
-            viewModel.startPosition.map {
-                scrollToPosition($0)
+            if let position = viewModel.startPosition {
+                scrollToPosition(.offset(yOffset: position.offset))
+                state.oldCollectionViewHeight = position.oldCollectionHeight
                 state.shouldScrollToNewMessages = false
             }
         }
@@ -1071,16 +1085,10 @@ extension ChatViewController {
                                       scrollAt: UICollectionView.ScrollPosition = .centeredVertically) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         switch position {
-        case let .offset(yOffset, oldHeight):
+        case let .offset(yOffset):
             state.isAutoScrolling = true
-
-            let heightDiff = messagesCollectionView.contentSize.height - oldHeight
-            var finalOffset = yOffset
-            if heightDiff >= 0 {
-                finalOffset += heightDiff
-            }
             
-            chatMessagesCollectionView.setBottomOffset(finalOffset, safely: state.isFirstTimeViewAppeared)
+            chatMessagesCollectionView.setBottomOffset(yOffset, safely: state.isFirstTimeViewAppeared)
             state.isAutoScrolling = false
             guard !state.isFirstTimeViewAppeared else { return }
             chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
@@ -1375,6 +1383,22 @@ extension ChatViewController {
             navigationController?.popViewController(animated: true)
         }
     }
+    
+    fileprivate func adjustScrollIfHeightIncreased() {
+        guard let oldHeight = state.oldCollectionViewHeight,
+              let offset = viewModel.startPosition?.offset,
+              viewModel.separatorState.separatorId != nil
+        else { return }
+        
+        var newHeight = messagesCollectionView.contentSize.height
+        if isMacOS {
+            newHeight -= separatorHeight
+        }
+        let heightDifference = newHeight - oldHeight
+        
+        scrollToPosition(.offset(yOffset: offset + separatorHeight + heightDifference))
+        state.oldCollectionViewHeight = nil
+    }
 }
 
 // MARK: Markdown
@@ -1466,6 +1490,7 @@ private let messagePadding: CGFloat = 12
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
 private let scrollButtonHeight: CGFloat = 30
+private let separatorHeight: CGFloat = 25
 //not a real height just for reading messages
 private var hiddenScrollViewPartHeight: CGFloat {
     if isMacOS {
@@ -1475,4 +1500,4 @@ private var hiddenScrollViewPartHeight: CGFloat {
     }
 }
 //this deley is to give a short time to read new message and dont show down button with unread count for milliseconds
-private let delayForDownButtonUpdate = 100
+private let delayForDownButtonUpdate = 200
