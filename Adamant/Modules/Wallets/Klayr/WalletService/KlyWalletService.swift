@@ -56,6 +56,10 @@ final class KlyWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var balanceValidInterval: Int? {
         Self.balanceValidInterval
     }
+    
+    static var indexerDisplayName: String? {
+        coinInfo?.services?.klyService?.displayName
+    }
 
     @MainActor
     var hasEnabledNode: Bool {

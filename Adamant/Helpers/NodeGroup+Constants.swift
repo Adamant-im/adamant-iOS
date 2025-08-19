@@ -129,20 +129,20 @@ extension NodeGroup {
     var name: String {
         switch self {
         case .btc:
-            return BtcWalletService.tokenNetworkSymbol
+            return BtcWalletService.nodeDisplayName ?? BtcWalletService.tokenNetworkSymbol
         case .eth:
-            return EthWalletService.tokenNetworkSymbol
+            return EthWalletService.nodeDisplayName ?? EthWalletService.tokenNetworkSymbol
         case .klyNode:
-            return KlyWalletService.tokenNetworkSymbol
+            return KlyWalletService.nodeDisplayName ?? KlyWalletService.tokenNetworkSymbol
         case .klyService:
-            return KlyWalletService.tokenNetworkSymbol
+            return KlyWalletService.indexerDisplayName ?? KlyWalletService.tokenNetworkSymbol
                 + " " + .adamant.coinsNodesList.serviceNode
         case .doge:
-            return DogeWalletService.tokenNetworkSymbol
+            return DogeWalletService.nodeDisplayName ?? DogeWalletService.tokenNetworkSymbol
         case .dash:
-            return DashWalletService.tokenNetworkSymbol
+            return DashWalletService.nodeDisplayName ?? DashWalletService.tokenNetworkSymbol
         case .adm:
-            return AdmWalletService.tokenNetworkSymbol
+            return AdmWalletService.nodeDisplayName ?? AdmWalletService.tokenNetworkSymbol
         case .ipfs:
             return IPFSApiService.symbol
         case .infoService:
