@@ -433,9 +433,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     row.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else if self?.transaction?.transactionStatus == .failed {
                     row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.failedValueString, second: nil)
-                    cell.detailTextLabel?.font = cell.detailTextLabel?.font.withSize(14)
+                    cell.detailsLabel?.font = cell.detailsLabel?.font.withSize(14)
                 } else {
-                    row.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
+                    row.value = DoubleDetail(first: self?.recipientId ?? transaction.recipientAddress, second: self?.recipientId == nil ? nil : transaction.recipientAddress)
                     if transaction.recipientAddress.isEmpty {
                         row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
                     }
