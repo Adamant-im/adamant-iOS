@@ -290,7 +290,8 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
+"ApiService.InternalError.NoNodesAvailable" = "Die Wallet-Adresse des Benutzers für %@ konnte nicht abgerufen werden\nBitte überprüfen Sie Ihre Verbindung.";
+"ApiService.InternalError.NoEndpointsAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";
@@ -1265,7 +1266,7 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Nicht genug Geld";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Die Wallet wurde noch nicht initiiert";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Empfänger verfügt noch über keine öffentliche %@-Wallet";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Ungültiger Betrag zum Senden: %@";
@@ -1384,3 +1385,5 @@
 "Chat.Alert.ReviewNodesList" = "ADM-Knotenliste überprüfen";
 
 "Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";
+
+"LearnMore" = "Lernen Sie mehr";

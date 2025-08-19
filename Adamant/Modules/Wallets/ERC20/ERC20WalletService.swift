@@ -530,12 +530,10 @@ extension ERC20WalletService {
             return address
         }
 
-        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address)
-            .mapError { $0.asWalletServiceError() }
-            .get()
+        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
 
         guard let result = result else {
-            throw WalletServiceError.walletNotInitiated
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
 
         cachedWalletAddress[address] = result

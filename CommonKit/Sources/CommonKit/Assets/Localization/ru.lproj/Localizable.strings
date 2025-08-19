@@ -287,7 +287,8 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
+"ApiService.InternalError.NoNodesAvailable" = "Не удалось получить адрес %@-кошелька пользователя\nПроверьте подключение";
+"ApiService.InternalError.NoEndpointsAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Нет доступных ADM нод для получения адреса партнера %@";
@@ -1245,7 +1246,7 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Недостаточно средств";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелек получателя еще не инициирован";
+"WalletServices.SharedErrors.WalletNotInitiated" = "У получателя нет публичного %@-кошелька";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Неверное количество для отправки: %@";
@@ -1364,3 +1365,5 @@
 "Chat.Alert.ReviewNodesList" = "К списку узлов ADM";
 
 "Chat.Timestamp.InFuture.Error" = "Узел сети отклонил сообщение, потому что время на вашем устройстве спешит.\nПроверьте время на устройстве или попробуйте отправить сообщение снова.";
+
+"LearnMore" = "Узнать больше";

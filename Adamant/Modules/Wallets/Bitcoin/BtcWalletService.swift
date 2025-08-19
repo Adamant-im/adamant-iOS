@@ -405,24 +405,18 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-
-        do {
-            let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
-
-            guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
-            }
-
-            cachedWalletAddress[address] = result
-
-            return result
-        } catch _ as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(
-                message: "BTC Wallet: failed to get address from KVS"
-            )
+        
+        let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
+        
+        guard let result = result else {
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
+        
+        cachedWalletAddress[address] = result
+        
+        return result
     }
-
+    
     private func isValid(bech32 address: String) -> Bool {
         guard let decoded = try? SegwitAddrCoder().decode(hrp: "bc", addr: address) else {
             return false
@@ -556,7 +550,7 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = btcWallet?.address else {
-            throw WalletServiceError.walletNotInitiated
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
 
         return try await getBalance(address: address)

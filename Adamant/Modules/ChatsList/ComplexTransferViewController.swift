@@ -170,10 +170,39 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         vc.rootCoinBalance = ethWallet?.wallet?.balance
                     }
                 } catch let error as WalletServiceError {
-                    vc.showAlertView(
-                        message: error.message,
-                        animated: true
-                    )
+                    switch error {
+                        case .walletNotInitiated:
+                            vc.showAlertView(
+                                message: error.message,
+                                animated: true,
+                                secondaryMessage: String.adamant.learnMore(),
+                                secondaryMessageURL: "https://news.adamant.im/chats-and-uninitialized-accounts-in-adamant-5035438e2fcd"
+                            )
+                        default:
+                            vc.showAlertView(
+                                message: error.message,
+                                animated: true
+                            )
+                    }
+                } catch let error as ApiServiceError {
+                    switch error {
+                        case .noEndpointsAvailable(_):
+                            vc.showAlertView(
+                                message: String.localizedStringWithFormat(
+                                    .localized(
+                                        "ApiService.InternalError.NoNodesAvailable",
+                                        comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet."
+                                    ),
+                                    String(services[index].core.tokenName)
+                                ),
+                                animated: true
+                            )
+                        default:
+                            vc.showAlertView(
+                                message: error.localizedDescription,
+                                animated: true
+                            )
+                    }
                 } catch {
                     vc.showAlertView(
                         message: String.adamant.sharedErrors.unknownError,

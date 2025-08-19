@@ -573,32 +573,26 @@ extension EthWalletService {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-
-        do {
-            let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
-
-            guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
-            }
-
-            cachedWalletAddress[address] = result
-
-            return result
-        } catch _ as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(
-                message: "ETH Wallet: failed to get address from KVS"
-            )
+        
+        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
+        
+        guard let result = result else {
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
+        
+        cachedWalletAddress[address] = result
+        
+        return result
     }
 }
 
 #if DEBUG
-    extension EthWalletService {
-        @available(*, deprecated, message: "For testing purposes only")
-        func setWalletForTests(_ wallet: EthWallet?) {
-            self.ethWallet = wallet
-        }
+extension EthWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
     }
+}
 #endif
 
 // MARK: - KVS

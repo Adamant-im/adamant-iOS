@@ -287,7 +287,8 @@
 "ApiService.InternalError.PassingFailed" = "分析失败。报告错误";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
+"ApiService.InternalError.NoNodesAvailable" = "无法获取用户的%@钱包地址。\n请检查您的网络连接。";
+"ApiService.InternalError.NoEndpointsAvailable" = "没有活动的%@节点。查看节点列表";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "没有活动的 ADM 节点来获取合作伙伴的 %@ 地址";
@@ -1234,7 +1235,8 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "代币不足";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "收款人的钱包尚未启动";
+"WalletServices.SharedErrors.WalletNotInitiated" = "收款方尚未开通公开 %@ 钱包";
+
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "要发送的金额无效：%@";
@@ -1354,3 +1356,5 @@
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
 
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
+
+"LearnMore" = "了解更多";
