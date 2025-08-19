@@ -51,7 +51,7 @@ extension String.adamant {
         static var updateAlertMessageV12: String {
             String.localized(
                 "AccountService.update.v12.message",
-                comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets"
+                comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets"
             )
         }
         static var reloginToInitiateWallets: String {

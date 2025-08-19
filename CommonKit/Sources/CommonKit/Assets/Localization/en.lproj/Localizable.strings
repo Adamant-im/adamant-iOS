@@ -142,7 +142,7 @@
 /* AccountService: Alert title. Changes in version 1.2 */
 "AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
 
-/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets */
 "AccountService.update.v12.message" = "You need to relogin to initiate Ethereum wallet";
 
 /* AccountService: User must relogin into app to initiate wallets */
@@ -189,9 +189,6 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "Send ETH";
-
-/* Account tab: 'Send KLY tokens' button */
-"AccountTab.Row.SendKly" = "Send KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "Send BTC";
@@ -252,9 +249,6 @@
 
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
-
-/* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr Wallet";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
@@ -1023,9 +1017,6 @@
 
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "Transactions not found";
-
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "Recipient must have at least 0.05 LSK—Send more tokens";
 
 /* Transaction status: updating in progress */
 "TransactionStatus.Updating" = "Updating…";

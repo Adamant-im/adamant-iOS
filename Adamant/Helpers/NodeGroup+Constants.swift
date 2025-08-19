@@ -17,10 +17,6 @@ extension NodeGroup {
             return BtcWalletService.healthCheckParameters.onScreenUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.onScreenUpdateInterval
-        case .klyNode:
-            return KlyWalletService.healthCheckParameters.onScreenUpdateInterval
-        case .klyService:
-            return KlyWalletService.healthCheckParameters.onScreenServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.onScreenUpdateInterval
         case .dash:
@@ -40,10 +36,6 @@ extension NodeGroup {
             return BtcWalletService.healthCheckParameters.crucialUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.crucialUpdateInterval
-        case .klyNode:
-            return KlyWalletService.healthCheckParameters.crucialUpdateInterval
-        case .klyService:
-            return KlyWalletService.healthCheckParameters.crucialServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.crucialUpdateInterval
         case .dash:
@@ -63,10 +55,6 @@ extension NodeGroup {
             return BtcWalletService.healthCheckParameters.threshold
         case .eth:
             return EthWalletService.healthCheckParameters.threshold
-        case .klyNode:
-            return KlyWalletService.healthCheckParameters.threshold
-        case .klyService:
-            return KlyWalletService.healthCheckParameters.threshold
         case .doge:
             return DogeWalletService.healthCheckParameters.threshold
         case .dash:
@@ -86,10 +74,6 @@ extension NodeGroup {
             return BtcWalletService.healthCheckParameters.normalUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.normalUpdateInterval
-        case .klyNode:
-            return KlyWalletService.healthCheckParameters.normalUpdateInterval
-        case .klyService:
-            return KlyWalletService.healthCheckParameters.normalServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.normalUpdateInterval
         case .dash:
@@ -110,10 +94,6 @@ extension NodeGroup {
             version = BtcWalletService.minNodeVersion
         case .eth:
             version = EthWalletService.minNodeVersion
-        case .klyNode:
-            version = KlyWalletService.minNodeVersion
-        case .klyService:
-            version = KlyWalletService.minNodeVersion
         case .doge:
             version = DogeWalletService.minNodeVersion
         case .dash:
@@ -132,11 +112,6 @@ extension NodeGroup {
             return BtcWalletService.tokenNetworkSymbol
         case .eth:
             return EthWalletService.tokenNetworkSymbol
-        case .klyNode:
-            return KlyWalletService.tokenNetworkSymbol
-        case .klyService:
-            return KlyWalletService.tokenNetworkSymbol
-                + " " + .adamant.coinsNodesList.serviceNode
         case .doge:
             return DogeWalletService.tokenNetworkSymbol
         case .dash:
@@ -152,7 +127,7 @@ extension NodeGroup {
 
     var heightType: Node.HeightType? {
         switch self {
-        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
+        case .btc, .eth, .doge, .dash, .adm, .ipfs:
             .blocks
         case .infoService:
             .date

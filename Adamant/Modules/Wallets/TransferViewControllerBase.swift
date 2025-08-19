@@ -979,11 +979,6 @@ class TransferViewControllerBase: FormViewController {
                 row?.updateCell()
             case .recipient:
                 break
-            case .klyrMessage(let message):
-                let commentRow = BaseRows.blockchainComments(coin: walletCore.tokenName)
-                let row: TextAreaRow? = form.rowBy(tag: commentRow.tag)
-                row?.value = message
-                row?.updateCell()
             }
         }
 

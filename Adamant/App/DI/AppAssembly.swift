@@ -260,38 +260,6 @@ struct AppAssembly: MainThreadAssembly {
             DashLastTransactionStorage(SecureStore: r.resolve(SecureStore.self)!)
         }.inObjectScope(.container)
 
-        // MARK: LskNodeApiService
-        container.register(KlyNodeApiService.self) { r in
-            KlyNodeApiService(
-                api: .init(
-                    service: .init(),
-                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                    isActive: true,
-                    params: NodeGroup.klyNode.blockchainHealthCheckParams,
-                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
-                )
-            )
-        }.inObjectScope(.container)
-
-        // MARK: KlyServiceApiService
-        container.register(KlyServiceApiService.self) { r in
-            KlyServiceApiService(
-                api: .init(
-                    service: .init(),
-                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                    isActive: true,
-                    params: NodeGroup.klyService.blockchainHealthCheckParams,
-                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
-                )
-            )
-        }.inObjectScope(.container)
-
-        container.register(KlyTransactionFactoryProtocol.self) { r in
-            KlyTransactionFactory()
-        }.inObjectScope(.container)
-
         // MARK: EthApiService
         container.register(EthApiService.self) { r in
             r.resolve(ERC20ApiService.self)!
@@ -468,7 +436,6 @@ struct AppAssembly: MainThreadAssembly {
                 AdmWalletService(),
                 BtcWalletService(),
                 EthWalletService(),
-                KlyWalletService(),
                 DogeWalletService(),
                 DashWalletService()
             ]
@@ -507,8 +474,6 @@ struct AppAssembly: MainThreadAssembly {
             ApiServiceCompose(
                 btc: $0.resolve(BtcApiService.self)!,
                 eth: $0.resolve(EthApiService.self)!,
-                klyNode: $0.resolve(KlyNodeApiService.self)!,
-                klyService: $0.resolve(KlyServiceApiService.self)!,
                 doge: $0.resolve(DogeApiService.self)!,
                 dash: $0.resolve(DashApiService.self)!,
                 adm: $0.resolve(AdamantApiServiceProtocol.self)!,

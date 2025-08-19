@@ -74,7 +74,6 @@ public struct CoinInfoDTO: Codable {
 
     public struct Services: Codable {
         public let infoService: Service?
-        public let klyService: Service?
         public let ipfsNode: Service?
     }
 
