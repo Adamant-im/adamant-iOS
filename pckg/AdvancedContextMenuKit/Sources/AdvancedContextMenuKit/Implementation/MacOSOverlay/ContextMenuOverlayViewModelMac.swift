@@ -61,11 +61,11 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
         upperContentViewLocation = calculateUpperContentViewLocation()
     }
 
+    
     @MainActor func dismiss() async {
         await animate(duration: animationDuration) {
-            self.additionalMenuVisible.toggle()
+            if self.additionalMenuVisible { self.additionalMenuVisible = false }
         }
-
         delegate?.didDissmis()
     }
 

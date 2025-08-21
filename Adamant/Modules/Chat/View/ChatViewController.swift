@@ -40,6 +40,17 @@ final class ChatViewController: MessagesViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var bottomMessageId: String?
     private var state = ChatViewControllerState()
+    private var backgroundObserver: NSObjectProtocol?
+    private var foregroundObserver: NSObjectProtocol?
+    
+    deinit {
+        if let backgroundObserver = backgroundObserver {
+            NotificationCenter.default.removeObserver(backgroundObserver)
+        }
+        if let foregroundObserver = foregroundObserver {
+            NotificationCenter.default.removeObserver(foregroundObserver)
+        }
+    }
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -253,6 +264,51 @@ final class ChatViewController: MessagesViewController {
         else { return }
 
         viewModel.loadMoreMessagesIfNeeded()
+    }
+}
+
+// https://trello.com/c/m0k5mrQR/868-bug-after-some-time-in-background-messages-menu-stop-working-on-macos-crash
+extension ChatViewController {
+    fileprivate func setupBackgroundObservers() {
+        backgroundObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillEnterBackground()
+        }
+        
+        foregroundObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillEnterForeground()
+        }
+    }
+    
+    fileprivate func handleAppWillEnterBackground() {
+        inputBar.inputTextView.resignFirstResponder()
+    }
+    
+    fileprivate func handleAppWillEnterForeground() {
+        guard isMacOS else { return }
+        
+        inputBar.isUserInteractionEnabled = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.refreshContextMenuInteractions()
+        }
+    }
+    
+    fileprivate func refreshContextMenuInteractions() {
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        
+        guard !visibleIndexPaths.isEmpty else { return }
+        
+        messagesCollectionView.performBatchUpdates({
+            messagesCollectionView.reloadItems(at: visibleIndexPaths)
+        }, completion: nil)
     }
 }
 
