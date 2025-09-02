@@ -22,7 +22,13 @@ public struct ChatRooms : Codable, Sendable {
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         chats = try values.decodeIfPresent([ChatRoomsChats].self, forKey: .chats)
-        count = Int(try (values.decodeIfPresent(String.self, forKey: .count) ?? "0")) ?? 0
+        if let intVal = try? values.decode(Int.self, forKey: .count) {
+            count = intVal
+        } else if let strVal = try? values.decode(String.self, forKey: .count) {
+            count = Int(strVal)
+        } else {
+            count = 0
+        }
         messages = try values.decodeIfPresent([Transaction].self, forKey: .messages)
     }
 }
