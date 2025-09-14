@@ -1,3 +1,10 @@
+excluded:
+  - .build
+  - "**/.build/**"
+  - Pods
+  - Carthage
+  - "**/DerivedData/**"
+
 disabled_rules:
   - colon
   - comma
