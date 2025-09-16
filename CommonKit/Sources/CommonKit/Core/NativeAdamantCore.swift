@@ -84,9 +84,9 @@ public final class NativeAdamantCore: AdamantCore {
         recipientPublicKey publicKey: String,
         privateKey privateKeyHex: String
     ) -> (data: Data, nonce: String)? {
-        let message = data.bytes
-        let recipientKey = publicKey.hexBytes()
-        let privateKey = privateKeyHex.hexBytes()
+        let message: [UInt8] = Array(data)
+        let recipientKey: [UInt8] = publicKey.hexBytes()
+        let privateKey: [UInt8] = privateKeyHex.hexBytes()
 
         guard let publicKey = Crypto.ed2Curve.publicKey(recipientKey) else {
             print("FAIL to create ed2curve publick key from SHA256")
@@ -115,7 +115,7 @@ public final class NativeAdamantCore: AdamantCore {
         senderPublicKey senderKeyHex: String,
         privateKey privateKeyHex: String
     ) -> Data? {
-        let message = data.bytes
+        let message: [UInt8] = Array(data)
         let nonce = rawNonce.hexBytes()
         let senderKey = senderKeyHex.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
