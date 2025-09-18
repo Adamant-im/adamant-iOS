@@ -205,6 +205,8 @@ final class ChatListViewController: KeyboardObservingViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        let offsetY = tableView.contentOffset.y + tableView.safeAreaInsets.top
+        scrollUpButton.isHidden = offsetY < cellHeight * 0.75
 
         if UIDevice.current.userInterfaceIdiom == .phone {
             if let indexPath = tableView.indexPathForSelectedRow {
