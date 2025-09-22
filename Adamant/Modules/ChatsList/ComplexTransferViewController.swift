@@ -193,7 +193,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                                         "ApiService.InternalError.NoNodesAvailable",
                                         comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet."
                                     ),
-                                    String(services[index].core.tokenName)
+                                    String(services[index].core.tokenSymbol)
                                 ),
                                 animated: true
                             )

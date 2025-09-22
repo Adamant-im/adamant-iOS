@@ -409,7 +409,7 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
         
         guard let result = result else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
         
         cachedWalletAddress[address] = result
@@ -550,7 +550,7 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = btcWallet?.address else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
 
         return try await getBalance(address: address)

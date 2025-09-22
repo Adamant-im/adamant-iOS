@@ -287,7 +287,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Failed to retrieve the user’s %@ wallet address\nPlease check your connection";
+"ApiService.InternalError.NoNodesAvailable" = "Failed to retrieve the user’s %@ wallet address\n\nPlease check your connection";
 "ApiService.InternalError.NoEndpointsAvailable" = "No active %@ nodes. Review the node list";
 
 /* Serious internal error: No ADM nodes available */

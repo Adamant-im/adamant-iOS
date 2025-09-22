@@ -287,7 +287,7 @@
 "ApiService.InternalError.PassingFailed" = "分析失败。报告错误";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "无法获取用户的%@钱包地址。\n请检查您的网络连接。";
+"ApiService.InternalError.NoNodesAvailable" = "无法获取用户的%@钱包地址。\n\n请检查您的网络连接。";
 "ApiService.InternalError.NoEndpointsAvailable" = "没有活动的%@节点。查看节点列表";
 
 /* Serious internal error: No ADM nodes available */
