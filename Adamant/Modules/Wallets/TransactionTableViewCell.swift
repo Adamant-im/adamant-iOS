@@ -187,18 +187,20 @@ final class TransactionTableViewCell: UITableViewCell {
         dateLabel.textColor = transaction.transactionStatus?.color ?? .adamant.secondary
 
         switch transaction.transactionStatus {
-        case .success, .inconsistent:
-            if let date = transaction.dateValue {
-                dateLabel.text = date.humanizedDateTime()
-            } else {
-                dateLabel.text = nil
-            }
-        case .failed:
-            dateLabel.text = TransactionStatus.failed.localized
-        case .pending, .registered, .notInitiated:
-            dateLabel.text = TransactionStatus.pending.localized
-        default:
-            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
+            case .success, .inconsistent:
+                if let date = transaction.dateValue {
+                    dateLabel.text = date.humanizedDateTime()
+                } else {
+                    dateLabel.text = nil
+                }
+            case .failed:
+                dateLabel.text = TransactionStatus.failed.localized
+            case .pending, .registered:
+                dateLabel.text = TransactionStatus.pending.localized
+            case .notInitiated:
+                dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
+            default:
+                dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
         }
 
         if let partnerName = transaction.partnerName {
