@@ -692,7 +692,7 @@ extension EthWalletService {
                     return nil
                 }
             }()
-
+            
             let confirmations = currentBlock - blockNumber
 
             let transaction = details.transaction.asEthTransaction(

@@ -957,7 +957,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
 
     func getFeeValue() -> String {
-        guard let value = transaction?.feeValue else {
+        guard let value = transaction?.feeValue, value > 0 else {
             return TransactionDetailsViewControllerBase.awaitingValueString
         }
 
