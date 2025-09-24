@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/google/GoogleDataTransport.git",
         "state": {
           "branch": null,
-          "revision": "a637d318ae7ae246b02d7305121275bc75ed5565",
-          "version": "9.4.0"
+          "revision": "aae45a320fd0d11811820335b1eabc8753902a40",
+          "version": "9.2.5"
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/google/GoogleUtilities.git",
         "state": {
           "branch": null,
-          "revision": "57a1d307f42df690fdef2637f3e5b776da02aad6",
-          "version": "7.13.3"
+          "revision": "bc27fad73504f3d4af235de451f02ee22586ebd3",
+          "version": "7.12.1"
         }
       },
       {
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/nathantannar4/InputBarAccessoryView",
         "state": {
           "branch": null,
-          "revision": "c7acd5fa32e54cd7a44ad7eb9a7730da35b54c95",
-          "version": "6.5.1"
+          "revision": "17ced92a5dccb36512b408b6276353631d7cbe57",
+          "version": "6.3.0"
         }
       },
       {
@@ -186,8 +186,8 @@
         "repositoryURL": "https://github.com/firebase/leveldb.git",
         "state": {
           "branch": null,
-          "revision": "a0bc79961d7be727d258d33d5a6b2f1023270ba1",
-          "version": "1.22.5"
+          "revision": "9d108e9112aa1d65ce508facf804674546116d9c",
+          "version": "1.22.3"
         }
       },
       {
@@ -195,8 +195,8 @@
         "repositoryURL": "https://github.com/bmoliveira/MarkdownKit.git",
         "state": {
           "branch": null,
-          "revision": "39ea7a3fc7e65bcafe55152592b834859be574a5",
-          "version": "1.7.3"
+          "revision": "5056f3305d3499f44d8815530d560b87082e0cf5",
+          "version": "1.7.1"
         }
       },
       {
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/MessageKit/MessageKit.git",
         "state": {
           "branch": null,
-          "revision": "b024c1287ac30fb6ea2ee07169e6193efc11d972",
-          "version": "4.3.0"
+          "revision": "1993e8e90d4e9a61b8d9bc8ceb733964ce943376",
+          "version": "4.2.0"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "8cb1d641ab5ebce2cd7cf31c93baef07bed672d4",
-          "version": "1.1.2301"
+          "revision": "0c70e4b7d22411a7fe3ff59b913d5b760b735ce1",
+          "version": "1.1.2100"
         }
       },
       {
@@ -258,8 +258,8 @@
         "repositoryURL": "https://github.com/google/promises.git",
         "state": {
           "branch": null,
-          "revision": "540318ecedd63d883069ae7f1ed811a2df00b6ac",
-          "version": "2.4.0"
+          "revision": "e70e889c0196c76d22759eb50d6a0270ca9f1d9e",
+          "version": "2.3.1"
         }
       },
       {
@@ -330,8 +330,8 @@
         "repositoryURL": "https://github.com/SnapKit/SnapKit.git",
         "state": {
           "branch": null,
-          "revision": "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
-          "version": "5.7.1"
+          "revision": "f222cbdf325885926566172f6f5f06af95473158",
+          "version": "5.6.0"
         }
       },
       {
@@ -357,8 +357,8 @@
         "repositoryURL": "https://github.com/daltoniam/Starscream",
         "state": {
           "branch": null,
-          "revision": "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
-          "version": "4.0.8"
+          "revision": "ac6c0fc9da221873e01bd1a0d4818498a71eef33",
+          "version": "4.0.6"
         }
       },
       {
@@ -366,8 +366,8 @@
         "repositoryURL": "https://github.com/apple/swift-async-algorithms",
         "state": {
           "branch": null,
-          "revision": "042e1c4d9d19748c9c228f8d4ebc97bb1e339b0b",
-          "version": "1.0.4"
+          "revision": "5c8bd186f48c16af0775972700626f0b74588278",
+          "version": "1.0.2"
         }
       },
       {
@@ -375,8 +375,8 @@
         "repositoryURL": "https://github.com/apple/swift-collections.git",
         "state": {
           "branch": null,
-          "revision": "8c0c0a8b49e080e54e5e328cc552821ff07cd341",
-          "version": "1.2.1"
+          "revision": "671108c96644956dddcd89dd59c203dcdb36cec7",
+          "version": "1.1.4"
         }
       },
       {
@@ -384,8 +384,8 @@
         "repositoryURL": "https://github.com/apple/swift-protobuf.git",
         "state": {
           "branch": null,
-          "revision": "2547102afd04fe49f1b286090f13ebce07284980",
-          "version": "1.31.1"
+          "revision": "07f7f26ded8df9645c072f220378879c4642e063",
+          "version": "1.25.1"
         }
       },
       {
@@ -402,8 +402,8 @@
         "repositoryURL": "https://github.com/EFPrefix/swift_qrcodejs.git",
         "state": {
           "branch": null,
-          "revision": "d1605333f7edac39b4518538ef4f2638fdd2e4d6",
-          "version": "2.3.1"
+          "revision": "aecbafebc602b8855ee34cc3fb2e73b1a9faed2b",
+          "version": "2.3.0"
         }
       },
       {
@@ -411,8 +411,8 @@
         "repositoryURL": "https://github.com/qonto/SwiftyMocky",
         "state": {
           "branch": null,
-          "revision": "6ca423fd8d2a82047d831e80638fcc8ac52367f6",
-          "version": "4.2.3"
+          "revision": "a53a970ffbb18527f307069bc1109aad16a86522",
+          "version": "4.2.2"
         }
       },
       {
@@ -447,8 +447,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams",
         "state": {
           "branch": null,
-          "revision": "3d6871d5b4a5cd519adf233fbb576e0a2af71c17",
-          "version": "5.4.0"
+          "revision": "b4b8042411dc7bbb696300a34a4bf3ba1b7ad19b",
+          "version": "5.3.1"
         }
       }
     ]
