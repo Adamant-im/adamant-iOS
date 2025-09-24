@@ -59,6 +59,7 @@ class EthApiService: EthApiServiceProtocol, @unchecked Sendable {
     }
 }
 
+// https://github.com/Adamant-im/adamant-iOS/pull/855/files
 extension EthApiService {
     func fetchBlockTimestamp(blockNumberHex: String) async throws -> Date {
         let body: [String: Any] = [

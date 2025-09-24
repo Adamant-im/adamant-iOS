@@ -125,8 +125,8 @@ final class MarkdownAdvancedAdm: MarkdownLink {
         formatText(attributedString, range: formatRange, link: linkURLString)
         addAttributes(attributedString, range: formatRange, link: linkURLString)
     }
-
-    override func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
+    
+    func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
         attributedString.addAttributes(attributes, range: range)
     }
 }
@@ -184,8 +184,8 @@ final class MarkdownLinkAdm: MarkdownLink {
         formatText(attributedString, range: formatRange, link: url.absoluteString)
         addAttributes(attributedString, range: formatRange, link: url.absoluteString)
     }
-
-    override func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
+    
+    func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
         attributedString.addAttributes(attributes, range: range)
     }
 }
