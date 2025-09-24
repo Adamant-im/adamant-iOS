@@ -44,6 +44,8 @@ extension BtcWalletService {
         transaction: CoinTransaction,
         btcTransaction: BtcTransaction
     ) async -> TransactionStatus {
+        // The status was already set in RawBtcTransactionResponse.asBtcTransaction(_:for:height:),
+        // so there's no need to check again for `.registered` — at this point it's guaranteed to be at least that.
         guard let status = btcTransaction.transactionStatus else {
             return .inconsistent(.unknown)
         }

@@ -115,6 +115,11 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         dashApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        dashApiService.hasAllowedNodePublisher
+    }
 
     // MARK: - Notifications
     let serviceEnabledChanged = Notification.Name("adamant.dashWallet.enabledChanged")
@@ -226,32 +231,29 @@ final class DashWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @un
         }
     }
     
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = dashWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
-
+    
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = dashWallet else {
             return
         }
-
+        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance{
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
@@ -409,7 +411,7 @@ extension DashWalletService: SwinjectDependentService {
 extension DashWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = dashWallet?.address else {
-            throw WalletServiceError.walletNotInitiated
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
 
         return try await getBalance(address: address)
@@ -457,21 +459,15 @@ extension DashWalletService {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-
-        do {
-            let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
-
-            guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
-            }
-
-            cachedWalletAddress[address] = result
-            return result
-        } catch _ as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(
-                message: "DASH Wallet: failed to get address from KVS"
-            )
+        
+        let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
+        
+        guard let result = result else {
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
+        
+        cachedWalletAddress[address] = result
+        return result
     }
 
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {

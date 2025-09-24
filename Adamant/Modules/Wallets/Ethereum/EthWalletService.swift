@@ -205,6 +205,11 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         ethApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        ethApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -291,33 +296,30 @@ final class EthWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, ERC2
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance(){
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = ethWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = await getWallet() else {
             return
         }
-
+        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             if wallet.balance < balance, wallet.isBalanceInitialized {
@@ -571,32 +573,26 @@ extension EthWalletService {
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-
-        do {
-            let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
-
-            guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
-            }
-
-            cachedWalletAddress[address] = result
-
-            return result
-        } catch _ as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(
-                message: "ETH Wallet: failed to get address from KVS"
-            )
+        
+        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
+        
+        guard let result = result else {
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
+        
+        cachedWalletAddress[address] = result
+        
+        return result
     }
 }
 
 #if DEBUG
-    extension EthWalletService {
-        @available(*, deprecated, message: "For testing purposes only")
-        func setWalletForTests(_ wallet: EthWallet?) {
-            self.ethWallet = wallet
-        }
+extension EthWalletService {
+    @available(*, deprecated, message: "For testing purposes only")
+    func setWalletForTests(_ wallet: EthWallet?) {
+        self.ethWallet = wallet
     }
+}
 #endif
 
 // MARK: - KVS
@@ -644,28 +640,28 @@ extension EthWalletService {
 extension EthWalletService {
     func getTransaction(by hash: String) async throws -> EthTransaction {
         let sender = wallet?.address
-
+        
         // MARK: 1. Transaction details
         let details = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
-
+        
         let isOutgoing: Bool
         if let sender = sender {
             isOutgoing = details.transaction.to.address != sender
         } else {
             isOutgoing = false
         }
-
+        
         // MARK: 2. Transaction receipt
         do {
             let receipt = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.transactionReceipt(hash)
             }.get()
-
+            
             // MARK: 3. Check if transaction is delivered
             guard receipt.status == .ok,
-                let blockNumber = details.blockNumber
+                  let blockNumber = details.blockNumber
             else {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
@@ -678,7 +674,7 @@ extension EthWalletService {
                 )
                 return transaction
             }
-
+            
             // MARK: 4. Block timestamp & confirmations
             let currentBlock = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.blockNumber()
@@ -694,7 +690,7 @@ extension EthWalletService {
             }()
             
             let confirmations = currentBlock - blockNumber
-
+            
             let transaction = details.transaction.asEthTransaction(
                 date: timestamp,
                 gasUsed: receipt.gasUsed,
@@ -705,11 +701,11 @@ extension EthWalletService {
                 isOutgoing: isOutgoing,
                 hash: details.transaction.txHash
             )
-
+            
             return transaction
         } catch let error as Web3Error {
             switch error {
-            // Transaction not delivired yet
+                // Transaction not delivired yet
             case .inputError, .nodeError:
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
@@ -721,7 +717,7 @@ extension EthWalletService {
                     isOutgoing: isOutgoing
                 )
                 return transaction
-
+                
             default:
                 throw error
             }
@@ -779,7 +775,6 @@ extension EthWalletService {
         }.get()
 
         let transactions = transactionsFrom + transactionsTo
-        
         return transactions.sorted { $0.date.compare($1.date) == .orderedDescending }
     }
 

@@ -204,6 +204,11 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         erc20ApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        erc20ApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -260,33 +265,30 @@ final class ERC20WalletService: WalletCoreProtocol, ERC20GasAlgorithmComputable,
             await update()
         }
     }
-
-    func updateWithRefreshUIBalance() {
+    
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = ethWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = ethWallet else {
             return
-        }
-
+        }     
+        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             if wallet.balance < balance, wallet.isBalanceInitialized {
@@ -455,7 +457,7 @@ extension ERC20WalletService {
         let details: Web3Core.TransactionDetails? = try? await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
-
+        
         let receipt: TransactionReceipt? = try? await erc20ApiService.requestWeb3(waitsForConnectivity: waitsForConnectivity) { web3 in
             try await web3.eth.transactionReceipt(hash)
         }.get()
@@ -463,7 +465,7 @@ extension ERC20WalletService {
         guard let tx = details?.transaction else {
             throw WalletServiceError.remoteServiceError(message: "Transaction details are required to construct transaction.")
         }
-
+        
         let isOutgoing: Bool = {
             guard let sender = sender else { return false }
             return details?.transaction.sender?.address == sender
@@ -478,7 +480,7 @@ extension ERC20WalletService {
                 return nil
             }
         }()
-
+        
         let confirmations: String? = await {
             guard let blockNumber = details?.blockNumber else { return nil }
             do {
@@ -490,7 +492,7 @@ extension ERC20WalletService {
                 return nil
             }
         }()
-
+        
         return tx.asEthTransaction(
             date: timestamp,
             gasUsed: receipt?.gasUsed,
@@ -528,12 +530,10 @@ extension ERC20WalletService {
             return address
         }
 
-        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address)
-            .mapError { $0.asWalletServiceError() }
-            .get()
+        let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
 
         guard let result = result else {
-            throw WalletServiceError.walletNotInitiated
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
 
         cachedWalletAddress[address] = result
@@ -584,7 +584,6 @@ extension ERC20WalletService {
         }.get()
 
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
-        
         return transactions
     }
 
@@ -647,5 +646,3 @@ extension ERC20WalletService {
         coinStorage.updateStatus(for: id, status: status)
     }
 }
-
-

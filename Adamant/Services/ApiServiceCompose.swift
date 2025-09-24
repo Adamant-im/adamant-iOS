@@ -12,8 +12,6 @@ import Foundation
 struct ApiServiceCompose: ApiServiceComposeProtocol {
     let btc: ApiServiceProtocol
     let eth: ApiServiceProtocol
-    let klyNode: ApiServiceProtocol
-    let klyService: ApiServiceProtocol
     let doge: ApiServiceProtocol
     let dash: ApiServiceProtocol
     let adm: ApiServiceProtocol
@@ -32,10 +30,6 @@ extension ApiServiceCompose {
             return btc
         case .eth:
             return eth
-        case .klyNode:
-            return klyNode
-        case .klyService:
-            return klyService
         case .doge:
             return doge
         case .dash:

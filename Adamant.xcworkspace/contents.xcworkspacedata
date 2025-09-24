@@ -20,9 +20,6 @@
       location = "group:PopupKit">
    </FileRef>
    <FileRef
-      location = "group:LiskKit">
-   </FileRef>
-   <FileRef
       location = "group:BitcoinKit">
    </FileRef>
    <FileRef

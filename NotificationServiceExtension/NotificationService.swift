@@ -26,7 +26,6 @@ class NotificationService: UNNotificationServiceExtension {
     private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
         var providers: [String: TransferNotificationContentProvider] = [
             EthProvider.richMessageType: EthProvider(),
-            KlyProvider.richMessageType: KlyProvider(),
             DogeProvider.richMessageType: DogeProvider(),
             DashProvider.richMessageType: DashProvider(),
             BtcProvider.richMessageType: BtcProvider()
@@ -337,9 +336,11 @@ class NotificationService: UNNotificationServiceExtension {
         var badgeValue = (Int(SecureStore.get(StoreKey.notificationsService.customBadgeNumber) ?? "0") ?? 0)
         if !shouldIgnoreNotification {
             badgeValue += 1
-            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
+        } else {
+            bestAttemptContent.body = ""
         }
         
+        bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
         bestAttemptContent.badge = NSNumber(value: badgeValue)
         SecureStore.set(String(badgeValue), for: StoreKey.notificationsService.customBadgeNumber)
 

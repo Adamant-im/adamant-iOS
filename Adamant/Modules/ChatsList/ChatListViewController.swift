@@ -79,6 +79,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var chatDeselectedIndex: IndexPath?
     private var isScrolling = false
     private var isRefreshing = false
+    private var selectedChatRoom: Chatroom?
 
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
 
@@ -140,6 +141,10 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
     private var swipedIndex: IndexPath?
+    
+    // MARK: Subjects
+    private var unreadBadgeUpdateSubject = ObservableSender<Int?>()
+    
     // MARK: Init
 
     init(
@@ -363,6 +368,14 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.configureCell(cell, for: chatroom)
             }
             .store(in: &subscriptions)
+        
+        unreadBadgeUpdateSubject
+            .debounce(for: .seconds(currentChatBudgeUpdateDelay), scheduler: DispatchQueue.main)
+            .sink { [weak self] count in
+                guard let self, let count else { return }
+                self.setBadgeValue(count)
+            }
+            .store(in: &subscriptions)
     }
 
     @MainActor
@@ -446,7 +459,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil,
-        newChat: Bool = false
+        newChat: Bool = false,
+        enterFromNotification: Bool = false
     ) -> ChatViewController {
         let vc = screensFactory.makeChat()
         vc.hidesBottomBarWhenPushed = true
@@ -455,7 +469,8 @@ final class ChatListViewController: KeyboardObservingViewController {
             account: accountService.account,
             chatroom: chatroom,
             messageIdToShow: messageId,
-            isNewChat: newChat
+            isNewChat: newChat,
+            isEnterFromNotification: enterFromNotification
         )
 
         return vc
@@ -615,6 +630,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
                 vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
+            self.selectedChatRoom = chatroom
         }
     }
 
@@ -785,7 +801,15 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
             tableView.endUpdates()
 
         case let c where c == unreadController:
-            setBadgeValue(controller.fetchedObjects?.count)
+            let unreadObjects = controller.fetchedObjects as? [ChatTransaction]
+
+            if let lastUnread = unreadObjects?.max(by: { ($0.sentDate ?? .distantPast) < ($1.sentDate ?? .distantPast) }),
+               lastUnread.chatroom == selectedChatRoom {
+                unreadBadgeUpdateSubject.send(controller.fetchedObjects?.count)
+            } else {
+                unreadBadgeUpdateSubject.send(nil)
+                setBadgeValue(controller.fetchedObjects?.count)
+            }
 
         default:
             break
@@ -980,6 +1004,7 @@ extension ChatListViewController {
 
     @MainActor
     func presentChatroom(_ chatroom: Chatroom, with message: String? = nil) {
+        defer { updateSelectedRow(chatroom: chatroom) }
         // MARK: 1. Create and config ViewController
         let vc = chatViewController(for: chatroom, with: message)
 
@@ -1002,6 +1027,7 @@ extension ChatListViewController {
                 present(vc, animated: true)
             }
         }
+        selectedChatRoom = chatroom
     }
     private func presentBuyAndSell() {
         let buyAndSellVC = screensFactory.makeBuyAndSell()
@@ -1602,14 +1628,6 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 return
             }
 
-            if let indexPath = tableView.indexPathForSelectedRow {
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-
-            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            }
-
             presenter.presentChatroom(chatroom, with: message.transactionId)
         }
     }
@@ -1620,14 +1638,6 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 return
             }
 
-            if let indexPath = tableView.indexPathForSelectedRow {
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-
-            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            }
-
             presenter.presentChatroom(chatroom)
         }
     }
@@ -1635,6 +1645,15 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     func didSelected(_ account: CoreDataAccount) {
         account.chatroom?.isForcedVisible = true
         newChatController(didSelectAccount: account, preMessage: nil, name: nil)
+    }
+    
+    func updateSelectedRow(chatroom: Chatroom) {
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        if let indexPath = self.chatsController?.indexPath(forObject: chatroom) {
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        }
     }
 }
 
@@ -1669,3 +1688,6 @@ extension UITableView {
         }
     }
 }
+
+//delay badge update for current chat to not update it if user will read it instantly
+fileprivate let currentChatBudgeUpdateDelay: TimeInterval = 1.0

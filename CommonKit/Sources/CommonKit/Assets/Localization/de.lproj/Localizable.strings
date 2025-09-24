@@ -142,7 +142,7 @@
 /* AccountService: Alert title. Changes in version 1.2 */
 "AccountService.update.v12.title" = "Version 1.2 Update: Cryptowallets";
 
-/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets */
 "AccountService.update.v12.message" = "Sie müssen sich wieder einloggen, um die Ethereum-Wallet zu initiieren";
 
 /* AccountService: User must relogin into app to initiate wallets */
@@ -192,9 +192,6 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "ETH senden";
-
-/* Account tab: 'Send KLY tokens' button */
-"AccountTab.Row.SendKly" = "KLY senden";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "BTC ";
@@ -256,9 +253,6 @@
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
 
-/* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr Wallet";
-
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
 
@@ -296,7 +290,8 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
+"ApiService.InternalError.NoNodesAvailable" = "Die Wallet-Adresse des Benutzers für %@ konnte nicht abgerufen werden\nBitte überprüfen Sie Ihre Verbindung.";
+"ApiService.InternalError.NoEndpointsAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";
@@ -1036,9 +1031,6 @@
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "Transactions not found";
 
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "Recipient must have at least 0.05 LSK—Send more tokens";
-
 /* Transaction status: updating in progress */
 "TransactionStatus.Updating" = "Aktualisieren…";
 
@@ -1104,9 +1096,6 @@
 
 /* Transaction details: date row. */
 "TransactionDetailsScene.Row.Date" = "Datum";
-
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "Der Empfänger muss mindestens 0,05 LSK haben – Senden Sie mehr Token";
 
 /* Transaction details: 'Open transaction in explorer' row. */
 "TransactionDetailsScene.Row.Explorer" = "Im Explorer öffnen";
@@ -1267,6 +1256,9 @@
 /* Transfer: Processing message */
 "TransferScene.SendingFundsProgress" = "Senden…";
 
+/* Transfer: Title text when it is no available messaging (ADM) nodes */
+"TransferScene.NoActiveMessagingNodes" = "Keine aktiven Messaging-Knoten. Überprüfen Sie die ADM-Knotenliste.";
+
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 
@@ -1274,7 +1266,7 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Nicht genug Geld";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Die Wallet wurde noch nicht initiiert";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Empfänger verfügt noch über keine öffentliche %@-Wallet";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Ungültiger Betrag zum Senden: %@";
@@ -1393,3 +1385,5 @@
 "Chat.Alert.ReviewNodesList" = "ADM-Knotenliste überprüfen";
 
 "Chat.Timestamp.InFuture.Error" = "Ein Netzwerkknoten hat die Nachricht abgelehnt, weil die Zeit auf Ihrem Gerät vorgeht.\nÜberprüfen Sie die Uhrzeit des Geräts oder versuchen Sie erneut, eine Nachricht zu senden.";
+
+"LearnMore" = "Lernen Sie mehr";

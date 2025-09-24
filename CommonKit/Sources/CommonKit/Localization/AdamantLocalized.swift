@@ -123,3 +123,9 @@ extension String.adamant {
         }
     }
 }
+
+extension String.adamant {
+    public static func learnMore() -> String {
+        String.localized("LearnMore", comment: "Learn more button title")
+    }
+}

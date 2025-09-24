@@ -70,7 +70,6 @@ extension ContextMenuOverlayViewMac {
             }
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -94,7 +93,6 @@ extension ContextMenuOverlayViewMac {
                 .padding(.leading, viewModel.contentLocation.x)
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -110,7 +108,6 @@ extension ContextMenuOverlayViewMac {
             }
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -120,7 +117,6 @@ extension ContextMenuOverlayViewMac {
                 .onTapGesture {}
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 
@@ -135,7 +131,6 @@ extension ContextMenuOverlayViewMac {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .fullScreen()
         .transition(.opacity)
     }
 }

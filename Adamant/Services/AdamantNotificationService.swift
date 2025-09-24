@@ -249,7 +249,7 @@ extension AdamantNotificationsService {
 
         if let number = type.badge {
             DispatchQueue.onMainThreadSyncSafe {
-                content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
+                content.badge = NSNumber(value: isMacOS ? getBadgeForLeftSplitViewController() ?? 0: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
             }
 
             if isBackgroundSession {
@@ -280,23 +280,58 @@ extension AdamantNotificationsService {
             SecureStore.remove(StoreKey.notificationsService.customBadgeNumber)
         }
 
-        DispatchQueue.onMainAsync {
+        DispatchQueue.onMainAsync { [weak self] in
             UIApplication.shared.applicationIconBadgeNumber = appIconBadgeNumber
+            
+            guard let self = self else { return }
+            self.setBadgeForLeftSplitViewController(count: appIconBadgeNumber)
         }
     }
 
     func removeAllPendingNotificationRequests() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
+        setBadgeForLeftSplitViewController(count: customBadgeNumber)
     }
 
     func removeAllDeliveredNotifications() {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
+        setBadgeForLeftSplitViewController(count: customBadgeNumber)
     }
 
     func setValue(for key: String, value: Bool) {
         SecureStore.set(value, for: key)
+    }
+    
+    private func setBadgeForLeftSplitViewController(count: Int) {
+        if let window = UIApplication.shared
+            .connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?
+            .windows
+            .first(where: \.isKeyWindow),
+           let tabBar = window.rootViewController as? UITabBarController,
+           let split = tabBar.viewControllers?.first(where: { $0 is UISplitViewController }) as? UISplitViewController {
+            split.tabBarItem.badgeValue = count > 0 ? String(count) : nil
+        }
+    }
+    
+    private func getBadgeForLeftSplitViewController() -> Int? {
+        if let window = UIApplication.shared
+            .connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?
+            .windows
+            .first(where: \.isKeyWindow),
+           let tabBar = window.rootViewController as? UITabBarController,
+           let split = tabBar.viewControllers?.first(where: { $0 is UISplitViewController }) as? UISplitViewController {
+            if let badgeValue = split.tabBarItem.badgeValue, let badge = Int(badgeValue) {
+                return badge
+            }
+            return nil
+        }
+        return nil
     }
 }
 
@@ -317,6 +352,7 @@ extension AdamantNotificationsService {
     fileprivate func onUserLoggedIn() {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = 0
+        setBadgeForLeftSplitViewController(count: 0)
 
         if let raw: String = SecureStore.get(StoreKey.notificationsService.notificationsMode),
             let mode = NotificationsMode(string: raw)

@@ -206,6 +206,11 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
     var hasEnabledNodePublisher: AnyObservable<Bool> {
         btcApiService.hasEnabledNodePublisher
     }
+    
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> {
+        btcApiService.hasAllowedNodePublisher
+    }
 
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUniqueID,
@@ -264,28 +269,32 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             .store(in: &subscriptions)
     }
 
-    func addTransactionObserver() {
+    private func addTransactionObserver() {
         coinStorage.transactionsPublisher
             .sink { [weak self] transactions in
                 self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
-
+    
     func update() {
         Task {
             await update()
         }
     }
 
-    func updateWithRefreshUIBalance(){
+    func resetBalanceAndUpdate() {
         Task {
-            await update(updateWithRefreshUIBalance: true)
+            if let wallet = btcWallet {
+                wallet.isBalanceInitialized = false
+                await walletUpdateSender.send()
+                await update()
+            }
         }
     }
     
     @MainActor
-    func update(updateWithRefreshUIBalance: Bool = false) async {
+    func update() async {
         guard let wallet = btcWallet else {
             return
         }
@@ -295,15 +304,8 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
             return
 
         case .upToDate:
-            break
+            setState(.updating)
         }
-        
-        if updateWithRefreshUIBalance {
-            wallet.isBalanceInitialized = false
-            walletUpdateSender.send()
-        }
-        
-        setState(.updating)
 
         if let balance = try? await getBalance() {
             if wallet.balance < balance, wallet.isBalanceInitialized {
@@ -403,24 +405,18 @@ final class BtcWalletService: WalletCoreProtocol, WalletStaticCoreProtocol, @unc
         if let address = cachedWalletAddress[address], !address.isEmpty {
             return address
         }
-
-        do {
-            let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
-
-            guard let result = result else {
-                throw WalletServiceError.walletNotInitiated
-            }
-
-            cachedWalletAddress[address] = result
-
-            return result
-        } catch _ as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(
-                message: "BTC Wallet: failed to get address from KVS"
-            )
+        
+        let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
+        
+        guard let result = result else {
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
+        
+        cachedWalletAddress[address] = result
+        
+        return result
     }
-
+    
     private func isValid(bech32 address: String) -> Bool {
         guard let decoded = try? SegwitAddrCoder().decode(hrp: "bc", addr: address) else {
             return false
@@ -554,7 +550,7 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = btcWallet?.address else {
-            throw WalletServiceError.walletNotInitiated
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
         }
 
         return try await getBalance(address: address)
@@ -768,7 +764,7 @@ extension BtcWalletService {
     func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         let txId =
             offset == .zero
-            ? transactions.first?.txId
+            ? nil
             : transactions.last?.txId
 
         return try await getTransactions(fromTx: txId)

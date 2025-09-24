@@ -56,7 +56,6 @@ struct AdamantScreensFactory: ScreensFactory {
         pkGeneratorFactory = .init(parent: assembler)
 
         walletFactoryCompose = AdamantWalletFactoryCompose(
-            klyWalletFactory: .init(assembler: assembler),
             dogeWalletFactory: .init(assembler: assembler),
             dashWalletFactory: .init(assembler: assembler),
             btcWalletFactory: .init(assembler: assembler),

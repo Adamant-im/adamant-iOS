@@ -36,7 +36,7 @@ extension Notification.Name {
         /// Raised when wallets collection updated
         ///
         /// Use only for communication between AdmanatAccountService and AdamantWalletService.
-        static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
+        static let isBalanceExpired = Notification.Name("adamant.accountService.isBalanceExpired")
 
         private init() {}
     }
@@ -51,7 +51,7 @@ extension String.adamant {
         static var updateAlertMessageV12: String {
             String.localized(
                 "AccountService.update.v12.message",
-                comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets"
+                comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets"
             )
         }
         static var reloginToInitiateWallets: String {
@@ -156,9 +156,7 @@ protocol AccountService: AnyObject, Sendable {
     // MARK: Account functions
 
     /// Update logged account info
-    func update()
-    func update(shouldUpdateUIBalance: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
-    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?)
+    func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
 
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult

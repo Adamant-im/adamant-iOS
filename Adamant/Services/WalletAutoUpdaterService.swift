@@ -21,7 +21,7 @@ import Combine
 ///    - Adjusts which wallets are actively scheduled for periodic updates.
 ///
 /// For each visible wallet, it uses `repeaterService` to register a recurring `update()` call at a
-/// wallet‑type‑specific interval (shorter for new ADM accounts, longer for BTC/KLY, etc.), and
+/// wallet‑type‑specific interval (shorter for new ADM accounts, longer for BTC/ETH, etc.), and
 /// unregisters any tasks when wallets go out of scope or the user logs out.
 actor WalletAutoUpdateService {
     private let visibleWalletService: VisibleWalletsService
@@ -109,8 +109,9 @@ actor WalletAutoUpdateService {
                 interval: getTimeIntervalFor(wallet: core),
                 queue: .global(qos: .utility),
                 callback: {
-                    if wallet.core is AdmWalletService{
-                        self.accountService.update()
+                    guard !(wallet.core is AdmWalletService) else {
+                        self.accountService.update(resetBalanceAndUpdate: false, updateOnlyADM: true, updateOnlyVisible: false)
+                        return
                     }
                     core.update()
                 }

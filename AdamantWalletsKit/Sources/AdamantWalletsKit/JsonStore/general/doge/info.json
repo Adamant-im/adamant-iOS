@@ -34,16 +34,20 @@
     "displayName": "doge-node",
     "list": [
       {
-        "url": "https://dogenode1.adamant.im",
-        "alt_ip": "http://5.9.99.62:44099"
-      },
-      {
         "url": "https://dogenode2.adamant.im",
         "alt_ip": "http://176.9.32.126:44098"
       },
       {
         "url": "https://dogenode3.adm.im",
         "alt_ip": "http://95.216.45.88:44098"
+      },
+      {
+        "url": "https://dogenode2.bbry.org",
+        "alt_ip": "http://51.15.238.199:7954"
+      },
+      {
+        "url": "https://dogenode3.bbry.org",
+        "alt_ip": "http://65.108.52.254:25556"
       }
     ],
     "healthCheck": {
@@ -62,10 +66,6 @@
         "docs": "https://github.com/blockstream/esplora/blob/master/API.md"
       },
       "list": [
-        {
-          "url": "https://dogenode1.adamant.im/api",
-          "alt_ip": "http://5.9.99.62:44099/api"
-        },
         {
           "url": "https://dogenode2.adamant.im/api",
           "alt_ip": "http://176.9.32.126:44098/api"
@@ -106,9 +106,6 @@
       "displayName": "doge-node",
       "list": [
         {
-          "url": "http://mtg4mq43p67cbj6qwcqgppjv7uzm7ximjlzapsbnbh5ls6zqkjsq26ad.onion"
-        },
-        {
           "url": "http://bfu3iiofsagyhi22zijfilbkzlzbalpylhhfcluqmezx2avdwcxut7yd.onion"
         },
         {
@@ -131,9 +128,6 @@
           "docs": "https://github.com/blockstream/esplora/blob/master/API.md"
         },
         "list": [
-          {
-            "url": "http://mtg4mq43p67cbj6qwcqgppjv7uzm7ximjlzapsbnbh5ls6zqkjsq26ad.onion/api"
-          },
           {
             "url": "http://bfu3iiofsagyhi22zijfilbkzlzbalpylhhfcluqmezx2avdwcxut7yd.onion/api"
           },

@@ -12,7 +12,7 @@ extension NodeGroup {
         switch self {
         case .adm:
             return false
-        case .eth, .doge, .dash, .btc, .klyNode, .klyService, .ipfs, .infoService:
+        case .eth, .doge, .dash, .btc, .ipfs, .infoService:
             return true
         }
     }

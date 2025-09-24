@@ -9,6 +9,11 @@
 import CoreGraphics
 
 enum ChatStartPosition {
-    case offset(yOffset: CGFloat, oldCollectionHeight: CGFloat)
+    case offset(yOffset: CGFloat)
     case messageId(String, toBottomIfNotFound: Bool = false)
+}
+
+struct RestorePosition {
+    var offset: CGFloat
+    var oldCollectionHeight: CGFloat
 }

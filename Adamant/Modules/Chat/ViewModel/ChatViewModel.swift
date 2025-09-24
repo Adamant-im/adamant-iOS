@@ -142,7 +142,7 @@ final class ChatViewModel: NSObject {
         }
     }
 
-    var startPosition: ChatStartPosition?
+    var startPosition: RestorePosition?
 
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
@@ -227,9 +227,11 @@ final class ChatViewModel: NSObject {
         account: AdamantAccount?,
         chatroom: Chatroom,
         messageIdToShow: String?,
-        isNewChat: Bool = false
+        isNewChat: Bool = false,
+        isEnterFromNotification: Bool = false
     ) {
         setUpMessagetoShow(messageId: messageIdToShow)
+        self.separatorState.isEnterFromRemoteNotifivation = isEnterFromNotification
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.chatroom?.updateLastTransaction()
@@ -308,7 +310,6 @@ final class ChatViewModel: NSObject {
     fileprivate func setUpMessagetoShow(messageId: String?) {
         if let messageId {
             self.messageIdToShow = messageId
-            separatorState.shouldScrollToNewMessagesOrSavedPosition = false
         }
     }
 
@@ -500,37 +501,38 @@ final class ChatViewModel: NSObject {
 
     func retrySendMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
+                  let message = messages.first(where: { $0.messageId == id })
             else { return }
-            
-            let message = messages.first(where: { $0.messageId == id })
-            
-            if case let .file(model) = message?.content {
-                try? await chatFileService.resendMessage(
-                    with: id,
-                    text: model.value.content.comment.string,
-                    chatroom: chatroom,
-                    replyMessage: nil,
-                    saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-                )
-                return
-            }
-            
+
             do {
-                try await chatsProvider.retrySendMessage(transaction)
-            } catch {
-                switch error as? ChatsProviderError {
-                    case .invalidTransactionStatus:
-                        break
-                    case let .serverError(serverError):
-                        switch serverError {
-                            case .timestampIsInTheFuture:
-                                dialog.send(.timestampIsInTheFuture)
-                            default: dialog.send(.warning(error.localizedDescription))
-                        }
-                    default:
-                        dialog.send(.richError(error))
+                if case let .file(model) = message.content {
+                    try await chatFileService.resendMessage(
+                        with: id,
+                        text: model.value.content.comment.string,
+                        chatroom: chatroom,
+                        replyMessage: nil,
+                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+                    )
+                } else {
+                    try await chatsProvider.retrySendMessage(transaction)
                 }
+            } catch let error as ChatsProviderError {
+                switch error {
+                case .invalidTransactionStatus:
+                    break
+                case let .serverError(serverError):
+                    switch serverError {
+                    case .timestampIsInTheFuture:
+                        dialog.send(.timestampIsInTheFuture)
+                    default:
+                        dialog.send(.warning(error.localizedDescription))
+                    }
+                default:
+                    dialog.send(.richError(error))
+                }
+            } catch {
+                dialog.send(.richError(error))
             }
         }.stored(in: tasksStorage)
     }
@@ -554,9 +556,6 @@ final class ChatViewModel: NSObject {
                         messageId,
                         recipient: partnerAddress
                     )
-                }
-                if let chatroom {
-                    await chatsProvider.markMessageAsRead(chatroom: chatroom, message: messageId)
                 }
 
                 await waitForMessage(withId: messageId)
@@ -1312,7 +1311,7 @@ extension ChatViewModel {
 
         startPosition = chatsProvider
             .getChatPositon(for: address)
-            .map { .offset(yOffset: $0.0, oldCollectionHeight: $0.1) }
+            .map { RestorePosition(offset: $0, oldCollectionHeight: $1) }
     }
 
     fileprivate func loadMessages(address: String, offset: Int) async {
@@ -1737,7 +1736,7 @@ extension ChatViewModel {
         if model.txStatus == .failed {
             return .failed
         }
-
+        
         if model.content.fileModel.files.contains(where: { $0.isUploading }) {
             return .uploading
         }
@@ -1757,6 +1756,18 @@ extension ChatViewModel {
                 guard let progress = $0.progress else { return false }
                 return progress < 100
             })
+
+            if model.content.fileModel.files.contains(where: { $0.file.nonce.isEmpty }) {
+                return .unableToDownload
+            }
+            
+            if model.content.fileModel.files.count > 1 {
+                let ids = model.content.fileModel.files.map { $0.file.id }
+                let uniqueIds = Set(ids)
+                if uniqueIds.count == 1 {
+                    return .unableToDownload
+                }
+            }
 
             return .needToDownload(failed: failed)
         }
@@ -1830,7 +1841,7 @@ extension ChatViewModel {
     fileprivate func updateSeparatorId() {
         guard !separatorState.didAddSeparator, !messages.isEmpty else { return }
         
-        if separatorState.isFirstUpdate || !separatorState.isScrollPositionNearlyTheBottom {
+        if separatorState.shouldUpdateSeparator {
             separatorState.isFirstUpdate = false
             guard let firstUnreadId = unreadMessagesIds?.first else {
                 separatorState.separatorId = nil
@@ -1840,6 +1851,7 @@ extension ChatViewModel {
             
             separatorState.didAddSeparator = true
             separatorState.separatorId = firstUnreadId
+            separatorState.isEnterFromRemoteNotifivation = false
             updateSeparatorIndex()
         }
     }

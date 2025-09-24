@@ -184,8 +184,13 @@ extension ChatMediaContainerView {
         
         reactionsStack.insertSubview(progressRingHostingView, aboveSubview: statusButton)
         progressRingHostingView.snp.makeConstraints { make in
-            make.center.equalTo(statusButton)
-            make.size.equalTo(30)
+            if isMacOS {
+                make.centerX.equalTo(statusButton).offset(-1)
+            } else {
+                make.centerX.equalTo(statusButton)
+            }
+            make.centerY.equalTo(statusButton)
+            make.size.equalTo(29)
         }
     }
 
@@ -206,33 +211,37 @@ extension ChatMediaContainerView {
         statusButton.isHidden = status == .success
     }
     
-    func averageUploadProgress() -> Double {
+    func totalUploadProgress() -> Double {
         let files = model.content.fileModel.files
-        
-        let progresses = files
-            .compactMap { $0.progress }
-        
-        guard !progresses.isEmpty else {
+
+        let totalBytes = files.map { $0.file.size }.reduce(0, +)
+
+        let uploadedBytes: Int64 = files.reduce(0) { result, file in
+            let progress = Double(file.progress ?? 0) / 100.0
+            return result + Int64(Double(file.file.size) * progress)
+        }
+
+        guard totalBytes > 0 else {
             return 0.0
         }
-        
-        let totalProgress = progresses.reduce(0, +)
-        return Double(totalProgress) / Double(progresses.count)
+
+        return Double(uploadedBytes) / Double(totalBytes) * 100.0
     }
     
     func updateProgressRing() {
-        let averageProgress = averageUploadProgress()
+        let averageProgress = totalUploadProgress()
         
         if averageProgress == 0 {
             statusProgressState.backgroundGradient = LinearGradient(
-                gradient: Gradient(colors: [.white, .black]),
+                gradient: Gradient(colors: [.white, Color(.adamant.sendingFileAnimationGrayColor)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
-        )} else {
+            )
+        } else {
             statusProgressState.backgroundGradient = nil
         }
         statusProgressState.progress = averageProgress / 100
-        statusProgressState.hidden = averageProgress == 100 || !(model.status == .uploading)
+        statusProgressState.hidden = !(model.status == .uploading)
         statusProgressState.isSpinning = (model.status == .uploading && averageProgress == 0)
     }
 

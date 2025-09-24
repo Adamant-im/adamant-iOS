@@ -14,5 +14,11 @@ struct NewMessageSeparatorState {
     var isFirstUpdate: Bool = true
     var didAddSeparator: Bool = false
     var isScrollPositionNearlyTheBottom = true
-    var shouldScrollToNewMessagesOrSavedPosition = true
+    var isEnterFromRemoteNotifivation: Bool = false
+    
+    var shouldUpdateSeparator: Bool {
+        isFirstUpdate
+        || !isScrollPositionNearlyTheBottom
+        || isEnterFromRemoteNotifivation
+    }
 }

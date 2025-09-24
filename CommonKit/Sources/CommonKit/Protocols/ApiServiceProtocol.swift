@@ -19,6 +19,16 @@ public protocol ApiServiceProtocol: Sendable {
 }
 
 extension ApiServiceProtocol {
+   
+    // It is used to update the balance after the node is turned on
+    @MainActor
+    public var hasAllowedNodePublisher: AnyObservable<Bool> {
+        nodesInfoPublisher
+            .map { $0.nodes.contains { $0.connectionStatus == .allowed } }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }
+    
     @MainActor
     public var hasEnabledNodePublisher: AnyObservable<Bool> {
         nodesInfoPublisher

@@ -102,7 +102,8 @@ final class ChatMediaContentView: UIView {
         view.addSubview(commentLabel)
 
         commentLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(verticalInsets)
+            make.top.equalToSuperview().inset(verticalInsets / 2)
+            make.bottom.equalToSuperview().inset(verticalInsets)
             make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
         }
 
@@ -281,9 +282,9 @@ extension ChatMediaContentView.Model {
         if isReply {
             spaceCount += 2
         }
-
+        
         if !comment.string.isEmpty {
-            spaceCount += 3
+            spaceCount += 2
         }
 
         return fileModel.height()

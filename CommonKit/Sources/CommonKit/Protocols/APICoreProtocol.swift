@@ -94,7 +94,7 @@ extension APICoreProtocol {
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<JSONOutput> {
-        await sendRequest(
+        return await sendRequest(
             origin: origin,
             path: path,
             method: method,

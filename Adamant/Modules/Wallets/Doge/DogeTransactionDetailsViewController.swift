@@ -97,10 +97,9 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
         }
 
         let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
+        
 
-        if let blockInfo = cachedBlockInfo,
-            blockInfo.hash == trs.blockHash
-        {
+        if let blockInfo = cachedBlockInfo, blockInfo.hash == trs.blockHash {
             transaction = trs.asBtcTransaction(
                 DogeTransaction.self,
                 for: address,

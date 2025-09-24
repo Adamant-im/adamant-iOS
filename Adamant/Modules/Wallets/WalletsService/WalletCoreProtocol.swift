@@ -31,7 +31,7 @@ enum WalletServiceError: Error, Sendable {
     case notEnoughMoney
     case networkError
     case accountNotFound
-    case walletNotInitiated
+    case walletNotInitiated(tokenName: String)
     case invalidAmount(Decimal)
     case remoteServiceError(message: String, error: Error?)
     case apiError(ApiServiceError)
@@ -56,17 +56,31 @@ extension WalletServiceError: RichError {
         case .accountNotFound:
             return String.adamant.transfer.accountNotFound
 
-        case .walletNotInitiated:
-            return .localized(
+        case .walletNotInitiated(let tokenName):
+                return String.localizedStringWithFormat(
+            .localized(
                 "WalletServices.SharedErrors.WalletNotInitiated",
                 comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet."
+            ),
+            tokenName
             )
 
         case .remoteServiceError(let message, let error):
             return String.adamant.sharedErrors.remoteServerError(message: message)
 
         case .apiError(let error):
-            return error.localizedDescription
+                switch error {
+                    case .noEndpointsAvailable(let nodeGroupName):
+                        return String.localizedStringWithFormat(
+                            .localized(
+                                "ApiService.InternalError.NoNodesAvailable",
+                                comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet."
+                            ),
+                            nodeGroupName
+                        )
+                    default:
+                        return error.localizedDescription
+                }
 
         case .internalError(let message, _):
             return String.adamant.sharedErrors.internalError(message: message)
@@ -196,7 +210,7 @@ extension ChatsProviderError {
             return .internalError(message: self.message, error: error)
 
         case .accountNotInitiated:
-            return .walletNotInitiated
+            return .internalError(message: self.message, error: nil)
 
         case .requestCancelled:
             return .requestCancelled
@@ -292,12 +306,16 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
 
     @MainActor
     var hasEnabledNodePublisher: AnyObservable<Bool> { get }
+    
+    // It is used to update the balance after the node is turned on
+    @MainActor
+    var hasAllowedNodePublisher: AnyObservable<Bool> { get }
 
     @MainActor
     var walletUpdatePublisher: AnyObservable<Void> { get }
 
     func update()
-    func updateWithRefreshUIBalance()
+    func resetBalanceAndUpdate()
 
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult

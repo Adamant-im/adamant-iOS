@@ -142,7 +142,7 @@
 /* AccountService: Alert title. Changes in version 1.2 */
 "AccountService.update.v12.title" = "版本1.2更新：加密钱包";
 
-/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth wallets */
 "AccountService.update.v12.message" = "您需要重新登录才能启动以太坊钱包";
 
 /* AccountService: User must relogin into app to initiate wallets */
@@ -189,9 +189,6 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "发送ETH";
-
-/* Account tab: 'Send KLY tokens' button */
-"AccountTab.Row.SendKly" = "发送KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "发送BTC";
@@ -253,9 +250,6 @@
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
 
-/* Account tab: Klayr wallet */
-"AccountTab.Wallets.kly_wallet" = "Klayr钱包";
-
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
 
@@ -293,7 +287,8 @@
 "ApiService.InternalError.PassingFailed" = "分析失败。报告错误";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
+"ApiService.InternalError.NoNodesAvailable" = "无法获取用户的%@钱包地址。\n请检查您的网络连接。";
+"ApiService.InternalError.NoEndpointsAvailable" = "没有活动的%@节点。查看节点列表";
 
 /* Serious internal error: No ADM nodes available */
 "ApiService.InternalError.NoAdmNodesAvailable" = "没有活动的 ADM 节点来获取合作伙伴的 %@ 地址";
@@ -1017,9 +1012,6 @@
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "未找到交易";
 
-/* Transaction send: recipient minimum remaining balance requirement */
-"TransactionSend.Minimum.Balance" = "收件人必须至少具有0.05 LSK--发送更多令牌";
-
 /* Transaction status: updating in progress */
 "TransactionStatus.Updating" = "正在更新…";
 
@@ -1233,6 +1225,9 @@
 /* Transfer: Processing message */
 "TransferScene.SendingFundsProgress" = "正在发送令牌…";
 
+/* Transfer: Title text when it is no available messaging (ADM) nodes */
+"TransferScene.NoActiveMessagingNodes" = "没有活动的消息节点。请查看 ADM 节点列表。";
+
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "完成！";
 
@@ -1240,7 +1235,8 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "代币不足";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "收款人的钱包尚未启动";
+"WalletServices.SharedErrors.WalletNotInitiated" = "收款方尚未开通公开 %@ 钱包";
+
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "要发送的金额无效：%@";
@@ -1360,3 +1356,5 @@
 "Chat.Alert.ReviewNodesList" = "查看 ADM 节点列表";
 
 "Chat.Timestamp.InFuture.Error" = "由于您设备上的时间超前，网络节点拒绝了信息。\n请检查设备的时间或再次尝试发送信息。";
+
+"LearnMore" = "了解更多";

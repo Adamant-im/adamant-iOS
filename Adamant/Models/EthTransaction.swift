@@ -206,7 +206,7 @@ extension CodableTransaction {
         if receiptStatus == .notYetProcessed {
             txValue = nil
         }
-        
+
         let feePrice: BigUInt? = {
             if type == .eip1559 {
                 guard let maxFeePerGas, let maxPriorityFeePerGas else { return nil }
@@ -215,7 +215,7 @@ extension CodableTransaction {
                 return gasPrice
             }
         }()
-        
+
         let gasPrice = gasPrice ?? feePrice
 
         return EthTransaction(

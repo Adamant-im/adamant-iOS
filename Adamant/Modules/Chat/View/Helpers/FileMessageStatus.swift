@@ -14,12 +14,15 @@ enum FileMessageStatus: Hashable {
     case downloading
     case success
     case failed
+    case unableToDownload
     case needToDownload(failed: Bool)
 
     var image: UIImage {
         switch self {
         case .uploading:
-            return UIImage(systemName: "square.fill") ?? UIImage()
+            let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .regular)
+            let image = UIImage(systemName: "square.fill", withConfiguration: config) ?? UIImage()
+            return image
         case .downloading:
             return .asset(named: "status_pending") ?? .init()
         case .success:
@@ -31,6 +34,8 @@ enum FileMessageStatus: Hashable {
                 return .asset(named: "download-circular-error") ?? .init()
             }
             return .asset(named: "download-circular") ?? .init()
+        case .unableToDownload:
+            return .asset(named: "download-circular-error") ?? .init()
         }
     }
 
@@ -40,6 +45,8 @@ enum FileMessageStatus: Hashable {
             return .adamant.primary
         case .failed:
             return .adamant.attention
+        case .unableToDownload:
+            return .adamant.warning
         }
     }
 }
