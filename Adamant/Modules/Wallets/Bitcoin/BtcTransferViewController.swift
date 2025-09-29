@@ -39,17 +39,17 @@ final class BtcTransferViewController: TransferViewControllerBase {
 
         Task {
             do {
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
+                    return
+                }
+                
                 let transaction = try await service.createTransaction(
                     recipient: recipient,
                     amount: amount,
                     fee: transactionFee,
                     comment: nil
                 )
-
-                if await !doesNotContainSendingTx() {
-                    presentSendingError()
-                    return
-                }
 
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
