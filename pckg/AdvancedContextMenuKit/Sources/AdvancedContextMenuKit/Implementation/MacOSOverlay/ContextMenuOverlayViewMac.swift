@@ -26,36 +26,31 @@ extension ContextMenuOverlayViewMac {
     fileprivate func makeStackView(geometry: GeometryProxy) -> some View {
         ZStack {
             viewModel.updateLocations(geometry: geometry)
-
-            Button(
-                action: {
-                    Task {
-                        await viewModel.dismiss()
-                    }
-                },
-                label: {
-                    if viewModel.additionalMenuVisible {
-                        Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
-                    } else {
-                        Color.clear
-                    }
-                }
-            )
-
-            makeContentOverlayView()
-
             if viewModel.additionalMenuVisible {
-                if let upperContentView = viewModel.upperContentView {
-                    makeUpperOverlayView(upperContentView: upperContentView)
-                }
+                Button(
+                    action: {
+                        Task { await viewModel.dismiss() }
+                    },
+                    label: {
+                        Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
+                    }
+                )
+            }
+            
+            makeContentOverlayView()
+            
+            if viewModel.additionalMenuVisible, let upperContentView = viewModel.upperContentView {
+                makeUpperOverlayView(upperContentView: upperContentView)
             }
             makeOverlayView()
         }
         .ignoresSafeArea()
         .onAppear {
             Task {
-                await animate(duration: viewModel.animationDuration) {
-                    viewModel.additionalMenuVisible.toggle()
+                if viewModel.additionalMenuVisible == false {
+                    await animate(duration: viewModel.animationDuration) {
+                        viewModel.additionalMenuVisible = true
+                    }
                 }
                 viewModel.delegate?.didAppear()
             }
