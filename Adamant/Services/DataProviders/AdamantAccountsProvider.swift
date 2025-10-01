@@ -235,12 +235,15 @@ extension AdamantAccountsProvider {
         // Check if there is an account, that we are looking for
         let dummy: DummyAccount?
         switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
-        case .core(let account):
-            return account
-        case .dummy(let account):
-            dummy = account
-        case .notFound:
-            dummy = nil
+            case .core(let account):
+                dummy = nil
+                if !account.isDummy {
+                    return account
+                }
+            case .dummy(let account):
+                dummy = account
+            case .notFound:
+                dummy = nil
         }
 
         switch validation {
@@ -385,8 +388,34 @@ extension AdamantAccountsProvider {
         in context: NSManagedObjectContext
     ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
-        if case .core(let account) = result {
-            return account
+        if case .core(let existingAccount) = result {
+            // If account does not contain publicKey we mark it as dummy, but every new account has a small time being without publick key.
+            // So this checking needs to update previously created dummy account if it is not dummy anymore
+            
+            // If existing account is dummy, update it with real data
+            if existingAccount.isDummy, !account.isDummy {
+                existingAccount.publicKey = account.publicKey
+                existingAccount.isDummy = account.isDummy
+                
+                // If we have dummy account data, transfer it
+                if let dummy = dummy {
+                    existingAccount.name = dummy.name
+                    
+                    if let transfers = dummy.transfers {
+                        dummy.removeFromTransfers(transfers)
+                        existingAccount.addToTransfers(transfers)
+                        
+                        if let chatroom = existingAccount.chatroom {
+                            chatroom.addToTransactions(transfers)
+                            chatroom.updateLastTransaction()
+                        }
+                    }
+                    context.delete(dummy)
+                }
+                
+                try? context.save()
+            }
+            return existingAccount
         }
 
         let coreAccount = createCoreDataAccount(from: account, context: context)
