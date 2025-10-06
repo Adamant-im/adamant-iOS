@@ -130,6 +130,7 @@ extension FullscreenAlertView {
             $0.center.equalToSuperview()
             $0.top.leading.greaterThanOrEqualToSuperview().inset(15)
             $0.bottom.trailing.lessThanOrEqualToSuperview().inset(15)
+            $0.width.equalTo(300)
         }
         
         containerView.addSubview(verticalStack)

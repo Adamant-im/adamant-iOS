@@ -428,7 +428,7 @@ extension DogeWalletService: SwinjectDependentService {
 extension DogeWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = dogeWallet?.address else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
 
         return try await getBalance(address: address)
@@ -460,7 +460,7 @@ extension DogeWalletService {
         let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address).get()
         
         guard let result = result else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
         
         cachedWalletAddress[address] = result

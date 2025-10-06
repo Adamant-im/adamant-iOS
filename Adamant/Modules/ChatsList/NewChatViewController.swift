@@ -313,7 +313,7 @@ final class NewChatViewController: FormViewController {
                 switch error {
                 case .dummy, .notFound, .notInitiated:
                     self.dialogService.dismissProgress()
-
+                        
                     dialogService.presentDummyChatAlert(
                         for: address,
                         from: nil,
@@ -456,16 +456,14 @@ extension NewChatViewController {
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
     nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
         MainActor.assumeIsolatedSafe {
-            if let admAddress = result.value.getAdamantAddress() {
-                startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
-                dismiss(animated: true, completion: nil)
-            } else if let admAddress = result.value.getLegacyAdamantAddress() {
-                startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
-                dismiss(animated: true, completion: nil)
-            } else {
-                dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    reader.startScanning()
+            Task { @MainActor in
+                await dismissAsync(reader)
+                if let a = result.value.getAdamantAddress() {
+                    startNewChat(with: a.address, name: a.name, message: a.message)
+                } else if let a = result.value.getLegacyAdamantAddress() {
+                    startNewChat(with: a.address, name: a.name, message: a.message)
+                } else {
+                    dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
                 }
             }
         }
@@ -480,29 +478,39 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        dismiss(animated: true, completion: nil)
-
-        guard let image = info[.originalImage] as? UIImage, let cgImage = image.cgImage else {
-            return
-        }
-
-        let codes = EFQRCode.recognize(cgImage)
-
-        if codes.count > 0 {
-            for aCode in codes {
-                if let admAddress = aCode.getAdamantAddress() {
-                    startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
-                    return
-                } else if let admAddress = aCode.getLegacyAdamantAddress() {
-                    startNewChat(with: admAddress.address, name: admAddress.name, message: nil)
-                    return
-                }
+    /// Waits for UIKit to finish dismissing `vc` (animation + completion).
+    /// Bridges the dismiss completion callback into async/await so callers can safely present next UI after it's fully gone.
+    @MainActor
+    private func dismissAsync(_ vc: UIViewController, animated: Bool = true) async {
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            vc.dismiss(animated: animated) {
+                // Resume when UIKit reports the dismissal is complete.
+                cont.resume(returning: ())
             }
+        }
+    }
 
-            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
-        } else {
-            dialogService.showWarning(withMessage: String.adamant.login.noQrError)
+    
+    @MainActor
+    func imagePickerController(
+        _ picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+    ) {
+        Task { @MainActor in
+            await dismissAsync(picker)
+            
+            if let image = info[.originalImage] as? UIImage, let cg = image.cgImage {
+                let codes = EFQRCode.recognize(cg)
+                if let c = codes.first, let adm = c.getAdamantAddress() {
+                    startNewChat(with: adm.address, name: adm.name, message: adm.message)
+                } else if let c = codes.first, let adm = c.getLegacyAdamantAddress() {
+                    startNewChat(with: adm.address, name: adm.name, message: nil)
+                } else {
+                    dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
+                }
+            } else {
+                dialogService.showWarning(withMessage: String.adamant.login.noQrError)
+            }
         }
     }
 }

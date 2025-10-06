@@ -290,7 +290,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Die Wallet-Adresse des Benutzers für %@ konnte nicht abgerufen werden\nBitte überprüfen Sie Ihre Verbindung.";
+"ApiService.InternalError.NoNodesAvailable" = "Die Wallet-Adresse des Benutzers für %@ konnte nicht abgerufen werden\n\nBitte überprüfen Sie Ihre Verbindung.";
 "ApiService.InternalError.NoEndpointsAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
 
 /* Serious internal error: No ADM nodes available */

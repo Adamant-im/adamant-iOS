@@ -287,7 +287,7 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Не удалось получить адрес %@-кошелька пользователя\nПроверьте подключение";
+"ApiService.InternalError.NoNodesAvailable" = "Не удалось получить адрес %@-кошелька пользователя\n\nПроверьте подключение";
 "ApiService.InternalError.NoEndpointsAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
 /* Serious internal error: No ADM nodes available */

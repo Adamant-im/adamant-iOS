@@ -411,7 +411,7 @@ extension DashWalletService: SwinjectDependentService {
 extension DashWalletService {
     func getBalance() async throws -> Decimal {
         guard let address = dashWallet?.address else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
 
         return try await getBalance(address: address)
@@ -463,7 +463,7 @@ extension DashWalletService {
         let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
         
         guard let result = result else {
-            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenName)
+            throw WalletServiceError.walletNotInitiated(tokenName: self.tokenSymbol)
         }
         
         cachedWalletAddress[address] = result
