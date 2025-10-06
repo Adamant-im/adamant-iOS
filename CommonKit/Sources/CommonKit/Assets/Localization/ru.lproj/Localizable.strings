@@ -1334,6 +1334,9 @@
 /* FileManager error 'Can't decrypt file' */
 "FileManagerError.CantDecryptFile" = "Не удалось расшифровать файл";
 
+/* FileManager error 'Unable to download corrupted file' */
+"FileManagerError.FilesUnaccessible" = "Файлы недоступны";
+
 /* File validation error 'Too many files' */
 "FileValidationError.TooManyFiles" = "Превышено максимально допустимое количество файлов (%lld)";
 

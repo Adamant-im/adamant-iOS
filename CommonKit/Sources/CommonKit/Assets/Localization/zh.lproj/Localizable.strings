@@ -1325,6 +1325,9 @@
 /* FileManager error 'Can't decrypt file' */
 "FileManagerError.CantDecryptFile" = "无法解密文件";
 
+/* FileManager error 'Unable to download corrupted file' */
+"FileManagerError.FilesUnaccessible" = "文件目前无法访问";
+
 /* File validation error 'Too many files' */
 "FileValidationError.TooManyFiles" = "文件太多。 最大允许：%lld";
 

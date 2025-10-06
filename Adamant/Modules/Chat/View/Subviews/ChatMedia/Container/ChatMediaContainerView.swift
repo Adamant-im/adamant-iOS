@@ -154,6 +154,11 @@ final class ChatMediaContainerView: UIView {
             actionHandler(.openFile(messageId: model.id, file: file))
             return
         }
+        
+        if model.status == .unableToDownload {
+            actionHandler(.showDialog(title: FileManagerError.unableToDownloadCorrupted.localizedDescription))
+            return
+        }
 
         guard case .needToDownload = model.status else {
             return

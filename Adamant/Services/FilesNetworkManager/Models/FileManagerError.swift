@@ -18,22 +18,25 @@ enum FileManagerError: Error {
     case cantUploadFile
     case cantEncryptFile
     case cantDecryptFile
+    case unableToDownloadCorrupted
     case apiError(error: ApiServiceError)
 }
 
 extension FileManagerError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .cantDownloadFile:
-            return .localized("FileManagerError.CantDownloadFile")
-        case .cantUploadFile:
-            return .localized("FileManagerError.CantUploadFile")
-        case .cantEncryptFile:
-            return .localized("FileManagerError.CantEncryptFile")
-        case .cantDecryptFile:
-            return .localized("FileManagerError.CantDecryptFile")
-        case let .apiError(error: error):
-            return error.localizedDescription
+            case .cantDownloadFile:
+                return .localized("FileManagerError.CantDownloadFile")
+            case .cantUploadFile:
+                return .localized("FileManagerError.CantUploadFile")
+            case .cantEncryptFile:
+                return .localized("FileManagerError.CantEncryptFile")
+            case .cantDecryptFile:
+                return .localized("FileManagerError.CantDecryptFile")
+            case .unableToDownloadCorrupted:
+                return .localized("FileManagerError.FilesUnaccessible")
+            case let .apiError(error: error):
+                return error.localizedDescription
         }
     }
 }
