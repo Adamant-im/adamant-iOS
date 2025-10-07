@@ -282,4 +282,5 @@ protocol DialogService: AnyObject {
     ) -> UIAlertController
     func selectAllTextFields(in alert: UIAlertController)
     func showFreeTokenAlert(url: String?, type: FreeTokensAlertType, showVC: @escaping () -> Void)
+    func copyToPasteboard(text: String, withNotification: Bool)
 }

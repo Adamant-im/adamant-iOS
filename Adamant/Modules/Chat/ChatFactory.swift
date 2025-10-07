@@ -134,10 +134,7 @@ extension ChatFactory {
             chatCacheService: chatCacheService,
             walletServiceCompose: walletServiceCompose,
             avatarService: avatarService,
-            chatMessagesListViewModel: .init(
-                avatarService: avatarService,
-                emojiService: emojiService
-            ),
+            chatMessagesListViewModel: .init(avatarService: avatarService),
             emojiService: emojiService,
             chatPreservation: chatPreservation,
             filesStorage: filesStorage,

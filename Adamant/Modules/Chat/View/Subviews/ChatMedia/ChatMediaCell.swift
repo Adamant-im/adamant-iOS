@@ -10,16 +10,19 @@ import Combine
 import MessageKit
 import SnapKit
 import UIKit
+import CommonKit
 
 final class ChatMediaCell: MessageContentCell, ChatModelView {
     private let containerMediaView = ChatMediaContainerView()
     private let cellContainerView = UIView()
     private lazy var swipeWrapper = ChatSwipeWrapper(cellContainerView)
-    private var taskManager = TaskManager()
-    private var didCopy = false
 
     var subscription: AnyCancellable?
-    var copyNotification: (() -> Void)?
+    var copyAction: ((String) -> Void)?
+    
+    // MARK: Gesture Helper
+    var GestureTaskManager: TaskManager = TaskManager()
+    var didPerformLongPressAction: Bool = false
 
     var model: ChatMediaContainerView.Model = .default {
         didSet {
@@ -42,8 +45,7 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
         didSet {
             containerMediaView.isSelected = isSelected
             if isSelected && model.content.comment.string != "" {
-                UIPasteboard.general.string = model.content.comment.string
-                copyNotification?()
+                copyAction?(model.content.comment.string)
             }
         }
     }
@@ -93,9 +95,7 @@ final class ChatMediaCell: MessageContentCell, ChatModelView {
             containerMediaView
         )
     }
-}
-
-extension ChatMediaCell {
+    
     fileprivate func configure() {
         contentView.addSubview(swipeWrapper)
         swipeWrapper.snp.makeConstraints {
@@ -105,50 +105,62 @@ extension ChatMediaCell {
     }
     
     private func configureLongPressGesture() {
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.minimumPressDuration = 0.2
         cellContainerView.addGestureRecognizer(longPress)
         cellContainerView.isUserInteractionEnabled = true
     }
-    
-    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            didCopy = false
-            cellContainerView.animatePressDown()
-            
-            Task { [weak self] in
-                try? await Task.sleep(interval: quickCopyInterval)
-                
-                guard let self = self,
-                      gesture.state == .began || gesture.state == .changed else { return }
-                
-                await MainActor.run {
-                    self.longPressCopyAction()
-                    self.didCopy = true
-                }
-            }.stored(in: taskManager)
-            
-        case .ended:
-            if !didCopy {
-                taskManager.clean()
-                longPressCopyAction()
-            }
-            
-        case .cancelled, .failed:
-            cellContainerView.animatePressUp()
-            
-        default:
-            break
+}
+
+extension ChatMediaCell: GestureHelper {
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if !isMacOS, model.status == .failed {
+            handleLongPressToShowFailed(gesture)
+            return
         }
+        if isMacOS {
+            handleLongPressToCopy(gesture)
+            return
+        }
+        handleLongPressToOpenMenu(gesture)
+    }
+
+    private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let text = self?.model.content.comment.string else { return }
+                self?.copyAction?(text) },
+            onGestureBegan: { [weak self] in
+                self?.cellContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.cellContainerView.animatePressUp() }
+        )
     }
     
-    private func longPressCopyAction() {
-        cellContainerView.animatePressUp()
-        if model.content.comment.string != "" {
-            UIPasteboard.general.string = model.content.comment.string
-            copyNotification?()
-        }
+    private func handleLongPressToShowFailed(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let id = self?.model.id else { return }
+                self?.actionHandler(.showFailedMessageAlert(id: id)) },
+            onGestureBegan: { [weak self] in
+                self?.cellContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.cellContainerView.animatePressUp() }
+        )
+    }
+    
+    private func handleLongPressToOpenMenu(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            touchDuration: 0.2,
+            perform:     { [weak self] in
+                guard let view = self?.cellContainerView else { return }
+                self?.containerMediaView.presentMenuProgrammatically(for: view)
+            },
+            onGestureBegan: { [weak self] in
+                self?.cellContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+        )
     }
 }
 

@@ -18,8 +18,14 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     // MARK: Dependencies
 
     var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    var copyAction: ((String) -> Void)?
 
     // MARK: Proprieties
+    
+    // MARK: Gesture Helper
+    var GestureTaskManager: TaskManager = TaskManager()
+    var didPerformLongPressAction: Bool = false
 
     private lazy var reactionsContanerView: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [ownReactionLabel, opponentReactionLabel])
@@ -88,8 +94,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
     }
     
-    var copyNotification: (() -> Void)?
-
     var reactionsContanerViewWidth: CGFloat {
         if getReaction(for: model.address) == nil && getReaction(for: model.opponentAddress) == nil {
             return .zero
@@ -117,8 +121,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
                 originalColor: model.backgroundColor.uiColor
             )
             if isSelected {
-                UIPasteboard.general.string = self.model.text.string
-                self.copyNotification?()
+                copyAction?(self.model.text.string)
             }
         }
     }
@@ -131,8 +134,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
-    private var taskManager = TaskManager()
-    private var didCopy = false
 
     // MARK: - Methods
 
@@ -173,7 +174,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     }
     
     private func configureLongPressGesture() {
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressToCopy(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.minimumPressDuration = 0.2
         messageContainerView.addGestureRecognizer(longPress)
         messageContainerView.isUserInteractionEnabled = true
@@ -411,29 +412,29 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     /// Handle tap gesture on contentView and its subviews.
     override func handleTapGesture(_ gesture: UIGestureRecognizer) {
         let touchLocation = gesture.location(in: self)
-
+        
         let containerViewContains = containerView.frame.contains(touchLocation)
         let canHandle = !cellContentView(
             canHandle: convert(touchLocation, to: containerView)
         )
-
+        
         switch true {
-        case containerViewContains && canHandle:
-            delegate?.didTapMessage(in: self)
-        case avatarView.frame.contains(touchLocation):
-            delegate?.didTapAvatar(in: self)
-        case cellTopLabel.frame.contains(touchLocation):
-            delegate?.didTapCellTopLabel(in: self)
-        case cellBottomLabel.frame.contains(touchLocation):
-            delegate?.didTapCellBottomLabel(in: self)
-        case messageTopLabel.frame.contains(touchLocation):
-            delegate?.didTapMessageTopLabel(in: self)
-        case messageBottomLabel.frame.contains(touchLocation):
-            delegate?.didTapMessageBottomLabel(in: self)
-        case accessoryView.frame.contains(touchLocation):
-            delegate?.didTapAccessoryView(in: self)
-        default:
-            delegate?.didTapBackground(in: self)
+            case containerViewContains && canHandle:
+                delegate?.didTapMessage(in: self)
+            case avatarView.frame.contains(touchLocation):
+                delegate?.didTapAvatar(in: self)
+            case cellTopLabel.frame.contains(touchLocation):
+                delegate?.didTapCellTopLabel(in: self)
+            case cellBottomLabel.frame.contains(touchLocation):
+                delegate?.didTapCellBottomLabel(in: self)
+            case messageTopLabel.frame.contains(touchLocation):
+                delegate?.didTapMessageTopLabel(in: self)
+            case messageBottomLabel.frame.contains(touchLocation):
+                delegate?.didTapMessageBottomLabel(in: self)
+            case accessoryView.frame.contains(touchLocation):
+                delegate?.didTapAccessoryView(in: self)
+            default:
+                delegate?.didTapBackground(in: self)
         }
     }
 
@@ -491,47 +492,17 @@ private extension ChatMessageCell {
     @objc func tapReactionAction() {
         chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
-    
-    @objc private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            didCopy = false
-            messageContainerView.animatePressDown()
-            
-            Task { [weak self] in
-                try? await Task.sleep(interval: quickCopyInterval)
-                
-                guard let self = self,
-                      gesture.state == .began || gesture.state == .changed else { return }
-                
-                await MainActor.run {
-                    self.longPressCopyAction()
-                    self.didCopy = true
-                }
-            }.stored(in: taskManager)
-            
-        case .ended:
-            if !didCopy {
-                taskManager.clean()
-                longPressCopyAction()
-            }
-            
-        case .cancelled, .failed:
-            messageContainerView.animatePressUp()
-            
-        default:
-            break
-        }
-    }
-    
-    private func longPressCopyAction() {
-        self.messageContainerView.animatePressUp()
-        UIPasteboard.general.string = self.model.text.string
-        self.copyNotification?()
-    }
 }
 
 extension ChatMessageCell: ChatMenuManagerDelegate {
+    var isFailedMessage: Bool {
+        model.backgroundColor == .failed
+    }
+    
+    func showFailedMenu(){
+        self.actionHandler(.showFailedMessageAlert(id: model.id))
+    }
+    
     func getCopyView() -> UIView? {
         copy(
             with: model,
@@ -596,6 +567,59 @@ extension ChatMessageCell: ChatCellProtocol {
     }
     func animateReactionHighlight() {
         opponentReactionLabel.animateHighlightOverlay()
+    }
+}
+
+// MARK: - Long Press
+extension ChatMessageCell: GestureHelper {
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if !isMacOS, model.backgroundColor == .failed {
+            handleLongPressToShowFailed(gesture)
+            return
+        }
+        if isMacOS {
+            handleLongPressToCopy(gesture)
+            return
+        }
+        handleLongPressToOpenMenu(gesture)
+    }
+    
+    private func handleLongPressToCopy(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let text = self?.model.text.string else { return }
+                self?.copyAction?(text) },
+            onGestureBegan: { [weak self] in
+                self?.messageContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+        )
+    }
+    
+    private func handleLongPressToShowFailed(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            perform:     { [weak self] in
+                guard let id = self?.model.id else { return }
+                self?.actionHandler(.showFailedMessageAlert(id: id)) },
+            onGestureBegan: { [weak self] in
+                self?.messageContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+        )
+    }
+    
+    private func handleLongPressToOpenMenu(_ gesture: UILongPressGestureRecognizer) {
+        processLongPress(
+            gesture: gesture,
+            touchDuration: 0.2,
+            perform:     { [weak self] in
+                guard let view = self?.containerView else { return } 
+                self?.chatMenuManager.presentMenuProgrammatically(for: view)
+            },
+            onGestureBegan: { [weak self] in
+                self?.messageContainerView.animatePressDown() },
+            onGestureEnded:   { [weak self] in self?.messageContainerView.animatePressUp() }
+        )
     }
 }
 

@@ -87,13 +87,14 @@ final class ChatDataSourceManager: MessagesDataSource {
                     return model.value
                 }
 
-                cell.actionHandler = { [weak self] in self?.handleAction($0) }
+                cell.actionHandler = { [weak self] in self?.handleAction($0) 
+                }
                 cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
                 cell.model = model.value
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -117,8 +118,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -152,8 +153,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -177,8 +178,8 @@ final class ChatDataSourceManager: MessagesDataSource {
                 cell.model = model.value
                 cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
                 cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-                cell.copyNotification = { [weak self] in
-                    self?.viewModel.dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+                cell.copyAction = { [weak self] text in
+                    self?.viewModel.copyMessageAction(text)
                 }
                 return cell
             }
@@ -223,6 +224,8 @@ extension ChatDataSourceManager {
             )
         case let .forceDownloadAllFiles(messageId, files):
             viewModel.forceDownloadAllFiles(messageId: messageId, files: files)
+        case let .showFailedMessageAlert(id):
+            viewModel.showFailedMessageAlert(id: id)
         }
     }
 }
