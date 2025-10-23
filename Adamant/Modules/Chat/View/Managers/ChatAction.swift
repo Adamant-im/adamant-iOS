@@ -24,4 +24,5 @@ enum ChatAction {
     case cancelUploading(messageId: String)
     case autoDownloadContentIfNeeded(messageId: String, files: [ChatFile])
     case forceDownloadAllFiles(messageId: String, files: [ChatFile])
+    case showDialog(title: String)
 }

@@ -1354,6 +1354,9 @@
 /* FileManager error 'Can't decrypt file' */
 "FileManagerError.CantDecryptFile" = "Datei kann nicht entschlüsselt werden";
 
+/* FileManager error 'Unable to download corrupted file' */
+"FileManagerError.FilesUnaccessible" = "Dateien sind derzeit nicht zugänglich";
+
 /* File validation error 'Too many files' */
 "FileValidationError.TooManyFiles" = "Zu viele Dateien. Höchstens erlaubt: %lld";
 
