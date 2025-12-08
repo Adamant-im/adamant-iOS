@@ -7,10 +7,13 @@
 public struct UserDefaultsManager {
     @UserDefaultsStorage(.needsToShowNoActiveNodesAlert)
     static var needsToShowNoActiveNodesAlert: Bool?
-
+    
     @UserDefaultsStorage(.lastReceivedId)
     public static var lastReceivedId: [String]?
-
+    
+    @UserDefaultsStorage(.chatPositions)
+    public static var chatPositions: [String: [Double]]?
+    
     public static func setInitialUserDefaults() {
         needsToShowNoActiveNodesAlert = true
     }

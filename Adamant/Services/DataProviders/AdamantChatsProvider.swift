@@ -323,6 +323,7 @@ extension AdamantChatsProvider {
         SecureStore.remove(StoreKey.chatProvider.receivedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.readedLastHeight)
         SecureStore.remove(StoreKey.chatProvider.markedChatsAsUnread)
+        UserDefaultsManager.chatPositions = nil
         UserDefaultsManager.lastReceivedId = nil
 
         // Set State
@@ -796,16 +797,30 @@ extension AdamantChatsProvider {
         return transaction
     }
 
-    @MainActor func removeChatPosition(for address: String) {
-        chatPositon.removeValue(forKey: address)
+    func removeChatPosition(for address: String) {
+        var positions = UserDefaultsManager.chatPositions ?? [:]
+        positions.removeValue(forKey: address)
+        UserDefaultsManager.chatPositions = positions
     }
-
-    @MainActor func setChatPositon(for address: String, position: CGFloat?, collectionHeight: CGFloat?) {
-        chatPositon[address] = (position, collectionHeight) as? (CGFloat, CGFloat)
+    
+    func setChatPositon(for address: String, position: CGFloat?, collectionHeight: CGFloat?) {
+        var positions = UserDefaultsManager.chatPositions ?? [:]
+        if let position = position, let collectionHeight = collectionHeight {
+            positions[address] = [Double(position), Double(collectionHeight)]
+        } else {
+            positions.removeValue(forKey: address)
+        }
+        UserDefaultsManager.chatPositions = positions
     }
-
-    @MainActor func getChatPositon(for address: String) -> (CGFloat, CGFloat)? {
-        return chatPositon[address]
+    
+    func getChatPositon(for address: String) -> (CGFloat, CGFloat)? {
+        guard
+            let values = UserDefaultsManager.chatPositions?[address],
+            values.count == 2
+        else {
+            return nil
+        }
+        return (CGFloat(values[0]), CGFloat(values[1]))
     }
 
     /// Logic:

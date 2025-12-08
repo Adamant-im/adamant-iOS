@@ -11,4 +11,5 @@ public enum UserDefaultsKey: String {
     case leftSplitViewController
     case rightSplitViewController
     case lastReceivedId
+    case chatPositions
 }
