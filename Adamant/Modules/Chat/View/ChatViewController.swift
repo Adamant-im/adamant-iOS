@@ -179,6 +179,7 @@ final class ChatViewController: MessagesViewController {
             state.isFirstTimeViewAppeared = true
             state.isViewDissappeared = false
             updateUnreadMessages()
+            setupBackgroundObservers()
         }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
@@ -199,20 +200,8 @@ final class ChatViewController: MessagesViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.preserveMessage(inputBar.text)
         
-        var bottomOffset = chatMessagesCollectionView.bottomOffset
-        var collectionHeight: CGFloat = messagesCollectionView.contentSize.height
-        if viewModel.separatorState.separatorIndex != nil {
-            collectionHeight -= separatorHeight
-            bottomOffset -= separatorHeight
-        }
-        
-        viewModel.saveChatOffset(
-            state.isScrollPositionNearlyTheBottom
-                ? nil
-            : bottomOffset, collectionHeight: collectionHeight
-        )
+        saveChatScrollPosition()
             
         state.isViewDissappeared = true
     }
@@ -289,6 +278,25 @@ extension ChatViewController {
     
     fileprivate func handleAppWillEnterBackground() {
         inputBar.inputTextView.resignFirstResponder()
+        saveChatScrollPosition()
+    }
+    
+    fileprivate func saveChatScrollPosition() {
+        viewModel.preserveMessage(inputBar.text)
+        
+        var bottomOffset = chatMessagesCollectionView.bottomOffset
+        var collectionHeight: CGFloat = messagesCollectionView.contentSize.height
+        if viewModel.separatorState.separatorIndex != nil {
+            bottomOffset -= separatorHeight
+            collectionHeight -= separatorHeight
+        }
+        
+        viewModel.saveChatOffset(
+            state.isScrollPositionNearlyTheBottom
+            ? nil
+            : bottomOffset,
+            collectionHeight: collectionHeight
+        )
     }
     
     fileprivate func handleAppWillEnterForeground() {
