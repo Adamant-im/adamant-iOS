@@ -113,6 +113,7 @@ extension MediaContainerView {
         if model.messageId != old.messageId { onAppear() }
 
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
+        var processedFileIds = Set<String>()
         updatePreviewDownloadLabel()
 
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
@@ -127,10 +128,12 @@ extension MediaContainerView {
 
                 if fileOverallIndex < fileList.count {
                     let file = fileList[fileOverallIndex]
+                    let isDuplicate = !processedFileIds.insert(file.file.id).inserted
                     mediaView.isHidden = false
                     mediaView.model = .init(
                         chatFile: file,
-                        txStatus: model.txStatus
+                        txStatus: model.txStatus,
+                        isDuplicate: isDuplicate
                     )
                     mediaView.buttonActionHandler = { [weak self, file, model] in
                         self?.actionHandler(

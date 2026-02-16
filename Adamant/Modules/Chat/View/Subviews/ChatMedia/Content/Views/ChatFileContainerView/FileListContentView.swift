@@ -14,7 +14,6 @@ final class FileListContentView: UIView {
     private lazy var iconImageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
     private lazy var videoIconIV = UIImageView(image: .asset(named: "playVideoIcon"))
-    private var usedFileIds: Set<String> = []
 
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
@@ -200,11 +199,11 @@ extension FileListContentView {
         chatFile.isCached
         || chatFile.isBusy
         || model.txStatus == .failed
-        
-        let fileId = chatFile.file.id
-        let isDuplicate = !usedFileIds.insert(fileId).inserted
-        
-        if isDuplicate || chatFile.file.nonce.isEmpty {
+        downloadImageView.image = .asset(named: "downloadIcon")
+        downloadImageView.tintColor = nil
+        downloadImageView.transform = .identity
+
+        if model.isDuplicate || chatFile.file.nonce.isEmpty {
             downloadImageView.tintColor = .adamant.warning
             downloadImageView.image = UIImage(systemName: "exclamationmark.triangle")
             downloadImageView.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
