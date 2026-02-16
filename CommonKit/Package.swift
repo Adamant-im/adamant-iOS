@@ -31,8 +31,8 @@ let package = Package(
             .upToNextMinor(from: "0.9.1")
         ),
         .package(
-            url: "https://github.com/maniramezan/DateTools.git",
-            branch: "mani_swiftpm_5_3"
+            url: "https://github.com/MatthewYork/DateTools.git",
+            branch: "master"
         ),
         .package(
             url: "https://github.com/bmoliveira/MarkdownKit.git",

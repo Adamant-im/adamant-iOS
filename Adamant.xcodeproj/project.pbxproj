@@ -1424,9 +1424,9 @@
 		};
 		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/maniramezan/DateTools.git";
+			repositoryURL = "https://github.com/MatthewYork/DateTools.git";
 			requirement = {
-				branch = mani_swiftpm_5_3;
+				branch = master;
 				kind = branch;
 			};
 		};
