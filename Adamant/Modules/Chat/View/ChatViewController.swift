@@ -684,11 +684,21 @@ extension ChatViewController {
         guard state.canReadChat else { return }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
 
+        // Keep the bottom excluded zone capped by real insets; on compact screens (iPhone SE 3rd for example)
+        // a fixed value can mark visible bottom messages as unread.
+        let bottomReadableInset = min(
+            hiddenScrollViewPartHeight,
+            chatMessagesCollectionView.fullInsets.bottom
+        )
+        let adjustedVisibleHeight = max(
+            messagesCollectionView.bounds.height - hiddenScrollViewPartHeight - bottomReadableInset - keyboardHeight,
+            .zero
+        )
         let adjustedVisibleRect = CGRect(
             x: messagesCollectionView.contentOffset.x,
             y: messagesCollectionView.contentOffset.y + hiddenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
-            height: messagesCollectionView.bounds.height - hiddenScrollViewPartHeight * 2 - keyboardHeight
+            height: adjustedVisibleHeight
         )
 
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
