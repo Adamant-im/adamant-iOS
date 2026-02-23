@@ -528,19 +528,15 @@ final class AccountViewController: FormViewController {
                 return
             }
 
+            row.deselect(animated: true)
+
             let alert = UIAlertController(
                 title: String.localizedStringWithFormat(String.adamant.alert.logoutMessageFormat, address),
                 message: nil,
                 preferredStyleSafe: .alert,
                 source: nil
             )
-            let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel) { _ in
-                guard let indexPath = row.indexPath else {
-                    return
-                }
-
-                self?.tableView.deselectRow(at: indexPath, animated: true)
-            }
+            let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel) { _ in }
             let logout = UIAlertAction(
                 title: .adamant.alert.logoutButton,
                 style: .default
