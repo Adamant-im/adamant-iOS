@@ -1238,6 +1238,9 @@
 /* Transfer: Title text when it is no available messaging (ADM) nodes */
 "TransferScene.NoActiveMessagingNodes" = "No active messaging nodes. Review ADM node list.";
 
+/* Transfer: Tokens transfered successfully message */
+"TransferScene.TransferSuccessMessage" = "Done!";
+
 /* Wallet Services: Shared error, user do not have enought money. */
 "WalletServices.SharedErrors.notEnoughMoney" = "Not enough tokens";
 
