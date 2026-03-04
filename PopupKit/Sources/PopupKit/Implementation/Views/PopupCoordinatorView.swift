@@ -73,10 +73,15 @@ extension PopupCoordinatorView {
         VStack {
             Spacer()
             if let message = model.toastMessage {
-                ToastView(message: message)
-                    .padding(.bottom, safeAreaInsets.bottom)
-                    .id(model.toastMessage?.hashValue)
-                    .transition(.move(edge: .bottom))
+                ToastView(
+                    message: message,
+                    dismissAction: { [weak model] in
+                        model?.toastMessage = nil
+                    }
+                )
+                .padding(.bottom, safeAreaInsets.bottom)
+                .id(model.toastMessage?.hashValue)
+                .transition(.move(edge: .bottom))
             }
         }
         .animation(.easeInOut(duration: animationDuration), value: model.toastMessage?.hashValue)
