@@ -335,6 +335,10 @@ extension ChatViewController {
         NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
             .sink { [weak self] _ in
                 self?.state.isAppActive = false
+                // Dismiss any open context menu on macOS to prevent stale overlay after returning from background
+                if isMacOS {
+                    self?.viewModel.dialog.send(.dismissMenu)
+                }
             }
             .store(in: &subscriptions)
         

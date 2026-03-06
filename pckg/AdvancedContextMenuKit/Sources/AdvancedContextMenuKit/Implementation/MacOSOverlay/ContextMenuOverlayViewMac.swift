@@ -26,14 +26,7 @@ extension ContextMenuOverlayViewMac {
     fileprivate func makeStackView(geometry: GeometryProxy) -> some View {
         ZStack {
             viewModel.updateLocations(geometry: geometry)
-            Button(
-                action: {
-                    Task { await viewModel.dismiss() }
-                },
-                label: {
-                    Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
-                }
-            )
+            InteractiveBackgroundView(color: .adamant.contextMenuOverlayMacColor)
             
             makeContentOverlayView()
             
@@ -43,6 +36,9 @@ extension ContextMenuOverlayViewMac {
             makeOverlayView()
         }
         .ignoresSafeArea()
+        .onTapGesture {
+            Task { await viewModel.dismiss() }
+        }
         .onAppear {
             Task {
                 await animate(duration: viewModel.animationDuration) {
