@@ -40,17 +40,6 @@ final class ChatViewController: MessagesViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var bottomMessageId: String?
     private var state = ChatViewControllerState()
-    private var backgroundObserver: NSObjectProtocol?
-    private var foregroundObserver: NSObjectProtocol?
-    
-    deinit {
-        if let backgroundObserver = backgroundObserver {
-            NotificationCenter.default.removeObserver(backgroundObserver)
-        }
-        if let foregroundObserver = foregroundObserver {
-            NotificationCenter.default.removeObserver(foregroundObserver)
-        }
-    }
 
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -267,51 +256,6 @@ final class ChatViewController: MessagesViewController {
     }
 }
 
-// https://trello.com/c/m0k5mrQR/868-bug-after-some-time-in-background-messages-menu-stop-working-on-macos-crash
-extension ChatViewController {
-    fileprivate func setupBackgroundObservers() {
-        backgroundObserver = NotificationCenter.default.addObserver(
-            forName: UIApplication.didEnterBackgroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppWillEnterBackground()
-        }
-        
-        foregroundObserver = NotificationCenter.default.addObserver(
-            forName: UIApplication.willEnterForegroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppWillEnterForeground()
-        }
-    }
-    
-    fileprivate func handleAppWillEnterBackground() {
-        inputBar.inputTextView.resignFirstResponder()
-    }
-    
-    fileprivate func handleAppWillEnterForeground() {
-        guard isMacOS else { return }
-        
-        inputBar.isUserInteractionEnabled = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.refreshContextMenuInteractions()
-        }
-    }
-    
-    fileprivate func refreshContextMenuInteractions() {
-        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
-        
-        guard !visibleIndexPaths.isEmpty else { return }
-        
-        messagesCollectionView.performBatchUpdates({
-            messagesCollectionView.reloadItems(at: visibleIndexPaths)
-        }, completion: nil)
-    }
-}
-
 extension ChatViewController {
     override func gestureRecognizerShouldBegin(
         _ gestureRecognizer: UIGestureRecognizer
@@ -391,6 +335,10 @@ extension ChatViewController {
         NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
             .sink { [weak self] _ in
                 self?.state.isAppActive = false
+                // Dismiss any open context menu on macOS to prevent stale overlay after returning from background
+                if isMacOS {
+                    self?.viewModel.dialog.send(.dismissMenu)
+                }
             }
             .store(in: &subscriptions)
         
@@ -684,11 +632,21 @@ extension ChatViewController {
         guard state.canReadChat else { return }
         guard let unreadIndexes = viewModel.unreadMesaggesIndexes, !unreadIndexes.isEmpty else { return }
 
+        // Keep the bottom excluded zone capped by real insets; on compact screens (iPhone SE 3rd for example)
+        // a fixed value can mark visible bottom messages as unread.
+        let bottomReadableInset = min(
+            hiddenScrollViewPartHeight,
+            chatMessagesCollectionView.fullInsets.bottom
+        )
+        let adjustedVisibleHeight = max(
+            messagesCollectionView.bounds.height - hiddenScrollViewPartHeight - bottomReadableInset - keyboardHeight,
+            .zero
+        )
         let adjustedVisibleRect = CGRect(
             x: messagesCollectionView.contentOffset.x,
             y: messagesCollectionView.contentOffset.y + hiddenScrollViewPartHeight,
             width: messagesCollectionView.bounds.width,
-            height: messagesCollectionView.bounds.height - hiddenScrollViewPartHeight * 2 - keyboardHeight
+            height: adjustedVisibleHeight
         )
 
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems

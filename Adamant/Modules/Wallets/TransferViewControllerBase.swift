@@ -497,8 +497,10 @@ class TransferViewControllerBase: FormViewController {
         }
         previousIsReadyToSend = isReadyToSend()
 
-        let doneBtn = UIBarButtonItem(title: String.adamant.transfer.done, style: .done, target: view, action: view.doneButton.action)
-        let sendBtn = UIBarButtonItem(title: String.adamant.transfer.send, style: .done, target: view, action: view.doneButton.action)
+        let doneBtn = UIBarButtonItem(title: String.adamant.transfer.done, style: .plain, target: view, action: view.doneButton.action)
+        doneBtn.tintColor = UIColor.adamant.primary
+        let sendBtn = UIBarButtonItem(title: String.adamant.transfer.send, style: .plain, target: view, action: view.doneButton.action)
+        sendBtn.tintColor = UIColor.adamant.primary
         view.doneButton = isReadyToSend() ? sendBtn : doneBtn
         if (view.items?.count ?? 0) > 4 {
             view.items?.remove(at: 4)

@@ -27,6 +27,12 @@ final class ChatTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         badgeView.layer.cornerRadius = badgeView.bounds.height / 2
         clockView.contentMode = .scaleAspectFit
+        
+        if isMacOS {
+            let bgView = UIView()
+            bgView.backgroundColor = .systemGray4
+            selectedBackgroundView = bgView
+        }
     }
 
     var avatarImage: UIImage? {

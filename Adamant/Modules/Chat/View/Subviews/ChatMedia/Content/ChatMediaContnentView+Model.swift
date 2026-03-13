@@ -59,11 +59,13 @@ extension ChatMediaContentView {
     struct FileContentModel {
         let chatFile: ChatFile
         let txStatus: MessageStatus
+        let isDuplicate: Bool
 
         static var `default`: Self {
             Self(
                 chatFile: .default,
-                txStatus: .failed
+                txStatus: .failed,
+                isDuplicate: false
             )
         }
     }

@@ -87,10 +87,10 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
     }
 
     private func setupView() {
-        addSubview(titleLabel)
+        contentView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(layoutMarginsGuide)
-            make.centerY.equalToSuperview()
+            make.leading.equalTo(contentView.layoutMarginsGuide)
+            make.centerY.equalTo(contentView)
         }
     }
 

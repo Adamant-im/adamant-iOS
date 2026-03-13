@@ -75,14 +75,17 @@ extension FileListContainerView {
         if old.messageId != model.messageId { onAppear() }
 
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
+        var processedFileIds = Set<String>()
         filesStack.arrangedSubviews.forEach { $0.isHidden = true }
 
         for (index, file) in fileList.enumerated() {
             let view = filesStack.arrangedSubviews[index] as? FileListContentView
+            let isDuplicate = !processedFileIds.insert(file.file.id).inserted
             view?.isHidden = false
             view?.model = .init(
                 chatFile: file,
-                txStatus: model.txStatus
+                txStatus: model.txStatus,
+                isDuplicate: isDuplicate
             )
             view?.buttonActionHandler = { [weak self, file, model] in
                 self?.actionHandler(
