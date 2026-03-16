@@ -336,6 +336,15 @@ For any non-trivial change, report exactly what was run.
 - Update localization strings when adding new user-facing text
 - Update all supported languages or mark missing translations with English fallback
 
+## AI Agent Workflow Notes
+
+When working with GitHub CLI (`gh`) or other command-line tools that require long text inputs:
+
+- Use `.ai/temp/` directory for temporary markdown files (issue descriptions, PR descriptions, etc.)
+- This directory is gitignored and safe for AI agent temporary files
+- Example: create `.ai/temp/pr-description.md` and use `gh pr create --body-file .ai/temp/pr-description.md`
+- This avoids command-line length limitations and shell escaping issues
+
 ## Documentation Drift Policy
 
 When behavior and docs diverge:
