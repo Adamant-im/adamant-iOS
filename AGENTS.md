@@ -4,7 +4,7 @@ This document defines how AI agents must work in this repository.
 
 ## Mission
 
-ADAMANT iOS is the native iOS client for ADAMANT Messenger, available on the App Store and supporting iPhone and iPad devices.
+ADAMANT iOS is the native iOS client for ADAMANT Messenger, available on the App Store and supporting iPhone, iPad, and Mac devices with Apple Silicon (M-series processors).
 
 Agent output must optimize for:
 
@@ -60,6 +60,7 @@ Use these sources when implementing or reviewing changes:
 - ADAMANT docs: <https://docs.adamant.im>
 - Node/API schema: <https://schema.adamant.im> and <https://github.com/Adamant-im/adamant-schema>
 - AIPs: <https://aips.adamant.im> and <https://github.com/Adamant-im/AIPs>
+- Wallet parameters and configuration: <https://github.com/Adamant-im/adamant-wallets>
 
 If sources disagree:
 
@@ -166,6 +167,7 @@ Wallet architecture:
 - Wallet API services with node failover: `*ApiService.swift` files in wallet modules
 - Wallet UI factories: `*WalletFactory.swift` files in wallet modules
 - Shared wallet models and utilities: `AdamantWalletsKit/Sources/AdamantWalletsKit/`
+- Wallet parameters (nodes, fees, etc.) are shared across ADAMANT applications and sourced from: <https://github.com/Adamant-im/adamant-wallets>
 
 Node and service architecture:
 
