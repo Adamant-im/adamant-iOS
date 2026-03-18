@@ -62,7 +62,7 @@ struct NotificationPresenterView: View {
 }
 extension NotificationPresenterView {
     fileprivate func processGeometry(_ geometry: GeometryProxy) -> some View {
-        return Color.init(uiColor: .adamant.swipeBlockColor)
+        return InteractiveBackgroundView(color: .adamant.swipeBlockColor)
             .cornerRadius(10)
     }
     fileprivate func onTap() {
