@@ -159,16 +159,16 @@ protocol AccountService: AnyObject, Sendable {
     func update(resetBalanceAndUpdate: Bool, updateOnlyADM: Bool, updateOnlyVisible: Bool)
 
     /// Login into Adamant using passphrase.
-    func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult
+    func loginWith(passphrase: String, password: String) async throws
 
     /// Login into Adamant using previously logged account
-    func loginWithStoredAccount() async throws -> AccountServiceResult
+    func loginWithStoredAccount() async throws
 
     /// Logout
     @MainActor func logout() async
 
     /// Reload current wallets state
-    func reloadWallets() async
+    //func reloadWallets() async
 
     // MARK: Stay in functions
 

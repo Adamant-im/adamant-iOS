@@ -83,7 +83,7 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             }.store(in: &subscriptions)
         
         setupSecureStore()
-    }    
+    }
 }
 
 // MARK: - Saved data
@@ -302,7 +302,7 @@ extension AdamantAccountService {
 extension AdamantAccountService {
     // MARK: Passphrase
     @MainActor
-    func loginWith(passphrase: String, password: String) async throws -> AccountServiceResult {
+    func loginWith(passphrase: String, password: String) async throws {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
             throw AccountServiceError.invalidPassphrase
         }
@@ -311,7 +311,7 @@ extension AdamantAccountService {
             throw AccountServiceError.internalError(message: "Failed to generate keypair for passphrase", error: nil)
         }
         
-        let account = try await loginWith(keypair: keypair)
+        try await loginWith(keypair: keypair)
         
         // MARK: Drop saved accs
         if let storedPassphrase = self.getSavedPassphrase(),
@@ -326,16 +326,11 @@ extension AdamantAccountService {
             dropSavedAccount()
         }
         
-        // Update and initiate wallet services
         self.passphrase = passphrase
-        
-        _ = await initWallets()
-        
-        return .success(account: account, alert: nil)
     }
     
     // MARK: Pincode
-    func loginWith(pincode: String) async throws -> AccountServiceResult {
+    func loginWith(pincode: String) async throws {
         guard let storePin = SecureStore.get(.pin) else {
             throw AccountServiceError.invalidPassphrase
         }
@@ -344,12 +339,12 @@ extension AdamantAccountService {
             throw AccountServiceError.invalidPassphrase
         }
         
-        return try await loginWithStoredAccount()
+        try await loginWithStoredAccount()
     }
     
     // MARK: Biometry
     @MainActor
-    func loginWithStoredAccount() async throws -> AccountServiceResult {
+    func loginWithStoredAccount() async throws {
         if let passphrase = getSavedPassphrase() {
             let account = try await loginWith(passphrase: passphrase, password: .empty)
             return account
@@ -373,68 +368,59 @@ extension AdamantAccountService {
                 wallet.core.setInitiationFailed(reason: .adamant.accountService.reloginToInitiateWallets)
             }
             
-            return .success(account: account, alert: alert)
         }
         
         throw AccountServiceError.invalidPassphrase
     }
     
     // MARK: Keypair
-    private func loginWith(keypair: Keypair) async throws -> AdamantAccount {
+    private func loginWith(keypair: Keypair) async throws {
         switch state {
-            case .isLoggingIn:
-                throw AccountServiceError.internalError(message: "Service is busy", error: nil)
-                
-                // Logout first
-            case .updating, .loggedIn:
-                await logout()
-                
-                // Go login
-            case .notLogged:
-                break
+        case .isLoggingIn:
+            throw AccountServiceError.internalError(message: "Service is busy", error: nil)
+            
+            // Logout first
+        case .updating, .loggedIn:
+            await logout()
+            
+            // Go login
+        case .notLogged:
+            break
         }
         
         state = .isLoggingIn
         
+        let address = adamantCore.getAddressFromPublicKey(keypair.publicKey)
+        self.keypair = keypair
+        //self.address = address
+        
+        let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: address]
+        NotificationCenter.default.post(
+            name: Notification.Name.AdamantAccountService.userLoggedIn,
+            object: self,
+            userInfo: userInfo
+        )
+        
+        self.state = .loggedIn
         do {
-            let account = try await apiService.getAccount(byPublicKey: keypair.publicKey).get()
-            self.account = account
-            self.keypair = keypair
-            markBalanceAsFresh()
-            
-            let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
-            
-            NotificationCenter.default.post(
-                name: Notification.Name.AdamantAccountService.userLoggedIn,
-                object: self,
-                userInfo: userInfo
-            )
-            
-            self.state = .loggedIn
-            return account
-        } catch let error as ApiServiceError {
-            self.state = .notLogged
-            
-            switch error {
-                case .accountNotFound:
-                    throw AccountServiceError.wrongPassphrase
-                    
-                default:
-                    throw AccountServiceError.apiError(error: error)
+            Task.detached(priority: .medium) { [weak self] in
+                guard let self else { return }
+                do {
+                    let fetchedAccount = try await self.apiService.getAccount(byPublicKey: keypair.publicKey).get()
+                    self.account = fetchedAccount
+                    markBalanceAsFresh()
+                    await initWallets()
+                } catch {
+                    throw AccountServiceError.internalError(message: "Failed to fetch account in background", error: error)
+                }
             }
-        } catch {
-            throw AccountServiceError.internalError(message: error.localizedDescription, error: error)
         }
     }
     
-    func reloadWallets() async {
-        _ = await initWallets()
-    }
-    
-    func initWallets() async -> [WalletAccount?] {
+    func initWallets() async {
         guard let passphrase = passphrase else {
             print("No passphrase found")
-            return []
+            return
         }
         
         return await withTaskGroup(of: WalletAccount?.self) { group in
@@ -453,8 +439,6 @@ extension AdamantAccountService {
             for await wallet in group {
                 wallets.append(wallet)
             }
-            
-            return wallets
         }
     }
 }

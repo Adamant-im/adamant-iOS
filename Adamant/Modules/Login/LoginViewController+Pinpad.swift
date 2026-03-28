@@ -68,8 +68,16 @@ extension LoginViewController {
 
         Task {
             do {
-                let result = try await accountService.loginWithStoredAccount()
-                handleSavedAccountLoginResult(result)
+                try await accountService.loginWithStoredAccount()
+                dialogService.dismissProgress()
+
+                guard let presenter = presentingViewController else {
+                    return
+                }
+
+                presenter.dismiss(animated: true, completion: nil)
+
+                presentUpdateV12AlertIfNeeded(presenter: presenter)
             } catch {
                 dialogService.showRichError(error: error)
 
@@ -80,36 +88,16 @@ extension LoginViewController {
         }
     }
 
-    private func handleSavedAccountLoginResult(_ result: AccountServiceResult) {
-        switch result {
-        case .success(_, let alert):
-            dialogService.dismissProgress()
-
-            let alertVc: UIAlertController?
-            if let alert = alert {
-                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyleSafe: .alert, source: nil)
-                alertVc!.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
-            } else {
-                alertVc = nil
-            }
-
-            guard let presenter = presentingViewController else {
-                return
-            }
-            presenter.dismiss(animated: true, completion: nil)
-
-            if let alertVc = alertVc {
-                alertVc.modalPresentationStyle = .overFullScreen
-                presenter.present(alertVc, animated: true, completion: nil)
-            }
-
-        case .failure(let error):
-            dialogService.showRichError(error: error)
-
-            if let pinpad = presentedViewController as? PinpadViewController {
-                pinpad.clearPin()
-            }
-        }
+    private func presentUpdateV12AlertIfNeeded(presenter: UIViewController) {
+        let alertVc = UIAlertController(
+            title: String.adamant.accountService.updateAlertTitleV12,
+            message: String.adamant.accountService.updateAlertMessageV12,
+            preferredStyleSafe: .alert,
+            source: nil
+        )
+        alertVc.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
+        alertVc.modalPresentationStyle = .overFullScreen
+        presenter.present(alertVc, animated: true, completion: nil)
     }
 }
 
