@@ -113,3 +113,6 @@ profiles
 Generated/
 .swiftpm/
 adamant-cli
+
+### AI ###
+.ai/temp/
