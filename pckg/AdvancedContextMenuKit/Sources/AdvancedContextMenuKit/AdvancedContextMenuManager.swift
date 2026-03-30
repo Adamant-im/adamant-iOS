@@ -14,7 +14,8 @@ public final class AdvancedContextMenuManager: NSObject {
     private var viewModel: ContextMenuOverlayViewModel?
     private var viewModelMac: ContextMenuOverlayViewModelMac?
     private var vcOverlay: UIViewController?
-    private let window = TransparentWindow(frame: UIScreen.main.bounds)
+    private var window: TransparentWindow?
+    private weak var sourceView: UIView?
     private var locationOnScreen: CGPoint = .zero
     private var getPositionOnScreen: (() -> CGPoint)?
     private var messageId: String = ""
@@ -33,6 +34,7 @@ public final class AdvancedContextMenuManager: NSObject {
         self.messageId = arg.messageId
         self.locationOnScreen = arg.location
         self.getPositionOnScreen = arg.getPositionOnScreen
+        self.sourceView = arg.copyView
 
         let containerCopyView = ContanierPreviewView(
             contentView: arg.copyView,
@@ -160,12 +162,68 @@ extension AdvancedContextMenuManager {
     }
 
     fileprivate func present(vc: UIViewController) {
+        let window = getWindow(for: sourceView)
         window.rootViewController = vc
         window.makeKeyAndVisible()
 
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         didPresentMenuAction?(messageId)
         vcOverlay = vc
+    }
+
+    fileprivate func getWindow(for sourceView: UIView?) -> TransparentWindow {
+        let scene = sourceView?.window?.windowScene ?? getActiveWindowScene()
+
+        if let scene {
+            if let window, window.windowScene === scene {
+                configure(window: window, scene: scene)
+                return window
+            }
+
+            tearDownWindow()
+            let window = TransparentWindow(windowScene: scene)
+            configure(window: window, scene: scene)
+            self.window = window
+            return window
+        }
+
+        if let window {
+            configure(window: window, frame: UIScreen.main.bounds)
+            return window
+        }
+
+        let window = TransparentWindow(frame: UIScreen.main.bounds)
+        configure(window: window, frame: UIScreen.main.bounds)
+        self.window = window
+        return window
+    }
+
+    fileprivate func getActiveWindowScene() -> UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+
+        return scenes.first {
+            $0.activationState == .foregroundActive
+                && $0.windows.contains(where: \.isKeyWindow)
+        }
+        ?? scenes.first(where: { $0.activationState == .foregroundActive })
+        ?? scenes.first(where: { $0.windows.contains(where: \.isKeyWindow) })
+        ?? scenes.first
+    }
+
+    fileprivate func configure(window: TransparentWindow, scene: UIWindowScene) {
+        configure(window: window, frame: scene.coordinateSpace.bounds)
+    }
+
+    fileprivate func configure(window: TransparentWindow, frame: CGRect) {
+        window.frame = frame
+        window.backgroundColor = .clear
+    }
+
+    fileprivate func tearDownWindow() {
+        window?.rootViewController = nil
+        window?.isHidden = true
+        window = nil
     }
 
     fileprivate func getMenuVC(content: AMenuSection) -> AMenuViewController {
@@ -202,12 +260,13 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
     func didDissmis() {
         didDismissMenuAction?(messageId)
         getPositionOnScreen = nil
+        sourceView = nil
+        vcOverlay = nil
         // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
             // TODO: Bug - Occasionally, the copied content view disappears faster than the original view is presented. Fix it later.
             try await Task.sleep(interval: 0.1)
-            window.rootViewController = nil
-            window.isHidden = true
+            tearDownWindow()
         }
     }
 
